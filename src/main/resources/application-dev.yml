@@ -1,4 +1,13 @@
 spring:
+  # H2 Web 控制台（仅 dev 环境开启）
+  h2:
+    console:
+      enabled: true
+      # 访问路径：http://localhost:9666/h2-console
+      path: /h2-console
+      # 允许后台以 iframe 方式嵌入控制台
+      settings:
+        web-allow-others: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     # 内存 H2 数据库
@@ -20,5 +29,3 @@ spring:
       max-lifetime: 1200000
       # 从池中返回的连接的默认自动提交行为
       auto-commit: true
-      # 禁止在应用启动阶段因获取数据库连接失败而抛出异常或阻止应用启动
-      initialization-fail-timeout: -1
