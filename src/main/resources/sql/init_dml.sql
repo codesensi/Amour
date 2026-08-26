@@ -23,7 +23,7 @@ FROM (VALUES (1, 'boy', '$2a$10$U.k0b43Pwg./Jg2QQl4bMOukItbYg4aYhKsciMamtHWvp3JE
               '110101200001010002',
               'girl@amour.com', '13800000000', 'https://api.dicebear.com/7.x/bottts/svg?seed=suser',
               '女孩儿')) AS t(id, username, password, nickname, id_card, email, phone, avatar, remark)
-WHERE NOT EXISTS (SELECT 1 FROM `sys_user` WHERE `sys_user`.id = v.id);
+WHERE NOT EXISTS (SELECT 1 FROM `sys_user` WHERE `sys_user`.id = t.id);
 
 
 SET
