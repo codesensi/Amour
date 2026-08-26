@@ -20,8 +20,13 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    // JDBC + HikariCP 数据源（Spring Boot 4 需显式引入才具备 DataSource/Hikari 自动配置）
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    // MyBatis-Flex ORM（Spring Boot 4 专用 starter）
+    implementation 'com.mybatis-flex:mybatis-flex-spring-boot4-starter:1.11.8'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+    runtimeOnly 'com.h2database:h2'
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
     testCompileOnly 'org.projectlombok:lombok'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

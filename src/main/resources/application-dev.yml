@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    # 内存 H2 数据库
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:./data/amour_dev;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    # HikariCP 连接池
+    hikari:
+      # 客户端从连接池等待连接的最大毫秒数
+      connection-timeout: 20000
+      # 连接池中维护的最小空闲连接数
+      minimum-idle: 10
+      # 最大连接池数大小
+      maximum-pool-size: 50
+      # 允许一个连接在连接池中闲置的最大毫秒数
+      idle-timeout: 300000
+      # 池中连接关闭后的最长生存毫秒数
+      max-lifetime: 1200000
+      # 从池中返回的连接的默认自动提交行为
+      auto-commit: true
+      # 禁止在应用启动阶段因获取数据库连接失败而抛出异常或阻止应用启动
+      initialization-fail-timeout: -1

@@ -38,3 +38,4 @@ out/
 
 /.reasonix/
 /reasonix.toml
+/logs/

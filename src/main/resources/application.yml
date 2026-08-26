@@ -1,3 +1,37 @@
+server:
+  port: 9666
+  # 开启优雅停机
+  shutdown: graceful
+
+# logback日志配置
+logging:
+  pattern:
+    dateformat: yyyy-MM-dd HH:mm:ss.SSS
+    console: '%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%t]){faint} [${spring.profiles.active}] [%X{traceId:-}] %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n'
+    file: '%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN:%5p} ${PID:- } --- [%t] [${spring.profiles.active}] [%X{traceId:-}] %-40.40logger{39} : %m%n'
+  file:
+    name: ./logs/${spring.application.name}_${spring.profiles.active}.log
+  logback:
+    rollingpolicy:
+      file-name-pattern: ${logging.file.name}.%d.%i.log
+      max-file-size: 100MB
+      max-history: 180
+  level:
+    org.zalando.logbook.Logbook: TRACE
+
 spring:
   application:
-    name: Amour
+    name: amour
+  lifecycle:
+    # 优雅停机最大等待时间
+    timeout-per-shutdown-phase: 60s
+  profiles:
+    active: dev
+
+# mybatis-flex配置
+mybatis-flex:
+  global-config:
+    key-config:
+      key-type: generator
+      value: snowFlakeId
+    logic-delete-column: del_flag
