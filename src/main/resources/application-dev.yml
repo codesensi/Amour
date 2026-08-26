@@ -1,13 +1,4 @@
 spring:
-  # H2 Web 控制台（仅 dev 环境开启）
-  h2:
-    console:
-      enabled: true
-      # 访问路径：http://localhost:9666/h2-console
-      path: /h2-console
-      # 允许后台以 iframe 方式嵌入控制台
-      settings:
-        web-allow-others: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     # H2 文件数据库
@@ -40,3 +31,16 @@ spring:
       data-locations: classpath:sql/init_dml.sql
       # 执行失败立即报错终止启动
       continue-on-error: false
+  # H2 Web 控制台（仅 dev 环境开启）
+  h2:
+    console:
+      enabled: true
+      # 访问路径：http://localhost:9666/h2-console
+      path: /h2-console
+      # 允许后台以 iframe 方式嵌入控制台
+      settings:
+        web-allow-others: true
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=1000,recordStats
