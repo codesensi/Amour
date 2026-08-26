@@ -3,6 +3,15 @@ server:
   # 开启优雅停机
   shutdown: graceful
 
+spring:
+  application:
+    name: amour
+  lifecycle:
+    # 优雅停机最大等待时间
+    timeout-per-shutdown-phase: 60s
+  profiles:
+    active: dev
+
 # logback日志配置
 logging:
   pattern:
@@ -18,15 +27,6 @@ logging:
       max-history: 180
   level:
     org.zalando.logbook.Logbook: TRACE
-
-spring:
-  application:
-    name: amour
-  lifecycle:
-    # 优雅停机最大等待时间
-    timeout-per-shutdown-phase: 60s
-  profiles:
-    active: dev
 
 # mybatis-flex配置
 mybatis-flex:

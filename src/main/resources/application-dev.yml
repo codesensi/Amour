@@ -10,7 +10,7 @@ spring:
         web-allow-others: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    # 内存 H2 数据库
+    # H2 文件数据库
     driver-class-name: org.h2.Driver
     url: jdbc:h2:./data/amour_dev;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     username: sa
@@ -29,3 +29,14 @@ spring:
       max-lifetime: 1200000
       # 从池中返回的连接的默认自动提交行为
       auto-commit: true
+  # 启动时执行初始化脚本：先建表（schema），再填充数据（data）
+  sql:
+    init:
+      # 每次启动都执行
+      mode: always
+      # 建表脚本
+      schema-locations: classpath:sql/init_ddl.sql
+      # 数据填充脚本
+      data-locations: classpath:sql/init_dml.sql
+      # 执行失败立即报错终止启动
+      continue-on-error: false
