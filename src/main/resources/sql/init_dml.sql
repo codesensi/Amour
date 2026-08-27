@@ -16,13 +16,10 @@ SELECT t.id,
        t.phone,
        t.avatar,
        t.remark
-FROM (VALUES (1, 'boy', '$2a$10$U.k0b43Pwg./Jg2QQl4bMOukItbYg4aYhKsciMamtHWvp3JEF2ism', '男孩儿',
+FROM (VALUES (1, 'admin', '$2a$10$U.k0b43Pwg./Jg2QQl4bMOukItbYg4aYhKsciMamtHWvp3JEF2ism', '超级管理员',
               '110101200001010001',
-              'boy@amour.com', '18900000000', 'https://api.dicebear.com/7.x/bottts/svg?seed=sadmin', '男孩儿'),
-             (2, 'girl', '$2a$10$U.k0b43Pwg./Jg2QQl4bMOukItbYg4aYhKsciMamtHWvp3JEF2ism', '女孩儿',
-              '110101200001010002',
-              'girl@amour.com', '13800000000', 'https://api.dicebear.com/7.x/bottts/svg?seed=suser',
-              '女孩儿')) AS t(id, username, password, nickname, id_card, email, phone, avatar, remark)
+              'admin@amour.com', '18900000000', 'https://api.dicebear.com/7.x/bottts/svg?seed=admin',
+              '超级管理员')) AS t(id, username, password, nickname, id_card, email, phone, avatar, remark)
 WHERE NOT EXISTS (SELECT 1 FROM `sys_user` WHERE `sys_user`.id = t.id);
 
 
