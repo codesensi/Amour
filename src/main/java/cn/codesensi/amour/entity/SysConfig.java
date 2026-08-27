@@ -55,7 +55,7 @@ public class SysConfig extends BaseEntity implements Serializable {
     /**
      * 是否启用:1-启用,0-停用
      */
-    private Integer isActive;
+    private Integer status;
 
     /**
      * 备注
