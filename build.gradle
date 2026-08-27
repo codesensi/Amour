@@ -1,44 +1,64 @@
+// ===== 插件相关 =====
 plugins {
+    // Java 基础插件：提供编译、打包（jar）、测试等标准任务
     id 'java'
+    // Spring Boot 插件：管理可执行 jar 的打包与 Spring Boot 启动
     id 'org.springframework.boot' version '4.1.1'
+    // Spring 依赖管理插件：结合 BOM 统一管理 Spring 系依赖版本
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
-group = 'cn.codesensi'
-version = '0.0.1-SNAPSHOT'
-description = 'Amour'
+// ===== 项目基本信息 =====
+group = 'cn.codesensi'          // Maven 坐标的 group（包名基础）
+version = '0.0.1-SNAPSHOT'      // 项目版本（SNAPSHOT 表示开发中版本）
+description = 'Amour'           // 项目描述
 
+// ===== Java 工具链（编译/运行所需的 JDK 版本） =====
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(21)  // 使用 JDK 21
     }
 }
 
+// ===== 依赖仓库：从 Maven 中央仓库拉取依赖 =====
 repositories {
     mavenCentral()
 }
 
+// ===== 依赖声明 =====
+// 排序规则：按依赖作用域（scope）分组；组内按依赖坐标字母序排列，便于快速定位与维护。
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
-    // JDBC + HikariCP 数据源（Spring Boot 4 需显式引入才具备 DataSource/Hikari 自动配置）
-    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-    // H2 Web 控制台自动配置（Spring Boot 4 拆分出的独立模块，需显式引入）
-    implementation 'org.springframework.boot:spring-boot-h2console'
-    // MyBatis-Flex ORM（Spring Boot 4 专用 starter）
-    implementation 'com.mybatis-flex:mybatis-flex-spring-boot4-starter:1.11.8'
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    runtimeOnly 'com.h2database:h2'
-    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-    testCompileOnly 'org.projectlombok:lombok'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testAnnotationProcessor 'org.projectlombok:lombok'
-    implementation 'org.springframework.boot:spring-boot-starter-cache'
-    implementation 'com.github.ben-manes.caffeine:caffeine'
-    implementation("org.lionsoul:ip2region:3.3.7")
-    implementation("org.zalando:logbook-spring-boot-starter:4.1.0")
+    // ---------- 实现期依赖（implementation）：编译 + 运行都需要 ----------
+    // Spring Boot 相关
+    implementation 'org.springframework.boot:spring-boot-starter-cache'    // Spring Cache 抽象
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'     // JDBC + HikariCP 数据源（Spring Boot 4 需显式引入才具备自动配置）
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'   // Spring Web（MVC）Starter：提供 Web 开发能力
+    implementation 'org.springframework.boot:spring-boot-h2console'        // H2 Web 控制台自动配置
+    // 第三方框架 / 库（按坐标字母序）
+    implementation 'com.github.ben-manes.caffeine:caffeine'                // Caffeine 本地缓存实现
+    implementation 'com.mybatis-flex:mybatis-flex-spring-boot4-starter:1.11.8'  // MyBatis-Flex ORM
+    implementation 'org.mapstruct:mapstruct:1.6.3'                         // MapStruct：编译期生成 Bean 映射代码
+    implementation 'org.lionsoul:ip2region:3.3.7'                          // 工具库：IP 归属地查询
+    implementation 'org.zalando:logbook-spring-boot-starter:4.1.0'         // 日志：HTTP 请求/响应日志
+
+    // ---------- 编译期依赖（compileOnly）：仅编译时需要，不打入最终产物 ----------
+    compileOnly 'org.projectlombok:lombok'                                 // Lombok：编译期生成 getter/setter 等样板代码
+
+    // ---------- 注解处理器（annotationProcessor）：编译期参与代码生成 ----------
+    annotationProcessor 'org.projectlombok:lombok'                         // Lombok 注解处理器
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'          // MapStruct 注解处理器（扫描 @Mapper 生成实现类）
+
+    // ---------- 运行期依赖（runtimeOnly）：仅运行时需要 ----------
+    runtimeOnly 'com.h2database:h2'                                        // H2 内存数据库
+
+    // ---------- 测试依赖（test*）：仅测试场景使用 ----------
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'  // Web 测试 Starter
+    testCompileOnly 'org.projectlombok:lombok'                             // 测试期 Lombok 依赖
+    testAnnotationProcessor 'org.projectlombok:lombok'                     // 测试期 Lombok 注解处理器
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'           // JUnit Platform 启动器
 }
 
+// ===== 测试任务配置 =====
 tasks.named('test') {
-    useJUnitPlatform()
+    useJUnitPlatform()  // 使用 JUnit Platform（JUnit 5）运行测试
 }
