@@ -35,4 +35,12 @@ public interface ConfigService {
      * @return 整数配置值；不存在或停用返回 {@code 0}
      */
     int getInt(String key);
+
+    /**
+     * 读取长整数配置。
+     *
+     * @param key 配置键（app 之下的点分路径）
+     * @return 长整数配置值；不存在或停用返回 {@code 0L}
+     */
+    long getLong(String key);
 }

@@ -67,6 +67,19 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     /**
+     * 按键读取长整数配置。
+     * <p>配置缺失或停用时返回 {@code 0L}（对 null 安全，不会抛出解析异常）。
+     *
+     * @param key 配置键（app 之下的点分路径，如 {@code captcha.image-expire}）
+     * @return 长整数配置值；不存在/停用返回 {@code 0L}
+     */
+    @Override
+    public long getLong(String key) {
+        String value = raw(key);
+        return value == null ? 0L : Long.parseLong(value);
+    }
+
+    /**
      * 从 sys_config 表查询指定配置键当前启用（status=启用）的配置值。
      *
      * @param key 配置键
