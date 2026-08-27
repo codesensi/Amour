@@ -36,6 +36,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'com.github.ben-manes.caffeine:caffeine'
     implementation("org.lionsoul:ip2region:3.3.7")
+    implementation("org.zalando:logbook-spring-boot-starter:4.1.0")
 }
 
 tasks.named('test') {

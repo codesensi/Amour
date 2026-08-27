@@ -35,3 +35,23 @@ mybatis-flex:
       key-type: generator
       value: snowFlakeId
     logic-delete-column: del_flag
+
+# Logbook配置
+logbook:
+  write:
+    # body 最大记录长度，超出部分用 ... 截断
+    max-body-size: 2000
+  obfuscate:
+    # 混淆内容替换字符串
+    replacement: "***"
+    # 需要混淆的 HTTP Header 名称列表
+    headers:
+      - Authorization
+      - cookie
+    # 需要混淆的 JSON Body 字段名称列表
+    json-body-fields:
+      - accessToken
+      - password
+      - oldPassword
+      - newPassword
+      - confirmPassword
