@@ -52,6 +52,10 @@ app:
       - name: captcha
         expire-after-write: 300
         expire-after-access: 0
+      - name: config
+        # 驻留不自动过期，热更新依赖写库侧调用 ConfigService.evict/evictAll 失效
+        expire-after-write: 0
+        expire-after-access: 0
   # 安全配置
   security:
     # 请求缓存限制 5M

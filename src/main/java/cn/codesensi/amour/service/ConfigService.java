@@ -43,4 +43,21 @@ public interface ConfigService {
      * @return 长整数配置值；不存在或停用返回 {@code 0L}
      */
     long getLong(String key);
+
+    /**
+     * 失效指定配置键对应的缓存。
+     * <p>
+     * 供写库侧（如管理端新增/修改/停用 sys_config）在数据变更后调用，立即清除该配置键的缓存，
+     * 从而在"驻留不过期"的缓存策略下仍能实现热更新。
+     *
+     * @param key 配置键（app 之下的点分路径）
+     */
+    void evict(String key);
+
+    /**
+     * 失效全部配置缓存。
+     * <p>
+     * 批量变更（如初始化、导入）后调用，清空整个 config 缓存。
+     */
+    void evictAll();
 }
