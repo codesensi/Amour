@@ -44,7 +44,7 @@ spring:
     type: caffeine
 
 # 自定义缓存配置（单位：秒）
-# caches 中 name 为基础缓存名，实际注册时会自动拼接「项目名_运行环境」前缀（见 CacheNameUtil）
+# caches 中 name 为基础缓存名，实际注册时会自动拼接「项目名_运行环境」前缀（见 CacheUtil）
 app:
   cache:
     max-size: 1000

@@ -1,9 +1,9 @@
 package cn.codesensi.amour.config;
 
+import cn.codesensi.amour.context.AppEnvContext;
 import cn.codesensi.amour.util.CacheUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
@@ -25,12 +25,17 @@ public class CacheConfig {
 
     /**
      * 构建缓存管理器，依据 yml 配置逐个注册缓存。
+     * <p>
+     * 通过 {@code @Bean} 方法参数注入 {@link AppEnvContext}：Spring 在调用本方法前会先装配该
+     * 参数对应的 Bean，从而保证 {@link AppEnvContext#getInstance()} 已就绪，调用
+     * {@link CacheUtil#withAppEnv(String)} 拼接前缀时不会拿到 null。
      *
-     * @param props        缓存配置属性
+     * @param appEnvContext 应用环境上下文（仅用于触发其提前装配，保证静态实例可用）
+     * @param props         缓存配置属性
      * @return 缓存管理器
      */
     @Bean
-    public CacheManager cacheManager(CacheProperties props) {
+    public CacheManager cacheManager(AppEnvContext appEnvContext, CacheProperties props) {
         CaffeineCacheManager manager = new CaffeineCacheManager();
         manager.setCaffeine(Caffeine.newBuilder()
                 .maximumSize(props.getMaxSize())

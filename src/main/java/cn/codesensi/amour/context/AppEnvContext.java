@@ -20,6 +20,13 @@ import org.springframework.util.StringUtils;
 public class AppEnvContext {
 
     /**
+     * 由 Spring 装配后自持的静态实例，供 {@link cn.codesensi.amour.util.CacheUtil} 等
+     * 非 Spring 管理（未加 {@code @Component}）的静态工具类读取当前环境信息。
+     * 构造器执行完成后即被赋值，此后不再变化。
+     */
+    private static AppEnvContext INSTANCE;
+
+    /**
      * Spring 配置项 {@code spring.application.name} 的键名，用于读取项目名。
      */
     public static final String SPRING_APPLICATION_NAME = "spring.application.name";
@@ -70,6 +77,20 @@ public class AppEnvContext {
             this.activeProfileStr = StringUtils.arrayToCommaDelimitedString(this.activeProfiles);
         }
         this.firstActiveProfile = this.activeProfiles.length > 0 ? this.activeProfiles[0] : DEFAULT_ACTIVE_PROFILE;
+        // 暴露为静态实例，供非 Spring 管理的静态工具类读取
+        AppEnvContext.INSTANCE = this;
+    }
+
+    /**
+     * 获取由 Spring 装配完成的 {@link AppEnvContext} 静态实例。
+     * <p>
+     * 仅在应用启动、该组件被 Spring 实例化之后调用才有值；在 {@code @Bean} 方法参数
+     * 或已注入该组件的地方调用可保证其已就绪，返回不为 null。
+     *
+     * @return 应用环境上下文的静态实例
+     */
+    public static AppEnvContext getInstance() {
+        return INSTANCE;
     }
 
 }
