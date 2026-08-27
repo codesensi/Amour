@@ -1,7 +1,6 @@
 package cn.codesensi.amour.util;
 
 import cn.codesensi.amour.context.AppEnvContext;
-import org.springframework.stereotype.Component;
 
 /**
  * 缓存工具类。
@@ -13,8 +12,9 @@ import org.springframework.stereotype.Component;
  * 运行环境取当前激活的 profile）。例如项目名 {@code amour}、环境 {@code dev} 时，
  * {@code withAppEnv("captcha")} 返回 {@code amour_dev_captcha}。
  * <p>
- * 本类为 Spring 容器管理的组件，须在 {@link AppEnvContext} 装配完成后再使用
- * （应用启动后即可）；缓存名通过静态方法 {@link #withAppEnv(String)} 统一获取。
+ * 静态前缀 {@code appEnv} 的初始化依赖 Spring 容器在启动阶段注入 {@link AppEnvContext}：
+ * 即通过构造器首次装配时完成拼接，因此须在应用启动完成、{@link AppEnvContext} 就绪后
+ * 再调用静态方法 {@link #withAppEnv(String)} 获取拼接后的缓存名。
  */
 public class CacheUtil {
 
@@ -24,12 +24,13 @@ public class CacheUtil {
     private static final String SEPARATOR = "_";
 
     /**
-     * 「项目名_运行环境」，如 {@code amour_dev}。
+     * 「项目名_运行环境」，如 {@code amour_dev}；
+     * 由构造器在 Spring 注入 {@link AppEnvContext} 时初始化，之后不再变化。
      */
     private static String appEnv;
 
     /**
-     * 从 {@link AppEnvContext} 读取项目名与运行环境，初始化静态前缀。
+     * 从 {@link AppEnvContext} 读取项目名与运行环境，初始化静态前缀 {@link #appEnv}。
      *
      * @param appEnvContext 应用环境上下文
      */

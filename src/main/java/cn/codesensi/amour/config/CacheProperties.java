@@ -8,12 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 缓存配置属性，可从 yml（{@code app.cache.*}）绑定。
+ * 缓存配置属性，可从 yml（前缀 {@code app.cache.*}）绑定，由 {@link CacheConfig} 消费。
  * <p>
- * 其中每个缓存的过期时间单位统一为「秒」，取先到者生效
- * {@code expireAfterWrite} 为写入后过期
- * {@code expireAfterAccess} 为访问后过期
- * {@code 0} 表示该维度不限
+ * 过期时间单位统一为「秒」，支持写入后与访问后两个维度，取先到者生效：
+ * <ul>
+ *   <li>{@code expireAfterWrite} 为写入后过期时间；</li>
+ *   <li>{@code expireAfterAccess} 为访问后过期时间；</li>
+ *   <li>{@code 0} 表示该维度不限制。</li>
+ * </ul>
  */
 @Data
 @ConfigurationProperties(prefix = "app.cache")

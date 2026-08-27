@@ -17,12 +17,38 @@ public class Result<T> implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * 是否成功；由 {@link ResultCode#SUCCESS} 的 code 值（200）判定。
+     */
     private boolean success;
+
+    /**
+     * 业务状态码，语义同 {@link ResultCode}。
+     */
     private int code;
+
+    /**
+     * 面向终端的可读提示信息。
+     */
     private String msg;
+
+    /**
+     * 响应数据（可选，失败或无数据时为 null）。
+     */
     private T data;
+
+    /**
+     * 响应生成时间戳（毫秒，epoch 纪元）。
+     */
     private long timestamp;
 
+    /**
+     * 私有构造器：仅允许通过下方静态工厂方法创建实例。
+     *
+     * @param code 业务状态码
+     * @param msg  提示信息
+     * @param data 响应数据
+     */
     private Result(int code, String msg, T data) {
         this.success = code == ResultCode.SUCCESS.getCode();
         this.code = code;
