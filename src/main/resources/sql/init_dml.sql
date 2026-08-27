@@ -35,7 +35,6 @@ WHERE NOT EXISTS (
 
 -- ============================================
 -- 数据填充：sys_config（幂等插入）
--- 说明：app.cache.* 与 app.security.request-cache-limit 仍保留在 yml 配置，不入库。
 -- ============================================
 INSERT INTO `sys_config` (
     `id`, `key`, `value`, `type`, `group`, `status`, `remark`
