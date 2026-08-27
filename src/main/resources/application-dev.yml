@@ -44,28 +44,14 @@ spring:
     type: caffeine
 
 # 自定义缓存配置（单位：秒）
-# caches 中 name 为基础缓存名，实际注册时会自动拼接「项目名_运行环境」前缀（见 CacheUtil）
 app:
-  demo-mode: false
+  # caches 中 name 为基础缓存名，实际注册时会自动拼接「项目名_运行环境」前缀（见 CacheUtil）
   cache:
     max-size: 1000
     caches:
       - name: captcha
         expire-after-write: 300
         expire-after-access: 0
-  # 验证码配置
-  captcha:
-    enabled: false
-    # 验证码类型
-    type: image
-    # 图形验证码类型，验证码类型为图形时需配置
-    image-type: arithmetic
-    # 图形验证码过期时间，单位秒。5分钟
-    image-expire: 300
-    # 短信验证码过期时间，单位秒。15 分钟
-    sms-expire: 900
-    # 短信验证码长度
-    sms-length: 6
   # 安全配置
   security:
     # 请求缓存限制 5M

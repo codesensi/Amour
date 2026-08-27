@@ -1,0 +1,65 @@
+package cn.codesensi.amour.entity;
+
+import cn.codesensi.amour.common.core.BaseEntity;
+import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.Table;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+
+import java.io.Serial;
+import java.io.Serializable;
+
+/**
+ * 系统配置实体。
+ * <p>
+ * 存储 {@code app.*} 业务可调配置，运行期由 {@code ConfigService} 实时查库读取（热更新）。
+ */
+@Data
+@Accessors(chain = true)
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+@Table("sys_config")
+public class SysConfig extends BaseEntity implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * 主键ID
+     */
+    @Id
+    private Long id;
+
+    /**
+     * 配置键（app 之下的点分路径，如 captcha.sms-expire）
+     */
+    private String configKey;
+
+    /**
+     * 配置值（统一字符串存储）
+     */
+    private String configValue;
+
+    /**
+     * 值类型:STRING,INTEGER,LONG,BOOLEAN
+     */
+    private String valueType;
+
+    /**
+     * 分组（app 的一级子项，如 name、captcha 等）
+     */
+    private String configGroup;
+
+    /**
+     * 是否启用:1-启用,0-停用
+     */
+    private Integer isActive;
+
+    /**
+     * 备注
+     */
+    private String remark;
+
+}
