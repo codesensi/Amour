@@ -1,5 +1,6 @@
 package cn.codesensi.amour.context;
 
+import cn.codesensi.amour.common.util.CacheUtil;
 import lombok.Data;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -9,7 +10,7 @@ import org.springframework.util.StringUtils;
  * 应用运行环境上下文。
  * <p>
  * 在应用启动时从 Spring {@link Environment} 中读取项目名（{@code spring.application.name}）
- * 与当前激活的 Profile（运行环境），供 {@link cn.codesensi.amour.util.CacheUtil} 等组件
+ * 与当前激活的 Profile（运行环境），供 {@link CacheUtil} 等组件
  * 拼接「项目名_运行环境」前缀，实现多项目、多环境的隔离。
  * <p>
  * 该组件由 Spring 容器管理，构造时完成属性绑定；属性缺失时会回退到默认值
@@ -20,7 +21,7 @@ import org.springframework.util.StringUtils;
 public class AppEnvContext {
 
     /**
-     * 由 Spring 装配后自持的静态实例，供 {@link cn.codesensi.amour.util.CacheUtil} 等
+     * 由 Spring 装配后自持的静态实例，供 {@link CacheUtil} 等
      * 非 Spring 管理（未加 {@code @Component}）的静态工具类读取当前环境信息。
      * 构造器执行完成后即被赋值，此后不再变化。
      */

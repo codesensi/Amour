@@ -1,8 +1,8 @@
 package cn.codesensi.amour.advice;
 
 import cn.codesensi.amour.annotation.ApiResponseBody;
-import cn.codesensi.amour.core.Result;
-import cn.codesensi.amour.util.JsonUtil;
+import cn.codesensi.amour.common.core.Result;
+import cn.codesensi.amour.common.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.core.MethodParameter;

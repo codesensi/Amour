@@ -1,7 +1,8 @@
 package cn.codesensi.amour.config;
 
+import cn.codesensi.amour.common.properties.AppCacheProperties;
 import cn.codesensi.amour.context.AppEnvContext;
-import cn.codesensi.amour.util.CacheUtil;
+import cn.codesensi.amour.common.util.CacheUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.cache.CacheManager;
@@ -14,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 缓存配置。
  * <p>
- * 基于 yml（{@code amour.cache.*}，见 {@link CacheProperties}）逐个注册带各自过期时间的
+ * 基于 yml（{@code amour.cache.*}，见 {@link AppCacheProperties}）逐个注册带各自过期时间的
  * Caffeine 缓存，绕过 Spring Boot 全局统一 spec 的限制。缓存名统一经
  * {@link CacheUtil#withAppEnv(String)} 拼接「项目名_运行环境」前缀，实现多环境隔离。
  * <p>
@@ -35,14 +36,14 @@ public class CacheConfig {
      * @return 缓存管理器
      */
     @Bean
-    public CacheManager cacheManager(AppEnvContext appEnvContext, CacheProperties props) {
+    public CacheManager cacheManager(AppEnvContext appEnvContext, AppCacheProperties props) {
         CaffeineCacheManager manager = new CaffeineCacheManager();
         manager.setCaffeine(Caffeine.newBuilder()
                 .maximumSize(props.getMaxSize())
                 .recordStats());
 
         // 逐个注册带各自过期时间的缓存，缓存名统一拼接「项目名_运行环境」前缀
-        for (CacheProperties.CacheItem item : props.getCaches()) {
+        for (AppCacheProperties.CacheItem item : props.getCaches()) {
             String cacheName = CacheUtil.withAppEnv(item.getName());
             Cache<Object, Object> nativeCache = build(item, props.getMaxSize());
             // registerCustomCache：注册自定义过期策略的原生 Caffeine 缓存（绕过全局 spec）
@@ -58,7 +59,7 @@ public class CacheConfig {
      * @param maxSize 最大容量（条数）
      * @return 构建完成的原生缓存
      */
-    private Cache<Object, Object> build(CacheProperties.CacheItem item, long maxSize) {
+    private Cache<Object, Object> build(AppCacheProperties.CacheItem item, long maxSize) {
         Caffeine<Object, Object> builder = Caffeine.newBuilder().maximumSize(maxSize);
         if (item.getExpireAfterWrite() > 0) {
             builder.expireAfterWrite(item.getExpireAfterWrite(), TimeUnit.SECONDS);
