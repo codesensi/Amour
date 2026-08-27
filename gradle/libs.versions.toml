@@ -1,0 +1,34 @@
+[versions]
+# Spring Boot —— 一个版本号同时供插件与 BOM 使用
+spring-boot = "4.1.1"
+# 第三方库（非 Spring BOM 内，需自定）
+mybatis-flex = "1.11.8"
+mapstruct = "1.6.3"
+ip2region = "3.3.7"
+logbook = "4.1.0"
+
+[libraries]
+# Spring Boot BOM：统一管 Spring 系 + caffeine/h2/lombok/junit 等 BOM 内组件版本
+spring-boot-dependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
+
+# Spring 系依赖（版本交给上面的 BOM，不写 version.ref）
+spring-boot-starter-cache = { module = "org.springframework.boot:spring-boot-starter-cache" }
+spring-boot-starter-jdbc = { module = "org.springframework.boot:spring-boot-starter-jdbc" }
+spring-boot-starter-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
+spring-boot-h2console = { module = "org.springframework.boot:spring-boot-h2console" }
+spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }
+caffeine = { module = "com.github.ben-manes.caffeine:caffeine" }
+lombok = { module = "org.projectlombok:lombok" }
+h2 = { module = "com.h2database:h2" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+
+# 第三方非 BOM 族（必须自定版本，version.ref 收进 [versions]）
+mybatis-flex-starter = { module = "com.mybatis-flex:mybatis-flex-spring-boot4-starter", version.ref = "mybatis-flex" }
+mybatis-flex-processor = { module = "com.mybatis-flex:mybatis-flex-processor", version.ref = "mybatis-flex" }
+mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
+mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
+ip2region = { module = "org.lionsoul:ip2region", version.ref = "ip2region" }
+logbook-starter = { module = "org.zalando:logbook-spring-boot-starter", version.ref = "logbook" }
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
