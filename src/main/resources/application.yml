@@ -48,6 +48,7 @@ logbook:
     headers:
       - Authorization
       - cookie
+      - Set-Cookie
     # 需要混淆的 JSON Body 字段名称列表
     json-body-fields:
       - accessToken
