@@ -35,25 +35,25 @@ public class SysConfig extends BaseEntity implements Serializable {
     /**
      * 配置键（app 之下的点分路径，如 captcha.sms-expire）
      */
-    private String configKey;
+    private String key;
 
     /**
      * 配置值（统一字符串存储）
      */
-    private String configValue;
+    private String value;
 
     /**
      * 值类型:STRING,INTEGER,LONG,BOOLEAN
      */
-    private String valueType;
+    private String type;
 
     /**
      * 分组（app 的一级子项，如 name、captcha 等）
      */
-    private String configGroup;
+    private String group;
 
     /**
-     * 是否启用:1-启用,0-停用
+     * 是配置状态:0-启用,1-禁用
      */
     private Integer status;
 
