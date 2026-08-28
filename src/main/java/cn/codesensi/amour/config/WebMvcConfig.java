@@ -64,11 +64,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addViewController("/").setViewName("index");
         registry.addViewController("/index.html").setViewName("index");
         // 门户子页：点点滴滴 / 留言板 / 关于我们 / 恋爱相册 / 恋爱列表
-        registry.addViewController("/portal/little.html").setViewName("portal/little");
-        registry.addViewController("/portal/leaving.html").setViewName("portal/leaving");
+        registry.addViewController("/portal/moments.html").setViewName("portal/moments");
+        registry.addViewController("/portal/message.html").setViewName("portal/message");
         registry.addViewController("/portal/about.html").setViewName("portal/about");
-        registry.addViewController("/portal/loveimg.html").setViewName("portal/loveimg");
-        registry.addViewController("/portal/list.html").setViewName("portal/list");
+        registry.addViewController("/portal/love-photo.html").setViewName("portal/love-photo");
+        registry.addViewController("/portal/love-list.html").setViewName("portal/love-list");
         // 后台管理入口：/admin 跳转到后台管理登录页（仍为静态页）
         registry.addRedirectViewController("/admin", "/admin/login.html");
     }
