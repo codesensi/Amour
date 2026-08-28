@@ -16,7 +16,7 @@ const PORTAL_CONFIG = {
   /** 管理后台入口 */
   adminUrl: '/admin/login.html',
   /** 开源地址 */
-  repoUrl: 'https://github.com/codesensi/like-girl',
+  repoUrl: 'https://github.com/codesensi/Amour',
   /** 本地化静态资源根 */
   imgBase: '/assets/portal/img'
 };
@@ -215,7 +215,7 @@ function scrollToTop(duration) {
 }
 
 /** 打开管理后台 */
-function portalGoAdmin() { location.href = PORTAL_CONFIG.adminUrl; }
+function portalGoAdmin() { window.open(PORTAL_CONFIG.adminUrl, '_blank'); }
 
 /** 打开开源地址 */
 function portalGoRepo() { window.open(PORTAL_CONFIG.repoUrl, '_blank'); }
