@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>参数配置</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/assets/layui/2.13.9/css/layui.css">
+</head>
+<body style="padding: 14px;">
+  <div class="layui-card">
+    <div class="layui-card-header">参数配置（占位页）</div>
+    <div class="layui-card-body">
+      <table id="configTable" lay-filter="config-table"></table>
+    </div>
+  </div>
+
+  <script src="/assets/layui/2.13.9/layui.js"></script>
+  <script>
+    layui.use(['table', 'layer'], function () {
+      const table = layui.table;
+
+      // 占位数据：后端配置管理接口实现后，替换为 url 方式加载
+      table.render({
+        elem: '#configTable',
+        defaultToolbar: [],
+        cols: [[
+          { field: 'key', title: '配置键', width: 220 },
+          { field: 'value', title: '配置值' },
+          { field: 'remark', title: '备注' }
+        ]],
+        data: [
+          { key: 'demo-mode', value: 'false', remark: '演示模式开关' }
+        ],
+        page: false,
+        skin: 'line'
+      });
+    });
+  </script>
+</body>
+</html>

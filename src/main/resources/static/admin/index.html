@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Amour - 后台管理</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/assets/layui/2.13.9/css/layui.css">
+  <style>
+    /* 后台主框架布局样式 */
+    html, body { height: 100%; margin: 0; overflow: hidden; }
+    body { display: flex; flex-direction: column; background: #f2f3f5; }
+
+    /* 顶部栏 */
+    .admin-header {
+      height: 56px; flex: none;
+      background: #23262e; color: #fff;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 18px;
+    }
+    .admin-logo { font-size: 16px; font-weight: 600; }
+    .admin-logo .layui-icon-heart-fill { color: #16b777; margin-right: 6px; }
+    .admin-user { display: flex; align-items: center; gap: 4px; cursor: pointer; font-size: 13px; }
+    .admin-user .layui-icon { font-size: 15px; }
+
+    /* 主体：左侧菜单 + 右侧内容 */
+    .admin-body { flex: 1; display: flex; min-height: 0; }
+    .admin-side {
+      width: 200px; flex-shrink: 0; overflow-y: auto;
+      background: #fff; border-right: 1px solid #e8e8e8;
+    }
+    .admin-side .layui-nav-tree { width: 100%; background: #fff; border-radius: 0; }
+    .admin-side .layui-nav-tree .layui-nav-item a { color: #333; }
+    .admin-side .layui-nav-tree .layui-nav-item a:hover { background: #f6f6f6; }
+    .admin-side .layui-nav-tree .layui-nav-bar { background-color: #16b777; }
+    .admin-side .layui-nav-tree .layui-this > a,
+    .admin-side .layui-nav-tree .layui-nav-itemed > a { color: #16b777 !important; }
+
+    /* 右侧多标签内容区 */
+    .admin-main { flex: 1; display: flex; flex-direction: column; min-width: 0; padding: 10px; }
+    .admin-main .layui-tab { margin: 0; height: 100%; display: flex; flex-direction: column; }
+    .admin-main .layui-tab .layui-tab-title { background: #fff; padding-top: 0; }
+    .admin-main .layui-tab .layui-tab-content { flex: 1; min-height: 0; padding: 10px 0 0; }
+    .admin-main .layui-tab-item, .admin-main .layui-tab-item iframe { height: 100%; }
+    .admin-main iframe { width: 100%; border: 0; background: #f2f3f5; }
+  </style>
+</head>
+<body>
+  <!-- 顶部栏 -->
+  <div class="admin-header">
+    <div class="admin-logo"><i class="layui-icon layui-icon-heart-fill"></i>Amour 后台管理</div>
+    <div class="admin-user" id="btnLogout" title="退出登录">
+      <i class="layui-icon layui-icon-username"></i> sadmin
+      <i class="layui-icon layui-icon-down"></i>
+    </div>
+  </div>
+
+  <div class="admin-body">
+    <!-- 左侧菜单 -->
+    <div class="admin-side">
+      <ul class="layui-nav layui-nav-tree" lay-filter="admin-nav" style="padding-top: 6px;">
+        <li class="layui-nav-item layui-nav-itemed">
+          <a href="javascript:;"><i class="layui-icon layui-icon-set"></i> 系统管理</a>
+          <dl class="layui-nav-child">
+            <dd data-url="/admin/views/user.html"><a href="javascript:;"><i class="layui-icon layui-icon-user"></i> 用户管理</a></dd>
+            <dd data-url="/admin/views/config.html"><a href="javascript:;"><i class="layui-icon layui-icon-set"></i> 参数配置</a></dd>
+            <dd data-url="/admin/views/cache.html"><a href="javascript:;"><i class="layui-icon layui-icon-chart"></i> 缓存管理</a></dd>
+          </dl>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 右侧多标签内容区 -->
+    <div class="admin-main">
+      <div class="layui-tab" lay-filter="admin-tabs" lay-allowClose="true">
+        <ul class="layui-tab-title"></ul>
+        <div class="layui-tab-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/layui/2.13.9/layui.js"></script>
+  <script>
+    layui.use(['element', 'jquery', 'layer'], function () {
+      const $ = layui.jquery, element = layui.element, layer = layui.layer;
+
+      const TAB_FILTER = 'admin-tabs';
+      const opened = {}; // 已打开标签：id -> true，防止重复打开
+
+      // 打开（或聚焦）一个标签页，内容以 iframe 方式加载
+      function openTab(id, title, url) {
+        if (opened[id]) {
+          element.tabChange(TAB_FILTER, id);
+          return;
+        }
+        opened[id] = true;
+        element.tabAdd(TAB_FILTER, {
+          title: title,
+          content: '<iframe src="' + url + '" frameborder="0"></iframe>',
+          id: id
+        });
+        element.tabChange(TAB_FILTER, id);
+      }
+
+      // 默认工作台标签
+      openTab('home', '<i class="layui-icon layui-icon-home"></i> 工作台', '/index.html');
+
+      // 左侧菜单点击：打开对应页面
+      $('.admin-side .layui-nav-child dd').on('click', function () {
+        const $dd = $(this);
+        $('.admin-side .layui-nav-child dd').removeClass('layui-this');
+        $dd.addClass('layui-this');
+        openTab($dd.data('url'), $.trim($dd.find('a').text()), $dd.data('url'));
+      });
+
+      // 关闭标签时同步清理状态（工作台之外允许关闭）
+      element.on('tabDelete(' + TAB_FILTER + ')', function (data) {
+        // data.index 对应 DOM 顺序，这里仅做状态标记；layui 会同步删除内容
+        const $title = $('.layui-tab[lay-filter=' + TAB_FILTER + '] .layui-tab-title li').eq(data.index);
+        const layId = $title.attr('lay-id');
+        if (layId) delete opened[layId];
+      });
+
+      // 退出登录：POST /auth/logout（后端实现后即可生效)
+      $('#btnLogout').on('click', function () {
+        layer.confirm('确定退出登录吗？', { icon: 3, title: '提示' }, function (index) {
+          layer.close(index);
+          $.ajax({
+            url: '/auth/logout',
+            type: 'POST',
+            dataType: 'json'
+          }).always(function () {
+            location.href = '/admin/login.html';
+          });
+        });
+      });
+    });
+  </script>
+</body>
+</html>

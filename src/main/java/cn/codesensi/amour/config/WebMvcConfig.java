@@ -6,10 +6,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * Web MVC 拦截器链配置 —— 统一注册应用的拦截器并控制执行顺序。
+ * Web MVC 拦截器链配置 —— 统一注册应用的拦截器与页面跳转视图控制器。
  *
  * @author codesensi
  * @since 1.0
@@ -49,6 +50,17 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 // 获取验证码、登录、登出接口不受演示模式限制
                 .excludePathPatterns(RbacConst.CAPTCHA_PATH, RbacConst.LOGIN_PATH, RbacConst.LOGOUT_PATH)
                 .order(2);
+    }
+
+    /**
+     * 注册页面跳转视图控制器 —— 无业务逻辑的纯跳转路由。
+     */
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        // 前端展示首页：/ 显式重定向到静态首页（与 Spring Boot 欢迎页行为保持一致）
+        registry.addRedirectViewController("/", "/index.html");
+        // 后台管理入口：/admin 跳转到后台管理登录页
+        registry.addRedirectViewController("/admin", "/admin/login.html");
     }
 
     /**

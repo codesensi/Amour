@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>用户管理</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/assets/layui/2.13.9/css/layui.css">
+</head>
+<body style="padding: 14px;">
+  <div class="layui-card">
+    <div class="layui-card-header">用户管理（占位页）</div>
+    <div class="layui-card-body">
+      <table id="userTable" lay-filter="user-table"></table>
+    </div>
+  </div>
+
+  <script src="/assets/layui/2.13.9/layui.js"></script>
+  <script>
+    layui.use(['table', 'layer'], function () {
+      const table = layui.table;
+
+      // 占位数据：后端用户管理接口实现后，替换为 url 方式加载
+      table.render({
+        elem: '#userTable',
+        defaultToolbar: [],
+        cols: [[
+          { field: 'id', title: 'ID', width: 90 },
+          { field: 'username', title: '用户名' },
+          { field: 'nickname', title: '昵称' },
+          { field: 'status', title: '状态', width: 100, templet: function (d) {
+              return d.status === 1 ? '<span style="color:#16b777;">启用</span>' : '<span style="color:#999;">停用</span>';
+            } },
+          { field: 'createdAt', title: '创建时间', width: 180 }
+        ]],
+        data: [
+          { id: 1, username: 'sadmin', nickname: '超级管理员', status: 1, createdAt: '2026-08-26 10:00:00' }
+        ],
+        page: false,
+        skin: 'line'
+      });
+    });
+  </script>
+</body>
+</html>

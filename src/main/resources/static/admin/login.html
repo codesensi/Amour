@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Amour - 后台登录</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/assets/layui/2.13.9/css/layui.css">
+  <style>
+    /* 后台登录页自定义样式 */
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #16b777 0%, #2f9be0 100%);
+    }
+    .login-card {
+      width: 380px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, .18);
+      padding: 38px 36px 30px;
+    }
+    .login-card .login-title {
+      text-align: center;
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 6px;
+    }
+    .login-card .login-sub {
+      text-align: center;
+      color: #999;
+      font-size: 12px;
+      margin-bottom: 28px;
+    }
+    .login-card .layui-icon { color: #bbb; }
+    /* 验证码：/captcha 返回 captchaValue 为 base64 图片 data URI，点击图片刷新 */
+    .captcha-box {
+      width: 110px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      overflow: hidden;
+      border-radius: 3px;
+      background: #f2f6f3;
+    }
+    .captcha-box img { max-width: 100%; height: 38px; }
+    .login-btn { width: 100%; margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <div class="login-title"><i class="layui-icon layui-icon-heart-fill" style="color:#16b777"></i> Amour 后台管理</div>
+    <div class="login-sub">Spring Boot 4 · Layui 2.13.9</div>
+
+    <form class="layui-form" lay-filter="login-form" lay-key="1">
+      <div class="layui-form-item">
+        <div class="layui-input-wrap">
+          <div class="layui-input-prefix"><i class="layui-icon layui-icon-username"></i></div>
+          <input type="text" name="username" value="sadmin" lay-verify="required" placeholder="用户名"
+                 autocomplete="username" class="layui-input" lay-affix="clear">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <div class="layui-input-wrap">
+          <div class="layui-input-prefix"><i class="layui-icon layui-icon-password"></i></div>
+          <input type="password" name="password" lay-verify="required" placeholder="密码"
+                 autocomplete="current-password" class="layui-input" lay-affix="eye">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <div class="layui-row" style="display:flex; gap:10px;">
+          <div class="layui-col" style="flex:1;">
+            <div class="layui-input-wrap">
+              <div class="layui-input-prefix"><i class="layui-icon layui-icon-vercode"></i></div>
+              <input type="text" name="captcha" lay-verify="required" placeholder="验证码"
+                     autocomplete="off" class="layui-input" maxlength="8">
+            </div>
+          </div>
+          <div class="layui-col captcha-box" id="captchaBox" title="点击刷新验证码">
+            <img id="captchaImg" src="" alt="验证码" style="display: none;">
+          </div>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="login-submit" style="background:#16b777;">
+          <i class="layui-icon layui-icon-release"></i> 登 录
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <script src="/assets/layui/2.13.9/layui.js"></script>
+  <script>
+    layui.use(['form', 'jquery', 'layer'], function () {
+      const $ = layui.jquery, form = layui.form, layer = layui.layer;
+
+      let captchaKey = '';
+
+      // 加载验证码：GET /captcha -> Result{success, code, msg, data:{captchaKey, captchaValue}}
+      // captchaValue 为 base64 图片 data URI，直接作为 <img> 展示
+      function loadCaptcha() {
+        captchaKey = '';
+        $('#captchaImg').hide();
+        $.ajax({
+          url: '/captcha',
+          type: 'GET',
+          dataType: 'json'
+        }).done(function (res) {
+          if (res.success && res.data) {
+            captchaKey = res.data.captchaKey || '';
+            $('#captchaImg').attr('src', res.data.captchaValue).show();
+          } else {
+            layer.msg(res.msg || '验证码加载失败', { icon: 2 });
+          }
+        }).fail(function (xhr) {
+          layer.msg('验证码接口请求失败：' + xhr.status, { icon: 2 });
+        });
+      }
+
+      // 点击图片刷新验证码
+      $('#captchaBox').on('click', loadCaptcha);
+
+      // 提交登录：POST /auth/login（后端尚未实现，失败时给出友好提示）
+      form.on('submit(login-submit)', function (data) {
+        const payload = Object.assign({}, data.field, { captchaKey: captchaKey });
+        $.ajax({
+          url: '/auth/login',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(payload),
+          dataType: 'json'
+        }).done(function (res) {
+          if (res.success) {
+            layer.msg('登录成功，正在跳转…', { icon: 1, time: 800 }, function () {
+              location.href = '/admin/index.html';
+            });
+          } else {
+            layer.msg(res.msg || '登录失败', { icon: 2 });
+            loadCaptcha();
+          }
+        }).fail(function (xhr) {
+          // 登录接口尚未实现（404）或校验失败时的兜底提示
+          let msg = '登录接口请求失败：' + xhr.status;
+          try { if (xhr.responseJSON && xhr.responseJSON.msg) msg = xhr.responseJSON.msg; } catch (e) { /* 忽略解析失败 */ }
+          layer.msg(msg, { icon: 2 });
+          loadCaptcha();
+        });
+        return false; // 阻止表单默认提交
+      });
+
+      loadCaptcha();
+    });
+  </script>
+</body>
+</html>

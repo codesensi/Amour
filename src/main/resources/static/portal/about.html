@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<!--
+ * 关于我们 —— 照搬自开源项目：Like Girl 5.2.1-Stable
+ * 原作者：Ki  版权：Copyright (c) 2023 - 2025 by Ki All Rights Reserved
+ * 原项目：https://github.com/codesensi/like-girl
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <title>龙猫の爱恋 — 关于我们</title>
+  <link rel="shortcut icon" href="/assets/portal/img/favicon.ico">
+  <link rel="stylesheet" href="/assets/portal/css/portal.css">
+  <link rel="stylesheet" href="/assets/portal/css/lg/content.css">
+  <link rel="stylesheet" href="/assets/portal/css/lg/about.css">
+  <link rel="stylesheet" href="/assets/portal/css/lg/little.css">
+  <link rel="stylesheet" href="/assets/portal/css/lg/leaving.css">
+  <link rel="stylesheet" href="/assets/portal/css/lg/loveImg.css">
+  <link rel="stylesheet" href="/assets/portal/css/lg/list.css">
+  <link rel="stylesheet" href="/assets/portal/font/font_list/iconfont.css">
+  <link rel="stylesheet" href="/assets/portal/lib/botui/botui.min.css">
+  <link rel="stylesheet" href="/assets/portal/lib/botui/botui-theme-default.css">
+  <link rel="stylesheet" href="/assets/portal/lib/toastr/toastr.css">
+  <style>
+    .alogo, .wenan { color: rgb(97 97 97); transition: all 0.2s linear; }
+    .text-ce { text-align: center; }
+  </style>
+</head>
+<body>
+
+<!-- 头部导航条 -->
+<div class="header-wrap">
+  <div class="header">
+    <div class="logo">
+      <h1><a class="alogo" href="/">龙猫の爱恋</a></h1>
+    </div>
+    <div class="word" data-tip="爱晨雾漫过青瓦，爱暮色染透篱笆，更爱与君并肩立，看遍这人间烟火里的朝暮与年华。" data-tip-position="bottom">
+      <span class="wenan">爱晨雾漫过青瓦，爱暮色染透篱笆，更爱与君并肩立，看遍这人间烟火里的朝暮与年华。</span>
+    </div>
+  </div>
+</div>
+
+<!-- 首屏：背景 + 双头像心跳 + 四层波浪 -->
+<div class="bg-wrap">
+  <div class="bg-img">
+    <div class="central central-800">
+      <div class="middle animated fadeInDown">
+        <div class="img-female">
+          <img src="https://q1.qlogo.cn/g?b=qq&nk=673822943&s=640" draggable="false">
+          <span>Su</span>
+        </div>
+        <div class="love-icon">
+          <img src="/assets/portal/img/like.svg" draggable="false">
+        </div>
+        <div class="img-male">
+          <img src="https://q1.qlogo.cn/g?b=qq&nk=2623669948&s=640" draggable="false">
+          <span>Li</span>
+        </div>
+      </div>
+    </div>
+    <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+         viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+      <defs>
+        <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"/>
+      </defs>
+      <g class="parallax">
+        <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(255,255,255,0.7"/>
+        <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(255,255,255,0.5)"/>
+        <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(255,255,255,0.3)"/>
+        <use xlink:href="#gentle-wave" x="48" y="7" fill="#fff"/>
+      </g>
+    </svg>
+  </div>
+</div>
+
+<!-- 内容：BotUI 对话机器人 -->
+<div id="pjax-container">
+  <style>
+    .central-600 {
+      background: url("https://ice.frostsky.com/2024/11/06/570374efdc2bb75a8b722c969118afb5.webp") no-repeat center top;
+      background-size: cover;
+    }
+    .central { padding: 0; }
+  </style>
+
+  <h4 class="text-ce central">与 <i>Ki_About</i> 小站对话中...</h4>
+  <div class="central central-600">
+    <div class="botui-app-container" id="botui-app">
+      <bot-ui></bot-ui>
+    </div>
+  </div>
+
+  <!-- 对话脚本置于 pjax 容器内：局部换页后重新执行 -->
+  <script>
+    // 对话脚本照搬原站 about.php
+    var botui = new BotUI("botui-app");
+    botui.message.bot({ delay: 200, content: "Hi, 欢迎你的来访" }).then(function () {
+      return botui.message.bot({ delay: 1000, content: "愿得一人心 白首不相离" });
+    }).then(function () {
+      return botui.message.bot({ delay: 1000, content: "记录日常生活 留住感动" });
+    }).then(function () {
+      return botui.action.button({
+        delay: 1500,
+        action: [
+          { text: "听我介绍", value: "and" },
+          { text: "结束介绍", value: "gg" }
+        ]
+      });
+    }).then(function (res) {
+      if (res.value === "and") { other(); }
+      if (res.value === "gg") {
+        return botui.message.bot({ delay: 1500, content: " ![告辞](https://img.gejiba.com/images/4f6983d663bea83530b8ac3a8a6b9220.jpg) " });
+      }
+    });
+
+    var other = function () {
+      botui.message.bot({ delay: 1500, content: "情侣小站Like Girl是 Ki 的原创项目" })
+        .then(function () { return botui.message.bot({ delay: 1500, content: "在2022年暑假的假期最后几天里发布了1.0版本" }); })
+        .then(function () { return botui.message.bot({ delay: 1500, content: "最新版本为 v5.2.0 亦是最终版本 目前已开源到码云" }); })
+        .then(function () { return botui.message.bot({ delay: 1500, content: "PHP确实是 “世界上最好的语言”  我非常喜欢（痛苦" }); })
+        .then(function () { return botui.message.bot({ delay: 1500, content: "在开发过程中遇到了许多奇葩问题 也是只能自己探索解决..." }); })
+        .then(function () { return botui.message.bot({ delay: 1500, content: "喜欢探索编程领域 热爱学习新知识 热爱开源文化" }); })
+        .then(function () {
+          return botui.action.button({
+            delay: 1500,
+            action: [{ text: "为什么叫 Ki？", value: "next" }]
+          });
+        }).then(function () {
+          return botui.message.bot({ delay: 1500, content: "不知道你有没有看过《比悲伤更悲伤的故事》" });
+        }).then(function () {
+          return botui.message.bot({ delay: 1500, content: "嗨，我是k，如果有下辈子的话，" });
+        }).then(function () {
+          return botui.message.bot({ delay: 1500, content: "“我想当戒指，眼镜，床和笔记本，这样的话，我就可以...”" });
+        }).then(function () {
+          return botui.message.bot({ delay: 1500, content: "当然跟这个没有关系哈哈" });
+        }).then(function () {
+          return botui.action.button({
+            delay: 1500,
+            action: [{ text: "结束对话", value: "end" }]
+          });
+        }).then(function () {
+          return botui.message.bot({ delay: 1500, content: "感谢你的来访，祝你们幸福长长久久~" });
+        });
+    };
+  </script>
+</div>
+
+<!-- 右下角悬浮侧栏 -->
+<div class="lg-sidebar">
+  <ul>
+    <li class="lg-sidebar-item" title="返回顶部" onclick="scrollToTop()">
+      <svg class="lg-sidebar-icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M898.346667 932.693333c-9.088 9.088-18.176 9.088-31.744 4.565334L512.853333 738.133333l-354.346666 200.234667c-13.653333 4.522667-22.741333 4.522667-31.786667-4.522667-9.045333-9.045333-9.045333-18.133333-9.045333-27.221333l373.418666-835.626667c0.042667-9.045333 13.653333-13.653333 22.741334-13.653333 9.088 0 18.133333 9.045333 22.656 13.568l366.421333 839.125333c4.48 4.522667-0.042667 18.133333-4.608 22.698667z" fill="#ffffff"/></svg>
+    </li>
+    <li class="lg-sidebar-item" title="小站首页" onclick="portalNavigate('/')">
+      <svg class="lg-sidebar-icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M920.38 408.41L584.24 65.21c-0.3-0.3-0.6-0.59-0.92-0.88-19.1-17.18-44.43-26.65-71.33-26.65-26.89 0-52.23 9.46-71.33 26.65-0.32 0.28-0.62 0.58-0.92 0.88l-336.12 343.2c-3.52 3.6-5.48 8.31-5.48 13.19v474.47c0.01 50.74 45.48 92.02 101.35 92.02H347.6c11.43 0 20.69-8.72 20.69-19.47V699.74c0-29.27 26.9-53.09 59.95-53.09h167.5c33.06 0 59.95 23.81 59.95 53.09v268.89c0 10.75 9.26 19.47 20.69 19.47h148.11c55.88 0 101.34-41.28 101.34-92.03V421.61c0.02-4.89-1.93-9.6-5.45-13.2z" fill="#ffffff"/></svg>
+    </li>
+    <li class="lg-sidebar-item" title="管理后台" onclick="portalGoAdmin()">
+      <svg class="lg-sidebar-icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M237.888 79.488l109.056 85.696a381.312 381.312 0 0 1 68.576-24.96L443.936 4.48a516.768 516.768 0 0 1 136.064 0l28.48 135.744c23.808 6.176 46.72 14.56 68.544 24.96l109.056-85.696a514.56 514.56 0 0 1 104.192 87.52L824.864 289.28c14.08 19.744 26.304 40.864 36.48 63.136l138.72 4.48c13.504 42.496 21.632 87.456 23.52 133.984l-128.768 51.616c-1.92 24.672-6.208 48.672-12.608 71.84L985.6 706.88a511.424 511.424 0 0 1-68.128 117.76l-131.84-43.2a385.824 385.824 0 0 1-55.808 46.848l19.712 137.408a508.352 508.352 0 0 1-127.872 46.528l-73.216-117.92a388.576 388.576 0 0 1-72.896 0l-73.216 117.92a508.352 508.352 0 0 1-127.84-46.528l19.68-137.408a385.888 385.888 0 0 1-55.808-46.88l-131.84 43.264A511.488 511.488 0 0 1 38.4 706.88l103.36-92.576c-6.368-23.168-10.624-47.168-12.576-71.84L0.416 490.88c1.92-46.528 9.984-91.488 23.52-134.016l138.688-4.48c10.208-22.24 22.432-43.36 36.512-63.104L133.696 167.04a514.56 514.56 0 0 1 104.192-87.52zM512 704a192 192 0 1 0 0-384 192 192 0 0 0 0 384z" fill="#ffffff"/></svg>
+    </li>
+    <li class="lg-sidebar-item" title="开源地址" onclick="portalGoRepo()">
+      <svg class="lg-sidebar-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14 4h6v6h-2V7.41l-8.29 8.3-1.42-1.42 8.3-8.29H14V4zm-5 1H5v14h14v-5h2v7H3V3h6v2z" fill="#ffffff"/></svg>
+    </li>
+  </ul>
+</div>
+
+<!-- 页脚 -->
+<div class="footer-warp">
+  <div class="footer">
+    <p><img src="/assets/portal/img/icp.svg"><a href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank">赣ICP备2026010001号</a></p>
+    <p id="footerCopyright"></p>
+  </div>
+</div>
+<script src="/assets/portal/lib/vue.min.js"></script>
+<script src="/assets/portal/lib/botui/botui.min.js"></script>
+<script src="/assets/portal/lib/toastr/toastr.js"></script>
+<script src="/assets/portal/font/font_leav/iconfont.js"></script>
+<script src="/assets/portal/js/portal.js?v=2"></script>
+<script src="/assets/portal/js/pjax.js?v=2"></script>
+
+</body>
+</html>
