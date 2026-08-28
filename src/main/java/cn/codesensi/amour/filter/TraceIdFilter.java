@@ -3,7 +3,6 @@ package cn.codesensi.amour.filter;
 import cn.codesensi.amour.common.consts.AppConst;
 import cn.codesensi.amour.common.util.IdUtil;
 import jakarta.servlet.*;
-import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.MDC;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -26,7 +25,7 @@ public class TraceIdFilter implements Filter {
      * <p>
      * 处理流程：
      * <ol>
-     *   <li>生成或获取 traceId（优先从请求头获取，支持跨服务传递）；</li>
+     *   <li>生成 traceId</li>
      *   <li>将 traceId 放入 MDC 上下文；</li>
      *   <li>放行请求，执行后续过滤器及业务逻辑；</li>
      *   <li>在 {@code finally} 块中清理 MDC，避免线程上下文污染。</li>
@@ -43,9 +42,8 @@ public class TraceIdFilter implements Filter {
                          ServletResponse response,
                          FilterChain chain) throws IOException, ServletException {
         try {
-            // 生成或获取 traceId（优先从请求头获取，支持跨服务传递）
-            String traceId = generateTraceId(request);
-            MDC.put(AppConst.TRACE_ID, traceId);
+            // 将 traceId 放入 MDC 上下文
+            MDC.put(AppConst.TRACE_ID, IdUtil.fastSimpleUUID());
             chain.doFilter(request, response);
         } finally {
             // 确保清理，避免线程复用导致上下文污染
@@ -53,25 +51,4 @@ public class TraceIdFilter implements Filter {
         }
     }
 
-    /**
-     * 生成或获取调用链路的 traceId。
-     * <p>
-     * 如果当前请求是 HTTP 请求且请求头中包含 {@code X-Trace-Id}，
-     * 则直接取用（用于跨服务链路透传）；
-     * 否则生成一个新的简洁 UUID 作为 traceId。
-     *
-     * @param request 当前请求
-     * @return 有效的 traceId
-     */
-    private String generateTraceId(ServletRequest request) {
-        if (request instanceof HttpServletRequest httpRequest) {
-            // 尝试从请求头获取（支持上游服务传递）
-            String headerTraceId = httpRequest.getHeader("X-Trace-Id");
-            if (!headerTraceId.isBlank()) {
-                return headerTraceId;
-            }
-        }
-        // 生成新的 traceId
-        return IdUtil.fastSimpleUUID();
-    }
 }
