@@ -372,7 +372,9 @@ async function loadLittles() {
   if (!box) return;
   const littles = await portalRequest('littles') || [];
   box.innerHTML = littles.map(function (it) {
-    return '<div class="card col-lg-12 col-md-12 col-sm-12 col-sm-x-12 animated fadeInUp delay-03s">'
+    // 不再使用 animated fadeInUp 入场动画：pjax 局部换页时动画会让内容区
+    // 先空白约 0.3 秒再淡入，表现为页面"闪烁"，与其它页面不一致
+    return '<div class="card col-lg-12 col-md-12 col-sm-12 col-sm-x-12">'
       + '<div class="little_texts">'
       + '<a href="javascript:void(0)" data-id="' + (it.id || '') + '">'
       + '<div class="top-title textOneHide">' + htmlEscape(it.title || '')

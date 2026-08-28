@@ -86,11 +86,14 @@
           location.href = targetUrl;
           return;
         }
+        // 必须先滚回顶部再交换内容：若先交换，新页面高度可能骤降（如点点滴滴页），
+        // 合成器会立即钳制滚动位置并提交一帧"新内容停在中部"的画面，表现为页面闪烁；
+        // 旧内容仍在时回顶高度充足无钳制，回顶与交换合并为同一次绘制
+        window.scrollTo(0, 0);
         target.innerHTML = frag.innerHTML;
         document.title = doc.title || document.title;
         executeScripts(target);
         if (push && !sameUrl) history.pushState({ pjax: true }, '', targetUrl);
-        window.scrollTo(0, 0);
         if (window.initPortalPage) window.initPortalPage();
         doneProgress();
       })

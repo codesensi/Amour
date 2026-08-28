@@ -25,6 +25,14 @@
   padding: 0;
 }
 
+/* 始终显示垂直滚动条并为槽位预留空间：点点滴滴页空内容态高度（约 985px）可能
+   小于视口高度，pjax 交换内容后到数据渲染前的短暂窗口内滚动条会消失，内容区
+   变宽导致所有元素向右移动一闪。强制滚动条恒在后宽度恒定、不再抖动 */
+html {
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
+
 ul {
   list-style: none;
 }
