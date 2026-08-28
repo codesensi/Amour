@@ -42,6 +42,9 @@ spring:
         web-allow-others: true
   cache:
     type: caffeine
+  # Thymeleaf 模板：开发环境关闭缓存，修改模板后刷新即生效，无需重启
+  thymeleaf:
+    cache: false
 
 # 日志级别配置
 logging:

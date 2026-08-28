@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<!--
+ * 恋爱列表 —— 照搬自开源项目：Like Girl 5.2.1-Stable
+ * 原作者：Ki  版权：Copyright (c) 2023 - 2025 by Ki All Rights Reserved
+ * 原项目：https://github.com/codesensi/like-girl
+ * 本页 .lovelist 专属样式已移入 css/lg/list.css
+-->
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('龙猫の爱恋 — Love List')}"></head>
+<body>
+
+<div th:replace="~{fragments/layout :: header}"></div>
+<div th:replace="~{fragments/layout :: hero}"></div>
+
+<!-- 内容：恋爱列表 -->
+<div id="pjax-container">
+  <div class="central">
+    <div class="title">
+      <h1>总有些惊奇的际遇 比方说当我遇见你</h1>
+    </div>
+    <div class="row central central-800">
+      <div class="card col-lg-12 col-md-12 col-sm-12 col-sm-x-12">
+        <div class="list_texts animated fadeInUp delay-03s">
+          <div class="lovelist" id="loveListBox">
+            <!-- 恋爱清单：接口口子 GET /love/list -> [{text, done, img}] -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>

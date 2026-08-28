@@ -50,3 +50,18 @@
     padding: 1rem;
     box-sizing: border-box;
 }
+
+/* ---------- 以下为原 about.html 页面内联样式，Thymeleaf 片段化时移入 ---------- */
+/* 覆盖上方的 .central-600 基础背景：使用与原站一致的对话区壁纸 */
+.central-600 {
+  background: url("https://ice.frostsky.com/2024/11/06/570374efdc2bb75a8b722c969118afb5.webp") no-repeat center top;
+  background-size: cover;
+}
+/* 限定作用域：只去除关于页内容区的内边距。
+   选择器使用关于页独有的内容类（.text-ce / .central-600）：
+   本文件被所有页面无条件加载，且 pjax 导航只替换容器内部内容，
+   不能依赖容器上的页面标识类，否则整页打开命中而 pjax 进入时不命中 */
+#pjax-container .text-ce,
+#pjax-container .central-600 {
+  padding: 0;
+}

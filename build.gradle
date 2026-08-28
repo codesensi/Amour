@@ -45,6 +45,7 @@ dependencies {
     implementation libs.spring.boot.h2console           // H2 Web 控制台自动配置
     implementation libs.spring.boot.starter.cache       // Spring Cache 抽象
     implementation libs.spring.boot.starter.jdbc        // JDBC + HikariCP 数据源（Spring Boot 4 需显式引入才具备自动配置）
+    implementation libs.spring.boot.starter.thymeleaf   // Thymeleaf 模板引擎：门户页公共外壳（头部/首屏/侧栏/页脚）服务端片段化
     implementation libs.spring.boot.starter.validation  // 参数校验（Jakarta Validation + Hibernate Validator）
     implementation libs.spring.boot.starter.webmvc      // Spring Web（MVC）Starter：提供 Web 开发能力
 

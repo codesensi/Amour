@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<!--
+ * 点点滴滴 —— 照搬自开源项目：Like Girl 5.2.1-Stable
+ * 原作者：Ki  版权：Copyright (c) 2023 - 2025 by Ki All Rights Reserved
+ * 原项目：https://github.com/codesensi/like-girl
+-->
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('龙猫の爱恋 — 点点滴滴')}"></head>
+<body>
+
+<div th:replace="~{fragments/layout :: header}"></div>
+<div th:replace="~{fragments/layout :: hero}"></div>
+
+<!-- 内容：点点滴滴 -->
+<div id="pjax-container">
+  <div class="central">
+    <div class="title">
+      <h1>有人愿意听你碎碎念念也很浪漫</h1>
+    </div>
+    <div class="row central central-800" id="littleBox">
+      <!-- 文章列表：接口口子 GET /love/littles，未实现时渲染内置示例 -->
+    </div>
+  </div>
+</div>
+
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>

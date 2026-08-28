@@ -54,12 +54,22 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     /**
      * 注册页面跳转视图控制器 —— 无业务逻辑的纯跳转路由。
+     *
+     * <p>门户页已由静态 HTML 迁移为 Thymeleaf 模板（公共外壳见 templates/fragments/layout.html），
+     * 此处以视图控制器直连模板渲染，渲染产物与原静态页等价，pjax 局部刷新行为不变。</p>
      */
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        // 前端展示首页：/ 显式重定向到静态首页（与 Spring Boot 欢迎页行为保持一致）
-        registry.addRedirectViewController("/", "/index.html");
-        // 后台管理入口：/admin 跳转到后台管理登录页
+        // 前端展示首页：/ 与 /index.html 均渲染首页模板（旧 .html 链接保持可用）
+        registry.addViewController("/").setViewName("index");
+        registry.addViewController("/index.html").setViewName("index");
+        // 门户子页：点点滴滴 / 留言板 / 关于我们 / 恋爱相册 / 恋爱列表
+        registry.addViewController("/portal/little.html").setViewName("portal/little");
+        registry.addViewController("/portal/leaving.html").setViewName("portal/leaving");
+        registry.addViewController("/portal/about.html").setViewName("portal/about");
+        registry.addViewController("/portal/loveimg.html").setViewName("portal/loveimg");
+        registry.addViewController("/portal/list.html").setViewName("portal/list");
+        // 后台管理入口：/admin 跳转到后台管理登录页（仍为静态页）
         registry.addRedirectViewController("/admin", "/admin/login.html");
     }
 

@@ -79,3 +79,12 @@
   border: 1px solid rgba(208, 206, 206, 0.6) !important;
   margin: 1.5rem 0;
 }
+
+/* ---------- 以下为原 list.html 页面内联样式，Thymeleaf 片段化时移入 ---------- */
+/* 完成项与待完成项文字（照搬原站样式语义） */
+.lovelist .unfinished { color: #666; }
+.lovelist .success { color: #f16b4f; }
+.lovelist img { width: 100%; max-width: 420px; border-radius: .8rem; margin: .5rem 0; }
+.lovelist li.cike { border-bottom: 1px solid #ddd; padding: 1rem 0; }
+.lovelist .air { color: #ccc; }
+.lovelist .com { color: #f16b4f; }

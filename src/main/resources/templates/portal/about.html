@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<!--
+ * 关于我们（BotUI 对话） —— 照搬自开源项目：Like Girl 5.2.1-Stable
+ * 原作者：Ki  版权：Copyright (c) 2023 - 2025 by Ki All Rights Reserved
+ * 原项目：https://github.com/codesensi/like-girl
+ * 本页 .central-600 背景与内容区去内边距的专属样式已移入 css/lg/about.css
+-->
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('龙猫の爱恋 — 关于我们')}"></head>
+<body>
+
+<div th:replace="~{fragments/layout :: header}"></div>
+<div th:replace="~{fragments/layout :: hero}"></div>
+
+<!-- 内容：BotUI 对话机器人 -->
+<div id="pjax-container">
+  <h4 class="text-ce central">与 <i>Ki_About</i> 小站对话中...</h4>
+  <div class="central central-600">
+    <div class="botui-app-container" id="botui-app">
+      <bot-ui></bot-ui>
+    </div>
+  </div>
+
+  <!-- 对话脚本置于 pjax 容器内：局部换页后重新执行 -->
+  <script>
+    // 阻止 BotUI 消息渲染时 scrollIntoView 驱动整个页面滚动（否则进入页面会被自动滚到对话处），
+    // 页面保持与其它页面一致从最上方显示，消息仅在对话容器内部滚动到底
+    (function () {
+      if (Element.prototype.__botuiScrollGuard) return;
+      Element.prototype.__botuiScrollGuard = true;
+      const originalScrollIntoView = Element.prototype.scrollIntoView;
+      Element.prototype.scrollIntoView = function () {
+        const container = this.closest && this.closest('.botui-app-container');
+        if (!container) {
+          return originalScrollIntoView.apply(this, arguments);
+        }
+        container.scrollTop = container.scrollHeight;
+      };
+    })();
+
+    // 对话脚本照搬原站 about.php
+    var botui = new BotUI("botui-app");
+    botui.message.bot({ delay: 200, content: "Hi, 欢迎你的来访" }).then(function () {
+      return botui.message.bot({ delay: 1000, content: "愿得一人心 白首不相离" });
+    }).then(function () {
+      return botui.message.bot({ delay: 1000, content: "记录日常生活 留住感动" });
+    }).then(function () {
+      return botui.action.button({
+        delay: 1500,
+        action: [
+          { text: "听我介绍", value: "and" },
+          { text: "结束介绍", value: "gg" }
+        ]
+      });
+    }).then(function (res) {
+      if (res.value === "and") { other(); }
+      if (res.value === "gg") {
+        return botui.message.bot({ delay: 1500, content: " ![告辞](https://img.gejiba.com/images/4f6983d663bea83530b8ac3a8a6b9220.jpg) " });
+      }
+    });
+
+    var other = function () {
+      botui.message.bot({ delay: 1500, content: "情侣小站Like Girl是 Ki 的原创项目" })
+        .then(function () { return botui.message.bot({ delay: 1500, content: "在2022年暑假的假期最后几天里发布了1.0版本" }); })
+        .then(function () { return botui.message.bot({ delay: 1500, content: "最新版本为 v5.2.0 亦是最终版本 目前已开源到码云" }); })
+        .then(function () { return botui.message.bot({ delay: 1500, content: "PHP确实是 “世界上最好的语言”  我非常喜欢（痛苦" }); })
+        .then(function () { return botui.message.bot({ delay: 1500, content: "在开发过程中遇到了许多奇葩问题 也是只能自己探索解决..." }); })
+        .then(function () { return botui.message.bot({ delay: 1500, content: "喜欢探索编程领域 热爱学习新知识 热爱开源文化" }); })
+        .then(function () {
+          return botui.action.button({
+            delay: 1500,
+            action: [{ text: "为什么叫 Ki？", value: "next" }]
+          });
+        }).then(function () {
+          return botui.message.bot({ delay: 1500, content: "不知道你有没有看过《比悲伤更悲伤的故事》" });
+        }).then(function () {
+          return botui.message.bot({ delay: 1500, content: "嗨，我是k，如果有下辈子的话，" });
+        }).then(function () {
+          return botui.message.bot({ delay: 1500, content: "“我想当戒指，眼镜，床和笔记本，这样的话，我就可以...”" });
+        }).then(function () {
+          return botui.message.bot({ delay: 1500, content: "当然跟这个没有关系哈哈" });
+        }).then(function () {
+          return botui.action.button({
+            delay: 1500,
+            action: [{ text: "结束对话", value: "end" }]
+          });
+        }).then(function () {
+          return botui.message.bot({ delay: 1500, content: "感谢你的来访，祝你们幸福长长久久~" });
+        });
+    };
+  </script>
+</div>
+
+<div th:replace="~{fragments/layout :: sidebar}"></div>
+<div th:replace="~{fragments/layout :: footer}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+</body>
+</html>
