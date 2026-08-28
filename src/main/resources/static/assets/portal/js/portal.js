@@ -112,7 +112,7 @@ const PORTAL_MOCK = {
         {
           text: '结束介绍', value: 'gg',
           next: [
-            { type: 'bot', delay: 1500, content: ' ![告辞](/assets/portal/img/goodbye.jpg) ' }
+            { type: 'bot', delay: 1500, content: ' ![告辞](/assets/portal/img/goodbye.webp) ' }
           ]
         }
       ]
