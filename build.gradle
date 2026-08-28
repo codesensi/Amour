@@ -42,10 +42,11 @@ dependencies {
     testRuntimeOnly platform(libs.spring.boot.dependencies)
 
     // ---------- implementation：Spring Boot 相关（对应 TOML「Spring 系依赖」板块） ----------
-    implementation libs.spring.boot.h2console        // H2 Web 控制台自动配置
-    implementation libs.spring.boot.starter.cache    // Spring Cache 抽象
-    implementation libs.spring.boot.starter.jdbc     // JDBC + HikariCP 数据源（Spring Boot 4 需显式引入才具备自动配置）
-    implementation libs.spring.boot.starter.webmvc   // Spring Web（MVC）Starter：提供 Web 开发能力
+    implementation libs.spring.boot.h2console           // H2 Web 控制台自动配置
+    implementation libs.spring.boot.starter.cache       // Spring Cache 抽象
+    implementation libs.spring.boot.starter.jdbc        // JDBC + HikariCP 数据源（Spring Boot 4 需显式引入才具备自动配置）
+    implementation libs.spring.boot.starter.validation  // 参数校验（Jakarta Validation + Hibernate Validator）
+    implementation libs.spring.boot.starter.webmvc      // Spring Web（MVC）Starter：提供 Web 开发能力
 
     // ---------- implementation：第三方框架 / 库（按依赖坐标字母序，对应 TOML「第三方库」板块） ----------
     implementation libs.caffeine                     // Caffeine 本地缓存实现
