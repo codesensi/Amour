@@ -12,6 +12,8 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static cn.codesensi.amour.entity.table.SysConfigTableDef.SYS_CONFIG;
 
 /**
@@ -21,7 +23,7 @@ import static cn.codesensi.amour.entity.table.SysConfigTableDef.SYS_CONFIG;
  * （如 {@code name}、{@code captcha.sms-expire}）作为 {@code config_key} 存储的配置，未命中时回源查库并回填，
  * 减少高频配置点的数据库压力。
  * <p>
- * 缓存采用"驻留不自动过期"策略，热更新依赖写库侧显式调用 {@link #evict(String)} / {@link #evictAll()}
+ * 缓存采用"驻留不自动过期"策略，热更新依赖写库侧显式调用 {@link #evictCache(List)}
  * 失效对应配置键；在缓存未就绪或回源异常时降级为直接查库，保证配置读取不受缓存故障影响。
  * <p>
  * 当配置键在库中不存在或处于停用状态时，各方法回落到对应类型的默认值，避免调用侧因缺配置而失败：
@@ -95,26 +97,25 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     /**
-     * 失效指定配置键对应的缓存。
+     * 失效配置缓存：入参为空（{@code null} 或不含元素）时清空整个缓存，否则逐个失效对应配置键。
+     * <p>集合中的 {@code null} 元素会被跳过，避免缓存层对空键抛出异常。
      *
-     * @param key 配置键
+     * @param keys 待失效的配置键集合；为空时清除全部
      */
     @Override
-    public void evict(String key) {
+    public void evictCache(List<String> keys) {
         Cache cache = configCache();
-        if (cache != null) {
-            cache.evict(key);
+        if (cache == null) {
+            return;
         }
-    }
-
-    /**
-     * 失效全部配置缓存。
-     */
-    @Override
-    public void evictAll() {
-        Cache cache = configCache();
-        if (cache != null) {
+        if (keys == null || keys.isEmpty()) {
             cache.clear();
+            return;
+        }
+        for (String key : keys) {
+            if (key != null) {
+                cache.evict(key);
+            }
         }
     }
 
