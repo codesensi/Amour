@@ -33,7 +33,7 @@ public class SysConfig extends BaseEntity implements Serializable {
     private Long id;
 
     /**
-     * 配置键（app 之下的点分路径，如 captcha.sms-expire）
+     * 配置键
      */
     private String cKey;
 

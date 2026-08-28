@@ -23,7 +23,7 @@ public class ConfigDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 配置键（app 之下的点分路径，如 captcha.sms-expire）
+     * 配置键
      */
     private String cKey;
 

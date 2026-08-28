@@ -1,5 +1,6 @@
 package cn.codesensi.amour.common.core;
 
+import com.mybatisflex.annotation.Column;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -28,6 +29,7 @@ public class BaseEntity implements Serializable {
     /**
      * 创建时间
      */
+    @Column(onInsertValue = "now()")
     private LocalDateTime createTime;
 
     /**
@@ -38,6 +40,7 @@ public class BaseEntity implements Serializable {
     /**
      * 更新时间
      */
+    @Column(onInsertValue = "now()", onUpdateValue = "now()")
     private LocalDateTime updateTime;
 
     /**

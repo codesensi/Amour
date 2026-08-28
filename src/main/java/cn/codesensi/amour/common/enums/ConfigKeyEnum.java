@@ -21,11 +21,8 @@ public enum ConfigKeyEnum implements BaseEnum<String> {
     AVATAR("avatar", "用户随机头像服务地址"),
     DEMO_MODE("demo-mode", "演示模式开关"),
     CAPTCHA_ENABLED("captcha.enabled", "验证码开关"),
-    CAPTCHA_TYPE("captcha.type", "验证码类型"),
     CAPTCHA_IMAGE_TYPE("captcha.image-type", "图形验证码类型"),
     CAPTCHA_IMAGE_EXPIRE("captcha.image-expire", "图形验证码过期秒"),
-    CAPTCHA_SMS_EXPIRE("captcha.sms-expire", "短信验证码过期秒"),
-    CAPTCHA_SMS_LENGTH("captcha.sms-length", "短信验证码长度"),
     ;
 
     /**

@@ -3,15 +3,21 @@ package cn.codesensi.amour.common.enums;
 import lombok.Getter;
 
 /**
- * 验证码生成类型枚举
- * sms-短信验证码
- * image-图形验证码
+ * 图形验证码类型枚举
+ * spec-PNG字符验证码
+ * gif-GIF字符验证码
+ * chinese-中文字符验证码
+ * chinese-gif-中文GIF字符验证码
+ * arithmetic-算术验证码
  */
 @Getter
-public enum CaptchaType implements BaseEnum<String> {
+public enum ImageType implements BaseEnum<String> {
 
-    SMS("sms", "短信验证码"),
-    IMAGE("image", "图形验证码"),
+    SPEC("spec", "PNG字符验证码"),
+    GIF("gif", "GIF字符验证码"),
+    CHINESE("chinese", "中文字符验证码"),
+    CHINESE_GIF("chinese-gif", "中文GIF字符验证码"),
+    ARITHMETIC("arithmetic", "算术验证码"),
     ;
 
     /**
@@ -30,7 +36,7 @@ public enum CaptchaType implements BaseEnum<String> {
      * @param code 编码
      * @param desc 说明
      */
-    CaptchaType(String code, String desc) {
+    ImageType(String code, String desc) {
         this.code = code;
         this.desc = desc;
     }

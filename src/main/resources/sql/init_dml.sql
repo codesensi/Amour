@@ -37,7 +37,7 @@ WHERE NOT EXISTS (
 -- 数据填充：sys_config（幂等插入）
 -- ============================================
 INSERT INTO `sys_config` (
-    `id`, `c_key`, `c_value`, `v_type`, `c_group`, `status`, `remark`
+    `id`, `c_key`, `c_value`, `v_type`, `c_group`, `remark`
 )
 SELECT
     t.id,
@@ -45,23 +45,19 @@ SELECT
     t.c_value,
     t.v_type,
     t.c_group,
-    t.status,
     t.remark
 FROM (
          VALUES
-             (1001, 'name', '爱慕情侣小站', 'STRING', 'app', 1, '项目名称'),
-             (1002, 'version', '1.0.0', 'STRING', 'app', 1, '版本号'),
-             (1003, 'author', 'codesensi', 'STRING', 'app', 1, '负责人'),
-             (1004, 'copyright', '2026', 'STRING', 'app', 1, '版权年份'),
-             (1005, 'avatar', 'https://api.dicebear.com/7.x/bottts/svg?seed=%s', 'STRING', 'app', 1, '用户随机头像服务地址'),
-             (1006, 'demo-mode', 'false', 'BOOLEAN', 'app', 1, '演示模式开关'),
-             (1007, 'captcha.enabled', 'false', 'BOOLEAN', 'captcha', 1, '验证码开关'),
-             (1008, 'captcha.type', 'image', 'STRING', 'captcha', 1, '验证码类型'),
-             (1009, 'captcha.image-type', 'arithmetic', 'STRING', 'captcha', 1, '图形验证码类型'),
-             (1010, 'captcha.image-expire', '300', 'INTEGER', 'captcha', 1, '图形验证码过期秒'),
-             (1011, 'captcha.sms-expire', '900', 'INTEGER', 'captcha', 1, '短信验证码过期秒'),
-             (1012, 'captcha.sms-length', '6', 'INTEGER', 'captcha', 1, '短信验证码长度')
-     ) AS t(id, c_key, c_value, v_type, c_group, status, remark)
+             (1001, 'name', '爱慕情侣小站', 'STRING', 'app', '项目名称'),
+             (1002, 'version', '1.0.0', 'STRING', 'app', '版本号'),
+             (1003, 'author', 'codesensi', 'STRING', 'app', '负责人'),
+             (1004, 'copyright', '2026', 'STRING', 'app', '版权年份'),
+             (1005, 'avatar', 'https://api.dicebear.com/7.x/bottts/svg?seed=%s', 'STRING', 'app', '用户随机头像服务地址'),
+             (1006, 'demo-mode', 'false', 'BOOLEAN', 'app', '演示模式开关'),
+             (1007, 'captcha.enabled', 'false', 'BOOLEAN', 'captcha', '验证码开关'),
+             (1009, 'captcha.image-type', 'arithmetic', 'STRING', 'captcha', '图形验证码类型'),
+             (1010, 'captcha.image-expire', '300', 'INTEGER', 'captcha', '图形验证码过期秒')
+     ) AS t(id, c_key, c_value, v_type, c_group, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_config` WHERE `sys_config`.`id` = t.id
 );
