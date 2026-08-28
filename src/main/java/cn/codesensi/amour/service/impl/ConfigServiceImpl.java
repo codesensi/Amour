@@ -3,7 +3,7 @@ package cn.codesensi.amour.service.impl;
 import cn.codesensi.amour.common.consts.CacheConst;
 import cn.codesensi.amour.common.enums.EnableEnum;
 import cn.codesensi.amour.common.util.CacheUtil;
-import cn.codesensi.amour.model.convert.ConfigConvert;
+import cn.codesensi.amour.model.converter.ConfigConverter;
 import cn.codesensi.amour.model.dto.ConfigDTO;
 import cn.codesensi.amour.model.entity.SysConfig;
 import cn.codesensi.amour.mapper.SysConfigMapper;
@@ -44,7 +44,7 @@ public class ConfigServiceImpl implements ConfigService {
 
     private final SysConfigMapper sysConfigMapper;
     private final CacheManager cacheManager;
-    private final ConfigConvert configConvert;
+    private final ConfigConverter configConverter;
 
     /**
      * 按配置键集合批量查询配置；入参为空（{@code null} 或不含元素）时返回全部启用的配置。
@@ -67,7 +67,7 @@ public class ConfigServiceImpl implements ConfigService {
             }
             SysConfig config = oneConfigByKey(key);
             if (config != null) {
-                result.add(configConvert.toDTO(config));
+                result.add(configConverter.toDTO(config));
             }
         }
         return result;
@@ -168,6 +168,6 @@ public class ConfigServiceImpl implements ConfigService {
                 cache.put(config.getCKey(), config);
             }
         }
-        return configConvert.toDTOList(configs);
+        return configConverter.toDTOList(configs);
     }
 }

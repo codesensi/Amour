@@ -1,4 +1,4 @@
-package cn.codesensi.amour.model.convert;
+package cn.codesensi.amour.model.converter;
 
 import cn.codesensi.amour.model.dto.ConfigDTO;
 import cn.codesensi.amour.model.entity.SysConfig;
@@ -18,7 +18,7 @@ import java.util.List;
  * @since 1.0
  */
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
-public interface ConfigConvert {
+public interface ConfigConverter {
 
     /**
      * 将配置实体转换为 DTO。
