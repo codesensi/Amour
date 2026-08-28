@@ -165,7 +165,9 @@ body {
 .bg-img {
   width: 100%;
   box-sizing: border-box;
-  background: url(../img/bgCover.png) no-repeat center;
+  /* !important 照搬原站内联写法：用于压过 content.css 里失效的原作者 COS 外链壁纸
+     （该对象已设为私有，403），确保本地 bgCover.png 壁纸稳定生效 */
+  background: url(../img/bgCover.png) no-repeat center !important;
   background-size: cover;
   padding-top: 8rem;
   position: relative;
