@@ -54,7 +54,7 @@
     return true;
   }
 
-  /* ---------- 执行换入内容中的内联脚本（如关于页 BotUI 对话） ---------- */
+  /* ---------- 执行换入内容中的内联脚本（如关于页对话机器人） ---------- */
   function executeScripts(container) {
     container.querySelectorAll('script').forEach(function (old) {
       const s = document.createElement('script');
