@@ -36,12 +36,6 @@ import static cn.codesensi.amour.model.entity.table.SysConfigTableDef.SYS_CONFIG
 @RequiredArgsConstructor
 public class ConfigServiceImpl implements ConfigService {
 
-    /**
-     * 缓存空值的哨兵对象：Caffeine 不允许缓存 {@code null}，用该哨兵占位，读取时再还原为 {@code null}，
-     * 从而让"配置不存在"的结果也能被缓存，避免反复回源查库。
-     */
-    private static final Object NULL_MARKER = new Object();
-
     private final SysConfigMapper sysConfigMapper;
     private final CacheManager cacheManager;
     private final ConfigConverter configConverter;
@@ -111,7 +105,7 @@ public class ConfigServiceImpl implements ConfigService {
         try {
             // 原子回源：未命中时执行 loader 查库并写入，防止缓存击穿
             Object cached = cache.get(key, () -> loadFromDb(key));
-            return cached == NULL_MARKER ? null : (SysConfig) cached;
+            return cached == CacheConst.NULL_MARKER ? null : (SysConfig) cached;
         } catch (Cache.ValueRetrievalException e) {
             // 回源异常时降级为直接查库，避免缓存故障阻断配置读取
             return oneConfigByKeyFromDb(key);
@@ -119,14 +113,14 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     /**
-     * 配置缓存回源加载器：查库一次并回填；未命中（不存在/停用）以 {@link #NULL_MARKER} 哨兵占位。
+     * 配置缓存回源加载器：查库一次并回填；未命中（不存在/停用）以 {@link CacheConst#NULL_MARKER} 哨兵占位。
      *
      * @param key 配置键
      * @return 配置实体或空值哨兵
      */
     private Object loadFromDb(String key) {
         SysConfig config = oneConfigByKeyFromDb(key);
-        return config == null ? NULL_MARKER : config;
+        return config == null ? CacheConst.NULL_MARKER : config;
     }
 
     /**
