@@ -36,7 +36,13 @@ const PORTAL_API = {
   /** 恋爱清单：GET /love/list -> [{text, done, date, img}] */
   loveList: { url: '/love/list', method: 'GET' },
   /** 点点滴滴文章列表：GET /love/littles -> [{id, title, author, date}] */
-  littles: { url: '/love/littles', method: 'GET' }
+  littles: { url: '/love/littles', method: 'GET' },
+  /**
+   * 关于页对话剧本：GET /love/chat -> 节点数组（后台可配置，预留口子）
+   * 节点两种：{type:'bot', delay, content} 消息（content 支持 "![alt](url)" 图片语法）；
+   *          {type:'buttons', delay, options:[{text, value, next:[...]}]} 分支按钮，next 为点选后继续执行的子序列
+   */
+  aboutChat: { url: '/love/chat', method: 'GET' }
 };
 
 /** 示例数据：仅在后端接口未实现时兜底展示 */
@@ -66,6 +72,51 @@ const PORTAL_MOCK = {
     { id: 1, title: 'Like_Girl 默认文章语法', author: 'Ki.', date: '2022-11-20' },
     { id: 2, title: '第一次一起去看海', author: 'Ki.', date: '2023-05-21' },
     { id: 3, title: '记录我们的第 1000 天', author: 'Su', date: '2024-05-15' }
+  ],
+  /** 关于页对话默认剧本（后台实现 /love/chat 后自动切换为配置数据） */
+  aboutChat: [
+    { type: 'bot', delay: 200, content: 'Hi, 欢迎你的来访' },
+    { type: 'bot', delay: 1000, content: '愿得一人心 白首不相离' },
+    { type: 'bot', delay: 1000, content: '记录日常生活 留住感动' },
+    {
+      type: 'buttons', delay: 1500,
+      options: [
+        {
+          text: '听我介绍', value: 'and',
+          next: [
+            { type: 'bot', delay: 1500, content: '情侣小站Like Girl是 Ki 的原创项目' },
+            { type: 'bot', delay: 1500, content: '在2022年暑假的假期最后几天里发布了1.0版本' },
+            { type: 'bot', delay: 1500, content: '最新版本为 v5.2.0 亦是最终版本 目前已开源到码云' },
+            { type: 'bot', delay: 1500, content: 'PHP确实是 “世界上最好的语言”  我非常喜欢（痛苦' },
+            { type: 'bot', delay: 1500, content: '在开发过程中遇到了许多奇葩问题 也是只能自己探索解决...' },
+            { type: 'bot', delay: 1500, content: '喜欢探索编程领域 热爱学习新知识 热爱开源文化' },
+            {
+              type: 'buttons', delay: 1500,
+              options: [{ text: '为什么叫 Ki？', value: 'next' }],
+              next: [
+                { type: 'bot', delay: 1500, content: '不知道你有没有看过《比悲伤更悲伤的故事》' },
+                { type: 'bot', delay: 1500, content: '嗨，我是k，如果有下辈子的话，' },
+                { type: 'bot', delay: 1500, content: '“我想当戒指，眼镜，床和笔记本，这样的话，我就可以...”' },
+                { type: 'bot', delay: 1500, content: '当然跟这个没有关系哈哈' },
+                {
+                  type: 'buttons', delay: 1500,
+                  options: [{ text: '结束对话', value: 'end' }],
+                  next: [
+                    { type: 'bot', delay: 1500, content: '感谢你的来访，祝你们幸福长长久久~' }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          text: '结束介绍', value: 'gg',
+          next: [
+            { type: 'bot', delay: 1500, content: ' ![告辞](/assets/portal/img/goodbye.jpg) ' }
+          ]
+        }
+      ]
+    }
   ]
 };
 
