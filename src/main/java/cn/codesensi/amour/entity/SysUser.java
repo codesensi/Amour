@@ -1,5 +1,6 @@
 package cn.codesensi.amour.entity;
 
+import cn.codesensi.amour.common.consts.RbacConst;
 import cn.codesensi.amour.common.core.BaseEntity;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
@@ -81,5 +82,15 @@ public class SysUser extends BaseEntity implements Serializable {
      * 备注
      */
     private String remark;
+
+    /**
+     * 判断当前用户是否为超级管理员。
+     * <p>用户ID等于 {@link RbacConst#USER_ADMIN_ID}（初始化数据中的 1 号账号）即为超级管理员。
+     *
+     * @return 是超级管理员返回 {@code true}；用户ID为 {@code null}（未持久化的新对象）返回 {@code false}
+     */
+    public boolean isAdmin() {
+        return RbacConst.USER_ADMIN_ID.equals(this.id);
+    }
 
 }
