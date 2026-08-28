@@ -1,6 +1,6 @@
 package cn.codesensi.amour.mapper;
 
-import cn.codesensi.amour.entity.SysUser;
+import cn.codesensi.amour.model.entity.SysUser;
 import com.mybatisflex.core.BaseMapper;
 
 /**

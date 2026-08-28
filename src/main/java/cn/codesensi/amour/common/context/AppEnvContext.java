@@ -1,4 +1,4 @@
-package cn.codesensi.amour.context;
+package cn.codesensi.amour.common.context;
 
 import cn.codesensi.amour.common.util.CacheUtil;
 import lombok.Data;

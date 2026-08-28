@@ -1,6 +1,6 @@
-package cn.codesensi.amour.advice;
+package cn.codesensi.amour.common.advice;
 
-import cn.codesensi.amour.annotation.ApiResponseBody;
+import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.common.core.Result;
 import cn.codesensi.amour.common.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;

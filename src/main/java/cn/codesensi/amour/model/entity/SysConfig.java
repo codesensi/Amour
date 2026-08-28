@@ -1,4 +1,4 @@
-package cn.codesensi.amour.entity;
+package cn.codesensi.amour.model.entity;
 
 import cn.codesensi.amour.common.core.BaseEntity;
 import com.mybatisflex.annotation.Id;

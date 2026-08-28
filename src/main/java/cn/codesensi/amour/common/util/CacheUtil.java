@@ -1,6 +1,6 @@
 package cn.codesensi.amour.common.util;
 
-import cn.codesensi.amour.context.AppEnvContext;
+import cn.codesensi.amour.common.context.AppEnvContext;
 
 /**
  * 缓存工具类。

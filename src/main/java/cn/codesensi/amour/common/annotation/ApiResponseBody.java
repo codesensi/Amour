@@ -1,5 +1,6 @@
-package cn.codesensi.amour.annotation;
+package cn.codesensi.amour.common.annotation;
 
+import cn.codesensi.amour.common.advice.ApiResponseBodyAdvice;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.lang.annotation.*;
@@ -11,7 +12,7 @@ import java.lang.annotation.*;
  * 自动包装为 {@code Result} 统一响应对象；返回值已是 {@code Result} 类型时不重复包装。
  *
  * @author codesensi
- * @see cn.codesensi.amour.advice.ApiResponseBodyAdvice
+ * @see ApiResponseBodyAdvice
  * @since 1.0
  */
 @Retention(RetentionPolicy.RUNTIME)

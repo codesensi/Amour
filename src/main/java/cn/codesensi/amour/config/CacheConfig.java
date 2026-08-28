@@ -1,7 +1,7 @@
 package cn.codesensi.amour.config;
 
 import cn.codesensi.amour.common.properties.AppCacheProperties;
-import cn.codesensi.amour.context.AppEnvContext;
+import cn.codesensi.amour.common.context.AppEnvContext;
 import cn.codesensi.amour.common.util.CacheUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;

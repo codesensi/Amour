@@ -3,7 +3,9 @@ package cn.codesensi.amour.service.impl;
 import cn.codesensi.amour.common.consts.CacheConst;
 import cn.codesensi.amour.common.enums.EnableEnum;
 import cn.codesensi.amour.common.util.CacheUtil;
-import cn.codesensi.amour.entity.SysConfig;
+import cn.codesensi.amour.model.convert.ConfigConvert;
+import cn.codesensi.amour.model.dto.ConfigDTO;
+import cn.codesensi.amour.model.entity.SysConfig;
 import cn.codesensi.amour.mapper.SysConfigMapper;
 import cn.codesensi.amour.service.ConfigService;
 import com.mybatisflex.core.query.QueryChain;
@@ -12,9 +14,10 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static cn.codesensi.amour.entity.table.SysConfigTableDef.SYS_CONFIG;
+import static cn.codesensi.amour.model.entity.table.SysConfigTableDef.SYS_CONFIG;
 
 /**
  * 运行时配置查询服务实现。
@@ -26,12 +29,8 @@ import static cn.codesensi.amour.entity.table.SysConfigTableDef.SYS_CONFIG;
  * 缓存采用"驻留不自动过期"策略，热更新依赖写库侧显式调用 {@link #evictCache(List)}
  * 失效对应配置键；在缓存未就绪或回源异常时降级为直接查库，保证配置读取不受缓存故障影响。
  * <p>
- * 当配置键在库中不存在或处于停用状态时，各方法回落到对应类型的默认值，避免调用侧因缺配置而失败：
- * <ul>
- *   <li>{@link #getString(String)} → {@code null}</li>
- *   <li>{@link #getBool(String)} → {@code false}</li>
- *   <li>{@link #getInt(String)} → {@code 0}</li>
- * </ul>
+ * 查询结果以 {@link ConfigDTO} 返回；当配置键在库中不存在或处于停用状态时，
+ * 结果中不包含对应条目，避免调用侧因缺配置而失败。
  */
 @Service
 @RequiredArgsConstructor
@@ -45,55 +44,33 @@ public class ConfigServiceImpl implements ConfigService {
 
     private final SysConfigMapper sysConfigMapper;
     private final CacheManager cacheManager;
+    private final ConfigConvert configConvert;
 
     /**
-     * 按键读取字符串配置。
-     * <p>配置缺失或停用时返回 {@code null}。
+     * 按配置键集合批量查询配置；入参为空（{@code null} 或不含元素）时返回全部启用的配置。
+     * <p>
+     * 指定 keys 时逐个按键读取（优先走缓存，未命中回源查库并回填），
+     * 不存在或停用的配置键不出现在结果中，集合中的 {@code null} 元素会被跳过。
      *
-     * @param key 配置键（app 之下的点分路径，如 {@code name}）
-     * @return 配置值字符串；不存在/停用返回 {@code null}
+     * @param keys 待查询的配置键集合（app 之下的点分路径）；为空时查询全部
+     * @return 配置 DTO 列表；无命中时返回空列表
      */
     @Override
-    public String getString(String key) {
-        return raw(key);
-    }
-
-    /**
-     * 按键读取布尔配置。
-     * <p>配置缺失或停用，或取回的字符串无法解析为布尔时返回 {@code false}。
-     *
-     * @param key 配置键（app 之下的点分路径，如 {@code demo-mode}）
-     * @return 布尔配置值；不存在/停用返回 {@code false}
-     */
-    @Override
-    public boolean getBool(String key) {
-        return Boolean.parseBoolean(raw(key));
-    }
-
-    /**
-     * 按键读取整数配置。
-     * <p>配置缺失或停用时返回 {@code 0}（对 null 安全，不会抛出解析异常）。
-     *
-     * @param key 配置键（app 之下的点分路径，如 {@code captcha.image-expire}）
-     * @return 整数配置值；不存在/停用返回 {@code 0}
-     */
-    @Override
-    public int getInt(String key) {
-        String value = raw(key);
-        return value == null ? 0 : Integer.parseInt(value);
-    }
-
-    /**
-     * 按键读取长整数配置。
-     * <p>配置缺失或停用时返回 {@code 0L}（对 null 安全，不会抛出解析异常）。
-     *
-     * @param key 配置键（app 之下的点分路径，如 {@code captcha.image-expire}）
-     * @return 长整数配置值；不存在/停用返回 {@code 0L}
-     */
-    @Override
-    public long getLong(String key) {
-        String value = raw(key);
-        return value == null ? 0L : Long.parseLong(value);
+    public List<ConfigDTO> listByKeys(List<String> keys) {
+        if (keys == null || keys.isEmpty()) {
+            return listAllFromDb();
+        }
+        List<ConfigDTO> result = new ArrayList<>();
+        for (String key : keys) {
+            if (key == null) {
+                continue;
+            }
+            SysConfig config = oneConfigByKey(key);
+            if (config != null) {
+                result.add(configConvert.toDTO(config));
+            }
+        }
+        return result;
     }
 
     /**
@@ -120,24 +97,24 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     /**
-     * 从 config 缓存读取指定配置键当前启用（status=启用）的配置值；未命中时回源查库并回填缓存。
+     * 从 config 缓存读取指定配置键当前启用（status=启用）的配置；未命中时回源查库并回填缓存。
      *
      * @param key 配置键
-     * @return 配置值字符串；不存在或停用返回 {@code null}
+     * @return 启用中的配置实体；不存在或停用返回 {@code null}
      */
-    private String raw(String key) {
+    private SysConfig oneConfigByKey(String key) {
         Cache cache = configCache();
         if (cache == null) {
             // 缓存未注册/未就绪：降级为直接查库
-            return queryDb(key);
+            return oneConfigByKeyFromDb(key);
         }
         try {
             // 原子回源：未命中时执行 loader 查库并写入，防止缓存击穿
             Object cached = cache.get(key, () -> loadFromDb(key));
-            return cached == NULL_MARKER ? null : (String) cached;
+            return cached == NULL_MARKER ? null : (SysConfig) cached;
         } catch (Cache.ValueRetrievalException e) {
             // 回源异常时降级为直接查库，避免缓存故障阻断配置读取
-            return queryDb(key);
+            return oneConfigByKeyFromDb(key);
         }
     }
 
@@ -145,11 +122,11 @@ public class ConfigServiceImpl implements ConfigService {
      * 配置缓存回源加载器：查库一次并回填；未命中（不存在/停用）以 {@link #NULL_MARKER} 哨兵占位。
      *
      * @param key 配置键
-     * @return 配置值字符串或空值哨兵
+     * @return 配置实体或空值哨兵
      */
     private Object loadFromDb(String key) {
-        String value = queryDb(key);
-        return value == null ? NULL_MARKER : value;
+        SysConfig config = oneConfigByKeyFromDb(key);
+        return config == null ? NULL_MARKER : config;
     }
 
     /**
@@ -162,16 +139,35 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     /**
-     * 从 sys_config 表查询指定配置键当前启用（status=启用）的配置值。
+     * 从 sys_config 表查询指定配置键当前启用（status=启用）的配置记录。
      *
      * @param key 配置键
-     * @return 配置值字符串；不存在或停用返回 {@code null}
+     * @return 启用中的配置实体；不存在或停用返回 {@code null}
      */
-    private String queryDb(String key) {
-        SysConfig c = QueryChain.of(sysConfigMapper)
+    private SysConfig oneConfigByKeyFromDb(String key) {
+        return QueryChain.of(sysConfigMapper)
                 .where(SYS_CONFIG.C_KEY.eq(key))
                 .and(SYS_CONFIG.STATUS.eq(EnableEnum.ENABLE.getCode()))
                 .one();
-        return c == null ? null : c.getCValue();
+    }
+
+    /**
+     * 查询全部启用（status=启用）的配置。
+     * <p>缓存就绪时逐条回填缓存，顺带完成常用配置点的预热。
+     *
+     * @return 配置 DTO 列表；无数据时返回空列表
+     */
+    private List<ConfigDTO> listAllFromDb() {
+        List<SysConfig> configs = QueryChain.of(sysConfigMapper)
+                .where(SYS_CONFIG.STATUS.eq(EnableEnum.ENABLE.getCode()))
+                .list();
+        Cache cache = configCache();
+        // 缓存就绪时逐条回填缓存，顺带完成常用配置点的预热
+        if (cache != null) {
+            for (SysConfig config : configs) {
+                cache.put(config.getCKey(), config);
+            }
+        }
+        return configConvert.toDTOList(configs);
     }
 }

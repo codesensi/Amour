@@ -1,6 +1,6 @@
 package cn.codesensi.amour.service.impl;
 
-import cn.codesensi.amour.entity.SysUser;
+import cn.codesensi.amour.model.entity.SysUser;
 import cn.codesensi.amour.mapper.SysUserMapper;
 import cn.codesensi.amour.service.UserService;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
