@@ -5,7 +5,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Map;
+import java.util.List;
 
 /**
  * 缓存内容响应 —— 面向缓存查询结果的数据传输对象。
@@ -41,7 +41,7 @@ public class CacheResponse implements Serializable {
     private Long maximumSize;
 
     /**
-     * 缓存条目（缓存键 → 缓存值；值为 null 表示该键缓存的是"数据不存在"的空值哨兵占位）
+     * 缓存条目列表（含每条目的键、值与剩余过期时间）
      */
-    private Map<String, Object> entries;
+    private List<CacheEntryResponse> entries;
 }

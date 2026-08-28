@@ -1,6 +1,7 @@
 package cn.codesensi.amour.service.impl;
 
 import cn.codesensi.amour.common.consts.CacheConst;
+import cn.codesensi.amour.model.response.CacheEntryResponse;
 import cn.codesensi.amour.model.response.CacheResponse;
 import cn.codesensi.amour.service.CacheService;
 import com.github.benmanes.caffeine.cache.Policy;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -22,8 +22,8 @@ import java.util.concurrent.TimeUnit;
  * 缓存查询服务实现。
  * <p>
  * 遍历 {@link CacheManager} 中注册的全部缓存，经 {@link CaffeineCache#getNativeCache()}
- * 获取原生 Caffeine 缓存后，通过 {@code asMap()} 视图读取全部条目，并通过 {@code policy()}
- * 读取实际生效的过期策略，用于运行期查看缓存内容。
+ * 获取原生 Caffeine 缓存后，通过 {@code asMap()} 视图读取全部条目，通过 {@code policy()}
+ * 读取过期策略与每条目的剩余过期时间，用于运行期查看缓存内容。
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -35,8 +35,8 @@ public class CacheServiceImpl implements CacheService {
     /**
      * 查询全部 Caffeine 缓存内容。
      * <p>
-     * 处理流程：遍历缓存管理器中注册的全部缓存 → 读取实际生效的过期策略 →
-     * 读取各缓存的原生条目视图 → 空值哨兵还原为 {@code null} → 按缓存名排序返回。
+     * 处理流程：遍历缓存管理器中注册的全部缓存 → 读取过期策略 → 读取各缓存条目及剩余过期时间 →
+     * 空值哨兵还原为 {@code null} → 按缓存名排序返回。
      *
      * @return 各缓存的名称、过期策略与条目列表；无缓存时返回空列表
      */
@@ -52,12 +52,8 @@ public class CacheServiceImpl implements CacheService {
 
             CacheResponse response = new CacheResponse();
             response.setCacheName(cacheName);
-            // 缓存过期策略
             fillPolicy(response, caffeineCache);
-            Map<String, Object> entries = new LinkedHashMap<>();
-            // asMap()：原生 Caffeine 缓存的并发条目视图，遍历时不会触发过期淘汰
-            caffeineCache.getNativeCache().asMap().forEach((key, value) -> entries.put(String.valueOf(key), renderValue(value)));
-            response.setEntries(entries);
+            response.setEntries(listEntries(caffeineCache));
             result.add(response);
         }
         // 按缓存名排序，保证输出顺序稳定
@@ -79,6 +75,49 @@ public class CacheServiceImpl implements CacheService {
         policy.expireAfterWrite().ifPresent(fixed -> response.setExpireAfterWrite(fixed.getExpiresAfter(TimeUnit.SECONDS)));
         policy.expireAfterAccess().ifPresent(fixed -> response.setExpireAfterAccess(fixed.getExpiresAfter(TimeUnit.SECONDS)));
         policy.eviction().ifPresent(eviction -> response.setMaximumSize(eviction.getMaximum()));
+    }
+
+    /**
+     * 读取缓存全部条目，并附每条目的剩余过期时间。
+     * <p>
+     * 剩余过期时间经 {@link Policy#getEntryIfPresentQuietly(Object)} 获取条目元数据后计算，
+     * 该方法为只读查询，不会刷新条目的访问时间；缓存配置了任一过期维度时其值为正数秒，
+     * 驻留不过期的缓存呈现在响应中为 {@code null}。
+     *
+     * @param caffeineCache Spring 缓存的 Caffeine 实现
+     * @return 缓存条目列表
+     */
+    private List<CacheEntryResponse> listEntries(CaffeineCache caffeineCache) {
+        Policy<Object, Object> policy = caffeineCache.getNativeCache().policy();
+        // 缓存是否配置了过期维度：均未配置时条目永不过期，无需查询剩余时间
+        boolean expirable = policy.expireAfterWrite().isPresent() || policy.expireAfterAccess().isPresent();
+
+        List<CacheEntryResponse> entries = new ArrayList<>();
+        for (Map.Entry<Object, Object> entry : caffeineCache.getNativeCache().asMap().entrySet()) {
+            CacheEntryResponse entryResponse = new CacheEntryResponse();
+            entryResponse.setKey(String.valueOf(entry.getKey()));
+            entryResponse.setValue(renderValue(entry.getValue()));
+            entryResponse.setRemainExpire(remainExpire(policy, entry.getKey(), expirable));
+            entries.add(entryResponse);
+        }
+        return entries;
+    }
+
+    /**
+     * 计算指定条目的剩余过期时间（秒）。
+     *
+     * @param policy    原生缓存的策略视图
+     * @param key       缓存键
+     * @param expirable 缓存是否配置了过期维度
+     * @return 剩余过期秒数；缓存不过期或条目已被移除时返回 {@code null}
+     */
+    private Long remainExpire(Policy<Object, Object> policy, Object key, boolean expirable) {
+        if (!expirable) {
+            return null;
+        }
+        Policy.CacheEntry<Object, Object> entry = policy.getEntryIfPresentQuietly(key);
+        // 条目在遍历间隙被淘汰/移除时视为已无剩余时间
+        return entry == null ? null : entry.expiresAfter().toSeconds();
     }
 
     /**
