@@ -15,9 +15,9 @@
   margin: 0 0.6rem;
 }
 
-/* 对话区背景卡（内容区壁纸） */
+/* 对话区背景卡（内容区壁纸；原图为原站 gejiba 图床外链，已自 Wayback 存档本地化） */
 .central-600 {
-  background: url("https://ice.frostsky.com/2024/11/06/570374efdc2bb75a8b722c969118afb5.webp") no-repeat center top;
+  background: url("../../img/about-bg.jpg") no-repeat center top;
   background-size: cover;
   border-radius: 3rem;
   overflow: hidden;
