@@ -6,27 +6,27 @@
 -->
 <html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
 
-<!-- 页面头部：meta + 标题 + 全部样式引入（版本参数在此统一管理） -->
+<!-- 页面头部：meta + 标题 + 全部样式引入（经 resourceUrlProvider 生成内容指纹 URL，自动管理缓存失效） -->
 <head th:fragment="head(title)">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
   <title th:text="${title}">龙猫の爱恋</title>
-  <link rel="shortcut icon" href="/assets/portal/img/favicon.ico">
-  <link rel="stylesheet" href="/assets/portal/css/portal.css?v=8">
-  <link rel="stylesheet" href="/assets/portal/css/theme/content.css">
-  <link rel="stylesheet" href="/assets/portal/css/theme/max-768.css" media="(max-width: 768px)">
-  <link rel="stylesheet" href="/assets/portal/css/theme/min-768.css" media="(min-width: 768px)">
-  <link rel="stylesheet" href="/assets/portal/css/theme/min-960.css" media="(min-width: 960px)">
-  <link rel="stylesheet" href="/assets/portal/css/theme/min-1200.css" media="(min-width: 1200px)">
-  <link rel="stylesheet" href="/assets/portal/css/theme/moments.css">
-  <link rel="stylesheet" href="/assets/portal/css/theme/message.css">
-  <link rel="stylesheet" href="/assets/portal/css/theme/about.css">
-  <link rel="stylesheet" href="/assets/portal/css/theme/love-photo.css">
-  <link rel="stylesheet" href="/assets/portal/css/theme/love-list.css">
-  <link rel="stylesheet" href="/assets/portal/icons/iconfont-list.css">
-  <link rel="stylesheet" href="/assets/portal/lib/botui/botui.min.css">
-  <link rel="stylesheet" href="/assets/portal/lib/botui/botui-theme-default.css">
-  <link rel="stylesheet" href="/assets/portal/lib/toastr/toastr.css">
+  <link rel="shortcut icon" th:href="${resourceUrlProvider.getForLookupPath('/assets/portal/img/favicon.ico')}">
+  <link rel="stylesheet" th:href="${resourceUrlProvider.getForLookupPath('/assets/portal/css/portal.css')}">
+  <link rel="stylesheet" th:href="${resourceUrlProvider.getForLookupPath('/assets/portal/css/content.css')}">
+  <link rel="stylesheet" th:href="${resourceUrlProvider.getForLookupPath('/assets/portal/css/breakpoints/max-768.css')}" media="(max-width: 768px)">
+  <link rel="stylesheet" th:href="${resourceUrlProvider.getForLookupPath('/assets/portal/css/breakpoints/min-768.css')}" media="(min-width: 768px)">
+  <link rel="stylesheet" th:href="${resourceUrlProvider.getForLookupPath('/assets/portal/css/breakpoints/min-960.css')}" media="(min-width: 960px)">
+  <link rel="stylesheet" th:href="${resourceUrlProvider.getForLookupPath('/assets/portal/css/breakpoints/min-1200.css')}" media="(min-width: 1200px)">
+  <link rel="stylesheet" th:href="${resourceUrlProvider.getForLookupPath('/assets/portal/css/pages/moments.css')}">
+  <link rel="stylesheet" th:href="${resourceUrlProvider.getForLookupPath('/assets/portal/css/pages/message.css')}">
+  <link rel="stylesheet" th:href="${resourceUrlProvider.getForLookupPath('/assets/portal/css/pages/about.css')}">
+  <link rel="stylesheet" th:href="${resourceUrlProvider.getForLookupPath('/assets/portal/css/pages/love-photo.css')}">
+  <link rel="stylesheet" th:href="${resourceUrlProvider.getForLookupPath('/assets/portal/css/pages/love-list.css')}">
+  <link rel="stylesheet" th:href="${resourceUrlProvider.getForLookupPath('/assets/portal/icons/iconfont-list.css')}">
+  <link rel="stylesheet" th:href="${resourceUrlProvider.getForLookupPath('/assets/portal/lib/botui/botui.min.css')}">
+  <link rel="stylesheet" th:href="${resourceUrlProvider.getForLookupPath('/assets/portal/lib/botui/botui-theme-default.css')}">
+  <link rel="stylesheet" th:href="${resourceUrlProvider.getForLookupPath('/assets/portal/lib/toastr/toastr.css')}">
 </head>
 
 <body>
@@ -125,12 +125,12 @@
       <path d="M810.666667 213.333333H213.333333a85.333333 85.333333 0 0 0-85.333333 85.333334v426.666666a85.333333 85.333333 0 0 0 85.333333 85.333334h597.333334a85.333333 85.333333 0 0 0 85.333333-85.333334V298.666667a85.333333 85.333333 0 0 0-85.333333-85.333334z m0 512H213.333333V298.666667h597.333334v426.666666zM341.333333 384a64 64 0 1 0 128 0 64 64 0 0 0-128 0z m128 128l-128 170.666667h512l-170.666666-256-128 170.666666-85.333334-85.333333z"/>
     </symbol>
   </svg>
-  <script src="/assets/portal/lib/vue.min.js"></script>
-  <script src="/assets/portal/lib/botui/botui.min.js"></script>
-  <script src="/assets/portal/lib/toastr/toastr.js"></script>
-  <script src="/assets/portal/icons/iconfont-sprite.js"></script>
-  <script src="/assets/portal/js/portal.js?v=4"></script>
-  <script src="/assets/portal/js/pjax.js?v=5"></script>
+  <script th:src="${resourceUrlProvider.getForLookupPath('/assets/portal/lib/vue.min.js')}"></script>
+  <script th:src="${resourceUrlProvider.getForLookupPath('/assets/portal/lib/botui/botui.min.js')}"></script>
+  <script th:src="${resourceUrlProvider.getForLookupPath('/assets/portal/lib/toastr/toastr.js')}"></script>
+  <script th:src="${resourceUrlProvider.getForLookupPath('/assets/portal/icons/iconfont-sprite.js')}"></script>
+  <script th:src="${resourceUrlProvider.getForLookupPath('/assets/portal/js/portal.js')}"></script>
+  <script th:src="${resourceUrlProvider.getForLookupPath('/assets/portal/js/pjax.js')}"></script>
 </div>
 
 </body>

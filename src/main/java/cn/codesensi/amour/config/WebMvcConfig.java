@@ -2,12 +2,15 @@ package cn.codesensi.amour.config;
 
 import cn.codesensi.amour.common.consts.RbacConst;
 import cn.codesensi.amour.interceptor.DemoModeInterceptor;
+import cn.codesensi.amour.interceptor.FrontendResourceInterceptor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.resource.VersionResourceResolver;
 
 /**
  * Web MVC 拦截器链配置 —— 统一注册应用的拦截器与页面跳转视图控制器。
@@ -21,6 +24,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebMvcConfig implements WebMvcConfigurer {
 
     private final DemoModeInterceptor demoModeInterceptor;
+    private final FrontendResourceInterceptor frontendResourceInterceptor;
 
     /**
      * 注册应用级拦截器链。
@@ -50,6 +54,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 // 获取验证码、登录、登出接口不受演示模式限制
                 .excludePathPatterns(RbacConst.CAPTCHA_PATH, RbacConst.LOGIN_PATH, RbacConst.LOGOUT_PATH)
                 .order(2);
+
+        // 3. 前端资源 URL 拦截器：为门户视图注入 resourceUrlProvider（配合内容指纹版本策略生成资源 URL）
+        registry.addInterceptor(frontendResourceInterceptor)
+                .addPathPatterns("/", "/index.html", "/portal/**")
+                .order(3);
     }
 
     /**
@@ -71,6 +80,22 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addViewController("/portal/love-list.html").setViewName("portal/love-list");
         // 后台管理入口：/admin 跳转到后台管理登录页（仍为静态页）
         registry.addRedirectViewController("/admin", "/admin/login.html");
+    }
+
+    /**
+     * 注册静态资源处理器 —— 为 /assets/** 启用内容指纹版本策略。
+     *
+     * <p>资源 URL 形如 /assets/portal/css/portal-{内容hash}.css：文件内容变更后
+     * 指纹自动变化，浏览器缓存随之失效，无需手工维护 ?v=N 版本参数；
+     * 模板端经 resourceUrlProvider bean 生成带指纹的 URL；
+     * 不带指纹的原始 URL 依然可正常解析，兼容未指纹化的引用。</p>
+     */
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/assets/**")
+                .addResourceLocations("classpath:/static/assets/")
+                .resourceChain(true)
+                .addResolver(new VersionResourceResolver().addContentVersionStrategy("/**"));
     }
 
     /**
