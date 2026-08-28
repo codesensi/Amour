@@ -115,32 +115,38 @@ async function portalRequest(apiKey, payload) {
   return PORTAL_MOCK[apiKey];
 }
 
-/** 恋爱计时器（照搬原站 show_date_time；_running 防止 pjax 重复初始化时叠加循环） */
+/** 计算并渲染恋爱计时（首次加载与 pjax 换页后立即调用，避免空白延迟） */
+function renderLoveTime() {
+  const birthDay = new Date(PORTAL_CONFIG.loveStartDate);
+  const today = new Date();
+  const timeold = today.getTime() - birthDay.getTime();
+  const msPerDay = 24 * 60 * 60 * 1000;
+  const e_daysold = timeold / msPerDay;
+  const daysold = Math.floor(e_daysold);
+  const e_hrsold = (e_daysold - daysold) * 24;
+  const hrsold = Math.floor(e_hrsold);
+  const e_minsold = (e_hrsold - hrsold) * 60;
+  const minsold = Math.floor((e_hrsold - hrsold) * 60);
+  let seconds = Math.floor((e_minsold - minsold) * 60);
+  if (seconds < 10) seconds = '0' + seconds;
+
+  const timeLabel = document.getElementById('span_dt_dt');
+  if (timeLabel !== null) {
+    timeLabel.innerHTML = '这是我们一起走过的';
+    document.getElementById('tian').innerHTML = daysold + '天';
+    document.getElementById('shi').innerHTML = hrsold + '时';
+    document.getElementById('fen').innerHTML = minsold + '分';
+    document.getElementById('miao').innerHTML = seconds + '秒';
+  }
+}
+
+/** 启动恋爱计时：先立即渲染一次，再进入每秒刷新循环（_running 防止 pjax 重复初始化时叠加循环） */
 function showLoveTime() {
+  renderLoveTime();
   if (showLoveTime._running) return;
   showLoveTime._running = true;
   window.setTimeout(function tick() {
-    const birthDay = new Date(PORTAL_CONFIG.loveStartDate);
-    const today = new Date();
-    const timeold = today.getTime() - birthDay.getTime();
-    const msPerDay = 24 * 60 * 60 * 1000;
-    const e_daysold = timeold / msPerDay;
-    const daysold = Math.floor(e_daysold);
-    const e_hrsold = (e_daysold - daysold) * 24;
-    const hrsold = Math.floor(e_hrsold);
-    const e_minsold = (e_hrsold - hrsold) * 60;
-    const minsold = Math.floor((e_hrsold - hrsold) * 60);
-    let seconds = Math.floor((e_minsold - minsold) * 60);
-    if (seconds < 10) seconds = '0' + seconds;
-
-    const timeLabel = document.getElementById('span_dt_dt');
-    if (timeLabel !== null) {
-      document.getElementById('span_dt_dt').innerHTML = '这是我们一起走过的';
-      document.getElementById('tian').innerHTML = daysold + '天';
-      document.getElementById('shi').innerHTML = hrsold + '时';
-      document.getElementById('fen').innerHTML = minsold + '分';
-      document.getElementById('miao').innerHTML = seconds + '秒';
-    }
+    renderLoveTime();
     window.setTimeout(tick, 1000);
   }, 1000);
 }

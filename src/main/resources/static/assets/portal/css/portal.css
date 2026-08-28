@@ -174,10 +174,29 @@ body {
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAKUlEQVQImU3IMREAIAgAwJfNkQCEsH8cijjpMf6vnXlQaIiJFx+omEBfmqIEZLe2jzcAAAAASUVORK5CYII=);
 }
 
+/* 内容容器（照搬原站 .central：各断点定宽 + 2rem 上下外边距，提供纵向间距） */
 .central {
+  width: 100%;
+  margin: 2rem auto;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .central { width: 728px; }
+}
+
+@media (min-width: 960px) {
+  .central { width: 930px; }
+}
+
+@media (min-width: 1200px) {
+  .central { width: 1180px; }
+}
+
+/* 首屏胶囊容器限宽（照搬原站 central-800） */
+.central-800 {
   max-width: 800px;
-  margin: 0 auto;
-  padding: 0 15px;
 }
 
 .bg-img .middle {
@@ -282,8 +301,6 @@ body {
 }
 
 .card-wrap .row {
-  max-width: 1200px;
-  margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   gap: 2rem;
