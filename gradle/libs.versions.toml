@@ -1,38 +1,43 @@
 [versions]
 # Spring Boot —— 一个版本号同时供插件与 BOM 使用
 spring-boot = "4.1.1"
+
 # 第三方库（非 Spring BOM 内，需自定）
-mybatis-flex = "1.11.8"
-mapstruct = "1.6.3"
+# 顺序与下方 [libraries] 的「第三方库」板块及 build.gradle 的第三方分组保持一致
 easy-captcha = "1.6.2"
+mybatis-flex = "1.11.8"
 ip2region = "3.3.7"
-logbook = "4.1.0"
+mapstruct = "1.6.3"
 nashorn = "15.7"
+logbook = "4.1.0"
 
 [libraries]
-# Spring Boot BOM：统一管 Spring 系 + caffeine/h2/lombok/junit 等 BOM 内组件版本
+# ===== Spring Boot BOM：统一管理 Spring 系组件（starter、caffeine、h2、lombok、junit 等）版本 =====
+# Gradle 的 platform() 版本约束仅作用于声明它的配置，故 build.gradle 中各依赖配置均需引入该 BOM
 spring-boot-dependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
 
-# Spring 系依赖（版本交给上面的 BOM，不写 version.ref）
+# ===== Spring 系依赖（版本交给 BOM）——对应 build.gradle 的 implementation「Spring Boot 相关」与 test 分组 =====
+spring-boot-h2console = { module = "org.springframework.boot:spring-boot-h2console" }
 spring-boot-starter-cache = { module = "org.springframework.boot:spring-boot-starter-cache" }
 spring-boot-starter-jdbc = { module = "org.springframework.boot:spring-boot-starter-jdbc" }
 spring-boot-starter-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
-spring-boot-h2console = { module = "org.springframework.boot:spring-boot-h2console" }
 spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }
+
+# ===== BOM 管理的非 Spring 组件（版本交给 BOM）——分布于 build.gradle 的 implementation/compileOnly/annotationProcessor/runtimeOnly/test* 各配置 =====
 caffeine = { module = "com.github.ben-manes.caffeine:caffeine" }
-lombok = { module = "org.projectlombok:lombok" }
 h2 = { module = "com.h2database:h2" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+lombok = { module = "org.projectlombok:lombok" }
 
-# 第三方非 BOM 族（必须自定版本，version.ref 收进 [versions]）
+# ===== 第三方库（自定版本）——对应 build.gradle 的 implementation「第三方框架/库」与 annotationProcessor 分组 =====
+easy-captcha = { module = "com.github.whvcse:easy-captcha", version.ref = "easy-captcha" }
 mybatis-flex-starter = { module = "com.mybatis-flex:mybatis-flex-spring-boot4-starter", version.ref = "mybatis-flex" }
 mybatis-flex-processor = { module = "com.mybatis-flex:mybatis-flex-processor", version.ref = "mybatis-flex" }
+ip2region = { module = "org.lionsoul:ip2region", version.ref = "ip2region" }
 mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
 mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
-easy-captcha = { module = "com.github.whvcse:easy-captcha", version.ref = "easy-captcha" }
-ip2region = { module = "org.lionsoul:ip2region", version.ref = "ip2region" }
-logbook-starter = { module = "org.zalando:logbook-spring-boot-starter", version.ref = "logbook" }
 nashorn-core = { module = "org.openjdk.nashorn:nashorn-core", version.ref = "nashorn" }
+logbook-starter = { module = "org.zalando:logbook-spring-boot-starter", version.ref = "logbook" }
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }

@@ -24,10 +24,11 @@ repositories {
 }
 
 // ===== 依赖声明 =====
-// 排序规则：按依赖作用域（scope）分组；组内按依赖坐标字母序排列，便于快速定位与维护。
+// 排序规则：板块划分及顺序与 gradle/libs.versions.toml 的 [libraries] 板块一一对应；
+// 各板块内按依赖坐标（groupId:artifactId）字母序排列（Lombok 除外：其注解处理器须先于其他处理器注册）。
 // 所有依赖坐标与版本号统一在 gradle/libs.versions.toml 中管理，这里仅通过 libs.xxx 引用。
 dependencies {
-    // Spring Boot BOM：统一管理 Spring 系组件（starter、caffeine、h2、lombok、junit 等）版本。
+    // ---------- Spring Boot BOM：统一管理 Spring 系组件（starter、caffeine、h2、lombok、junit 等）版本 ----------
     // Gradle 的 platform() 版本约束仅作用于声明它的配置，而 lombok/h2/junit 等 BOM 组件分布在
     // compileOnly/annotationProcessor/runtimeOnly/test* 等不同配置，因此需为每个相关配置都引入该 BOM，
     // 否则这些配置里的组件会因缺少版本而无法解析。
@@ -40,37 +41,37 @@ dependencies {
     testAnnotationProcessor platform(libs.spring.boot.dependencies)
     testRuntimeOnly platform(libs.spring.boot.dependencies)
 
-    // ---------- 实现期依赖（implementation）：编译 + 运行都需要 ----------
-    // Spring Boot 相关
+    // ---------- implementation：Spring Boot 相关（对应 TOML「Spring 系依赖」板块） ----------
+    implementation libs.spring.boot.h2console        // H2 Web 控制台自动配置
     implementation libs.spring.boot.starter.cache    // Spring Cache 抽象
     implementation libs.spring.boot.starter.jdbc     // JDBC + HikariCP 数据源（Spring Boot 4 需显式引入才具备自动配置）
     implementation libs.spring.boot.starter.webmvc   // Spring Web（MVC）Starter：提供 Web 开发能力
-    implementation libs.spring.boot.h2console        // H2 Web 控制台自动配置
-    // 第三方框架 / 库（按坐标字母序）
-    implementation libs.caffeine                    // Caffeine 本地缓存实现
-    implementation libs.easy.captcha                // EasyCaptcha：图形/算术验证码生成
-    implementation libs.mybatis.flex.starter         // MyBatis-Flex ORM
-    implementation libs.mapstruct                    // MapStruct：编译期生成 Bean 映射代码
-    implementation libs.ip2region                    // 工具库：IP 归属地查询
-    implementation libs.logbook.starter              // 日志：HTTP 请求/响应日志
-    implementation libs.nashorn.core                 // Nashorn：独立 JavaScript 引擎（算术验证码表达式求值等场景）
 
-    // ---------- 编译期依赖（compileOnly）：仅编译时需要，不打入最终产物 ----------
+    // ---------- implementation：第三方框架 / 库（按依赖坐标字母序，对应 TOML「第三方库」板块） ----------
+    implementation libs.caffeine                     // Caffeine 本地缓存实现
+    implementation libs.easy.captcha                 // EasyCaptcha：图形/算术验证码生成
+    implementation libs.mybatis.flex.starter         // MyBatis-Flex ORM
+    implementation libs.ip2region                    // 工具库：IP 归属地查询
+    implementation libs.mapstruct                    // MapStruct：编译期生成 Bean 映射代码
+    implementation libs.nashorn.core                 // Nashorn：独立 JavaScript 引擎（算术验证码表达式求值等场景）
+    implementation libs.logbook.starter              // 日志：HTTP 请求/响应日志
+
+    // ---------- compileOnly：仅编译时需要，不打入最终产物 ----------
     compileOnly libs.lombok                          // Lombok：编译期生成 getter/setter 等样板代码
 
-    // ---------- 注解处理器（annotationProcessor）：编译期参与代码生成 ----------
+    // ---------- annotationProcessor：编译期参与代码生成（Lombok 须先于其他处理器注册） ----------
     annotationProcessor libs.lombok                  // Lombok 注解处理器
-    annotationProcessor libs.mapstruct.processor     // MapStruct 注解处理器（扫描 @Mapper 生成实现类）
     annotationProcessor libs.mybatis.flex.processor  // MyBatis-Flex 注解处理器（生成 TableDef 等查询常量）
+    annotationProcessor libs.mapstruct.processor     // MapStruct 注解处理器（扫描 @Mapper 生成实现类）
 
-    // ---------- 运行期依赖（runtimeOnly）：仅运行时需要 ----------
-    runtimeOnly libs.h2                               // H2 内存数据库
+    // ---------- runtimeOnly：仅运行时需要 ----------
+    runtimeOnly libs.h2                              // H2 内存数据库
 
-    // ---------- 测试依赖（test*）：仅测试场景使用 ----------
+    // ---------- test*：仅测试场景使用 ----------
     testImplementation libs.spring.boot.starter.webmvc.test  // Web 测试 Starter
-    testCompileOnly libs.lombok                       // 测试期 Lombok 依赖
-    testAnnotationProcessor libs.lombok               // 测试期 Lombok 注解处理器
-    testRuntimeOnly libs.junit.platform.launcher      // JUnit Platform 启动器
+    testCompileOnly libs.lombok                      // 测试期 Lombok 依赖
+    testAnnotationProcessor libs.lombok              // 测试期 Lombok 注解处理器
+    testRuntimeOnly libs.junit.platform.launcher     // JUnit Platform 启动器
 }
 
 // ===== 测试任务配置 =====
