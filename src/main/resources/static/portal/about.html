@@ -80,7 +80,10 @@
       background: url("https://ice.frostsky.com/2024/11/06/570374efdc2bb75a8b722c969118afb5.webp") no-repeat center top;
       background-size: cover;
     }
-    .central { padding: 0; }
+    /* 限定作用域：只去除本页内容区的内边距。
+       若写成全局 .central 会连带清掉首屏头像胶囊容器的内边距，
+       导致进入本页后头像和心形整块被撑大 */
+    #pjax-container .central { padding: 0; }
   </style>
 
   <h4 class="text-ce central">与 <i>Ki_About</i> 小站对话中...</h4>
