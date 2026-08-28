@@ -4,8 +4,10 @@ spring-boot = "4.1.1"
 # 第三方库（非 Spring BOM 内，需自定）
 mybatis-flex = "1.11.8"
 mapstruct = "1.6.3"
+easy-captcha = "1.6.2"
 ip2region = "3.3.7"
 logbook = "4.1.0"
+nashorn = "15.7"
 
 [libraries]
 # Spring Boot BOM：统一管 Spring 系 + caffeine/h2/lombok/junit 等 BOM 内组件版本
@@ -27,8 +29,10 @@ mybatis-flex-starter = { module = "com.mybatis-flex:mybatis-flex-spring-boot4-st
 mybatis-flex-processor = { module = "com.mybatis-flex:mybatis-flex-processor", version.ref = "mybatis-flex" }
 mapstruct = { module = "org.mapstruct:mapstruct", version.ref = "mapstruct" }
 mapstruct-processor = { module = "org.mapstruct:mapstruct-processor", version.ref = "mapstruct" }
+easy-captcha = { module = "com.github.whvcse:easy-captcha", version.ref = "easy-captcha" }
 ip2region = { module = "org.lionsoul:ip2region", version.ref = "ip2region" }
 logbook-starter = { module = "org.zalando:logbook-spring-boot-starter", version.ref = "logbook" }
+nashorn-core = { module = "org.openjdk.nashorn:nashorn-core", version.ref = "nashorn" }
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }

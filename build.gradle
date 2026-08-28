@@ -48,10 +48,12 @@ dependencies {
     implementation libs.spring.boot.h2console        // H2 Web 控制台自动配置
     // 第三方框架 / 库（按坐标字母序）
     implementation libs.caffeine                    // Caffeine 本地缓存实现
+    implementation libs.easy.captcha                // EasyCaptcha：图形/算术验证码生成
     implementation libs.mybatis.flex.starter         // MyBatis-Flex ORM
     implementation libs.mapstruct                    // MapStruct：编译期生成 Bean 映射代码
     implementation libs.ip2region                    // 工具库：IP 归属地查询
     implementation libs.logbook.starter              // 日志：HTTP 请求/响应日志
+    implementation libs.nashorn.core                 // Nashorn：独立 JavaScript 引擎（算术验证码表达式求值等场景）
 
     // ---------- 编译期依赖（compileOnly）：仅编译时需要，不打入最终产物 ----------
     compileOnly libs.lombok                          // Lombok：编译期生成 getter/setter 等样板代码
