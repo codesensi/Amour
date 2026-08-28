@@ -7,7 +7,6 @@ import cn.codesensi.amour.model.response.CaptchaResponse;
 import cn.codesensi.amour.service.CaptchaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @ApiResponseBody
 @RequiredArgsConstructor
-@RequestMapping()
 public class CaptchaController {
 
     private final CaptchaService captchaService;
