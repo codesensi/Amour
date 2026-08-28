@@ -1,7 +1,10 @@
 package cn.codesensi.amour.common.consts;
 
 /**
- * 权限常量
+ * 权限常量 —— RBAC 相关的用户、角色、权限标识及公开/管理接口路径。
+ *
+ * @author codesensi
+ * @since 1.0
  */
 public class RbacConst {
 

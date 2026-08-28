@@ -8,7 +8,10 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 基础实体类
+ * 基础实体类 —— 业务实体的公共字段基类（审计字段与逻辑删除标识）。
+ * <p>
+ * 对应数据库各表的 {@code creator}、{@code create_time}、{@code updater}、
+ * {@code update_time}、{@code del_flag} 公共列。
  */
 @Data
 @Accessors(chain = true)

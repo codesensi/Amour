@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 缓存配置。
  * <p>
- * 基于 yml（{@code amour.cache.*}，见 {@link AppCacheProperties}）逐个注册带各自过期时间的
+ * 基于 yml（{@code app.cache.*}，见 {@link AppCacheProperties}）逐个注册带各自过期时间的
  * Caffeine 缓存，绕过 Spring Boot 全局统一 spec 的限制。缓存名统一经
  * {@link CacheUtil#withAppEnv(String)} 拼接「项目名_运行环境」前缀，实现多环境隔离。
  * <p>

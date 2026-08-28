@@ -1,7 +1,10 @@
 package cn.codesensi.amour.common.consts;
 
 /**
- * 线程常量
+ * 线程常量 —— 线程池执行器的 Bean 名称定义。
+ *
+ * @author codesensi
+ * @since 1.0
  */
 public class ThreadConst {
 

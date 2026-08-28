@@ -12,7 +12,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * Web MVC 拦截器链配置 —— 统一注册应用的拦截器并控制执行顺序。
  *
  * @author codesensi
- * @since 2024/1/21 15:00
+ * @since 1.0
  */
 @Slf4j
 @Configuration
@@ -43,7 +43,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         //         })).addPathPatterns(RbacConst.ROOT_PATH)
         //         .order(1);
 
-        // 3. 演示模式拦截器：演示环境下仅允许查询和登录/登出，拒绝所有写操作
+        // 2. 演示模式拦截器：演示环境下仅允许查询和登录/登出，拒绝所有写操作
         registry.addInterceptor(demoModeInterceptor)
                 .addPathPatterns(RbacConst.ROOT_PATH)
                 // 获取验证码、登录、登出接口不受演示模式限制

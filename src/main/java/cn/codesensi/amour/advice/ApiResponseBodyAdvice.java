@@ -68,7 +68,7 @@ public class ApiResponseBodyAdvice implements ResponseBodyAdvice<Object> {
      *
      * @param body            Controller 方法返回的原始数据对象
      * @param methodParameter 当前方法参数元信息
-     * @param mediaType       当前响应内容的 MediaType，用于判断是否需要进行特殊处理
+     * @param mediaType       响应需要使用的内容类型（当前实现未使用，保留以符合接口契约）
      * @param clazz           当前使用的 HttpMessageConverter 类型
      * @param request         当前服务端 HTTP 请求
      * @param response        当前服务端 HTTP 响应

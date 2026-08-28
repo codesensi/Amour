@@ -67,7 +67,7 @@ public enum ResultCode {
      */
     SERVICE_UNAVAILABLE(503, "服务暂不可用"),
     /**
-     * 数据库异常
+     * 数据库异常（借用 HTTP 504，本项目内自定义语义）
      */
     DB_ERROR(504, "数据库异常"),
     ;

@@ -3,7 +3,10 @@ package cn.codesensi.amour.common.consts;
 import cn.codesensi.amour.common.util.CacheUtil;
 
 /**
- * 缓存常量
+ * 缓存常量 —— 项目内使用的缓存名定义。
+ *
+ * @author codesensi
+ * @since 1.0
  */
 public class CacheConst {
 

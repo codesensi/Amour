@@ -53,7 +53,7 @@ public class SysConfig extends BaseEntity implements Serializable {
     private String cGroup;
 
     /**
-     * 是配置状态:0-启用,1-禁用
+     * 配置状态:0-启用,1-禁用
      */
     private Integer status;
 

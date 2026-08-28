@@ -1,7 +1,10 @@
 package cn.codesensi.amour.common.consts;
 
 /**
- * 通用常量
+ * 通用常量 —— 项目内跨模块复用的基础常量（数值、字符串与上下文键名）。
+ *
+ * @author codesensi
+ * @since 1.0
  */
 public class AppConst {
 
@@ -36,22 +39,22 @@ public class AppConst {
     public static final String ONE_STR = "1";
 
     /**
-     * traceId
+     * 链路追踪 ID 在 MDC 中的键名
      */
     public static final String TRACE_ID = "traceId";
 
     /**
-     * 默认密码
+     * 默认密码（初始账号的明文密码，仅供初始化数据使用）
      */
     public static final String DEFAULT_PASSWORD = "123456";
 
     /**
-     * 用户上下文
+     * 用户上下文标识
      */
     public static final String USER_CONTEXT = "userContext";
 
     /**
-     * MDC上下文
+     * MDC上下文标识
      */
     public static final String MDC_CONTEXT = "mdcContext";
 

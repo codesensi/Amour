@@ -106,7 +106,7 @@ public class JsonUtil {
      * @param type   目标类型
      * @param <T>    目标类型
      * @return 转换后的对象
-     * @throws IllegalArgumentException 转换失败时抛出
+     * @throws tools.jackson.core.JacksonException 转换失败时抛出
      */
     public static <T> T convertValue(Object object, Class<T> type) {
         return MAPPER.convertValue(object, type);
@@ -119,7 +119,7 @@ public class JsonUtil {
      * @param typeReference 泛型类型描述
      * @param <T>           目标类型
      * @return 转换后的对象
-     * @throws IllegalArgumentException 转换失败时抛出
+     * @throws tools.jackson.core.JacksonException 转换失败时抛出
      */
     public static <T> T convertValue(Object object, TypeReference<T> typeReference) {
         return MAPPER.convertValue(object, typeReference);

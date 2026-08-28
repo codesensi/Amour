@@ -26,6 +26,18 @@ public class DemoModeInterceptor implements HandlerInterceptor {
 
     private final ConfigService configService;
 
+    /**
+     * 演示模式写操作拦截。
+     * <p>
+     * 当 {@code demo-mode} 配置开启时，仅放行 GET、HEAD 等只读请求，
+     * 其余写操作（POST、PUT、DELETE 等）抛出 {@link AuthorizationException}；
+     * 演示模式未开启时直接放行所有请求。
+     *
+     * @param request  当前 HTTP 请求
+     * @param response 当前 HTTP 响应
+     * @param handler  实际执行的处理器
+     * @return {@code true} 表示继续执行后续拦截器与处理器
+     */
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
         if (configService.getBool("demo-mode")) {

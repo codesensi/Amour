@@ -38,7 +38,7 @@ public class Result<T> implements Serializable {
     private T data;
 
     /**
-     * 响应生成时间戳（毫秒，epoch 纪元）。
+     * 响应生成时间戳（毫秒，Unix epoch）。
      */
     private long timestamp;
 

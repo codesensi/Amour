@@ -19,7 +19,7 @@ import static cn.codesensi.amour.entity.table.SysConfigTableDef.SYS_CONFIG;
 /**
  * 运行时配置查询服务实现。
  * <p>
- * 优先从 Caffeine 缓存（配置名 {@code config}，见 {@link CacheConst#CONFIG}）读取以 point 路径
+ * 优先从 Caffeine 缓存（配置名 {@code config}，见 {@link CacheConst#CONFIG}）读取以点分路径
  * （如 {@code name}、{@code captcha.sms-expire}）作为 {@code config_key} 存储的配置，未命中时回源查库并回填，
  * 减少高频配置点的数据库压力。
  * <p>

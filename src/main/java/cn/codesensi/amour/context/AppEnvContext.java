@@ -71,7 +71,7 @@ public class AppEnvContext {
         // 属性缺失时给出合理默认值：取 spring.application.name，缺省为 "app"
         this.appName = environment.getProperty(SPRING_APPLICATION_NAME, DEFAULT_APP_NAME);
         this.activeProfiles = environment.getActiveProfiles();
-        // 如果未激活任何Profile，Spring默认返回 ["default"]
+        // 未显式激活任何 Profile 时 getActiveProfiles() 返回空数组，此时回退为 default
         if (this.activeProfiles.length == 0) {
             this.activeProfileStr = DEFAULT_ACTIVE_PROFILE;
         } else {

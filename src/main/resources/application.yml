@@ -15,7 +15,7 @@ spring:
     # 日期格式
     date-format: yyyy-MM-dd HH:mm:ss
 
-# logback日志配置
+# 日志配置（含 logback 滚动策略）
 logging:
   pattern:
     dateformat: yyyy-MM-dd HH:mm:ss.SSS
