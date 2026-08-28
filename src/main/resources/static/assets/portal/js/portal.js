@@ -35,8 +35,6 @@ const PORTAL_API = {
   sendMessage: { url: '/love/messages', method: 'POST' },
   /** 恋爱清单：GET /love/list -> [{text, done, date, img}] */
   loveList: { url: '/love/list', method: 'GET' },
-  /** 关于我们：GET /love/about -> {title, html} */
-  about: { url: '/love/about', method: 'GET' },
   /** 点点滴滴文章列表：GET /love/littles -> [{id, title, author, date}] */
   littles: { url: '/love/littles', method: 'GET' }
 };
@@ -64,10 +62,6 @@ const PORTAL_MOCK = {
     { text: '一起去看樱花🌸', done: false },
     { text: '一起存钱💰', done: false }
   ],
-  about: {
-    title: '关于我们',
-    html: '<p style="line-height:2;color:#555;">这里记录我们之间认识的经历与回忆。（示例内容：后端接口实现后自动替换）</p>'
-  },
   littles: [
     { id: 1, title: 'Like_Girl 默认文章语法', author: 'Ki.', date: '2022-11-20' },
     { id: 2, title: '第一次一起去看海', author: 'Ki.', date: '2023-05-21' },
@@ -405,14 +399,7 @@ async function loadLoveList() {
   }).join('');
 }
 
-/** 关于我们内容渲染 */
-async function loadAbout() {
-  const box = document.getElementById('aboutBox');
-  if (!box) return;
-  const about = await portalRequest('about');
-  document.getElementById('aboutTitle').textContent = (about && about.title) || '关于我们';
-  box.innerHTML = (about && about.html) || '<p class="portal-empty">内容建设中…</p>';
-}
+/** 关于页：BotUI 对话由页面内联脚本驱动，无内容接口渲染逻辑 */
 
 /**
  * 页面初始化 —— 首次加载与每次 pjax 局部刷新后都会调用。
@@ -477,8 +464,6 @@ window.initPortalPage = function () {
 
   // 清单页
   if (document.getElementById('loveListBox')) loadLoveList();
-  // 关于页（内容型兜底；对话脚本由页面内联脚本执行）
-  if (document.getElementById('aboutBox')) loadAbout();
 };
 
 document.addEventListener('DOMContentLoaded', function () {

@@ -101,10 +101,6 @@
 }
 
 
-.header-btn-wrap .header-btn .btnClass span a b {
-  display: none;
-}
-
 .central.bg .row .card .inputbox .rig {
   width: 100%;
   margin-right: 0;
@@ -125,23 +121,8 @@
   margin: 1rem 0;
 }
 
-.sm-w125 {
-  width: 800px !important;
-}
-
 .central.bg .row .card .inputbox input {
   padding: 1rem 1.5rem;
-}
-
-.flex-ha1 {
-  display: flex !important;
-  flex-direction: row !important;
-  flex-wrap: nowrap !important;
-  justify-content: flex-start;
-}
-
-#spotlight .icon {
-  margin-top: 16px;
 }
 
 .bg-img .middle {
@@ -187,10 +168,6 @@
   margin-right: 0rem !important;
 }
 
-.header-btn-wrap .header-btn .btnClass span a b {
-  display: none;
-}
-
 .central.bg .row .card .inputbox .rig {
   width: 100%;
   margin-right: 0;
@@ -211,23 +188,8 @@
   margin: 1rem 0;
 }
 
-.sm-w125 {
-  width: 800px !important;
-}
-
 .central.bg .row .card .inputbox input {
   padding: 1rem 1.5rem;
-}
-
-.flex-ha1 {
-  display: flex !important;
-  flex-direction: row !important;
-  flex-wrap: nowrap !important;
-  justify-content: flex-start;
-}
-
-#spotlight .icon {
-  margin-top: 16px;
 }
 
 .central.central-800.bg {
@@ -254,12 +216,6 @@ textarea {
 
 .words {
   padding: 0 1rem;
-}
-
-.spl-footer .spl-title {
-  font-size: 18px;
-  line-height: 2.5rem;
-  letter-spacing: 2px;
 }
 
 .central.bg .row .card .inputbox {
