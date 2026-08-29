@@ -22,5 +22,13 @@
   }
   if (!token) {
     location.replace('/admin/login.html');
+    return;
+  }
+
+  // views 是 pjax 片段页（无外壳脚本，首屏加载遮罩无人关闭），
+  // 已登录用户直接访问/刷新片段页时重定向到外壳并携带目标页参数，
+  // 由 main.js 读取 ?view= 后经 pjax 进入目标页，保证刷新/分享链接停留原页
+  if (/^\/admin\/views\//.test(location.pathname)) {
+    location.replace('/admin/index.html?view=' + encodeURIComponent(location.pathname));
   }
 })();

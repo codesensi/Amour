@@ -14,7 +14,7 @@
  */
 import { getAuth, isLoggedIn, clearAuth, redirectToLogin, setupAjaxGuard } from '/assets/common/auth.js';
 import { getConfig, qqAvatar } from '/assets/common/config.js';
-import { initPjax } from '/assets/common/pjax.js';
+import { initPjax, navigate as pjaxNavigate } from '/assets/common/pjax.js';
 import { loadLayui } from '/assets/common/layui.js';
 import { initAdminDataTables, destroyAdminDataTables } from './datatable-init.js';
 
@@ -151,6 +151,18 @@ $('.js-logout').on('click', function () {
 });
 
 /* ---------- 整页加载：初始化表格并执行当前页模块 ---------- */
-initAdminDataTables();
-setActiveMenu(location.href);
-loadPageModule(location.href);
+
+// 深链接：guard.js 把 views 片段页的直访/刷新重定向到 /admin/index.html?view=<目标页>，
+// 此处读取参数并经 pjax 进入目标页（侧栏高亮、页面模块、表格复用既有链路）；
+// 目标页合法性与 /admin/views/ 前缀校验在 guard.js 已完成
+const deepView = new URLSearchParams(location.search).get('view');
+const initialUrl = deepView && deepView.indexOf('/admin/views/') === 0 ? deepView : location.href;
+
+if (deepView && initialUrl === deepView) {
+  // 深链接模式：跳过首页模块初始化，直接由 pjax 装载目标页
+  pjaxNavigate(initialUrl, false);
+} else {
+  initAdminDataTables();
+  setActiveMenu(location.href);
+  loadPageModule(location.href);
+}

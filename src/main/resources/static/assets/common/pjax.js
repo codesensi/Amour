@@ -146,7 +146,15 @@ export function navigate(url, push) {
       target.innerHTML = frag.innerHTML;
       document.title = options.buildTitle ? options.buildTitle(doc.title) : (doc.title || document.title);
       executeScripts(target);
-      if (push && !sameUrl) history.pushState({ pjax: true }, '', targetUrl);
+      // push 模式追加历史；replace 模式（深链接接管等）原地替换地址，
+      // 保证 onPageReady 里基于 location.href 的高亮/模块调度拿到目标页地址
+      if (!sameUrl) {
+        if (push) {
+          history.pushState({ pjax: true }, '', targetUrl);
+        } else {
+          history.replaceState({ pjax: true }, '', targetUrl);
+        }
+      }
       if (options.onPageReady) options.onPageReady();
       doneProgress();
     })

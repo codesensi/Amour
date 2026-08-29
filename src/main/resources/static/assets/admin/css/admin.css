@@ -91,13 +91,22 @@
     box-shadow: 0 0 0 2px rgba(22, 183, 119, .15);
 }
 
-/* 侧栏：深蓝灰底 + 微渐变增加纵深 */
+/* 侧栏：深蓝灰底 + 微渐变增加纵深；flex 纵向布局让滚动容器精确填满剩余高度 */
 .admin-side {
     background: linear-gradient(180deg, #2b3546, #2f3a4a 240px);
+    display: flex;
+    flex-direction: column;
 }
 
+/* 侧栏滚动容器：flex 填满侧栏剩余高度（layui 默认的容器高度计算会多出
+   顶栏差值，矮屏下内容仅超出几像素也会误出滚动条）；
+   内容真正超出时才出现滚动条，超出部分可滚动查看 */
 .admin-side .layui-side-scroll {
-    padding: 12px 0;
+    flex: 1;
+    min-height: 0;
+    height: auto;
+    padding: 8px 0;
+    overflow-x: hidden;
 }
 
 .side-user {
@@ -106,14 +115,14 @@
     align-items: center;
     gap: 8px;
     color: #fff;
-    padding: 8px 0 16px;
+    padding: 6px 0 12px;
     border-bottom: 1px solid rgba(255, 255, 255, .08);
     margin-bottom: 8px;
 }
 
 .side-user img {
-    width: 46px;
-    height: 46px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     object-fit: cover;
 }
@@ -127,13 +136,14 @@
 
 .admin-side .layui-nav-tree .layui-nav-item a {
     color: rgba(255, 255, 255, .72);
-    height: 42px;
-    line-height: 42px;
+    height: 40px;
+    line-height: 40px;
     margin: 2px 10px;
     border-radius: 8px;
     transition: background .2s, color .2s;
 }
 
+/* 侧栏菜单项悬停态 */
 .admin-side .layui-nav-tree .layui-nav-item a:hover {
     background: rgba(255, 255, 255, .07);
     color: #fff;
