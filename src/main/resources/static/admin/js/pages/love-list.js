@@ -3,9 +3,9 @@
  */
 import { escapeHtml as esc } from '../escape.js';
 import { bindMockSubmissions } from '../mock-submit.js';
+import { openCrudDialog, confirmDelete, mockRequest, nextId } from '../crud-dialog.js';
 import { toast } from '/assets/common/toast.js';
 import { openPhotoViewer } from '/assets/common/photoviewer.js';
-import { loadLayui } from '/assets/common/layui.js';
 import { renderAdminTable } from '../datatable-init.js';
 
 /** 恋爱清单列表演示数据（原站 83 条静态行迁移；后端接口实现后由 table.url 取数） */
@@ -98,9 +98,42 @@ const LOVE_EVENTS = [
 /** 内容区内参与灯箱预览的图片选择器（照搬原站的扩展名匹配） */
 const IMG_SELECTOR = 'img[src$=jpg],img[src$=gif],img[src$=JPG],img[src$=png],img[src$=jpeg]';
 
+/**
+ * 恋爱清单 CRUD API（mock 实现）。
+ * TODO(后端): 接口实现后替换为真实请求，例如：
+ *   create: (data) => fetch('/admin/api/love-events', { method: 'POST', body: JSON.stringify(data) })
+ */
+const api = {
+    create(data) {
+        return mockRequest('新增事件成功！', function () {
+            LOVE_EVENTS.unshift({ id: nextId(LOVE_EVENTS), title: data.title, done: data.done === '1', img: data.img || '' });
+        });
+    },
+    update(id, data) {
+        return mockRequest('修改事件成功！', function () {
+            const row = LOVE_EVENTS.find(function (r) { return String(r.id) === String(id); });
+            if (row) Object.assign(row, { title: data.title, done: data.done === '1', img: data.img || '' });
+        });
+    },
+    remove(id) {
+        return mockRequest('删除事件成功！', function () {
+            const i = LOVE_EVENTS.findIndex(function (r) { return String(r.id) === String(id); });
+            if (i > -1) LOVE_EVENTS.splice(i, 1);
+        });
+    }
+};
+
+/** 新增/修改事件表单字段配置 */
+const EVENT_FIELDS = [
+    { name: 'title', label: '事件标题', required: true, placeholder: '请输入事件标题' },
+    { name: 'done', label: '完成状态', type: 'select', options: [{ value: '0', label: '未完成' }, { value: '1', label: '已完成' }] },
+    { name: 'img', label: '图片地址', placeholder: '选填，填写图片 URL' }
+];
+
 export function init() {
     // 恋爱清单列表：layui table 常规页码分页（83 条演示数据）
-    renderAdminTable({
+    function renderTable() {
+        return renderAdminTable({
             elem: '#love-event-table',
         cols: [[
             { type: 'numbers', title: '序号', width: 70 },
@@ -115,7 +148,7 @@ export function init() {
             } },
             { title: '操作', width: 200, templet: function (d) {
                 // 删除按钮用 data 属性传参（避免 title 中引号/emoji 破坏 href 字符串），点击行为由下方委托接管
-                return '<a href="javascript:void(0);" class="layui-btn layui-btn-xs js-mock-edit">'
+                return '<a href="javascript:void(0);" class="layui-btn layui-btn-xs js-mock-edit" data-id="' + d.id + '">'
                     + '<i class=" layui-icon layui-icon-edit"></i>修改</a> '
                     + '<a href="javascript:void(0);" class="layui-btn layui-btn-xs layui-btn-danger delete-btn" data-id="' + d.id + '" data-title="' + esc(d.title) + '">'
                     + '<i class=" layui-icon layui-icon-delete"></i>删除</a>';
@@ -123,6 +156,9 @@ export function init() {
         ]],
         data: LOVE_EVENTS
     });
+    }
+
+    renderTable();
 
     // 为页面中的图片挂载灯箱预览（layui layer.photos，替换原 hs.expand/spotlight 方案）：
     // 委托绑定到内容区外壳（pjax 不替换外壳，绑定一次即可），layui table 渲染的图片同样生效
@@ -137,9 +173,15 @@ export function init() {
         });
     }
 
-    // 新增事件按钮：原站跳转 lovelistAdd.php 新增页；该页面尚未迁移，mock 为演示提示
+    // 新增事件：弹出表单弹框，确认后经 API 层提交（现阶段 mock，后端接入后仅换 API 层）
     $('.js-add-event').on('click', function () {
-        toast.error("演示数据：新增事件功能暂未开放！", "Like_Girl");
+        openCrudDialog({
+            title: '新增事件',
+            fields: EVENT_FIELDS,
+            onSubmit: function (values) {
+                return api.create(values).then(renderTable);
+            }
+        });
     });
 
     // 表格行内按钮（事件委托）：layui table 动态渲染的行必须用委托才能命中。
@@ -147,14 +189,23 @@ export function init() {
     if (page && !page._rowBtnBound) {
         page._rowBtnBound = true;
         page.addEventListener('click', function (e) {
-            // 修改事件：原站跳转 modlist.php?id=x 编辑页；该页面尚未迁移，mock 为演示提示
+            // 修改事件：弹出表单弹框并预填当前行数据
             const editBtn = e.target.closest('.js-mock-edit');
             if (editBtn) {
                 e.preventDefault();
-                toast.error("演示数据：修改事件功能暂未开放！", "Like_Girl");
+                const row = LOVE_EVENTS.find(function (r) { return String(r.id) === String(editBtn.dataset.id); });
+                if (!row) return;
+                openCrudDialog({
+                    title: '修改事件',
+                    fields: EVENT_FIELDS,
+                    initial: { title: row.title, done: row.done ? '1' : '0', img: row.img },
+                    onSubmit: function (values) {
+                        return api.update(row.id, values).then(renderTable);
+                    }
+                });
                 return;
             }
-            // 删除事件：读取 data-id / data-title 后走 layer.confirm 确认
+            // 删除事件：读取 data-id / data-title 后走确认提示
             const delBtn = e.target.closest('.delete-btn');
             if (delBtn) {
                 e.preventDefault();
@@ -164,14 +215,13 @@ export function init() {
     }
 
     // 删除事件：原站 confirm 确认后跳转 dellist.php?id=x 真实删除；
-    // 现阶段后端接口未实现，mock 处理：layer.confirm 确认后仅弹出演示提示，不真正删除数据
+    // 现经确认提示 + API 层处理（mock），数据变更后重渲染表格
     function removeRow(id, title) {
-        loadLayui('layer').then(function (m) {
-            m[0].confirm('您确认要删除内容为 ' + title + ' 的事件吗', { title: '删除确认' }, function (index) {
-                m[0].close(index);
-                // 原站此处为 location.href = 'dellist.php?id=' + id（真实删除），现按演示数据处理
-                toast.warning("演示数据：删除功能暂未接入后端", "Like_Girl");
-            });
+        confirmDelete({
+            message: '您确认要删除内容为 ' + title + ' 的事件吗',
+            onDelete: function () {
+                return api.remove(id).then(renderTable);
+            }
         });
     }
 

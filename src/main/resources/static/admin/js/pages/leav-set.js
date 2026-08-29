@@ -3,8 +3,8 @@
  */
 import { bindMockSubmissions } from '../mock-submit.js';
 import { escapeHtml as esc } from '../escape.js';
+import { confirmDelete, mockRequest } from '../crud-dialog.js';
 import { toast } from '/assets/common/toast.js';
-import { loadLayui } from '/assets/common/layui.js';
 import { renderAdminTable } from '../datatable-init.js';
 
 /** 留言列表演示数据（原站静态行迁移；后端接口实现后由 table.url 取数） */
@@ -30,6 +30,7 @@ export function init() {
     });
 
     // 留言列表：layui table 常规页码分页
+    function renderTable() {
     renderAdminTable({
             elem: '#leav-table',
         cols: [[
@@ -45,8 +46,11 @@ export function init() {
         ]],
         data: MESSAGES
     });
+    }
 
-    // 删除留言按钮（事件委托）：layer.confirm 确认后给出演示提示，不做真实删除。
+    renderTable();
+
+    // 删除留言按钮（事件委托）：确认提示 + API 层处理（mock），数据变更后重渲染表格。
     // 绑定在内容区外壳（pjax 不替换外壳，_bound 防重入叠加）
     const page = document.querySelector('.content-page');
     if (page && !page._deleteBtnBound) {
@@ -59,14 +63,17 @@ export function init() {
         });
     }
 
-    // 原站确认后跳转 delleav.php?id=x 执行删除；现为演示数据，仅给出提示
+    // 删除留言：确认提示 + API 层处理（mock）
+    // TODO(后端): 接口实现后 api.remove 替换为 fetch('/admin/api/messages/' + id, { method: 'DELETE' })
     function removeRow(id, text) {
-        loadLayui('layer').then(function (m) {
-            m[0].confirm('您确认要删除 ' + text + ' 内容吗', { title: '删除确认' }, function (index) {
-                m[0].close(index);
-                // 现阶段后端接口未实现，mock 演示提示；接口实现后恢复为真实删除请求
-                toast.warning("演示数据：删除功能暂未接入后端", "Like_Girl");
-            });
+        confirmDelete({
+            message: '您确认要删除 ' + text + ' 内容吗',
+            onDelete: function () {
+                return mockRequest('删除留言成功！', function () {
+                    const i = MESSAGES.findIndex(function (r) { return String(r.id) === String(id); });
+                    if (i > -1) MESSAGES.splice(i, 1);
+                }).then(renderTable);
+            }
         });
     }
 
