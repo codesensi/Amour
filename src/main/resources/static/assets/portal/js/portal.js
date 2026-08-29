@@ -5,14 +5,8 @@
  * 原站版权：Copyright (c) 2023 - 2025 by Ki（Like Girl）
  * ===================================================================== */
 
-/** 站点配置：改这里即可，无需动页面结构 */
+/** 站点配置：纯前端路由类配置；站点展示类配置（logo/文案/头像/计时起点/ICP 等）走 siteConfig 口子 */
 const PORTAL_CONFIG = {
-  /** 恋爱计时起点 */
-  loveStartDate: '2018-07-15T00:00:00',
-  /** 顶部 slogan 文案 */
-  slogan: '爱晨雾漫过青瓦，爱暮色染透篱笆，更爱与君并肩立，看遍这人间烟火里的朝暮与年华。',
-  /** 页脚版权行 */
-  copyright: 'Copyright © 2022 - 2026 Like_Girl All Rights Reserved.',
   /** 管理后台入口 */
   adminUrl: '/admin/login.html',
   /** 开源地址 */
@@ -42,7 +36,12 @@ const PORTAL_API = {
    * 节点两种：{type:'bot', delay, content} 消息（content 支持 "![alt](url)" 图片语法）；
    *          {type:'buttons', delay, options:[{text, value, next:[...]}]} 分支按钮，next 为点选后继续执行的子序列
    */
-  aboutChat: { url: '/love/chat', method: 'GET' }
+  aboutChat: { url: '/love/chat', method: 'GET' },
+  /**
+   * 站点展示配置：GET /site/config -> {logo, slogan, femaleName, maleName, femaleAvatar,
+   * maleAvatar, loveStartDate, icpText, icpUrl, copyright}（后台可配置，预留口子）
+   */
+  siteConfig: { url: '/site/config', method: 'GET' }
 };
 
 /** 示例数据：仅在后端接口未实现时兜底展示 */
@@ -73,6 +72,19 @@ const PORTAL_MOCK = {
     { id: 2, title: '第一次一起去看海', author: 'Ki.', date: '2023-05-21' },
     { id: 3, title: '记录我们的第 1000 天', author: 'Su', date: '2024-05-15' }
   ],
+  /** 站点展示配置默认值（后台实现 /site/config 后自动切换为配置数据） */
+  siteConfig: {
+    logo: '龙猫の爱恋',
+    slogan: '爱晨雾漫过青瓦，爱暮色染透篱笆，更爱与君并肩立，看遍这人间烟火里的朝暮与年华。',
+    femaleName: 'Su',
+    maleName: 'Li',
+    femaleAvatar: 'https://q1.qlogo.cn/g?b=qq&nk=673822943&s=640',
+    maleAvatar: 'https://q1.qlogo.cn/g?b=qq&nk=2623669948&s=640',
+    loveStartDate: '2018-07-15T00:00:00',
+    icpText: '赣ICP备2026010001号',
+    icpUrl: 'https://beian.miit.gov.cn/#/Integrated/index',
+    copyright: 'Copyright © 2022 - 2026 Like_Girl All Rights Reserved.'
+  },
   /** 关于页对话默认剧本（后台实现 /love/chat 后自动切换为配置数据） */
   aboutChat: [
     { type: 'bot', delay: 200, content: 'Hi, 欢迎你的来访' },
@@ -161,8 +173,8 @@ async function portalRequest(apiKey, payload) {
 }
 
 /** 计算并渲染恋爱计时（首次加载与 pjax 换页后立即调用，避免空白延迟） */
-function renderLoveTime() {
-  const birthDay = new Date(PORTAL_CONFIG.loveStartDate);
+function renderLoveTime(loveStartDate) {
+  const birthDay = new Date(loveStartDate || siteConfig.loveStartDate);
   const today = new Date();
   const timeold = today.getTime() - birthDay.getTime();
   const msPerDay = 24 * 60 * 60 * 1000;
@@ -452,17 +464,60 @@ async function loadLoveList() {
 
 /** 关于页：对话机器人由页面内联脚本驱动（原 BotUI 的自研轻量复刻），无内容接口渲染逻辑 */
 
+/** 站点展示配置（运行时状态）：初始为内置默认值，applySiteConfig 拉取后台配置后整体替换 */
+let siteConfig = PORTAL_MOCK.siteConfig;
+
+/**
+ * 站点展示配置：拉取并应用到 DOM（后台可配置，预留口子）。
+ * 覆盖范围：头部 logo / 右侧文字说明、首屏双方名字与 QQ 头像、
+ * 恋爱计时起点、页脚 ICP 备案号与链接、页脚版权行。
+ * 接口未实现或失败时 portalRequest 降级为 PORTAL_MOCK.siteConfig，
+ * 应用结果与 Thymeleaf 片段内置文案一致，页面无感。
+ */
+async function applySiteConfig() {
+  const config = await portalRequest('siteConfig');
+  if (!config) return;
+  siteConfig = config;
+  const logoEl = document.querySelector('.alogo');
+  if (logoEl && config.logo) logoEl.textContent = config.logo;
+  const sloganEl = document.querySelector('.wenan');
+  if (sloganEl && config.slogan) {
+    sloganEl.textContent = config.slogan;
+    const tipEl = sloganEl.closest('.word');
+    if (tipEl) tipEl.setAttribute('data-tip', config.slogan);
+  }
+  const femaleImg = document.querySelector('.img-female img');
+  if (femaleImg && config.femaleAvatar) femaleImg.src = config.femaleAvatar;
+  const femaleName = document.querySelector('.img-female span');
+  if (femaleName && config.femaleName) femaleName.textContent = config.femaleName;
+  const maleImg = document.querySelector('.img-male img');
+  if (maleImg && config.maleAvatar) maleImg.src = config.maleAvatar;
+  const maleName = document.querySelector('.img-male span');
+  if (maleName && config.maleName) maleName.textContent = config.maleName;
+  const icpLink = document.getElementById('footerIcpLink');
+  if (icpLink && config.icpText) icpLink.textContent = config.icpText;
+  if (icpLink && config.icpUrl) icpLink.href = config.icpUrl;
+  const copyEl = document.getElementById('footerCopyright');
+  if (copyEl && config.copyright) copyEl.textContent = config.copyright;
+  // 计时起点可能被配置改变，配置就绪后重渲染计时器
+  renderLoveTime(siteConfig.loveStartDate);
+}
+
 /**
  * 页面初始化 —— 首次加载与每次 pjax 局部刷新后都会调用。
  * 所有按需初始化均以元素存在性判断，保证在任意页面重复调用安全。
  */
 window.initPortalPage = function () {
-  // slogan 注入（有该节点时）
+  // 站点展示配置：异步拉取（后台口子 /site/config），就绪后覆盖
+  // logo / 文字说明 / 头像 / 名字 / ICP / 版权，并按配置的计时起点重渲染计时器。
+  // 未就绪期间页面先展示 Thymeleaf 片段内置文案，与默认配置一致，无感切换。
+  applySiteConfig();
+  // slogan 注入（配置到达前的兜底）
   const sloganEl = document.querySelector('.wenan');
-  if (sloganEl && !sloganEl.textContent.trim()) sloganEl.textContent = PORTAL_CONFIG.slogan;
-  // 页脚版权注入
+  if (sloganEl && !sloganEl.textContent.trim()) sloganEl.textContent = siteConfig.slogan;
+  // 页脚版权注入（配置到达前的兜底）
   const copyEl = document.getElementById('footerCopyright');
-  if (copyEl) copyEl.textContent = PORTAL_CONFIG.copyright;
+  if (copyEl) copyEl.textContent = siteConfig.copyright;
 
   initHeaderScrollColor();
   initTooltip();
