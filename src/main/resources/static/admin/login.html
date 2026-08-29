@@ -37,19 +37,25 @@
       margin-bottom: 28px;
     }
     .login-card .layui-icon { color: #bbb; }
+    /* 验证码行：验证码图在左、输入框在右，整体宽度与用户名/密码输入框对齐 */
+    .captcha-row { display: flex; gap: 10px; }
     /* 验证码：/captcha 返回 captchaValue 为 base64 图片 data URI，点击图片刷新 */
     .captcha-box {
       width: 110px;
       height: 38px;
+      flex: none;
+      box-sizing: border-box;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       overflow: hidden;
       border-radius: 3px;
+      border: 1px solid #eee;
       background: #f2f6f3;
     }
-    .captcha-box img { max-width: 100%; height: 38px; }
+    .captcha-box img { max-width: 100%; height: 100%; }
+    .captcha-input { flex: 1; min-width: 0; }
     .login-btn { width: 100%; margin-top: 6px; }
   </style>
 </head>
@@ -74,16 +80,14 @@
         </div>
       </div>
       <div class="layui-form-item">
-        <div class="layui-row" style="display:flex; gap:10px;">
-          <div class="layui-col" style="flex:1;">
-            <div class="layui-input-wrap">
-              <div class="layui-input-prefix"><i class="layui-icon layui-icon-vercode"></i></div>
-              <input type="text" name="captcha" lay-verify="required" placeholder="验证码"
-                     autocomplete="off" class="layui-input" maxlength="8">
-            </div>
-          </div>
-          <div class="layui-col captcha-box" id="captchaBox" title="点击刷新验证码">
+        <div class="captcha-row">
+          <div class="captcha-box" id="captchaBox" title="点击刷新验证码">
             <img id="captchaImg" src="" alt="验证码" style="display: none;">
+          </div>
+          <div class="layui-input-wrap captcha-input">
+            <div class="layui-input-prefix"><i class="layui-icon layui-icon-vercode"></i></div>
+            <input type="text" name="captcha" lay-verify="required" placeholder="验证码"
+                   autocomplete="off" class="layui-input" maxlength="8">
           </div>
         </div>
       </div>
