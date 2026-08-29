@@ -2,9 +2,10 @@
  * layui 模块加载器（ES Module，两端通用）—— layui.use 的 Promise 化包装。
  *
  * 页面通常已以普通脚本加载 layui.js（全模块一体构建）；
- * 若页面遗漏引入，本加载器会按需动态注入 layui.js 并等待就绪（自愈），
- * 之后组件内部通过本加载器惰性获取 layer/form/laypage 等模块实例，
- * 调用方以 await/then 使用，无需关心 layui.use 的回调时序。
+ * 若页面遗漏引入（例如浏览器缓存了旧版外壳），本加载器会按需动态注入
+ * layui.js 与样式表并等待就绪（自愈），之后组件内部通过本加载器惰性获取
+ * layer/form/laypage 等模块实例，调用方以 await/then 使用，无需关心
+ * layui.use 的回调时序。
  *
  * 用法：
  *   const [layer, laypage] = await loadLayui('layer', 'laypage');
@@ -13,8 +14,28 @@
 /** layui.js 的固定路径（与登录页/后台外壳/门户外壳的引入保持一致） */
 const LAYUI_JS = '/assets/layui/2.13.9/layui.js';
 
+/** 自愈时需要确保就位的样式表（layui 基础样式 + 管理端适配覆盖） */
+const LAYUI_CSS = [
+  '/assets/layui/2.13.9/css/layui.css',
+  '/assets/admin/css/admin.css'
+];
+
 /** 动态注入的加载 Promise 缓存：多组件并发调用时只注入一次 */
 let layuiReady = null;
+
+/**
+ * 确保样式表就位（幂等）：浏览器缓存旧版外壳时自动补齐缺失的样式引用。
+ */
+function ensureStyles() {
+  LAYUI_CSS.forEach(function (href) {
+    if (!document.querySelector('link[href="' + href + '"]')) {
+      var link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = href;
+      document.head.appendChild(link);
+    }
+  });
+}
 
 /**
  * 确保 window.layui 就绪：已存在直接通过；缺失时动态注入 layui.js 并等待加载完成。
@@ -52,6 +73,8 @@ function ensureLayui() {
  * @returns {Promise<Array>} 按传入顺序返回模块实例数组
  */
 export function loadLayui(...names) {
+  // 样式与脚本都做自愈：浏览器缓存旧外壳时自动补齐缺失引用
+  ensureStyles();
   return ensureLayui().then(function () {
     return new Promise(function (resolve) {
       window.layui.use(names, function () {

@@ -12,8 +12,8 @@
 
 import { loadLayui } from '/assets/common/layui.js';
 
-/** 每页条数（常规页码分页） */
-export const TABLE_PAGE_SIZE = 10;
+/** 每页条数（常规页码分页，默认 20 条/页） */
+export const TABLE_PAGE_SIZE = 20;
 
 /**
  * 渲染后台列表表格。
@@ -24,8 +24,7 @@ export async function renderAdminTable(config) {
   const table = (await loadLayui('table'))[0];
   table.render(Object.assign({
     elem: '#basic-datatable',
-    page: true,
-    limit: TABLE_PAGE_SIZE
+    page: { limit: TABLE_PAGE_SIZE, limits: [10, 20, 30, 50] }
   }, config));
 }
 
