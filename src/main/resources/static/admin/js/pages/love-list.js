@@ -114,9 +114,9 @@ export function init() {
             { title: '操作', width: 200, templet: function (d) {
                 // 删除按钮用 data 属性传参（避免 title 中引号/emoji 破坏 href 字符串），点击行为由下方委托接管
                 return '<a href="javascript:void(0);" class="js-mock-edit">'
-                    + '<button type="button" class="layui-btn layui-btn-primary layui-btn-radius"><i class=" layui-icon layui-icon-edit mr-1"></i>修改</button></a> '
+                    + '<button type="button" class="layui-btn layui-btn-xs"><i class=" layui-icon layui-icon-edit"></i>修改</button></a> '
                     + '<a href="javascript:void(0);" class="delete-btn" data-id="' + d.id + '" data-title="' + d.title + '">'
-                    + '<button type="button" class="layui-btn layui-btn-danger layui-btn-radius"><i class=" layui-icon layui-icon-delete mr-1"></i>删除</button></a>';
+                    + '<button type="button" class="layui-btn layui-btn-xs layui-btn-danger"><i class=" layui-icon layui-icon-delete"></i>删除</button></a>';
             } }
         ]],
         data: LOVE_EVENTS

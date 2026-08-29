@@ -46,7 +46,7 @@ export function init() {
             { field: 'ip', title: 'IP', width: 180, templet: function (d) { return '<span class="layui-badge layui-bg-red">' + esc(d.ip) + '</span> <i>' + esc(d.region) + '</i>'; } },
             { title: 'Action', width: 130, templet: function (d) {
                 return '<a class="delete-btn" data-id="' + esc(d.id) + '" data-content="' + esc(d.content) + '">'
-                    + '<button type="button" class="layui-btn layui-btn-danger layui-btn-radius" style="white-space: nowrap;">删除</button></a>';
+                    + '<button type="button" class="layui-btn layui-btn-xs layui-btn-danger">删除</button></a>';
             } }
         ]],
         data: MESSAGES
