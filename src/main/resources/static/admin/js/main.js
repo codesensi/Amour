@@ -119,6 +119,9 @@ initPjax({
 
 /* ---------- 外壳初始化（仅整页加载执行一次） ---------- */
 
+// 加载动画淡出（原各页内联脚本归口此处；页面无该遮罩时 jQuery 调用为空操作）
+$('#Loadanimation').fadeOut(1000);
+
 // 顶栏与侧栏展示当前登录用户名
 const auth = getAuth();
 $('.js-username').text(auth && auth.username ? auth.username : 'Admin');
