@@ -78,8 +78,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addViewController("/portal/about.html").setViewName("portal/about");
         registry.addViewController("/portal/love-photo.html").setViewName("portal/love-photo");
         registry.addViewController("/portal/love-list.html").setViewName("portal/love-list");
-        // 后台管理入口：/admin 跳转到后台管理登录页（仍为静态页）
-        registry.addRedirectViewController("/admin", "/admin/login.html");
+        // 后台管理入口：/admin 总是进入后台管理首页，登录态由首页前端脚本判断
+        registry.addRedirectViewController("/admin", "/admin/index.html");
     }
 
     /**

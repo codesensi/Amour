@@ -4,6 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Amour - 后台管理</title>
+  <!-- 登录态守卫：未登录则跳转登录页；已登录停留在后台管理首页（在 layui 渲染前执行，避免闪屏） -->
+  <script src="/admin/js/auth.js"></script>
+  <script>
+    if (!AdminAuth.isLoggedIn()) {
+      location.replace('/admin/login.html');
+    }
+  </script>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="/assets/layui/2.13.9/css/layui.css">
   <style>
@@ -50,7 +57,7 @@
   <div class="admin-header">
     <div class="admin-logo"><i class="layui-icon layui-icon-heart-fill"></i>Amour 后台管理</div>
     <div class="admin-user" id="btnLogout" title="退出登录">
-      <i class="layui-icon layui-icon-username"></i> sadmin
+      <i class="layui-icon layui-icon-username"></i> <span id="adminUsername">sadmin</span>
       <i class="layui-icon layui-icon-down"></i>
     </div>
   </div>
@@ -83,6 +90,13 @@
   <script>
     layui.use(['element', 'jquery', 'layer'], function () {
       const $ = layui.jquery, element = layui.element, layer = layui.layer;
+
+      // 请求守卫：同源请求统一携带 accessToken，接口返回 401 时重定向登录页
+      AdminAuth.setupAjaxGuard();
+
+      // 顶栏显示当前登录用户名（mock 登录时已写入本地登录态）
+      const auth = AdminAuth.getAuth();
+      $('#adminUsername').text(auth ? auth.username : '未登录');
 
       const TAB_FILTER = 'admin-tabs';
       const opened = {}; // 已打开标签：id -> true，防止重复打开
@@ -121,17 +135,13 @@
         if (layId) delete opened[layId];
       });
 
-      // 退出登录：POST /auth/logout（后端实现后即可生效)
+      // 退出登录：mock 阶段直接清除本地登录态并回到登录页；
+      // 后端 /auth/logout 实现后可恢复为先请求接口再跳转
       $('#btnLogout').on('click', function () {
         layer.confirm('确定退出登录吗？', { icon: 3, title: '提示' }, function (index) {
           layer.close(index);
-          $.ajax({
-            url: '/auth/logout',
-            type: 'POST',
-            dataType: 'json'
-          }).always(function () {
-            location.href = '/admin/login.html';
-          });
+          AdminAuth.clearAuth();
+          location.href = '/admin/login.html';
         });
       });
     });

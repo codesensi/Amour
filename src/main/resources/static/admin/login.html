@@ -95,10 +95,14 @@
     </form>
   </div>
 
+  <script src="/admin/js/auth.js"></script>
   <script src="/assets/layui/2.13.9/layui.js"></script>
   <script>
     layui.use(['form', 'jquery', 'layer'], function () {
       const $ = layui.jquery, form = layui.form, layer = layui.layer;
+
+      // 请求守卫：同源请求统一携带 accessToken，接口返回 401 时重定向登录页
+      AdminAuth.setupAjaxGuard();
 
       let captchaKey = '';
 
@@ -126,8 +130,29 @@
       // 点击图片刷新验证码
       $('#captchaBox').on('click', loadCaptcha);
 
-      // 提交登录：POST /auth/login（后端尚未实现，失败时给出友好提示）
+      // MOCK_LOGIN = true：后端 /auth/login 尚未实现，表单校验通过后直接 mock 登录成功，
+      // 写入本地登录态并跳转后台管理首页；后端登录接口实现后将其改为 false 即恢复走真实接口
+      const MOCK_LOGIN = true;
+
+      // 提交登录：POST /auth/login（后端实现后生效）
       form.on('submit(login-submit)', function (data) {
+        if (MOCK_LOGIN) {
+          // 构造与后端约定一致的登录返回体：data.accessToken + data.expiresIn（秒，-1 代表永不过期）
+          const mockRes = {
+            success: true,
+            code: 200,
+            msg: '登录成功',
+            data: {
+              accessToken: 'mock-' + Date.now() + '-' + Math.random().toString(36).slice(2),
+              expiresIn: 7 * 24 * 60 * 60 // mock 默认 7 天；后端实现后以真实返回为准
+            }
+          };
+          AdminAuth.saveAuth(mockRes.data, data.field.username);
+          layer.msg('登录成功，正在跳转…', { icon: 1, time: 800 }, function () {
+            location.href = '/admin/index.html';
+          });
+          return false; // 阻止表单默认提交
+        }
         const payload = Object.assign({}, data.field, { captchaKey: captchaKey });
         $.ajax({
           url: '/auth/login',
@@ -137,6 +162,7 @@
           dataType: 'json'
         }).done(function (res) {
           if (res.success) {
+            AdminAuth.saveAuth(res.data, data.field.username);
             layer.msg('登录成功，正在跳转…', { icon: 1, time: 800 }, function () {
               location.href = '/admin/index.html';
             });
