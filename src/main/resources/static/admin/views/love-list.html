@@ -2252,6 +2252,75 @@
 
             <!-- content End -->
 
+<!-- 页面级脚本置于内容区容器内：整页加载与 pjax 局部注入两个场景均会执行 -->
+<!-- 页面交互脚本（照搬原站并做 mock 化改造） -->
+<script>
+    // 说明：原站该位置为多个后台页面复用的公共提交脚本，
+    // 此处仅保留恋爱清单页相关的两个提交处理（新增事件 / 修改事件），
+    // 其余页面（基本设置/相册/文章等）的提交逻辑为复用代码，已按需精简。
+    // 新增事件提交：原站为 $.ajax({url: "listaddPost.php", ...})
+    $("#listaddPost").click(function () {
+        var eventname = $("input[name='eventname']").val();
+        var icon = $("input[name='icon']").val();
+        var img = $("input[name='img']").val();
+
+        // 表单校验（保留原站逻辑）：事件标题非空校验
+        if ($.trim(eventname) === '') {
+            toastr["error"]("事件标题不能为空！", "Like_Girl");
+            return false;
+        }
+
+        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
+        toastr["success"]("新增事件成功！", "Like_Girl");
+        $('#listaddPost').text('新增中...');
+        $("#listaddPost").attr("disabled", "disabled");
+        // 原站用 setInterval 存在重复触发问题，改为 setTimeout 并走 pjax 局部刷新
+        setTimeout(function () { AdminPjax.load('/admin/views/love-list.html'); }, 1000);
+    });
+
+    // 修改事件提交：原站为 $.ajax({url: "listupda.php", ...})
+    $("#listupda").click(function () {
+        var eventname = $("input[name='eventname']").val();
+        var icon = $("input[name='icon']").val();
+        var imgurl = $("input[name='imgurl']").val();
+        var id = $("input[name='id']").val();
+
+        // 表单校验（保留原站逻辑）：事件标题非空校验
+        if ($.trim(eventname) === '') {
+            toastr["error"]("事件标题不能为空！", "Like_Girl");
+            return false;
+        }
+
+        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
+        toastr["success"]("修改事件成功！", "Like_Girl");
+        $('#listupda').text('修改中...');
+        $("#listupda").attr("disabled", "disabled");
+        // 原站用 setInterval 存在重复触发问题，改为 setTimeout 并走 pjax 局部刷新
+        setTimeout(function () { AdminPjax.load('/admin/views/love-list.html'); }, 1000);
+    });
+
+    $(function () {
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": true,
+            "rtl": false,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": 300,
+            "hideDuration": 1000,
+            "timeOut": 5000,
+            "extendedTimeOut": 1000,
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+    })
+</script>
+
 <!-- Footer Start -->
 <footer class="footer">
     <div class="row footer_center">
@@ -2293,72 +2362,8 @@
 <script src="/admin/assets/js/pages/demo.datatable-init.js"></script>
 <!-- end demo js-->
 <script src="/admin/assets/js/pages/demo.toastr.js"></script>
-
-<!-- 页面交互脚本（照搬原站并做 mock 化改造） -->
-<script>
-    // 说明：原站该位置为多个后台页面复用的公共提交脚本，
-    // 此处仅保留恋爱清单页相关的两个提交处理（新增事件 / 修改事件），
-    // 其余页面（基本设置/相册/文章等）的提交逻辑为复用代码，已按需精简。
-    // 新增事件提交：原站为 $.ajax({url: "listaddPost.php", ...})
-    $("#listaddPost").click(function () {
-        var eventname = $("input[name='eventname']").val();
-        var icon = $("input[name='icon']").val();
-        var img = $("input[name='img']").val();
-
-        // 表单校验（保留原站逻辑）：事件标题非空校验
-        if ($.trim(eventname) === '') {
-            toastr["error"]("事件标题不能为空！", "Like_Girl");
-            return false;
-        }
-
-        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
-        toastr["success"]("新增事件成功！", "Like_Girl");
-        $('#listaddPost').text('新增中...');
-        $("#listaddPost").attr("disabled", "disabled");
-        setInterval(function () { window.location.href = '/admin/views/love-list.html'; }, 1000);
-    });
-
-    // 修改事件提交：原站为 $.ajax({url: "listupda.php", ...})
-    $("#listupda").click(function () {
-        var eventname = $("input[name='eventname']").val();
-        var icon = $("input[name='icon']").val();
-        var imgurl = $("input[name='imgurl']").val();
-        var id = $("input[name='id']").val();
-
-        // 表单校验（保留原站逻辑）：事件标题非空校验
-        if ($.trim(eventname) === '') {
-            toastr["error"]("事件标题不能为空！", "Like_Girl");
-            return false;
-        }
-
-        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
-        toastr["success"]("修改事件成功！", "Like_Girl");
-        $('#listupda').text('修改中...');
-        $("#listupda").attr("disabled", "disabled");
-        setInterval(function () { window.location.href = '/admin/views/love-list.html'; }, 1000);
-    });
-
-    $(function () {
-        toastr.options = {
-            "closeButton": true,
-            "debug": false,
-            "newestOnTop": false,
-            "progressBar": true,
-            "rtl": false,
-            "positionClass": "toast-top-right",
-            "preventDuplicates": false,
-            "onclick": null,
-            "showDuration": 300,
-            "hideDuration": 1000,
-            "timeOut": 5000,
-            "extendedTimeOut": 1000,
-            "showEasing": "swing",
-            "hideEasing": "linear",
-            "showMethod": "fadeIn",
-            "hideMethod": "fadeOut"
-        };
-    })
-</script>
+<!-- 局部刷新（pjax）：拦截后台 .html 链接，仅替换内容区 -->
+<script src="/admin/js/admin-pjax.js"></script>
 
 <script>
     (function () {

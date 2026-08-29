@@ -595,35 +595,7 @@
 
             <!-- content End -->
 
-<!-- Footer Start -->
-<footer class="footer">
-    <div class="row footer_center">
-        <div class="col-md-6">
-            Copyright © 2022-2026 <a href="https://blog.kikiw.cn/index.php/archives/52/" target="_blank">Ki</a> All Rights Reserved.
-        </div>
-    </div>
-</footer>
-<!-- end Footer -->
-</div>
-
-<!-- content-page -->
-
-</div>
-
-</div>
-
-<script>
-    console.log("%c Amour 后台管理 | Powered by codesensi", "color:#fff;background:linear-gradient(270deg,#986fee,#8695e6,#68b7dd,#18d7d3);padding:8px 15px;border-radius:15px");
-</script>
-
-
-<script src="/Style/toastr/toastr.js"></script>
-<!-- App js -->
-<script src="/admin/assets/js/app.min.js"></script>
-
-<!-- end demo js-->
-<script src="/admin/assets/js/pages/demo.toastr.js"></script>
-
+<!-- 页面级脚本置于内容区容器内：整页加载与 pjax 局部注入两个场景均会执行 -->
 <!-- 页面交互脚本：照搬原站 user.php 的交互逻辑并 mock 化（原站为多个页面共用一段脚本，此处仅保留本页用到的提交处理） -->
 <script>
     // 原站遗留的账号/密码格式校验函数，按原样保留（表单未绑定 onsubmit，不会自动触发）
@@ -697,6 +669,37 @@
         };
     })
 </script>
+
+<!-- Footer Start -->
+<footer class="footer">
+    <div class="row footer_center">
+        <div class="col-md-6">
+            Copyright © 2022-2026 <a href="https://blog.kikiw.cn/index.php/archives/52/" target="_blank">Ki</a> All Rights Reserved.
+        </div>
+    </div>
+</footer>
+<!-- end Footer -->
+</div>
+
+<!-- content-page -->
+
+</div>
+
+</div>
+
+<script>
+    console.log("%c Amour 后台管理 | Powered by codesensi", "color:#fff;background:linear-gradient(270deg,#986fee,#8695e6,#68b7dd,#18d7d3);padding:8px 15px;border-radius:15px");
+</script>
+
+
+<script src="/Style/toastr/toastr.js"></script>
+<!-- App js -->
+<script src="/admin/assets/js/app.min.js"></script>
+
+<!-- end demo js-->
+<script src="/admin/assets/js/pages/demo.toastr.js"></script>
+<!-- 局部刷新（pjax）：拦截后台 .html 链接，仅替换内容区 -->
+<script src="/admin/js/admin-pjax.js"></script>
 
 <!-- 外壳适配脚本 -->
 <script>

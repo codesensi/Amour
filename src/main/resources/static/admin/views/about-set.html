@@ -724,35 +724,7 @@
                 });
             </script>
 
-            <!-- Footer Start -->
-            <footer class="footer">
-                <div class="row footer_center">
-                    <div class="col-md-6">
-                        Copyright © 2022-2026 <a href="https://blog.kikiw.cn/index.php/archives/52/" target="_blank">Ki</a> All Rights Reserved.
-                    </div>
-                </div>
-            </footer>
-            <!-- end Footer -->
-        </div>
-
-        <!-- content-page -->
-
-    </div>
-
-</div>
-
-<script>
-    console.log("%c Amour 后台管理 | Powered by codesensi", "color:#fff;background:linear-gradient(270deg,#986fee,#8695e6,#68b7dd,#18d7d3);padding:8px 15px;border-radius:15px");
-</script>
-
-
-<script src="/Style/toastr/toastr.js"></script>
-<!-- App js -->
-<script src="/admin/assets/js/app.min.js"></script>
-
-<!-- end demo js-->
-<script src="/admin/assets/js/pages/demo.toastr.js"></script>
-
+<!-- 页面级脚本置于内容区容器内：整页加载与 pjax 局部注入两个场景均会执行 -->
 <script>
     // ==================== 页面交互脚本（照搬原站公共提交脚本，mock 化改造） ====================
 
@@ -840,7 +812,8 @@
         toastr["success"]("文章修改成功！", "Like_Girl");
         $('#littleupda').text('修改中...');
         $("#littleupda").attr("disabled", "disabled");
-        setInterval("window.location.href='/admin/views/little-set.html'", 1000);
+        // 原站用 setInterval 存在重复触发问题，改为 setTimeout 并走 pjax 局部刷新
+        setTimeout(function () { AdminPjax.load('/admin/views/little-set.html'); }, 1000);
     })
     $("#littleAddPost").click(function () {
         var articlename = $("select[name='articlename']").val();
@@ -866,7 +839,8 @@
         toastr["success"]("新增文章成功！", "Like_Girl");
         $('#littleAddPost').text('发布中...');
         $("#littleAddPost").attr("disabled", "disabled");
-        setInterval("window.location.href='/admin/views/little-set.html'", 1000);
+        // 原站用 setInterval 存在重复触发问题，改为 setTimeout 并走 pjax 局部刷新
+        setTimeout(function () { AdminPjax.load('/admin/views/little-set.html'); }, 1000);
     })
     $("#ImgUpdaPost").click(function () {
         var imgDatd = $("input[name='imgDatd']").val();
@@ -891,7 +865,8 @@
         toastr["success"]("相册修改成功！", "Like_Girl");
         $('#ImgUpdaPost').text('修改中...');
         $("#ImgUpdaPost").attr("disabled", "disabled");
-        setInterval("window.location.href='/admin/views/love-img-set.html'", 1000);
+        // 原站用 setInterval 存在重复触发问题，改为 setTimeout 并走 pjax 局部刷新
+        setTimeout(function () { AdminPjax.load('/admin/views/love-img-set.html'); }, 1000);
     })
     $("#ImgAddPost").click(function () {
         var imgDatd = $("input[name='imgDatd']").val();
@@ -916,7 +891,8 @@
         toastr["success"]("新增相册成功！", "Like_Girl");
         $('#ImgUpdaPost').text('新增中...');
         $("#ImgUpdaPost").attr("disabled", "disabled");
-        setInterval("window.location.href='/admin/views/love-img-set.html'", 1000);
+        // 原站用 setInterval 存在重复触发问题，改为 setTimeout 并走 pjax 局部刷新
+        setTimeout(function () { AdminPjax.load('/admin/views/love-img-set.html'); }, 1000);
     })
     $("#listaddPost").click(function () {
         var eventname = $("input[name='eventname']").val();
@@ -932,7 +908,8 @@
         toastr["success"]("新增事件成功！", "Like_Girl");
         $('#listaddPost').text('新增中...');
         $("#listaddPost").attr("disabled", "disabled");
-        setInterval("window.location.href='/admin/views/love-list.html'", 1000);
+        // 原站用 setInterval 存在重复触发问题，改为 setTimeout 并走 pjax 局部刷新
+        setTimeout(function () { AdminPjax.load('/admin/views/love-list.html'); }, 1000);
     })
     $("#ipAddPost").click(function () {
         var ipdz = $("input[name='ipdz']").val();
@@ -948,7 +925,8 @@
         toastr["success"]("IP封禁成功！", "Like_Girl");
         $('#listupda').text('提交中...');
         $("#listupda").attr("disabled", "disabled");
-        setInterval("window.location.href='/admin/views/ip-list.html'", 1000);
+        // 原站用 setInterval 存在重复触发问题，改为 setTimeout 并走 pjax 局部刷新
+        setTimeout(function () { AdminPjax.load('/admin/views/ip-list.html'); }, 1000);
     })
     $("#listupda").click(function () {
         var eventname = $("input[name='eventname']").val();
@@ -965,7 +943,8 @@
         toastr["success"]("修改事件成功！", "Like_Girl");
         $('#listupda').text('修改中...');
         $("#listupda").attr("disabled", "disabled");
-        setInterval("window.location.href='/admin/views/love-list.html'", 1000);
+        // 原站用 setInterval 存在重复触发问题，改为 setTimeout 并走 pjax 局部刷新
+        setTimeout(function () { AdminPjax.load('/admin/views/love-list.html'); }, 1000);
     })
     $("#aboutPost").click(function () {
         var title = $("input[name='title']").val();
@@ -997,6 +976,38 @@
         toastr["success"]("修改对话配置成功！", "Like_Girl");
     })
 </script>
+
+            <!-- Footer Start -->
+            <footer class="footer">
+                <div class="row footer_center">
+                    <div class="col-md-6">
+                        Copyright © 2022-2026 <a href="https://blog.kikiw.cn/index.php/archives/52/" target="_blank">Ki</a> All Rights Reserved.
+                    </div>
+                </div>
+            </footer>
+            <!-- end Footer -->
+        </div>
+
+        <!-- content-page -->
+
+    </div>
+
+</div>
+
+<script>
+    console.log("%c Amour 后台管理 | Powered by codesensi", "color:#fff;background:linear-gradient(270deg,#986fee,#8695e6,#68b7dd,#18d7d3);padding:8px 15px;border-radius:15px");
+</script>
+
+
+<script src="/Style/toastr/toastr.js"></script>
+<!-- App js -->
+<script src="/admin/assets/js/app.min.js"></script>
+
+<!-- end demo js-->
+<script src="/admin/assets/js/pages/demo.toastr.js"></script>
+<!-- 局部刷新（pjax）：拦截后台 .html 链接，仅替换内容区 -->
+<script src="/admin/js/admin-pjax.js"></script>
+
 <script>
     (function () {
         'use strict';
