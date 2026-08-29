@@ -618,17 +618,25 @@ export function initPortalPage() {
   // 若用 link.click() 触发合成点击，合成事件与原始事件会先后冒泡到
   // pjax 的 document 级拦截器，导致一次点击 pushState 两次——
   // 表现为"浏览器返回需要点两次才能回到上一页"。
-  document.querySelectorAll('.card, .card-b').forEach(function (card) {
-    if (card._portalBound) return;
-    card._portalBound = true;
-    card.addEventListener('click', function (e) {
-      const link = card.querySelector('a');
-      if (!link) return;
-      e.preventDefault();
-      e.stopPropagation();
-      window.portalNavigate(link.href);
+  // 仅首页绑定：列表页的 .card 是内容卡片，内部"加载更多"等按钮
+  // 若被误判为整卡跳转（卡内第一个 a 的 href 为 javascript:;），
+  // 会触发 pjax.fetch('javascript:;') 使顶部进度条卡死、数据不追加。
+  if (location.pathname === '/' || location.pathname === '/index.html') {
+    document.querySelectorAll('.card, .card-b').forEach(function (card) {
+      if (card._portalBound) return;
+      card._portalBound = true;
+      card.addEventListener('click', function (e) {
+        const link = card.querySelector('a');
+        if (!link) return;
+        const href = link.getAttribute('href') || '';
+        // 脚本/锚点/邮件链接不是页面跳转目标，交给各自的处理器
+        if (!href || href.charAt(0) === '#' || href.indexOf('javascript:') === 0 || href.indexOf('mailto:') === 0) return;
+        e.preventDefault();
+        e.stopPropagation();
+        window.portalNavigate(link.href);
+      });
     });
-  });
+  }
 
   // 相册页：懒加载与灯箱由页面模块 js/pages/love-photo.js 编排（经 main.js 的页面模块调度加载）
 
