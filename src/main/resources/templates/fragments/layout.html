@@ -12,6 +12,8 @@
   <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
   <title th:text="${title}">站点名</title>
   <link rel="shortcut icon" th:href="${resourceUrlProvider.getForLookupPath('/assets/portal/img/favicon.ico')}">
+  <!-- layui 基础样式：置于门户样式之前，门户样式可整体覆盖（layer 弹层与 laypage 分页由组件按需使用） -->
+  <link rel="stylesheet" th:href="${resourceUrlProvider.getForLookupPath('/assets/layui/2.13.9/css/layui.css')}">
   <link rel="stylesheet" th:href="${resourceUrlProvider.getForLookupPath('/assets/portal/css/portal.css')}">
   <link rel="stylesheet" th:href="${resourceUrlProvider.getForLookupPath('/assets/portal/css/content.css')}">
   <link rel="stylesheet" th:href="${resourceUrlProvider.getForLookupPath('/assets/portal/css/breakpoints/max-768.css')}" media="(max-width: 768px)">
@@ -123,6 +125,7 @@
       <path d="M810.666667 213.333333H213.333333a85.333333 85.333333 0 0 0-85.333333 85.333334v426.666666a85.333333 85.333333 0 0 0 85.333333 85.333334h597.333334a85.333333 85.333333 0 0 0 85.333333-85.333334V298.666667a85.333333 85.333333 0 0 0-85.333333-85.333334z m0 512H213.333333V298.666667h597.333334v426.666666zM341.333333 384a64 64 0 1 0 128 0 64 64 0 0 0-128 0z m128 128l-128 170.666667h512l-170.666666-256-128 170.666666-85.333334-85.333333z"/>
     </symbol>
   </svg>
+  <script th:src="${resourceUrlProvider.getForLookupPath('/assets/layui/2.13.9/layui.js')}"></script>
   <script th:src="${resourceUrlProvider.getForLookupPath('/assets/portal/icons/iconfont-sprite.js')}"></script>
   <!-- 门户 ESM 入口：经 import 加载 common/pjax、common/config 与门户业务 -->
   <script type="module" th:src="${resourceUrlProvider.getForLookupPath('/assets/portal/main.js')}"></script>

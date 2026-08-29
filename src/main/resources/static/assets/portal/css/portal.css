@@ -523,47 +523,7 @@ li {
   margin-right: .3rem;
 }
 
-/* ---------- 自定义 Tooltip（data-tip 悬浮提示） ---------- */
-.custom-tooltip {
-  position: absolute;
-  z-index: 1000;
-  max-width: 250px;
-  padding: 8px 12px;
-  background: #333;
-  color: #fff;
-  border-radius: 4px;
-  font-size: 14px;
-  line-height: 1.4;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  transform: translateY(10px);
-  pointer-events: none;
-  white-space: pre-line;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-}
-
-.custom-tooltip::after {
-  content: '';
-  position: absolute;
-  width: 0;
-  height: 0;
-  border: 6px solid transparent;
-}
-
-.custom-tooltip.bottom::after {
-  top: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-bottom-color: #333;
-}
-
-.custom-tooltip.top::after {
-  bottom: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-top-color: #333;
-}
+/* data-tip 悬浮提示已迁移至 common/tooltip.js（layui layer.tips），样式随组件注入 */
 
 /* 空状态提示（留言板/清单/点滴列表无数据时） */
 .portal-empty {
@@ -571,6 +531,42 @@ li {
   color: #999;
   line-height: 4rem;
   font-size: 1rem;
+}
+
+/* ---------- layui flow "加载更多"按钮（门户风格定制） ---------- */
+/* 按钮条占满整行并居中：列表容器多为栅格布局，需显式横跨整行，否则按钮随格子收缩不居中 */
+.layui-flow-more {
+  width: 100%;
+  grid-column: 1 / -1;
+  margin: 2rem 0 1rem;
+  text-align: center;
+  clear: both;
+}
+
+.layui-flow-more a {
+  display: inline-block;
+  height: auto;
+  line-height: 1;
+  padding: 10px 32px;
+  border: 1px solid #d9d9d9;
+  border-radius: 20px;
+  background-color: #fff;
+  color: #666;
+  font-size: 14px;
+  transition: color .3s, border-color .3s;
+}
+
+.layui-flow-more a:hover {
+  color: #8695e6;
+  border-color: #8695e6;
+  opacity: 1;
+}
+
+/* 到底提示（flow 将按钮文字替换为 end 文案后的展示形态） */
+.layui-flow-more a cite {
+  padding: 0;
+  background-color: transparent;
+  color: inherit;
 }
 
 .photo-item {

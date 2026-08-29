@@ -28,16 +28,16 @@
         <!-- 留言列表：接口口子 GET /love/messages -->
         <div id="leavingList"><div class="portal-empty">留言加载中…</div></div>
 
-        <!-- 提交表单：接口口子 POST /love/messages {qq, name, text} -->
-        <form onsubmit="return false">
+        <!-- 提交表单：接口口子 POST /love/messages {qq, name, text}；校验与提交由 layui-form 接管 -->
+        <form class="layui-form" lay-filter="message-form">
           <div class="inputbox" id="MessageArea">
             <img src="https://q1.qlogo.cn/g?b=qq&nk=1234567&s=100" alt="" class="avatar">
-            <input id="QQ" type="text" name="qq" placeholder="请输入QQ号码" class="rig">
-            <input id="nickname" type="text" name="name" placeholder="输入QQ号码后自动获取" class="let">
+            <input id="QQ" type="text" name="qq" placeholder="请输入QQ号码" class="rig" lay-verify="portalQQ">
+            <input id="nickname" type="text" name="name" placeholder="输入QQ号码后自动获取" class="let" lay-verify="portalNickname">
           </div>
-          <textarea name="text" id="wenben" rows="8" placeholder="请输入您的留言内容..."></textarea>
+          <textarea name="text" id="wenben" rows="8" placeholder="请输入您的留言内容..." lay-verify="portalContent"></textarea>
           <div class="input-sub">
-            <button type="button" id="leavingPost" class="tijiao">提交留言
+            <button type="button" id="leavingPost" class="tijiao" lay-submit lay-filter="message-submit">提交留言
               <svg style="width:1.3em;height:1.3em;" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M620.8 179.2c12.8 12.8 6.4 32-6.4 44.8-19.2 6.4-38.4 6.4-44.8-12.8-44.8-70.4-128-115.2-217.6-115.2-140.8 0-256 115.2-256 256 0 89.6 44.8 166.4 115.2 217.6 19.2 6.4 19.2 25.6 12.8 38.4-12.8 19.2-32 19.2-44.8 12.8C89.6 563.2 32 460.8 32 352c0-179.2 140.8-320 320-320 108.8 0 211.2 57.6 268.8 147.2zM326.4 332.8l243.2 601.6 83.2-243.2c6.4-19.2 19.2-32 38.4-38.4L934.4 576 326.4 332.8z m25.6-57.6L960 518.4c32 12.8 51.2 51.2 38.4 83.2-6.4 19.2-19.2 32-38.4 38.4l-243.2 83.2L633.6 960c-12.8 32-44.8 51.2-83.2 38.4-19.2-6.4-32-19.2-38.4-38.4L268.8 358.4c-12.8-32 6.4-70.4 38.4-83.2 12.8-6.4 32-6.4 44.8 0z" fill="#ffffff"/></svg>
             </button>
           </div>

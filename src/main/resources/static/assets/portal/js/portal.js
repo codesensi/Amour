@@ -10,6 +10,8 @@
 import { loadConfig, qqAvatar } from '/assets/common/config.js';
 import { navigate as pjaxNavigate } from '/assets/common/pjax.js';
 import { toast } from '/assets/common/toast.js';
+import { loadLayui } from '/assets/common/layui.js';
+import { initTooltip } from '/assets/common/tooltip.js';
 
 /** 侧栏悬浮栏的 HTML onclick 属性引用的函数，模块化后统一挂回全局 */
 window.scrollToTop = function scrollToTop() {
@@ -47,9 +49,9 @@ const PORTAL_API = {
   messages: { url: '/love/messages', method: 'GET' },
   /** 提交留言：POST /love/messages {qq, nickname, content} */
   sendMessage: { url: '/love/messages', method: 'POST' },
-  /** 恋爱清单：GET /love/list -> [{text, done, date, img}] */
+  /** 恋爱清单分页：GET /love/list?page=&limit= -> {total, data:[{text, done, date, img}]} */
   loveList: { url: '/love/list', method: 'GET' },
-  /** 点点滴滴文章列表：GET /love/littles -> [{id, title, author, date}] */
+  /** 点点滴滴文章分页：GET /love/littles?page=&limit= -> {total, data:[{id, title, author, date}]} */
   littles: { url: '/love/littles', method: 'GET' },
   /**
    * 关于页对话剧本：GET /love/chat -> 节点数组（后台可配置，预留口子）
@@ -60,16 +62,40 @@ const PORTAL_API = {
   /* 站点展示类配置不走独立接口：统一经 config.js 的 /config/public 口子读取 sys_config */
 };
 
+/** 占位图渐变色池：批量生成的示例照片循环取色，视觉上区分页与页 */
+const PHOTO_GRADIENTS = [
+  ['#ffd3d3', '#cfe8ff'],
+  ['#d3ffe3', '#cfe0ff'],
+  ['#fff3d3', '#ffd6e0'],
+  ['#e3d3ff', '#cfeaff'],
+  ['#d3e8ff', '#e8ffd3']
+];
+
+/** 批量生成示例照片的文案池 */
+const PHOTO_LABELS = [
+  '海边漫步', '山顶日出', '巷口的猫', '一起逛的夜市', '雨后的彩虹', '冬天的初雪',
+  '游乐园的一天', '深夜的电影院', '郊外的野餐', '咖啡馆的下午', '花田里的合影', '车站的告别'
+];
+
+/**
+ * 批量生成示例照片（凑足多页数据，便于查看滚动懒加载的分页效果）。
+ * @param {number} count 生成条数
+ */
+function generateMorePhotos(count) {
+  const list = [];
+  for (let i = 0; i < count; i++) {
+    const label = PHOTO_LABELS[i % PHOTO_LABELS.length] + ' · ' + (Math.floor(i / PHOTO_LABELS.length) + 1);
+    const gradient = PHOTO_GRADIENTS[i % PHOTO_GRADIENTS.length];
+    const month = String((i % 12) + 1).padStart(2, '0');
+    const day = String((i % 27) + 1).padStart(2, '0');
+    list.push({ img: mockPhoto(label, gradient[0], gradient[1]), text: label, date: '2025-' + month + '-' + day });
+  }
+  return list;
+}
+
 /** 示例数据：仅在后端接口未实现时兜底展示（关于页对话模块复用 aboutChat 剧本） */
 export const PORTAL_MOCK = {
-  photos: [
-    { img: mockPhoto('第一次旅行的海边'), text: '第一次旅行的海边', date: '2023-05-20' },
-    { img: mockPhoto('巷口的黄昏'), text: '巷口的黄昏', date: '2023-08-13' },
-    { img: mockPhoto('冬天的第一场雪'), text: '冬天的第一场雪', date: '2023-12-16' },
-    { img: mockPhoto('一起逛的夜市'), text: '一起逛的夜市', date: '2024-06-01' },
-    { img: mockPhoto('你拍的晚霞'), text: '你拍的晚霞', date: '2024-09-15' },
-    { img: mockPhoto('周年纪念日的晚餐'), text: '周年纪念日的晚餐', date: '2025-07-15' }
-  ],
+  photos: generateMorePhotos(48),
   messages: [
     { qq: '3439780232', nickname: 'Ki.', avatar: 'https://q1.qlogo.cn/g?b=qq&nk=3439780232&s=100', content: 'Like Girl 5.2.1-Stable 默认留言', date: '2025-09-02 16:24:09', location: '广东' },
     { qq: '673822943', nickname: 'Su', avatar: 'https://q1.qlogo.cn/g?b=qq&nk=673822943&s=100', content: '愿得一心人，白头不相离。', date: '2025-09-03 00:00:00', location: '' }
@@ -135,14 +161,34 @@ export const PORTAL_MOCK = {
   ]
 };
 
-/** 生成占位照片（内联 SVG，保证离线可用） */
-function mockPhoto(label) {
+/** 生成占位照片（内联 SVG，保证离线可用；from/to 为渐变色，缺省为原站蓝粉渐变） */
+function mockPhoto(label, from, to) {
+  const f = from || '#ffd3d3';
+  const t = to || '#cfe8ff';
   const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400">'
     + '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">'
-    + '<stop offset="0" stop-color="#ffd3d3"/><stop offset="1" stop-color="#cfe8ff"/></linearGradient></defs>'
+    + '<stop offset="0" stop-color="' + f + '"/><stop offset="1" stop-color="' + t + '"/></linearGradient></defs>'
     + '<rect width="600" height="400" fill="url(#g)"/>'
     + '<text x="300" y="205" font-size="26" fill="#ffffff" text-anchor="middle" font-family="serif">' + label + '</text></svg>';
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+
+/**
+ * mock 数据响应：数组型 mock 数据按真实接口契约模拟分页
+ * （{total, data: 当前页切片}，分页大小随请求 limit），使流加载逐页触发可见；
+ * 其余接口原样返回内置数据。
+ */
+function mockResponse(apiKey, payload) {
+  const data = PORTAL_MOCK[apiKey];
+  if (Array.isArray(data) && payload && payload.page) {
+    const page = payload.page;
+    const limit = payload.limit || PAGE_SIZE;
+    return {
+      total: data.length,
+      data: data.slice((page - 1) * limit, page * limit)
+    };
+  }
+  return data;
 }
 
 /**
@@ -172,7 +218,7 @@ export async function portalRequest(apiKey, payload) {
     /* 接口未实现或网络异常，走 mock */
   }
   console.warn('[portal] 接口 ' + apiKey + '（' + api.method + ' ' + api.url + '）未实现或请求失败，当前使用内置示例数据。后端实现后无需改前端。');
-  return PORTAL_MOCK[apiKey];
+  return mockResponse(apiKey, payload);
 }
 
 /** 计算并渲染恋爱计时（首次加载与 pjax 换页后立即调用，避免空白延迟） */
@@ -224,55 +270,15 @@ function initHeaderScrollColor() {
   }, { passive: true });
 }
 
-/** data-tip 自定义悬浮提示（照搬；事件委托方式绑定一次，pjax 换页后自动生效） */
-function initTooltip() {
-  if (initTooltip._bound) return;
-  initTooltip._bound = true;
-  let $tooltip = null;
-  function show(el) {
-    const text = el.getAttribute('data-tip') || '';
-    const position = el.getAttribute('data-tip-position') || 'top';
-    if (!$tooltip) {
-      $tooltip = document.createElement('div');
-      $tooltip.className = 'custom-tooltip';
-      document.body.appendChild($tooltip);
-    }
-    $tooltip.textContent = text;
-    $tooltip.className = 'custom-tooltip ' + position;
-    $tooltip.style.visibility = 'hidden';
-    $tooltip.style.display = 'block';
-    const rect = el.getBoundingClientRect();
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-    const tipWidth = $tooltip.offsetWidth;
-    const tipHeight = $tooltip.offsetHeight;
-    let top = 0, left = 0;
-    if (position === 'bottom') { top = rect.bottom + scrollTop + 10; left = rect.left + scrollLeft + (rect.width - tipWidth) / 2; }
-    else { top = rect.top + scrollTop - tipHeight - 10; left = rect.left + scrollLeft + (rect.width - tipWidth) / 2; }
-    $tooltip.style.top = top + 'px';
-    $tooltip.style.left = left + 'px';
-    $tooltip.style.visibility = 'visible';
-    $tooltip.style.opacity = '1';
-  }
-  function hide() { if ($tooltip) { $tooltip.style.opacity = '0'; $tooltip.style.visibility = 'hidden'; } }
-  document.addEventListener('mouseover', function (e) {
-    const el = e.target.closest('[data-tip]');
-    if (el) show(el);
-  });
-  document.addEventListener('mouseout', function (e) {
-    if (e.target.closest('[data-tip]')) hide();
-  });
-  window.addEventListener('scroll', hide);
-}
+/** data-tip 悬浮提示已抽至 common/tooltip.js（基于 layui layer.tips，声明式接口不变） */
 
 /** 右侧悬浮栏动作：scrollToTop 已在文件头部挂到 window（侧栏 HTML onclick 引用） */
 
-/** Love Photo 相册：分页加载 + 逐张浮现动画（照搬原站模板，接口走 portalRequest 口子） */
-let photoPage = 1;
-const photoLimit = 6;
-
-/** 照片卡片模板（照搬原站 createPhotoElement；后端数据统一经 htmlEscape 转义防注入） */
-function createPhotoElement(photo) {
+/**
+ * 照片卡片模板（照搬原站 createPhotoElement；后端数据统一经 htmlEscape 转义防注入）。
+ * 相册页的懒加载与灯箱交互在页面模块 js/pages/love-photo.js 中编排。
+ */
+export function createPhotoElement(photo) {
   const img = htmlEscape(photo.img || '');
   const text = htmlEscape(photo.text || '');
   const date = htmlEscape(photo.date || '');
@@ -284,105 +290,210 @@ function createPhotoElement(photo) {
     + '</div></div></div>';
 }
 
-async function loadPhotos() {
-  const gallery = document.getElementById('photoGallery');
-  const loading = document.getElementById('loading');
-  const loadBtn = document.getElementById('loadMoreBtn');
-  if (!gallery) return;
-
-  if (loading) loading.style.display = 'block';
-  loadBtn.disabled = true;
-
-  const res = await portalRequest('photos', { page: photoPage, limit: photoLimit });
-  const photos = (res && res.data) ? res.data : (photos_list(res));
-  const total = (res && res.total) ? res.total : photos.length;
-  const startIndex = gallery.children.length;
-
-  photos.forEach(function (photo) {
-    const tpl = document.createElement('template');
-    tpl.innerHTML = createPhotoElement(photo).trim();
-    gallery.appendChild(tpl.content.firstChild);
-  });
-
-  gallery.querySelectorAll('.photo-item').forEach(function (el, idx) {
-    if (idx >= startIndex) {
-      setTimeout(function () { el.classList.add('show'); }, (idx - startIndex) * 300);
-    }
-  });
-
-  photoPage++;
-  if (loading) loading.style.display = 'none';
-  if (gallery.children.length >= total) {
-    loadBtn.textContent = '暂无更多数据';
-    loadBtn.disabled = true;
-  } else {
-    loadBtn.innerHTML = '加载更多';
-    loadBtn.disabled = false;
-  }
-}
-
 /** 兼容 mock：photos 无外层 total/data 结构时 */
-function photos_list(res) {
+export function photos_list(res) {
   return Array.isArray(res) ? res : [];
 }
 
-function resetPhotos() {
-  photoPage = 1;
-  const gallery = document.getElementById('photoGallery');
-  if (gallery) gallery.innerHTML = '';
+/**
+ * 留言表单：layui-form 校验规则与提交接管。
+ * 校验提示文案逐字保留原站；verify/on 均为全局注册（事件委托对 pjax 动态内容
+ * 同样生效），以 _bound 防止 pjax 重入导致重复绑定、重复提交。
+ */
+function initMessageForm(form) {
+  if (initMessageForm._bound) {
+    return;
+  }
+  initMessageForm._bound = true;
+
+  form.verify({
+    portalQQ: function (value) {
+      if (value.length === 0) return '请填写QQ号码！';
+      if (!/^[0-9]{6,12}$/.test(value)) return '您的QQ号码格式错误<br/>请输入由6-12位的数字<br/>组成的QQ号码！';
+      if (value === '123456' || value === '100000' || value === '1234567') return '我想也许这并不是您的QQ号码...';
+    },
+    portalNickname: function (value) {
+      if (value.length === 0) return '请填写您的昵称！';
+    },
+    portalContent: function (value) {
+      if (value.length === 0) return '请填写您要留言的内容！';
+      if (value.length <= 2) return '请填写两个字符以上的内容！';
+      if (/^[0-9]+$/.test(value)) return '内容为纯数字 已被拦截！';
+      if (new RegExp('[操垃圾傻逼妈]').test(value)) return '您输入的内容是违禁词<br/>请注意您的发言不文明的留言<br/>会被管理员拉进小黑屋喔';
+    }
+  });
+
+  form.on('submit(message-submit)', function (data) {
+    submitMessage(data.field);
+    return false;
+  });
 }
 
 /** 留言板：渲染（照搬原站 leavform 结构）+ 提交校验（接口走 portalRequest 口子） */
-function htmlEscape(str) {
+export function htmlEscape(str) {
   return String(str == null ? '' : str)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
-async function loadMessages() {
-  const list = document.getElementById('leavingList');
-  if (!list) return;
-  const data = await portalRequest('messages', { page: 1, limit: 100 });
-  const messages = (data && data.data) ? data.data : (Array.isArray(data) ? data : []);
-  const countEl = document.getElementById('leavingCount');
-  if (countEl) countEl.textContent = String(messages.length);
-  list.innerHTML = messages.map(function (m, i) {
-    return '<div class="leavform animated fadeInUp delay-03s">'
-      + '<div class="textinfo">'
-      + '<div class="MsgTopInfo"><i class="time" data-tip="' + htmlEscape(m.date || '') + '" data-tip-position="top">'
-      + htmlEscape(m.date || '') + (m.location ? '<b class="yuan"></b>' + htmlEscape(m.location) : '')
-      + '</i></div>'
-      + '<div class="user_info">'
-      + '<img src="' + htmlEscape(m.avatar || mockPhoto('游客')) + '">'
-      + '<div class="head_content"><div class="level">访客 <b>#' + (i + 1) + '</b></div>'
-      + '<span class="name">' + htmlEscape(m.nickname || '游客') + '</span></div>'
-      + '</div>'
-      + '<div class="text">' + htmlEscape(m.content || '') + '</div>'
-      + '</div></div>';
-  }).join('') || '<div class="portal-empty">还没有留言，来写下第一条吧~</div>';
+/** 门户列表每页条数：相册、留言、点点滴滴、恋爱清单统一 */
+export const PAGE_SIZE = 6;
+
+/** 流加载编排序号：每次 initLoadMore 递增，旧实例的回调据此自行终止（防 pjax 重入叠加） */
+let loadMoreSeq = 0;
+
+/**
+ * 通用"加载更多"流加载编排（layui flow 按钮模式，门户列表页共用）。
+ * 首屏自动加载第 1 页，之后每点击一次"加载更多"追加一页（每页 PAGE_SIZE 条）；
+ * 数据加载完（含首屏不足一页）后隐藏"加载更多"按钮。
+ * @param {object} o 配置项
+ * @param {string} o.elem 列表容器选择器
+ * @param {Function} o.fetchPage (page) => Promise<{total, data:Array}> 分页取数
+ * @param {Function} o.render (item, index, page) => string 单条 HTML（调用方负责转义）
+ * @param {string} [o.emptyText] 无数据提示（仅首屏为空时展示）
+ * @param {Function} [o.onTotal] (total) => void 数据总数回调（留言计数等）
+ * @param {Function} [o.onItems] (items, page) => void 本页数据追加后的 DOM 后处理（浮现动画等）
+ */
+export async function initLoadMore(o) {
+  const box = document.querySelector(o.elem);
+  if (!box) return;
+  const token = ++loadMoreSeq;
+
+  const [layer, flow] = await loadLayui('layer', 'flow');
+  flow.load({
+    elem: o.elem,
+    isAuto: false,
+    end: '暂无更多',
+    done: function (page, next) {
+      // pjax 已切走或被更新的实例取代：终止旧实例，不再发请求
+      if (!box.isConnected || token !== loadMoreSeq) {
+        next('', 0);
+        return;
+      }
+      const loadIndex = layer.load(1, { shade: false });
+      o.fetchPage(page).then(function (res) {
+        layer.close(loadIndex);
+        if (!box.isConnected || token !== loadMoreSeq) {
+          next('', 0);
+          return;
+        }
+        const items = (res && res.data) ? res.data : [];
+        const total = (res && res.total) ? res.total : items.length;
+        const html = items.map(function (item, i) { return o.render(item, i, page); }).join('')
+          || (page === 1 ? (o.emptyText || '暂无数据') : '');
+        // layui flow 的 next(html, end)：end 为 truthy 表示"还有更多"，0/false 表示到底
+        next(html, page * PAGE_SIZE < total ? 1 : 0);
+        if (o.onTotal) o.onTotal(total);
+        if (o.onItems) o.onItems(items, page);
+        // 数据加载完（含首屏不足一页）：隐藏"加载更多"按钮
+        if (page * PAGE_SIZE >= total) {
+          const more = box.querySelector('.layui-flow-more');
+          if (more) more.style.display = 'none';
+        }
+      });
+    }
+  });
 }
 
-/** 提交留言（校验规则照搬原站） */
-async function submitMessage() {
-  const qqInput = document.getElementById('QQ');
-  const nameInput = document.getElementById('nickname');
-  const textInput = document.getElementById('wenben');
+/** 留言卡片模板（index 与 page 合成为全局访客序号） */
+function renderMessage(m, i, page) {
+  const seq = (page - 1) * PAGE_SIZE + i + 1;
+  return '<div class="leavform animated fadeInUp delay-03s">'
+    + '<div class="textinfo">'
+    + '<div class="MsgTopInfo"><i class="time" data-tip="' + htmlEscape(m.date || '') + '" data-tip-position="top">'
+    + htmlEscape(m.date || '') + (m.location ? '<b class="yuan"></b>' + htmlEscape(m.location) : '')
+    + '</i></div>'
+    + '<div class="user_info">'
+    + '<img src="' + htmlEscape(m.avatar || mockPhoto('游客')) + '">'
+    + '<div class="head_content"><div class="level">访客 <b>#' + seq + '</b></div>'
+    + '<span class="name">' + htmlEscape(m.nickname || '游客') + '</span></div>'
+    + '</div>'
+    + '<div class="text">' + htmlEscape(m.content || '') + '</div>'
+    + '</div></div>';
+}
+
+/** 留言板：流加载编排（每页 6 条，提交留言后经 reloadMessages 重置重载） */
+function initMessageFlow() {
+  // 模板里的"留言加载中…"静态占位是覆盖式渲染时代的产物，流加载为追加式，先清掉
+  const list = document.getElementById('leavingList');
+  if (list) list.innerHTML = '';
+  return initLoadMore({
+    elem: '#leavingList',
+    fetchPage: function (page) { return portalRequest('messages', { page: page, limit: PAGE_SIZE }); },
+    render: renderMessage,
+    emptyText: '还没有留言，来写下第一条吧~',
+    onTotal: function (total) {
+      const countEl = document.getElementById('leavingCount');
+      if (countEl) countEl.textContent = String(total);
+    }
+  });
+}
+
+/** 提交留言成功后重载留言列表：清空旧内容并重建流加载 */
+function reloadMessages() {
+  const list = document.getElementById('leavingList');
+  if (list) list.innerHTML = '';
+  initMessageFlow();
+}
+
+/** 点点滴滴卡片模板 */
+function renderLittle(it) {
+  // 不再使用 animated fadeInUp 入场动画：pjax 局部换页时动画会让内容区
+  // 先空白约 0.3 秒再淡入，表现为页面"闪烁"，与其它页面不一致
+  return '<div class="card col-lg-12 col-md-12 col-sm-12 col-sm-x-12">'
+    + '<div class="little_texts">'
+    + '<a href="javascript:void(0)" data-id="' + (it.id || '') + '">'
+    + '<div class="top-title textOneHide">' + htmlEscape(it.title || '')
+    + '<svg class="little_icon" aria-hidden="true"><use xlink:href="#icon-zhankai"></use></svg>'
+    + '</div></a>'
+    + '<div class="info"><span><svg class="little_icon" aria-hidden="true"><use xlink:href="#icon-shoucang"></use></svg> '
+    + htmlEscape(it.author || '') + ' <i>记录于</i> ' + htmlEscape(it.date || '') + '</span></div>'
+    + '</div></div>';
+}
+
+/** 点点滴滴：流加载编排（每页 6 条） */
+function initLittleFlow() {
+  return initLoadMore({
+    elem: '#littleBox',
+    fetchPage: function (page) { return portalRequest('littles', { page: page, limit: PAGE_SIZE }); },
+    render: renderLittle,
+    emptyText: '暂无记录…'
+  });
+}
+
+/** Love List 恋爱清单单条模板（照搬原站 lovelist 结构） */
+function renderLoveListItem(it) {
+  const icon = it.done
+    ? '<i class="iconfont icon-chenggong2 com"></i>'
+    : '<i class="iconfont icon-chenggong2 air"></i>';
+  const span = it.done
+    ? '<span class="success">' + htmlEscape(it.text || '') + '</span>'
+    : '<span class="unfinished">' + htmlEscape(it.text || '') + '</span>';
+  const img = it.img ? '<ul><li><img src="' + htmlEscape(it.img) + '" alt="' + htmlEscape(it.text || '') + '" loading="lazy"></li></ul>' : '<ul><li></li></ul>';
+  return '<li class="cike">' + (it.done ? '<i class="iconfont icon-chenggong2 com"></i>' + span
+    + '<svg class="icon" aria-hidden="true"><use xlink:href="#icon-tupian"></use></svg>'
+    : '<i class="iconfont icon-chenggong2 air"></i>' + span) + img + '</li>';
+}
+
+/** 恋爱清单：流加载编排（每页 6 条） */
+function initLoveListFlow() {
+  return initLoadMore({
+    elem: '#loveListBox',
+    fetchPage: function (page) { return portalRequest('loveList', { page: page, limit: PAGE_SIZE }); },
+    render: renderLoveListItem,
+    emptyText: '暂无清单…'
+  });
+}
+
+/**
+ * 提交留言（由 layui-form 的 lay-verify 校验 + lay-submit 接管，见 message.html）。
+ * 校验规则经 form.verify 注册（校验提示文案逐字保留原站），到达此处即已通过校验。
+ */
+async function submitMessage(field) {
   const btn = document.getElementById('leavingPost');
-  if (!qqInput || !nameInput || !textInput) return false;
+  if (!btn) return false;
 
-  const qq = qqInput.value.trim();
-  const name = nameInput.value.trim();
-  const text = textInput.value.trim();
-
-  if (qq.length === 0) { toast.warning('请填写QQ号码！', 'Like_Girl'); return false; }
-  if (name.length === 0) { toast.warning('请填写您的昵称！', 'Like_Girl'); return false; }
-  const qqReg = /^[0-9]{6,12}$/;
-  if (!qqReg.test(qq)) { toast.warning('您的QQ号码格式错误<br/>请输入由6-12位的数字<br/>组成的QQ号码！', 'Like_Girl'); return false; }
-  if (qq === '123456' || qq === '100000' || qq === '1234567') { toast.warning('我想也许这并不是您的QQ号码...', 'Like_Girl'); return false; }
-  if (text.length === 0) { toast.warning('请填写您要留言的内容！', 'Like_Girl'); return false; }
-  if (text.length <= 2) { toast.warning('请填写两个字符以上的内容！', 'Like_Girl'); return false; }
-  if (/^[0-9]+$/.test(text)) { toast.warning('内容为纯数字 已被拦截！', 'Like_Girl'); return false; }
-  if (new RegExp('[操垃圾傻逼妈]').test(text)) { toast.warning('您输入的内容是违禁词<br/>请注意您的发言不文明的留言<br/>会被管理员拉进小黑屋喔', 'Like_Girl'); return false; }
+  const qq = field.qq, name = field.name, text = field.text;
 
   btn.textContent = '留言提交中...';
   btn.disabled = true;
@@ -390,7 +501,7 @@ async function submitMessage() {
   toast.success('留言提交成功！', 'Like_Girl');
   btn.textContent = '留言成功';
   setTimeout(function () { btn.disabled = false; btn.textContent = '提交留言'; }, 5000);
-  loadMessages();
+  reloadMessages();
   return false;
 }
 
@@ -423,44 +534,7 @@ function initQqAvatar() {
   });
 }
 
-/** 点点滴滴：文章卡片列表渲染 */
-async function loadLittles() {
-  const box = document.getElementById('littleBox');
-  if (!box) return;
-  const littles = await portalRequest('littles') || [];
-  box.innerHTML = littles.map(function (it) {
-    // 不再使用 animated fadeInUp 入场动画：pjax 局部换页时动画会让内容区
-    // 先空白约 0.3 秒再淡入，表现为页面"闪烁"，与其它页面不一致
-    return '<div class="card col-lg-12 col-md-12 col-sm-12 col-sm-x-12">'
-      + '<div class="little_texts">'
-      + '<a href="javascript:void(0)" data-id="' + (it.id || '') + '">'
-      + '<div class="top-title textOneHide">' + htmlEscape(it.title || '')
-      + '<svg class="little_icon" aria-hidden="true"><use xlink:href="#icon-zhankai"></use></svg>'
-      + '</div></a>'
-      + '<div class="info"><span><svg class="little_icon" aria-hidden="true"><use xlink:href="#icon-shoucang"></use></svg> '
-      + htmlEscape(it.author || '') + ' <i>记录于</i> ' + htmlEscape(it.date || '') + '</span></div>'
-      + '</div></div>';
-  }).join('') || '<div class="portal-empty">暂无记录…</div>';
-}
-
 /** Love List 恋爱清单渲染（照搬原站 lovelist 结构） */
-async function loadLoveList() {
-  const list = document.getElementById('loveListBox');
-  if (!list) return;
-  const items = await portalRequest('loveList') || [];
-  list.innerHTML = items.map(function (it) {
-    const icon = it.done
-      ? '<i class="iconfont icon-chenggong2 com"></i>'
-      : '<i class="iconfont icon-chenggong2 air"></i>';
-    const span = it.done
-      ? '<span class="success">' + htmlEscape(it.text || '') + '</span>'
-      : '<span class="unfinished">' + htmlEscape(it.text || '') + '</span>';
-    const img = it.img ? '<ul><li><img src="' + htmlEscape(it.img) + '" alt="' + htmlEscape(it.text || '') + '" loading="lazy"></li></ul>' : '<ul><li></li></ul>';
-    return '<li class="cike">' + (it.done ? '<i class="iconfont icon-chenggong2 com"></i>' + span
-      + '<svg class="icon" aria-hidden="true"><use xlink:href="#icon-tupian"></use></svg>'
-      : '<i class="iconfont icon-chenggong2 air"></i>' + span) + img + '</li>';
-  }).join('');
-}
 
 /** 关于页：对话机器人由页面内联脚本驱动（原 BotUI 的自研轻量复刻），无内容接口渲染逻辑 */
 
@@ -556,23 +630,17 @@ export function initPortalPage() {
     });
   });
 
-  // 首页：相册初始化（photoGallery 存在时）
-  if (document.getElementById('photoGallery')) {
-    resetPhotos();
-    loadPhotos();
-    const loadBtn = document.getElementById('loadMoreBtn');
-    if (loadBtn) loadBtn.addEventListener('click', loadPhotos);
-  }
+  // 相册页：懒加载与灯箱由页面模块 js/pages/love-photo.js 编排（经 main.js 的页面模块调度加载）
 
   // 点点滴滴页
-  if (document.getElementById('littleBox')) loadLittles();
+  if (document.getElementById('littleBox')) initLittleFlow();
 
   // 留言板页
   if (document.getElementById('leavingList')) {
-    loadMessages();
+    initMessageFlow();
     initQqAvatar();
-    const postBtn = document.getElementById('leavingPost');
-    if (postBtn) postBtn.addEventListener('click', submitMessage);
+    // 提交接管：lay-verify 校验 + lay-submit（common 组件对 pjax 动态内容同样生效）
+    loadLayui('form').then(function (m) { initMessageForm(m[0]); });
     // 浮动留言按钮：点击滚动到留言区（照搬原站 initScrollButton 行为）
     const msgBtn = document.getElementById('MessageBtn');
     const msgArea = document.getElementById('MessageArea');
@@ -585,5 +653,5 @@ export function initPortalPage() {
   }
 
   // 清单页
-  if (document.getElementById('loveListBox')) loadLoveList();
+  if (document.getElementById('loveListBox')) initLoveListFlow();
 }
