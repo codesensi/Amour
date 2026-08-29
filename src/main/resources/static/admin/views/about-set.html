@@ -13,8 +13,6 @@
     <!-- 登录态守卫：未登录则跳转登录页（在渲染前同步执行，避免闪屏） -->
     <script src="/admin/js/guard.js"></script>
     <!-- App css -->
-    <link href="/admin/assets/css/icons.min.css" rel="stylesheet" type="text/css"/>
-    <link href="/admin/assets/css/app.min.css" rel="stylesheet" type="text/css"/>
     <link href="/assets/admin/css/loading.css" rel="stylesheet">
 </head>
 
@@ -30,7 +28,6 @@
         </div>
     </div>
 </div>
-<script src="/assets/lib/jquery/jquery.min.js"></script>
 <!--顶部栏 Start-->
 
 <div class="navbar-custom topnav-navbar">
@@ -50,7 +47,7 @@
 
             <li class="dropdown notification-list">
                 <a class="nav-link right-bar-toggle" href="/admin/views/user.html" title="全局设置">
-                    <i class="dripicons-gear noti-icon"></i>
+                    <i class="layui-icon layui-icon-set noti-icon"></i>
                 </a>
             </li>
 
@@ -70,13 +67,13 @@
 
                     <!-- item-->
                     <a href="/admin/views/user.html" class="dropdown-item notify-item">
-                        <i class="mdi mdi-account-circle mr-1"></i>
+                        <i class="layui-icon layui-icon-username mr-1"></i>
                         <span>全局设置</span>
                     </a>
 
                     <!-- item-->
                     <a href="javascript:void(0);" class="dropdown-item notify-item js-logout">
-                        <i class="mdi mdi-account-edit mr-1"></i>
+                        <i class="layui-icon layui-icon-edit mr-1"></i>
                         <span>退出登录</span>
                     </a>
 
@@ -116,58 +113,58 @@
 
                 <li class="side-nav-item">
                     <a href="/admin/index.html" class="side-nav-link">
-                        <i class="dripicons-direction"></i>
+                        <i class="layui-icon layui-icon-home"></i>
                         <span> 后台首页 </span>
                     </a>
                 </li>
 
                 <li class="side-nav-item">
                     <a href="/admin/views/set.html" class="side-nav-link">
-                        <i class="dripicons-meter"></i>
-                        <span class="badge badge-success float-right"><i class="dripicons-gear margin_0"></i></span>
+                        <i class="layui-icon layui-icon-chart"></i>
+                        <span class="layui-badge layui-bg-green float-right"><i class="layui-icon layui-icon-set margin_0"></i></span>
                         <span> 基本设置 </span>
                     </a>
                 </li>
 
                 <li class="side-nav-item">
                     <a href="/admin/views/leav-set.html" class="side-nav-link">
-                        <i class="dripicons-view-apps"></i>
+                        <i class="layui-icon layui-icon-app"></i>
                         <span> 留言管理
-                                <span class="badge badge-danger float-right">1</span>
+                                <span class="layui-badge layui-bg-red float-right">1</span>
                             </span>
                     </a>
                 </li>
 
                 <li class="side-nav-item">
                     <a href="/admin/views/little-set.html" class="side-nav-link">
-                        <i class="dripicons-copy"></i>
+                        <i class="layui-icon layui-icon-list"></i>
                         <span> 点点滴滴
-                                <span class="badge badge-danger float-right">1</span>
+                                <span class="layui-badge layui-bg-red float-right">1</span>
                             </span>
                     </a>
                 </li>
 
                 <li class="side-nav-item">
                     <a href="/admin/views/love-img-set.html" class="side-nav-link">
-                        <i class="dripicons-photo-group"></i>
+                        <i class="layui-icon layui-icon-picture"></i>
                         <span> 恋爱相册
-                                <span class="badge badge-danger float-right">1</span>
+                                <span class="layui-badge layui-bg-red float-right">1</span>
                             </span>
                     </a>
                 </li>
 
                 <li class="side-nav-item">
                     <a href="/admin/views/love-list.html" class="side-nav-link">
-                        <i class="dripicons-location"></i>
+                        <i class="layui-icon layui-icon-location"></i>
                         <span> 恋爱清单
-                                <span class="badge badge-danger float-right">83</span>
+                                <span class="layui-badge layui-bg-red float-right">83</span>
                             </span>
                     </a>
                 </li>
 
                 <li class="side-nav-item">
                     <a href="/admin/views/about-set.html" class="side-nav-link">
-                        <i class="dripicons-tags"></i>
+                        <i class="layui-icon layui-icon-tag"></i>
                         <span> 关于页面</span>
                         <span class="menu-arrow"></span>
                     </a>
@@ -175,7 +172,7 @@
 
                 <li class="side-nav-item">
                     <a href="/admin/views/ip-list.html" class="side-nav-link">
-                        <i class="dripicons-location"></i>
+                        <i class="layui-icon layui-icon-location"></i>
                         <span> IP/拉黑</span>
                         <span class="menu-arrow"></span>
                     </a>
@@ -183,7 +180,7 @@
 
                 <li class="side-nav-item">
                     <a href="/admin/views/feifa.html" class="side-nav-link">
-                        <i class="dripicons-time-reverse"></i>
+                        <i class="layui-icon layui-icon-time"></i>
                         <span> 非法访问</span>
                         <span class="menu-arrow"></span>
                     </a>
@@ -211,338 +208,51 @@
             <!--内容 Start-->
             <div class="content">
 
-                <style>
-                    .textHide {
-                        width: 300px;
-                        white-space: normal;
-                    }
-
-                    .textHide.index {
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        display: -webkit-box;
-                        -webkit-box-orient: vertical;
-                        -webkit-line-clamp: 2;
-                    }
-
-                    .toast-title {
-                        font-size: 1.1rem;
-                        margin-bottom: .3rem;
-                    }
-
-                    .color {
-                        color: #999;
-                    }
-
-                    .form-control:focus {
-                        border-color: #ff5295;
-                    }
-
-                    .form-control {
-                        color: #b6b6b6;
-                    }
-
-                    .side-nav .side-nav-link i {
-                        height: 20px;
-                    }
-
-                    span.badge.badge-danger-lighten {
-                        font-size: 0.9rem;
-                        font-family: 'Noto Serif SC', serif;
-                        font-weight: 400;
-                    }
-
-                    span.badge.badge-primary-lighten {
-                        font-size: 0.9rem;
-                        font-family: 'Noto Serif SC', serif;
-                        font-weight: 400;
-                    }
-
-                    ul.text {
-                        line-height: 2rem;
-                        font-size: 0.9rem;
-                    }
-
-                    ul {
-                        font-family: 'Noto Serif SC', serif;
-                        font-weight: 400;
-                    }
-
-                    h3.mt-0,
-                    h5 {
-                        font-family: 'Noto Serif SC', serif;
-                        font-weight: 700;
-                    }
-
-                    .hhtext {
-                        white-space: normal !important;
-                    }
-
-                    .notification-list .dropdown-menu.dropdown-menu-right {
-                        border-radius: 0px 0px 10px 10px;
-                        box-shadow: 0 8px 12px #efefef;
-                    }
-
-                    button.btn.btn-success.mb-2.mr-2 {
-                        border-radius: 10px;
-                    }
-
-                    .badge-success-lighten,
-                    .badge-warning-lighten {
-                        font-size: 0.9rem;
-                        font-family: 'Noto Serif SC', serif;
-                        font-weight: 400;
-                        padding: 0.4rem;
-                    }
-
-                    i {
-                        font-family: 'Noto Serif SC', serif;
-                        font-weight: 400;
-                    }
-
-                    .form-group.col-sm-4 {
-                        margin-left: 0;
-                        padding-left: 0;
-                    }
-
-                    .table td,
-                    .table th {
-                        padding: 0.95rem;
-                        vertical-align: middle;
-                        border-top: 1px solid #e3eaef;
-                    }
-
-                    .margin_0 {
-                        margin: 0 !important;
-                    }
-
-                    .account-user-name {
-                        text-transform: capitalize;
-                    }
-
-                    .leftbar-user .leftbar-user-name {
-                        margin-left: 0px;
-                    }
-
-                    span.topnav-logo-lg,
-                    span.topnav-logo-sm {
-                        color: #fff;
-                        font-size: 1.2rem;
-                        text-transform: capitalize;
-                    }
-
-                    .card {
-                        border-radius: 0.80rem;
-                    }
-
-                    .content-page {
-                        padding-top: 20px;
-                    }
-
-                    h3.my-2.py-1 {
-                        font-size: 2rem;
-                    }
-
-                    h3.my-2.py-1 i {
-                        font-style: normal;
-                        font-weight: 200;
-                        font-size: 1.2rem;
-                        margin-left: 0.5rem;
-                    }
-
-                    .row.footer_center {
-                        width: 100%;
-                        display: flex;
-                        justify-content: center;
-                        text-align: center;
-                    }
-
-                    .topnav-navbar {
-                        padding: 0px 30px;
-                        margin: 0;
-                        min-height: 70px;
-                    }
-
-                    button.btn.btn-danger.mb-2.mr-2 {
-                        border-radius: 0.4rem;
-                    }
-
-                    .table .action-icon:hover {
-                        color: #ee7c74;
-                    }
-
-                    .form-group.mb-3.text_right {
-                        text-align: right;
-                    }
-
-                    i.mdi.mdi-account-circle.mr-1.rihjt-0 {
-                        margin-right: 0rem !important;
-                    }
-
-                    button.btn.btn-primary {
-                        border-radius: 0.4rem;
-                    }
-
-                    h4.header-title.mb-3 {
-                        text-align: center;
-                        font-size: 1.2rem;
-                        font-family: 'Noto Serif SC', serif;
-                        font-weight: 700;
-                    }
-
-                    label {
-                        font-family: 'Noto Serif SC', serif;
-                        font-weight: 400;
-                    }
-
-                    .text-muted {
-                        white-space: nowrap;
-                    }
-
-                    body {
-                        cursor: url(/assets/admin/cur/cursor.cur), default;
-                    }
-
-                    a:hover {
-                        cursor: url(/assets/admin/cur/hover.cur), pointer;
-                    }
-
-                    @media (min-width: 992px) {
-                        .text-lg-right {
-                            text-align: left !important;
-                        }
-                    }
-
-                    @media (max-width: 767.98px) {
-                        .navbar-custom {
-                            padding: 0px;
-                        }
-
-                        .topnav-navbar .topnav-logo {
-                            min-width: 50px;
-                            display: none;
-                        }
-                    }
-                </style>
-
                 <!-- 页面特有样式（照搬原站 aboutSet.html，路径已改为绝对路径） -->
-                <style>
-                    div#test-editor {
-                        z-index: 10;
-                    }
-
-                    .editormd-preview video {
-                        width: 100%;
-                    }
-
-                    #img_url {
-                        display: block;
-                    }
-
-                    h4.header-title.mb-3.size_18 {
-                        font-size: 1.8rem;
-                    }
-
-                    table.dataTable tbody td.focus,
-                    table.dataTable tbody th.focus {
-                        outline: none !important;
-                        outline-offset: 0;
-                        background-color: white;
-                    }
-
-                    .right_10 {
-                        margin-left: 10px;
-                        border-radius: 0.6rem;
-                    }
-
-                    iframe {
-                        width: 100%;
-                        height: 260px;
-                        border-radius: 15px;
-                        border: 2px solid #d9d9d9d1;
-                        box-shadow: 2px 1px 15px rgb(36 37 38 / 44%);
-                    }
-
-                    quote {
-                        padding: 5px 0px 5px 15px;
-                        width: 100%;
-                        display: block;
-                        border-left: 3px solid #856f6f;
-                        background: #f2f2f2;
-                        border-radius: 0px 6px 6px 0px;
-                        margin: 15px 0;
-                    }
-
-                    default-Code {
-                        text-align: center;
-                        width: 100%;
-                        display: block;
-                        color: #ff876c;
-                    }
-
-                    .editormd {
-                        border-radius: 10px;
-                        box-shadow: 0 4px 13px 0 rgb(115 118 120 / 14%);
-                        height: 450px !important;
-                        margin: 40px 0 !important;
-                    }
-
-                    .markdown-body h1 {
-                        color: #383838 !important;
-                        padding-bottom: 0.3em;
-                        font-size: 2.25em;
-                        line-height: 1.2;
-                        border-bottom: 1px solid #eee;
-                    }
-
-                    .margin_left {
-                        margin-left: 10px;
-                    }
-                </style>
 
                 <!-- 现阶段后端接口未实现，去除原表单 action/method（原为 aboutPost.php），提交逻辑见页面底部 mock 脚本 -->
                 <form class="needs-validation" novalidate>
     <div class="row">
         <div class="col-lg-6">
-            <div class="card">
-                <div class="card-body">
+            <div class="layui-card">
+                <div class="layui-card-body">
                     <h4 class="header-title mb-3">对话配置——1</h4>
                     <div class="form-group mb-3">
                         <label for="validationCustom01">对话标题</label>
-                        <input type="text" class="form-control" id="validationCustom01" placeholder="请输入标题" name="title"
+                        <input type="text" class="layui-input" id="validationCustom01" placeholder="请输入标题" name="title"
                                value="Ki_About" required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="validationCustom01">对话模块背景图片地址</label>
-                        <input type="text" class="form-control" id="validationCustom01" placeholder="请输入图片URL地址"
+                        <input type="text" class="layui-input" id="validationCustom01" placeholder="请输入图片URL地址"
                                name="aboutimg" value="https://ice.frostsky.com/2024/11/06/570374efdc2bb75a8b722c969118afb5.webp" required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="validationCustom02">对话1文本</label>
-                        <input type="text" class="form-control" id="validationCustom02" placeholder="请填写对话内容"
+                        <input type="text" class="layui-input" id="validationCustom02" placeholder="请填写对话内容"
                                name="info1" value="Hi, 欢迎你的来访" required>
 
                     </div>
                     <div class="form-group mb-3">
                         <label for="validationCustom03">对话2文本</label>
-                        <input type="text" class="form-control" id="validationCustom03" placeholder="请填写对话内容"
+                        <input type="text" class="layui-input" id="validationCustom03" placeholder="请填写对话内容"
                                name="info2" value="愿得一人心 白首不相离" required>
 
                     </div>
                     <div class="form-group mb-3">
                         <label for="validationCustom04">对话3文本</label>
-                        <input type="text" class="form-control" id="validationCustom04" placeholder="请填写对话内容"
+                        <input type="text" class="layui-input" id="validationCustom04" placeholder="请填写对话内容"
                                name="info3" value="记录日常生活 留住感动" required>
 
                     </div>
                     <div class="form-group mb-3">
                         <label for="validationCustom05">对话1按钮确认文本</label>
-                        <input type="text" class="form-control" id="validationCustom05" name="btn1"
+                        <input type="text" class="layui-input" id="validationCustom05" name="btn1"
                                value="听我介绍" placeholder="请填写确认按钮文本">
                     </div>
                     <div class="form-group mb-3">
                         <label for="validationCustom05">对话1按钮取消文本</label>
-                        <input type="text" class="form-control" id="validationCustom05" name="btn2"
+                        <input type="text" class="layui-input" id="validationCustom05" name="btn2"
                                value="结束介绍" placeholder="请填写取消按钮文本">
                     </div>
                 </div> <!-- end card-body-->
@@ -550,46 +260,46 @@
         </div> <!-- end col-->
 
         <div class="col-lg-6">
-            <div class="card">
-                <div class="card-body">
+            <div class="layui-card">
+                <div class="layui-card-body">
                     <h4 class="header-title mb-3">对话配置——2</h4>
 
                     <div class="form-group mb-3">
                         <label for="validationCustom01">对话2-1文本</label>
-                        <input type="text" class="form-control" id="validationCustom01" placeholder="请填写对话内容"
+                        <input type="text" class="layui-input" id="validationCustom01" placeholder="请填写对话内容"
                                name="infox1" value="情侣小站Like Girl是 Ki 的原创项目" required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="validationCustom02">对话2-2文本</label>
-                        <input type="text" class="form-control" id="validationCustom02" placeholder="请填写对话内容"
+                        <input type="text" class="layui-input" id="validationCustom02" placeholder="请填写对话内容"
                                name="infox2" value="在2022年暑假的假期最后几天里发布了1.0版本" required>
 
                     </div>
                     <div class="form-group mb-3">
                         <label for="validationCustom03">对话2-3文本</label>
-                        <input type="text" class="form-control" id="validationCustom03" placeholder="请填写对话内容"
+                        <input type="text" class="layui-input" id="validationCustom03" placeholder="请填写对话内容"
                                name="infox3" value="最新版本为 v5.2.0 亦是最终版本 目前已开源到码云" required>
 
                     </div>
                     <div class="form-group mb-3">
                         <label for="validationCustom04">对话2-4文本</label>
-                        <input type="text" class="form-control" id="validationCustom04" placeholder="请填写对话内容"
+                        <input type="text" class="layui-input" id="validationCustom04" placeholder="请填写对话内容"
                                name="infox4" value="PHP确实是 “世界上最好的语言”  我非常喜欢（痛苦" required>
 
                     </div>
                     <div class="form-group mb-3">
                         <label for="validationCustom05">对话2-5文本</label>
-                        <input type="text" class="form-control" id="validationCustom05" name="infox5"
+                        <input type="text" class="layui-input" id="validationCustom05" name="infox5"
                                value="在开发过程中遇到了许多奇葩问题 也是只能自己探索解决..." placeholder="请填写对话内容">
                     </div>
                     <div class="form-group mb-3">
                         <label for="validationCustom05">对话2-6文本</label>
-                        <input type="text" class="form-control" id="validationCustom05" name="infox6"
+                        <input type="text" class="layui-input" id="validationCustom05" name="infox6"
                                value="喜欢探索编程领域 热爱学习新知识 热爱开源文化" placeholder="请填写对话内容">
                     </div>
                     <div class="form-group mb-3">
                         <label for="validationCustom05">对话2-1按钮文本</label>
-                        <input type="text" class="form-control" id="validationCustom05" name="btnx2"
+                        <input type="text" class="layui-input" id="validationCustom05" name="btnx2"
                                value="为什么叫 Ki？" placeholder="请填写按钮文本">
                     </div>
                 </div> <!-- end card-body-->
@@ -601,35 +311,35 @@
 
     <div class="row">
         <div class="col-lg-6">
-            <div class="card">
-                <div class="card-body">
+            <div class="layui-card">
+                <div class="layui-card-body">
                     <h4 class="header-title mb-3">对话配置——3</h4>
                     <div class="form-group mb-3">
                         <label for="validationCustom01">对话3-1文本</label>
-                        <input type="text" class="form-control" id="validationCustom01" placeholder="请填写对话内容"
+                        <input type="text" class="layui-input" id="validationCustom01" placeholder="请填写对话内容"
                                name="infof1" value="不知道你有没有看过《比悲伤更悲伤的故事》" required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="validationCustom02">对话3-2文本</label>
-                        <input type="text" class="form-control" id="validationCustom02" placeholder="请填写对话内容"
+                        <input type="text" class="layui-input" id="validationCustom02" placeholder="请填写对话内容"
                                name="infof2" value="嗨，我是k，如果有下辈子的话，" required>
 
                     </div>
                     <div class="form-group mb-3">
                         <label for="validationCustom03">对话3-3文本</label>
-                        <input type="text" class="form-control" id="validationCustom03" placeholder="请填写对话内容"
+                        <input type="text" class="layui-input" id="validationCustom03" placeholder="请填写对话内容"
                                name="infof3" value="“我想当戒指，眼镜，床和笔记本，这样的话，我就可以...”" required>
 
                     </div>
                     <div class="form-group mb-3">
                         <label for="validationCustom04">对话3-4文本</label>
-                        <input type="text" class="form-control" id="validationCustom04" placeholder="请填写对话内容"
+                        <input type="text" class="layui-input" id="validationCustom04" placeholder="请填写对话内容"
                                name="infof4" value="当然跟这个没有关系哈哈" required>
 
                     </div>
                     <div class="form-group mb-3">
                         <label for="validationCustom05">对话3-1按钮文本</label>
-                        <input type="text" class="form-control" id="validationCustom05" name="btnf3"
+                        <input type="text" class="layui-input" id="validationCustom05" name="btnf3"
                                value="本站前端所有页面" placeholder="请填写按钮文本">
                     </div>
                 </div> <!-- end card-body-->
@@ -638,35 +348,35 @@
 
 
         <div class="col-lg-6">
-            <div class="card">
-                <div class="card-body">
+            <div class="layui-card">
+                <div class="layui-card-body">
                     <h4 class="header-title mb-3">对话配置——4</h4>
                     <div class="form-group mb-3">
                         <label for="validationCustom01">对话4-1文本</label>
-                        <input type="text" class="form-control" id="validationCustom01" placeholder="请填写对话内容"
+                        <input type="text" class="layui-input" id="validationCustom01" placeholder="请填写对话内容"
                                name="infod1" value="首页 index" required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="validationCustom02">对话4-2文本</label>
-                        <input type="text" class="form-control" id="validationCustom02" placeholder="请填写对话内容"
+                        <input type="text" class="layui-input" id="validationCustom02" placeholder="请填写对话内容"
                                name="infod2" value="点点滴滴 little" required>
 
                     </div>
                     <div class="form-group mb-3">
                         <label for="validationCustom03">对话4-3文本</label>
-                        <input type="text" class="form-control" id="validationCustom03" placeholder="请填写对话内容"
+                        <input type="text" class="layui-input" id="validationCustom03" placeholder="请填写对话内容"
                                name="infod3" value="留言板 leaving" required>
 
                     </div>
                     <div class="form-group mb-3">
                         <label for="validationCustom04">对话4-4文本</label>
-                        <input type="text" class="form-control" id="validationCustom04" placeholder="请填写对话内容"
+                        <input type="text" class="layui-input" id="validationCustom04" placeholder="请填写对话内容"
                                name="infod4" value="关于 about" required>
 
                     </div>
                     <div class="form-group mb-3">
                         <label for="validationCustom05">对话4-5文本</label>
-                        <input type="text" class="form-control" id="validationCustom05" name="infod5"
+                        <input type="text" class="layui-input" id="validationCustom05" name="infod5"
                                value="欢迎您的来访 IP已记录 请尽情浏览本站～" placeholder="请填写对话内容">
                     </div>
                 </div> <!-- end card-body-->
@@ -675,7 +385,7 @@
     </div>
 
     <div class="form-group mb-3 text_right">
-        <button class="btn btn-primary" type="button" id="aboutPost">提交修改</button>
+        <button class="layui-btn" type="button" id="aboutPost">提交修改</button>
     </div>
 </form>
 
@@ -700,10 +410,8 @@
 
 </div>
 <!-- App js -->
-<script src="/admin/assets/js/app.min.js"></script>
 
 <!-- 后台 ESM 入口：登录校验、外壳初始化、pjax 与页面模块调度 -->
-<script type="module" src="/admin/js/main.js"></script>
 
 </body>
 

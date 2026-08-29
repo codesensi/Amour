@@ -20,9 +20,9 @@ export function init() {
             { field: 'date', title: '日期', width: 180 },
             { title: '操作', width: 220, templet: function (d) {
                 return '<a href="javascript:void(0);" class="js-mock-edit">'
-                    + '<button type="button" class="btn btn-secondary btn-rounded"><i class=" mdi mdi-clipboard-text-play-outline mr-1"></i>修改</button></a> '
+                    + '<button type="button" class="layui-btn layui-btn-primary layui-btn-radius"><i class=" layui-icon layui-icon-edit mr-1"></i>修改</button></a> '
                     + '<a href="javascript:void(0);" class="delete-btn" data-id="' + d.id + '" data-desc="' + d.desc + '">'
-                    + '<button type="button" class="btn btn-danger btn-rounded"><i class=" mdi mdi-delete-empty mr-1"></i>删除</button></a>';
+                    + '<button type="button" class="layui-btn layui-btn-danger layui-btn-radius"><i class=" layui-icon layui-icon-delete mr-1"></i>删除</button></a>';
             } }
         ]],
         data: LOVE_IMG_ROWS

@@ -30,9 +30,9 @@ export function init() {
             { title: '操作', width: 230, templet: function (d) {
                 // 按钮形态与原站一致：修改（btn-secondary）+ 删除（btn-danger）
                 return '<a href="javascript:void(0);" class="js-demo-edit">'
-                    + '<button type="button" class="btn btn-secondary btn-rounded"><i class="mdi mdi-clipboard-text-play-outline mr-1"></i>修改</button></a> '
+                    + '<button type="button" class="layui-btn layui-btn-primary layui-btn-radius"><i class="layui-icon layui-icon-edit mr-1"></i>修改</button></a> '
                     + '<a class="delete-btn" data-id="' + d.id + '" data-title="' + d.title + '">'
-                    + '<button type="button" class="btn btn-danger btn-rounded"><i class="mdi mdi-delete-empty mr-1"></i>删除</button></a>';
+                    + '<button type="button" class="layui-btn layui-btn-danger layui-btn-radius"><i class="layui-icon layui-icon-delete mr-1"></i>删除</button></a>';
             } }
         ]],
         data: LITTLE_ROWS

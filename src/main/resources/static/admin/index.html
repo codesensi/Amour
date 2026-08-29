@@ -1,28 +1,22 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
-    <meta charset="utf-8"/>
-    <title>后台管理</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description"/>
-    <meta content="Coderthemes" name="author"/>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>爱慕情侣小站 - 后台管理</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <!-- 登录态守卫：未登录则跳转登录页（在渲染前同步执行，避免闪屏） -->
     <script src="/admin/js/guard.js"></script>
-    <!-- App css -->
-    <!-- layui 基础样式：置于主题样式之前，layer 弹层（toast/tooltip 等 common 组件）按需使用 -->
+    <!-- layui 基础样式（一体构建，含表格/弹层/导航等全部组件样式） -->
     <link href="/assets/layui/2.13.9/css/layui.css" rel="stylesheet" type="text/css"/>
-    <link href="/admin/assets/css/icons.min.css" rel="stylesheet" type="text/css"/>
-    <link href="/admin/assets/css/app.min.css" rel="stylesheet" type="text/css"/>
-    <!-- layui 适配覆盖：需在主题样式之后引入，恢复分页条等被主题重置抹掉的 layui 样式 -->
+    <!-- 管理端自建布局与 layui 适配样式（含分页条、工具类等价实现） -->
     <link href="/assets/admin/css/admin.css" rel="stylesheet" type="text/css"/>
     <link href="/assets/admin/css/loading.css" rel="stylesheet">
 </head>
 
 <body>
 
+<!-- 加载动画（自研，独立于主题） -->
 <div id="Loadanimation" style="z-index:999999;">
     <div id="Loadanimation-center">
         <div id="Loadanimation-center-absolute">
@@ -33,493 +27,145 @@
         </div>
     </div>
 </div>
-<script src="/assets/lib/jquery/jquery.min.js"></script>
-<!--顶部栏 Start-->
 
-<div class="navbar-custom topnav-navbar">
-    <div class="container-fluid">
+<!-- layui 管理布局：顶栏 + 侧栏 + 内容区 -->
+<div class="layui-layout layui-layout-admin admin-layout">
 
-        <!-- LOGO -->
-        <a href="/admin/index.html" class="topnav-logo">
-                <span class="topnav-logo-lg">
-                    <span class="js-site-name">后台管理</span>
-                </span>
-            <span class="topnav-logo-sm">
-                    <span class="js-site-name">后台管理</span>
-                </span>
+    <!-- 顶栏 -->
+    <div class="layui-header admin-header">
+        <a href="/admin/index.html" class="admin-logo">
+            <span class="js-site-name">后台管理</span>
         </a>
-
-        <ul class="list-unstyled topbar-right-menu float-right mb-0">
-
-            <li class="dropdown notification-list">
-                <a class="nav-link right-bar-toggle" href="/admin/views/user.html" title="全局设置">
-                    <i class="dripicons-gear noti-icon"></i>
-                </a>
-            </li>
-
-            <li class="dropdown notification-list">
-                <a class="nav-link dropdown-toggle nav-user arrow-none mr-0" data-toggle="dropdown"
-                   id="topbar-userdrop" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                        <span class="account-user-avatar">
-                            <img src="" alt="user-image" class="rounded-circle js-user-avatar">
-                        </span>
-                    <span>
-                            <span class="account-user-name js-username">Admin</span>
-                            <span class="account-position">操作</span>
-                        </span>
-                </a>
-                <div class="dropdown-menu dropdown-menu-right dropdown-menu-animated topbar-dropdown-menu profile-dropdown"
-                     aria-labelledby="topbar-userdrop">
-
-                    <!-- item-->
-                    <a href="/admin/views/user.html" class="dropdown-item notify-item">
-                        <i class="mdi mdi-account-circle mr-1"></i>
-                        <span>全局设置</span>
-                    </a>
-
-                    <!-- item-->
-                    <a href="javascript:void(0);" class="dropdown-item notify-item js-logout">
-                        <i class="mdi mdi-account-edit mr-1"></i>
-                        <span>退出登录</span>
-                    </a>
-
-                </div>
-            </li>
-
-        </ul>
-        <a class="button-menu-mobile disable-btn">
-            <div class="lines">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+        <a href="javascript:;" class="admin-menu-toggle js-menu-toggle" title="收起/展开侧栏">
+            <i class="layui-icon layui-icon-spread-left"></i>
         </a>
-        <div class="app-search">
+        <div class="admin-header-right">
+            <a href="/admin/views/user.html" title="全局设置">
+                <i class="layui-icon layui-icon-set"></i>
+            </a>
+            <span class="admin-user">
+                <img src="" alt="user" class="js-user-avatar">
+                <span class="js-username">Admin</span>
+            </span>
+            <a href="javascript:;" class="js-logout" title="退出登录">
+                <i class="layui-icon layui-icon-logout"></i>
+            </a>
         </div>
     </div>
-</div>
 
-<!--顶部栏 End-->
-
-
-<div class="container-fluid">
-
-    <div class="wrapper">
-        <!--侧边导航栏 Start-->
-        <div class="left-side-menu">
-            <div class="leftbar-user">
-                <a href="#">
-                    <img src="" alt="user-image" height="42" class="rounded-circle shadow-sm js-user-avatar">
-                    <span class="leftbar-user-name js-site-name">后台管理</span>
-                </a>
+    <!-- 侧边导航栏 -->
+    <div class="layui-side admin-side">
+        <div class="layui-side-scroll">
+            <div class="side-user">
+                <img src="" alt="user" class="js-user-avatar">
+                <span class="js-site-name">后台管理</span>
             </div>
-
-            <!--- Sidemenu -->
-            <ul class="metismenu side-nav">
-
-                <li class="side-nav-item">
-                    <a href="/admin/index.html" class="side-nav-link">
-                        <i class="dripicons-direction"></i>
-                        <span> 后台首页 </span>
-                    </a>
+            <ul class="layui-nav layui-nav-tree" lay-filter="adminMenu">
+                <li class="layui-nav-item">
+                    <a href="/admin/index.html"><i class="layui-icon layui-icon-home"></i><cite>后台首页</cite></a>
                 </li>
-
-                <li class="side-nav-item">
-                    <a href="/admin/views/set.html" class="side-nav-link">
-                        <i class="dripicons-meter"></i>
-                        <span class="badge badge-success float-right"><i class="dripicons-gear margin_0"></i></span>
-                        <span> 基本设置 </span>
-                    </a>
+                <li class="layui-nav-item">
+                    <a href="/admin/views/set.html"><i class="layui-icon layui-icon-set"></i><cite>基本设置</cite></a>
                 </li>
-
-                <li class="side-nav-item">
-                    <a href="/admin/views/leav-set.html" class="side-nav-link">
-                        <i class="dripicons-view-apps"></i>
-                        <span> 留言管理
-                                <span class="badge badge-danger float-right">1</span>
-                            </span>
-                    </a>
+                <li class="layui-nav-item">
+                    <a href="/admin/views/leav-set.html"><i class="layui-icon layui-icon-message"></i><cite>留言管理</cite><span class="layui-badge layui-bg-red">1</span></a>
                 </li>
-
-                <li class="side-nav-item">
-                    <a href="/admin/views/little-set.html" class="side-nav-link">
-                        <i class="dripicons-copy"></i>
-                        <span> 点点滴滴
-                                <span class="badge badge-danger float-right">1</span>
-                            </span>
-                    </a>
+                <li class="layui-nav-item">
+                    <a href="/admin/views/little-set.html"><i class="layui-icon layui-icon-list"></i><cite>点点滴滴</cite><span class="layui-badge layui-bg-red">1</span></a>
                 </li>
-
-                <li class="side-nav-item">
-                    <a href="/admin/views/love-img-set.html" class="side-nav-link">
-                        <i class="dripicons-photo-group"></i>
-                        <span> 恋爱相册
-                                <span class="badge badge-danger float-right">1</span>
-                            </span>
-                    </a>
+                <li class="layui-nav-item">
+                    <a href="/admin/views/love-img-set.html"><i class="layui-icon layui-icon-picture"></i><cite>恋爱相册</cite><span class="layui-badge layui-bg-red">1</span></a>
                 </li>
-
-                <li class="side-nav-item">
-                    <a href="/admin/views/love-list.html" class="side-nav-link">
-                        <i class="dripicons-location"></i>
-                        <span> 恋爱清单
-                                <span class="badge badge-danger float-right">83</span>
-                            </span>
-                    </a>
+                <li class="layui-nav-item">
+                    <a href="/admin/views/love-list.html"><i class="layui-icon layui-icon-location"></i><cite>恋爱清单</cite><span class="layui-badge layui-bg-red">83</span></a>
                 </li>
-
-                <li class="side-nav-item">
-                    <a href="/admin/views/about-set.html" class="side-nav-link">
-                        <i class="dripicons-tags"></i>
-                        <span> 关于页面</span>
-                        <span class="menu-arrow"></span>
-                    </a>
+                <li class="layui-nav-item">
+                    <a href="/admin/views/about-set.html"><i class="layui-icon layui-icon-tag"></i><cite>关于页面</cite></a>
                 </li>
-
-                <li class="side-nav-item">
-                    <a href="/admin/views/ip-list.html" class="side-nav-link">
-                        <i class="dripicons-location"></i>
-                        <span> IP/拉黑</span>
-                        <span class="menu-arrow"></span>
-                    </a>
+                <li class="layui-nav-item">
+                    <a href="/admin/views/ip-list.html"><i class="layui-icon layui-icon-username"></i><cite>IP/拉黑</cite></a>
                 </li>
-
-                <li class="side-nav-item">
-                    <a href="/admin/views/feifa.html" class="side-nav-link">
-                        <i class="dripicons-time-reverse"></i>
-                        <span> 非法访问</span>
-                        <span class="menu-arrow"></span>
-                    </a>
+                <li class="layui-nav-item">
+                    <a href="/admin/views/feifa.html"><i class="layui-icon layui-icon-time"></i><cite>非法访问</cite></a>
                 </li>
             </ul>
-
-
-            <!-- Help Box -->
-            <div class="help-box text-center">
-                <a href="javascript: void(0);" class="float-right close-btn text-body"></a>
-                <img src="/admin/assets/images/help-icon.svg" height="90" alt="Helper Icon Image"/>
-                <h5 class="mt-3">Amour 后台管理</h5>
-                <p class="mb-3">愿得一心人 白头不相离</p>
+            <div class="side-help">
+                <h5>Amour 后台管理</h5>
+                <p>愿得一心人 白头不相离</p>
             </div>
-            <!-- end Help Box -->
-            <!-- End Sidebar -->
-
-
-            <div class="clearfix"></div>
-            <!-- Sidebar -left -->
         </div>
-        <!--侧边导航栏 End-->
-        <!--内容页面 Start-->
+    </div>
+
+    <!-- 内容页面 -->
+    <div class="layui-body admin-body">
         <div class="content-page">
-            <!--内容 Start-->
             <div class="content">
-
-                <style>
-                    .textHide {
-                        width: 300px;
-                        white-space: normal;
-                    }
-
-                    .textHide.index {
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        display: -webkit-box;
-                        -webkit-box-orient: vertical;
-                        -webkit-line-clamp: 2;
-                    }
-
-                    .toast-title {
-                        font-size: 1.1rem;
-                        margin-bottom: .3rem;
-                    }
-
-                    .color {
-                        color: #999;
-                    }
-
-                    .form-control:focus {
-                        border-color: #ff5295;
-                    }
-
-                    .form-control {
-                        color: #b6b6b6;
-                    }
-
-                    .side-nav .side-nav-link i {
-                        height: 20px;
-                    }
-
-                    span.badge.badge-danger-lighten {
-                        font-size: 0.9rem;
-                        font-family: 'Noto Serif SC', serif;
-                        font-weight: 400;
-                    }
-
-                    span.badge.badge-primary-lighten {
-                        font-size: 0.9rem;
-                        font-family: 'Noto Serif SC', serif;
-                        font-weight: 400;
-                    }
-
-                    ul.text {
-                        line-height: 2rem;
-                        font-size: 0.9rem;
-                    }
-
-                    ul {
-                        font-family: 'Noto Serif SC', serif;
-                        font-weight: 400;
-                    }
-
-                    h3.mt-0,
-                    h5 {
-                        font-family: 'Noto Serif SC', serif;
-                        font-weight: 700;
-                    }
-
-                    .hhtext {
-                        white-space: normal !important;
-                    }
-
-                    .notification-list .dropdown-menu.dropdown-menu-right {
-                        border-radius: 0px 0px 10px 10px;
-                        box-shadow: 0 8px 12px #efefef;
-                    }
-
-                    button.btn.btn-success.mb-2.mr-2 {
-                        border-radius: 10px;
-                    }
-
-                    .badge-success-lighten,
-                    .badge-warning-lighten {
-                        font-size: 0.9rem;
-                        font-family: 'Noto Serif SC', serif;
-                        font-weight: 400;
-                        padding: 0.4rem;
-                    }
-
-                    i {
-                        font-family: 'Noto Serif SC', serif;
-                        font-weight: 400;
-                    }
-
-                    .form-group.col-sm-4 {
-                        margin-left: 0;
-                        padding-left: 0;
-                    }
-
-                    .table td,
-                    .table th {
-                        padding: 0.95rem;
-                        vertical-align: middle;
-                        border-top: 1px solid #e3eaef;
-                    }
-
-                    .margin_0 {
-                        margin: 0 !important;
-                    }
-
-                    .account-user-name {
-                        text-transform: capitalize;
-                    }
-
-                    .leftbar-user .leftbar-user-name {
-                        margin-left: 0px;
-                    }
-
-                    span.topnav-logo-lg,
-                    span.topnav-logo-sm {
-                        color: #fff;
-                        font-size: 1.2rem;
-                        text-transform: capitalize;
-                    }
-
-                    .card {
-                        border-radius: 0.80rem;
-                    }
-
-                    .content-page {
-                        padding-top: 20px;
-                    }
-
-                    h3.my-2.py-1 {
-                        font-size: 2rem;
-                    }
-
-                    h3.my-2.py-1 i {
-                        font-style: normal;
-                        font-weight: 200;
-                        font-size: 1.2rem;
-                        margin-left: 0.5rem;
-                    }
-
-                    .row.footer_center {
-                        width: 100%;
-                        display: flex;
-                        justify-content: center;
-                        text-align: center;
-                    }
-
-                    .topnav-navbar {
-                        padding: 0px 30px;
-                        margin: 0;
-                        min-height: 70px;
-                    }
-
-                    button.btn.btn-danger.mb-2.mr-2 {
-                        border-radius: 0.4rem;
-                    }
-
-                    .table .action-icon:hover {
-                        color: #ee7c74;
-                    }
-
-                    .form-group.mb-3.text_right {
-                        text-align: right;
-                    }
-
-                    i.mdi.mdi-account-circle.mr-1.rihjt-0 {
-                        margin-right: 0rem !important;
-                    }
-
-                    button.btn.btn-primary {
-                        border-radius: 0.4rem;
-                    }
-
-                    h4.header-title.mb-3 {
-                        text-align: center;
-                        font-size: 1.2rem;
-                        font-family: 'Noto Serif SC', serif;
-                        font-weight: 700;
-                    }
-
-                    label {
-                        font-family: 'Noto Serif SC', serif;
-                        font-weight: 400;
-                    }
-
-                    .text-muted {
-                        white-space: nowrap;
-                    }
-
-                    body {
-                        cursor: url(/assets/admin/cur/cursor.cur), default;
-                    }
-
-                    a:hover {
-                        cursor: url(/assets/admin/cur/hover.cur), pointer;
-                    }
-
-                    @media (min-width: 992px) {
-                        .text-lg-right {
-                            text-align: left !important;
-                        }
-                    }
-
-                    @media (max-width: 767.98px) {
-                        .navbar-custom {
-                            padding: 0px;
-                        }
-
-                        .topnav-navbar .topnav-logo {
-                            min-width: 50px;
-                            display: none;
-                        }
-                    }
-                </style>
 
                 <div class="row">
                     <div class="col-md-6 col-xl-4">
-                        <div class="card">
-                            <div class="card-body">
+                        <div class="layui-card">
+                            <div class="layui-card-body">
                                 <div class="row align-items-center">
                                     <div class="col-6">
-                                        <h5 class="text-muted font-weight-normal mt-0 text-truncate" title="Campaign Sent">留言祝福</h5>
+                                        <h5 class="text-muted text-truncate" title="留言祝福">留言祝福</h5>
                                         <h3 class="my-2 py-1">1<i>条</i></h3>
                                     </div>
                                     <div class="col-6" style="text-align: center;">
-                                        <svg t="1717913183813" class="icon" viewBox="0 0 1178 1024" version="1.1"
-                                            xmlns="http://www.w3.org/2000/svg" p-id="1538" width="100" height="100">
-                                            <path
-                                                d="M1052.279486 606.582238c5.281913-43.119549 2.222694-86.401823-9.0981-128.631813-11.311152-42.2324-30.306511-81.239241-56.436431-115.946543-27.086979-35.965704-60.664853-65.659889-99.793436-88.252059-39.129789-22.590965-81.634601-36.822719-126.325948-42.298695-43.119549-5.280707-86.400618-2.222694-128.630607 9.0981-42.231195 11.320795-81.246474 30.302895-115.947748 56.436431-35.965704 27.088185-65.659889 60.664853-88.250854 99.794642-22.59217 39.129789-36.823924 81.634601-42.298696 126.324742-5.281913 43.119549-2.222694 86.401823 9.098101 128.631812s30.306511 81.239241 56.43643 115.946543c27.086979 35.965704 60.664853 65.659889 99.793437 88.25206 39.129789 22.590965 81.634601 36.822719 126.325948 42.298695 43.118344 5.280707 86.400618 2.222694 128.630607-9.098101 42.237222-11.317179 81.239241-30.306511 115.947748-56.43643 35.965704-27.086979 65.659889-60.664853 88.250854-99.794642 22.59217-39.129789 36.823924-81.634601 42.298695-126.324742z"
-                                                fill="#FA6666" p-id="1539"></path>
-                                            <path
-                                                d="M869.263982 276.743541c-22.866994-53.825608-55.566156-102.225865-97.188642-143.839912-41.614047-41.622485-90.014304-74.312004-143.839912-97.188642C572.447485 12.017497 513.314651 0 452.489485 0s-119.958 12.017497-175.745944 35.714987c-53.824403 22.865788-102.225865 55.566156-143.838707 97.188642-41.614047 41.62369-74.322853 90.014304-97.188641 143.839912C12.017497 332.531484 0 391.664318 0 452.489485c0 60.823962 12.017497 119.958 35.714987 175.744738 22.866994 53.825608 55.566156 102.225865 97.189847 143.839912 41.622485 41.612842 90.014304 74.312004 143.838707 97.188641 55.787943 23.697491 114.920777 35.714987 175.745944 35.714988s119.958-12.017497 175.745943-35.714988c53.825608-22.866994 102.225865-55.566156 143.839912-97.188641 41.622485-41.62369 74.312004-90.014304 97.188642-143.839912 23.697491-55.786738 35.714987-114.920777 35.714987-175.744738 0-60.825167-12.017497-119.958-35.714987-175.745944zM268.467499 500.831884c-26.695235 0-48.342399-21.648369-48.342399-48.342399 0-26.695235 21.647164-48.343605 48.342399-48.343605 26.695235 0 48.342399 21.648369 48.3424 48.343605 0 26.69403-21.647164 48.342399-48.3424 48.342399z m184.021986 0c-26.695235 0-48.342399-21.648369-48.3424-48.342399 0-26.695235 21.647164-48.343605 48.3424-48.343605 26.695235 0 48.343605 21.648369 48.343604 48.343605 0 26.69403-21.648369 48.342399-48.343604 48.342399z m184.021985 0c-26.69403 0-48.342399-21.648369-48.3424-48.342399 0-26.695235 21.648369-48.343605 48.3424-48.343605 26.695235 0 48.343605 21.648369 48.343604 48.343605 0 26.69403-21.648369 48.342399-48.343604 48.342399z"
-                                                fill="#FFCCCE" opacity=".9" p-id="1540"></path>
-                                        </svg>
+                                        <i class="layui-icon layui-icon-message admin-stat-icon" style="color:#FA6666;"></i>
                                     </div>
-                                </div> <!-- end row-->
-                            </div> <!-- end card-body -->
-                        </div> <!-- end card -->
-                    </div> <!-- end col -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="col-md-6 col-xl-4">
-                        <div class="card">
-                            <div class="card-body">
+                        <div class="layui-card">
+                            <div class="layui-card-body">
                                 <div class="row align-items-center">
                                     <div class="col-6">
-                                        <h5 class="text-muted font-weight-normal mt-0 text-truncate" title="New Leads">点点滴滴</h5>
+                                        <h5 class="text-muted text-truncate" title="点点滴滴">点点滴滴</h5>
                                         <h3 class="my-2 py-1">1<i>条</i></h3>
                                     </div>
                                     <div class="col-6" style="text-align: center;">
-                                        <svg t="1717913234288" class="icon" viewBox="0 0 1177 1024" version="1.1"
-                                            xmlns="http://www.w3.org/2000/svg" p-id="1707" width="100" height="100">
-                                            <path
-                                                d="M978.987254 727.204413c35.012548-8.899202 61.423559-36.382792 68.938987-71.716376 7.509278-35.337274-5.442843-71.186236-33.804667-93.559088l-93.688241-73.907042a17.033331 17.033331 0 0 1-6.45023-14.490878l7.767583-119.078334c2.34688-36.049456-15.627417-69.66224-46.909311-87.722639-31.281894-18.061629-69.387945-16.818077-99.428749 3.242336l-99.241785 66.266152a17.048091 17.048091 0 0 1-15.77379 1.659298l-110.849493-44.182355c-33.556203-13.375248-71.079224-6.669174-97.926893 17.504429-26.846439 24.172373-37.43692 60.790098-27.639802 95.560333l32.355702 114.854442a17.038251 17.038251 0 0 1-3.296456 15.517945l-76.274833 91.770638c-23.089954 27.778795-28.310164 65.53921-13.612642 98.546823 8.305102 18.652039 21.982936 33.585724 38.834223 43.31519 12.963191 7.484678 27.809545 11.886923 43.505843 12.506854l119.240697 4.72082a17.059161 17.059161 0 0 1 13.735645 7.931176l63.708938 100.903544c8.389973 13.286687 19.613915 23.936209 32.583257 31.424576 16.845138 9.725776 36.630026 14.110801 56.930292 11.973025 35.926454-3.778625 66.015228-27.173624 78.536842-61.063163l41.338546-111.940522a17.055471 17.055471 0 0 1 11.784831-10.616312l115.647806-29.413492-0.0123-0.00738z"
-                                                fill="#F779D4" p-id="1708"></path>
-                                            <path
-                                                d="M936.02631 484.815242c36.177378-35.256092 48.944996-87.004306 33.343409-135.047697-15.612657-48.043391-56.363253-82.400338-106.351306-89.663612l-165.129091-23.99771a23.818127 23.818127 0 0 1-17.942317-13.038222L606.097774 73.433484C583.734762 28.137961 538.467528 0 487.956716 0c-50.509583 0-95.786656 28.146571-118.139829 73.444555L295.967656 223.076611a23.840267 23.840267 0 0 1-17.942317 13.039452l-165.13032 23.99771c-49.988054 7.263274-90.73742 41.620221-106.347617 89.663612-15.612657 48.043391-2.835198 99.791605 33.339719 135.047697l119.485472 116.467a23.827967 23.827967 0 0 1 6.857367 21.09486l-28.205612 164.46242c-8.540036 49.78387 11.540057 99.163064 52.416115 128.857001 23.097335 16.782407 50.103676 25.303992 77.311741 25.303992 20.931268 0 41.989227-5.049236 61.430939-15.273171l147.698463-77.651226a23.850107 23.850107 0 0 1 22.179739 0l147.699693 77.651226c19.451552 10.223935 40.488602 15.273171 61.42971 15.273171 27.199455 0 54.224246-8.521586 77.312971-25.303992 40.866218-29.693937 60.946311-79.063291 52.414885-128.857001l-28.205612-164.46242a23.853797 23.853797 0 0 1 6.848757-21.09486L936.04599 484.815242h-0.01968z"
-                                                fill="#FAC5EB" opacity=".9" p-id="1709"></path>
-                                        </svg>
+                                        <i class="layui-icon layui-icon-list admin-stat-icon" style="color:#F779D4;"></i>
                                     </div>
-                                </div> <!-- end row-->
-                            </div> <!-- end card-body -->
-                        </div> <!-- end card -->
-                    </div> <!-- end col -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="col-md-6 col-xl-4">
-                        <div class="card">
-                            <div class="card-body">
+                        <div class="layui-card">
+                            <div class="layui-card-body">
                                 <div class="row align-items-center">
                                     <div class="col-6">
-                                        <h5 class="text-muted font-weight-normal mt-0 text-truncate" title="Deals">恋爱清单</h5>
+                                        <h5 class="text-muted text-truncate" title="恋爱清单">恋爱清单</h5>
                                         <h3 class="my-2 py-1">83<i>条</i></h3>
                                     </div>
                                     <div class="col-6" style="text-align: center;">
-                                        <svg t="1717913149788" class="icon" viewBox="0 0 1060 1024" version="1.1"
-                                            xmlns="http://www.w3.org/2000/svg" p-id="1371" width="100" height="100">
-                                            <path
-                                                d="M992.512591 333.751271L627.279282 122.883497c-37.821381-21.835375-86.182236-8.877606-108.018874 28.943775L258.280252 603.857808c-31.836889 55.142184 11.457542 123.626034 75.013879 119.76939 87.04474-5.281102 181.618397-9.386522 192.44453-3.135576 10.847601 6.262311 54.725454 90.525065 93.728833 168.674519 28.433596 56.970744 109.171826 59.776724 141.008715 4.63454l260.980156-452.030536c21.835375-37.821381 8.877606-86.183498-28.943774-108.018874z"
-                                                fill="#C98FFF" p-id="1372"></path>
-                                            <path
-                                                d="M687.087577 0H108.487379C48.571745 0 0 48.571745 0 108.488642v716.102069c0 87.355393 98.418936 139.026092 171.287288 90.84582C271.085221 849.450534 380.635892 779.698816 397.787478 779.698816c17.184419 0 127.118987 70.01691 227.068458 136.114035C697.720499 963.998174 795.574956 911.946104 795.574956 824.590711V108.487379C795.574956 48.571745 747.00321 0 687.087577 0zM282.871095 199.525148h229.832765c24.41026 0 44.198609 19.788349 44.198609 44.198608s-19.788349 44.198609-44.198609 44.198609H282.871095c-24.41026 0-44.198609-19.788349-44.198608-44.198609s19.788349-44.198609 44.198608-44.198608z"
-                                                fill="#E2C8FA" opacity=".9" p-id="1373"></path>
-                                        </svg>
+                                        <i class="layui-icon layui-icon-location admin-stat-icon" style="color:#C98FFF;"></i>
                                     </div>
-                                </div> <!-- end row-->
-                            </div> <!-- end card-body -->
-                        </div> <!-- end card -->
-                    </div> <!-- end col -->
-
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <!-- end row -->
+
                 <div class="row">
                     <div class="col-12">
-                        <div class="card">
-                            <div class="card-body">
+                        <div class="layui-card">
+                            <div class="layui-card-body">
                                 <div class="row mb-2">
                                     <div class="col-lg-4">
-                                        <div class="text-lg-right">
-                                            <button type="button" class="btn btn-danger mb-2 mr-2"><i class="mdi mdi-basket mr-1"></i>
-                                                最新留言
-                                            </button>
-                                        </div>
-                                    </div><!-- end col-->
+                                        <button type="button" class="layui-btn layui-btn-danger layui-btn-sm"><i class="layui-icon layui-icon-message"></i>
+                                            最新留言
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div class="table-responsive">
                                     <table class="table table-centered mb-0">
-                                        <thead class="thead-light">
+                                        <thead>
                                             <tr>
                                                 <th>评论内容</th>
                                                 <th>Date</th>
@@ -541,8 +187,8 @@
                                                     </small>
                                                 </td>
                                                 <td>
-                                                    <h5><span class="badge badge-success-lighten"><i
-                                                                class="mdi mdi-account-circle mr-1 rihjt-0"></i>
+                                                    <h5><span class="layui-badge layui-bg-green"><i
+                                                                class="layui-icon layui-icon-username"></i>
                                                             Ki.</span>
                                                     </h5>
                                                 </td>
@@ -551,7 +197,7 @@
                                                 </td>
                                                 <td>
                                                     <h5>
-                                                        <span class="badge badge-danger-lighten">223.104.79.236</span>
+                                                        <span class="layui-badge layui-bg-red">223.104.79.236</span>
                                                     </h5>
                                                 </td>
                                             </tr>
@@ -564,32 +210,23 @@
                 </div>
 
             </div>
+            <!-- 内容区 End -->
 
-            <!-- content End -->
-
-<!-- Footer Start -->
-<footer class="footer">
-    <div class="row footer_center">
-        <div class="col-md-6">
-            Copyright © 2022-2026 <a href="https://blog.kikiw.cn/index.php/archives/52/" target="_blank">Ki</a> All Rights Reserved.
+            <footer class="footer">
+                <div class="row footer_center">
+                    <div class="col-md-6">
+                        Copyright © 2022-2026 <a href="https://blog.kikiw.cn/index.php/archives/52/" target="_blank">Ki</a> All Rights Reserved.
+                    </div>
+                </div>
+            </footer>
         </div>
+        <!-- content-page -->
     </div>
-</footer>
-<!-- end Footer -->
 </div>
-
-<!-- content-page -->
-
-</div>
-
-</div>
-<!-- App js -->
-<script src="/assets/layui/2.13.9/layui.js"></script>
-<script src="/admin/assets/js/app.min.js"></script>
 
 <!-- 后台 ESM 入口：登录校验、外壳初始化、pjax 与页面模块调度 -->
+<script src="/assets/layui/2.13.9/layui.js"></script>
 <script type="module" src="/admin/js/main.js"></script>
 
 </body>
-
 </html>

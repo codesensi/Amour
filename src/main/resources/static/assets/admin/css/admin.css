@@ -1,10 +1,179 @@
 /**
- * 管理端 layui 适配覆盖样式。
+ * 管理端 layui 适配样式（自建布局 + 组件适配 + 工具类等价实现）。
  *
- * 后台主题（app.min.css）在 layui.css 之后加载，其全局 a/按钮重置
- * 会抹掉 layui 分页条的边框与背景；本文件在主题样式之后引入，
- * 恢复分页组件样式，并把分页条定位到表格右下角。
+ * 后台外壳已从 Hyper 主题（app.min.js/app.min.css/icons.min.css）迁移到
+ * layui 布局体系：顶栏 + 侧栏 + 内容区由下方布局样式承担；
+ * views 里沿用的少量 Bootstrap 风格工具类（row/col/text-muted 等）
+ * 在此提供等价实现，页面 HTML 无需改动。
  */
+
+/* ===== 管理布局：顶栏 60px + 侧栏 220px ===== */
+.admin-layout {
+    height: 100vh;
+}
+
+/* 顶栏 */
+.admin-header {
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0, 21, 41, .08);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+}
+
+.admin-logo {
+    color: #16b777;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-right: 16px;
+    white-space: nowrap;
+}
+
+.admin-menu-toggle {
+    color: #555;
+    font-size: 18px;
+    padding: 8px 10px;
+    cursor: pointer;
+}
+
+.admin-menu-toggle:hover {
+    color: #16b777;
+}
+
+.admin-header-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.admin-header-right a {
+    color: #555;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.admin-header-right a:hover {
+    color: #16b777;
+}
+
+.admin-header-right .admin-user {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #555;
+}
+
+.admin-header-right .admin-user img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* 侧栏 */
+.admin-side {
+    background: #2f3a4a;
+}
+
+.admin-side .layui-side-scroll {
+    padding: 12px 0;
+}
+
+.side-user {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+    padding: 8px 0 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+    margin-bottom: 8px;
+}
+
+.side-user img {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* 侧栏菜单：layui-nav-tree 深色，覆盖绿色主题色 */
+.admin-side .layui-nav-tree {
+    background-color: transparent;
+}
+
+.admin-side .layui-nav-tree .layui-nav-item a {
+    color: rgba(255, 255, 255, .78);
+    height: 44px;
+    line-height: 44px;
+}
+
+.admin-side .layui-nav-tree .layui-nav-item a:hover {
+    background: rgba(255, 255, 255, .06);
+}
+
+.admin-side .layui-nav-tree .layui-nav-itemed > a,
+.admin-side .layui-nav-tree .layui-nav-item a.layui-this {
+    background: rgba(22, 183, 119, .18);
+    color: #fff;
+}
+
+.admin-side .layui-nav-tree .layui-nav-item a .layui-icon {
+    margin-right: 8px;
+}
+
+.admin-side .layui-nav-tree .layui-badge {
+    margin-left: 8px;
+}
+
+/* 侧栏底部帮助盒 */
+.side-help {
+    margin: 16px 12px;
+    padding: 14px;
+    text-align: center;
+    color: rgba(255, 255, 255, .66);
+    background: rgba(255, 255, 255, .06);
+    border-radius: 8px;
+}
+
+.side-help h5 {
+    color: #fff;
+    margin-bottom: 6px;
+}
+
+/* 内容区 */
+.admin-body {
+    left: 220px;
+    top: 60px;
+    padding: 20px;
+    background: #f5f6f8;
+    overflow: auto;
+}
+
+.admin-body .content {
+    min-height: calc(100% - 60px);
+}
+
+.admin-body .footer {
+    padding: 16px 0;
+    color: #999;
+    font-size: .85rem;
+}
+
+/* 侧栏折叠态：内容区占满全宽 */
+body.side-collapsed .admin-side {
+    display: none;
+}
+
+body.side-collapsed .admin-body {
+    left: 0;
+}
+
+/* 首页统计卡图标 */
+.admin-stat-icon {
+    font-size: 64px;
+}
 
 /* ===== 表格分页条：右下角布局 ===== */
 .layui-table-page {
@@ -77,4 +246,143 @@
 .layui-table-page .layui-laypage-limits select {
     margin: 0 4px;
     padding: 0 4px;
+}
+
+/* ===== 工具类等价实现（替代原 Hyper 主题里的 Bootstrap 4 工具类） ===== */
+
+/* 网格（views 实际使用的组合） */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: -8px;
+    margin-right: -8px;
+}
+
+.row > [class*="col-"] {
+    padding-left: 8px;
+    padding-right: 8px;
+    width: 100%;
+}
+
+.col-6 { width: 50%; }
+.col-12 { width: 100%; }
+.col-lg-4 { width: 100%; }
+.col-lg-6 { width: 100%; }
+.col-lg-12 { width: 100%; }
+.col-md-6 { width: 100%; }
+.col-xl-4 { width: 100%; }
+
+@media (min-width: 768px) {
+    .col-md-6 { width: 50%; }
+}
+
+@media (min-width: 992px) {
+    .col-lg-4 { width: 33.3333%; }
+    .col-lg-6 { width: 50%; }
+    .col-lg-12 { width: 100%; }
+    .text-lg-right { text-align: right; }
+}
+
+@media (min-width: 1200px) {
+    .col-xl-4 { width: 33.3333%; }
+}
+
+/* flex 对齐 */
+.align-items-center {
+    display: flex;
+    align-items: center;
+}
+
+/* 间距 */
+.mb-0 { margin-bottom: 0; }
+.mb-2 { margin-bottom: .5rem; }
+.mb-3 { margin-bottom: 1rem; }
+.mr-0 { margin-right: 0; }
+.mr-1 { margin-right: .25rem; }
+.mt-0 { margin-top: 0; }
+.mt-3 { margin-top: 1rem; }
+.my-2 { margin-top: .5rem; margin-bottom: .5rem; }
+.py-1 { padding-top: .25rem; padding-bottom: .25rem; }
+
+/* 文本 */
+.text-muted { color: #999; }
+.text-center { text-align: center; }
+.text-body { color: #555; }
+.text-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.font-weight-normal { font-weight: 400; }
+
+/* 浮动 */
+.float-right { float: right; }
+
+/* 圆形头像与阴影 */
+.rounded-circle { border-radius: 50%; }
+.shadow-sm { box-shadow: 0 2px 6px rgba(0, 0, 0, .1); }
+
+/* 表格（首页最新留言等原生表格） */
+.table-responsive { overflow-x: auto; }
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+}
+
+.table th,
+.table td {
+    padding: .75rem;
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+
+.table thead th {
+    background: #fafafa;
+    color: #666;
+    font-weight: 600;
+}
+
+/* 表单分组 */
+.form-group { margin-bottom: 1rem; }
+
+/* 页面标题 */
+.header-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: .75rem;
+}
+
+/* ===== 业务样式（原外壳内嵌 style 迁移） ===== */
+.textHide {
+    width: 300px;
+    white-space: normal;
+}
+
+.textHide.index {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.toast-title {
+    font-size: 1.1rem;
+    margin-bottom: .3rem;
+}
+
+.color { color: #999; }
+.hhtext { white-space: normal !important; }
+
+ul.text {
+    line-height: 2rem;
+    font-size: .9rem;
+}
+
+.margin_0 { margin: 0 !important; }
+
+.footer_center {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    text-align: center;
 }

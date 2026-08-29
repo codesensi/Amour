@@ -15,10 +15,17 @@
 import { getAuth, isLoggedIn, clearAuth, redirectToLogin, setupAjaxGuard } from '/assets/common/auth.js';
 import { getConfig, qqAvatar } from '/assets/common/config.js';
 import { initPjax } from '/assets/common/pjax.js';
+import { loadLayui } from '/assets/common/layui.js';
 import { initAdminDataTables, destroyAdminDataTables } from './datatable-init.js';
 
-/** 后台页面依赖的全局 jQuery（主题与 vendor 脚本以普通脚本形式加载） */
-const $ = window.jQuery;
+/* ---------- jQuery 桥接 ---------- */
+// 独立 jquery.min.js 已移除：layui 一体构建内置 jQuery（2.2.6），
+// 此处取模块实例并桥接为全局 $，页面模块的 $() 调用零改动继续工作。
+const [jquery] = await loadLayui('jquery');
+window.jQuery = window.$ = jquery;
+
+/** 后台页面依赖的全局 jQuery（由 layui 内置实例桥接） */
+const $ = jquery;
 
 /* ---------- 登录完整校验 ---------- */
 if (!isLoggedIn()) {
@@ -87,11 +94,28 @@ initPjax({
     destroyAdminDataTables($(target));
   },
 
-  // 注入后：重渲染表格 + 调度目标页模块
+  // 注入后：重渲染表格 + 调度目标页模块 + 侧栏高亮同步
   onPageReady: function () {
     initAdminDataTables();
+    setActiveMenu(location.href);
     loadPageModule(location.href);
   }
+});
+
+/* ---------- 侧栏菜单高亮与折叠（原主题脚本职责归口此处） ---------- */
+
+// 按当前地址高亮侧栏菜单项
+function setActiveMenu(url) {
+  const path = new URL(url, location.href).pathname;
+  document.querySelectorAll('.admin-side .layui-nav-item').forEach(function (li) {
+    const a = li.querySelector('a');
+    li.classList.toggle('layui-this', a && a.getAttribute('href') === path);
+  });
+}
+
+// 汉堡按钮：收起/展开侧栏
+$('.js-menu-toggle').on('click', function () {
+  document.body.classList.toggle('side-collapsed');
 });
 
 /* ---------- 外壳初始化（仅整页加载执行一次） ---------- */
@@ -128,4 +152,5 @@ $('.js-logout').on('click', function () {
 
 /* ---------- 整页加载：初始化表格并执行当前页模块 ---------- */
 initAdminDataTables();
+setActiveMenu(location.href);
 loadPageModule(location.href);

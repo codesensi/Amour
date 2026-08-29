@@ -12,8 +12,6 @@
     <!-- 登录态守卫：未登录则跳转登录页（在渲染前同步执行，避免闪屏） -->
     <script src="/admin/js/guard.js"></script>
     <!-- App css -->
-    <link href="/admin/assets/css/icons.min.css" rel="stylesheet" type="text/css"/>
-    <link href="/admin/assets/css/app.min.css" rel="stylesheet" type="text/css"/>
     <link href="/assets/admin/css/loading.css" rel="stylesheet">
 </head>
 
@@ -29,7 +27,6 @@
         </div>
     </div>
 </div>
-<script src="/assets/lib/jquery/jquery.min.js"></script>
 <!--顶部栏 Start-->
 
 <div class="navbar-custom topnav-navbar">
@@ -49,7 +46,7 @@
 
             <li class="dropdown notification-list">
                 <a class="nav-link right-bar-toggle" href="/admin/views/user.html" title="全局设置">
-                    <i class="dripicons-gear noti-icon"></i>
+                    <i class="layui-icon layui-icon-set noti-icon"></i>
                 </a>
             </li>
 
@@ -69,13 +66,13 @@
 
                     <!-- item-->
                     <a href="/admin/views/user.html" class="dropdown-item notify-item">
-                        <i class="mdi mdi-account-circle mr-1"></i>
+                        <i class="layui-icon layui-icon-username mr-1"></i>
                         <span>全局设置</span>
                     </a>
 
                     <!-- item-->
                     <a href="javascript:void(0);" class="dropdown-item notify-item js-logout">
-                        <i class="mdi mdi-account-edit mr-1"></i>
+                        <i class="layui-icon layui-icon-edit mr-1"></i>
                         <span>退出登录</span>
                     </a>
 
@@ -115,58 +112,58 @@
 
                 <li class="side-nav-item">
                     <a href="/admin/index.html" class="side-nav-link">
-                        <i class="dripicons-direction"></i>
+                        <i class="layui-icon layui-icon-home"></i>
                         <span> 后台首页 </span>
                     </a>
                 </li>
 
                 <li class="side-nav-item">
                     <a href="/admin/views/set.html" class="side-nav-link">
-                        <i class="dripicons-meter"></i>
-                        <span class="badge badge-success float-right"><i class="dripicons-gear margin_0"></i></span>
+                        <i class="layui-icon layui-icon-chart"></i>
+                        <span class="layui-badge layui-bg-green float-right"><i class="layui-icon layui-icon-set margin_0"></i></span>
                         <span> 基本设置 </span>
                     </a>
                 </li>
 
                 <li class="side-nav-item">
                     <a href="/admin/views/leav-set.html" class="side-nav-link">
-                        <i class="dripicons-view-apps"></i>
+                        <i class="layui-icon layui-icon-app"></i>
                         <span> 留言管理
-                                <span class="badge badge-danger float-right">1</span>
+                                <span class="layui-badge layui-bg-red float-right">1</span>
                             </span>
                     </a>
                 </li>
 
                 <li class="side-nav-item">
                     <a href="/admin/views/little-set.html" class="side-nav-link">
-                        <i class="dripicons-copy"></i>
+                        <i class="layui-icon layui-icon-list"></i>
                         <span> 点点滴滴
-                                <span class="badge badge-danger float-right">1</span>
+                                <span class="layui-badge layui-bg-red float-right">1</span>
                             </span>
                     </a>
                 </li>
 
                 <li class="side-nav-item">
                     <a href="/admin/views/love-img-set.html" class="side-nav-link">
-                        <i class="dripicons-photo-group"></i>
+                        <i class="layui-icon layui-icon-picture"></i>
                         <span> 恋爱相册
-                                <span class="badge badge-danger float-right">1</span>
+                                <span class="layui-badge layui-bg-red float-right">1</span>
                             </span>
                     </a>
                 </li>
 
                 <li class="side-nav-item">
                     <a href="/admin/views/love-list.html" class="side-nav-link">
-                        <i class="dripicons-location"></i>
+                        <i class="layui-icon layui-icon-location"></i>
                         <span> 恋爱清单
-                                <span class="badge badge-danger float-right">83</span>
+                                <span class="layui-badge layui-bg-red float-right">83</span>
                             </span>
                     </a>
                 </li>
 
                 <li class="side-nav-item">
                     <a href="/admin/views/about-set.html" class="side-nav-link">
-                        <i class="dripicons-tags"></i>
+                        <i class="layui-icon layui-icon-tag"></i>
                         <span> 关于页面</span>
                         <span class="menu-arrow"></span>
                     </a>
@@ -174,7 +171,7 @@
 
                 <li class="side-nav-item">
                     <a href="/admin/views/ip-list.html" class="side-nav-link">
-                        <i class="dripicons-location"></i>
+                        <i class="layui-icon layui-icon-location"></i>
                         <span> IP/拉黑</span>
                         <span class="menu-arrow"></span>
                     </a>
@@ -182,7 +179,7 @@
 
                 <li class="side-nav-item">
                     <a href="/admin/views/feifa.html" class="side-nav-link">
-                        <i class="dripicons-time-reverse"></i>
+                        <i class="layui-icon layui-icon-time"></i>
                         <span> 非法访问</span>
                         <span class="menu-arrow"></span>
                     </a>
@@ -210,335 +207,48 @@
             <!--内容 Start-->
             <div class="content">
 
-                <style>
-                    .textHide {
-                        width: 300px;
-                        white-space: normal;
-                    }
-
-                    .textHide.index {
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        display: -webkit-box;
-                        -webkit-box-orient: vertical;
-                        -webkit-line-clamp: 2;
-                    }
-
-                    .toast-title {
-                        font-size: 1.1rem;
-                        margin-bottom: .3rem;
-                    }
-
-                    .color {
-                        color: #999;
-                    }
-
-                    .form-control:focus {
-                        border-color: #ff5295;
-                    }
-
-                    .form-control {
-                        color: #b6b6b6;
-                    }
-
-                    .side-nav .side-nav-link i {
-                        height: 20px;
-                    }
-
-                    span.badge.badge-danger-lighten {
-                        font-size: 0.9rem;
-                        font-family: 'Noto Serif SC', serif;
-                        font-weight: 400;
-                    }
-
-                    span.badge.badge-primary-lighten {
-                        font-size: 0.9rem;
-                        font-family: 'Noto Serif SC', serif;
-                        font-weight: 400;
-                    }
-
-                    ul.text {
-                        line-height: 2rem;
-                        font-size: 0.9rem;
-                    }
-
-                    ul {
-                        font-family: 'Noto Serif SC', serif;
-                        font-weight: 400;
-                    }
-
-                    h3.mt-0,
-                    h5 {
-                        font-family: 'Noto Serif SC', serif;
-                        font-weight: 700;
-                    }
-
-                    .hhtext {
-                        white-space: normal !important;
-                    }
-
-                    .notification-list .dropdown-menu.dropdown-menu-right {
-                        border-radius: 0px 0px 10px 10px;
-                        box-shadow: 0 8px 12px #efefef;
-                    }
-
-                    button.btn.btn-success.mb-2.mr-2 {
-                        border-radius: 10px;
-                    }
-
-                    .badge-success-lighten,
-                    .badge-warning-lighten {
-                        font-size: 0.9rem;
-                        font-family: 'Noto Serif SC', serif;
-                        font-weight: 400;
-                        padding: 0.4rem;
-                    }
-
-                    i {
-                        font-family: 'Noto Serif SC', serif;
-                        font-weight: 400;
-                    }
-
-                    .form-group.col-sm-4 {
-                        margin-left: 0;
-                        padding-left: 0;
-                    }
-
-                    .table td,
-                    .table th {
-                        padding: 0.95rem;
-                        vertical-align: middle;
-                        border-top: 1px solid #e3eaef;
-                    }
-
-                    .margin_0 {
-                        margin: 0 !important;
-                    }
-
-                    .account-user-name {
-                        text-transform: capitalize;
-                    }
-
-                    .leftbar-user .leftbar-user-name {
-                        margin-left: 0px;
-                    }
-
-                    span.topnav-logo-lg,
-                    span.topnav-logo-sm {
-                        color: #fff;
-                        font-size: 1.2rem;
-                        text-transform: capitalize;
-                    }
-
-                    .card {
-                        border-radius: 0.80rem;
-                    }
-
-                    .content-page {
-                        padding-top: 20px;
-                    }
-
-                    h3.my-2.py-1 {
-                        font-size: 2rem;
-                    }
-
-                    h3.my-2.py-1 i {
-                        font-style: normal;
-                        font-weight: 200;
-                        font-size: 1.2rem;
-                        margin-left: 0.5rem;
-                    }
-
-                    .row.footer_center {
-                        width: 100%;
-                        display: flex;
-                        justify-content: center;
-                        text-align: center;
-                    }
-
-                    .topnav-navbar {
-                        padding: 0px 30px;
-                        margin: 0;
-                        min-height: 70px;
-                    }
-
-                    button.btn.btn-danger.mb-2.mr-2 {
-                        border-radius: 0.4rem;
-                    }
-
-                    .table .action-icon:hover {
-                        color: #ee7c74;
-                    }
-
-                    .form-group.mb-3.text_right {
-                        text-align: right;
-                    }
-
-                    i.mdi.mdi-account-circle.mr-1.rihjt-0 {
-                        margin-right: 0rem !important;
-                    }
-
-                    button.btn.btn-primary {
-                        border-radius: 0.4rem;
-                    }
-
-                    h4.header-title.mb-3 {
-                        text-align: center;
-                        font-size: 1.2rem;
-                        font-family: 'Noto Serif SC', serif;
-                        font-weight: 700;
-                    }
-
-                    label {
-                        font-family: 'Noto Serif SC', serif;
-                        font-weight: 400;
-                    }
-
-                    .text-muted {
-                        white-space: nowrap;
-                    }
-
-                    body {
-                        cursor: url(/assets/admin/cur/cursor.cur), default;
-                    }
-
-                    a:hover {
-                        cursor: url(/assets/admin/cur/hover.cur), pointer;
-                    }
-
-                    @media (min-width: 992px) {
-                        .text-lg-right {
-                            text-align: left !important;
-                        }
-                    }
-
-                    @media (max-width: 767.98px) {
-                        .navbar-custom {
-                            padding: 0px;
-                        }
-
-                        .topnav-navbar .topnav-logo {
-                            min-width: 50px;
-                            display: none;
-                        }
-                    }
-                </style>
-
                 <!-- 页面特有样式：照搬原站 Set.php 内容区样式，追加在全站样式之后 -->
-                <style>
-                    div#test-editor {
-                        z-index: 10;
-                    }
-
-                    .editormd-preview video {
-                        width: 100%;
-                    }
-
-                    #img_url {
-                        display: block;
-                    }
-
-                    h4.header-title.mb-3.size_18 {
-                        font-size: 1.8rem;
-                    }
-
-                    table.dataTable tbody td.focus,
-                    table.dataTable tbody th.focus {
-                        outline: none !important;
-                        outline-offset: 0;
-                        background-color: white;
-                    }
-
-                    .right_10 {
-                        margin-left: 10px;
-                        border-radius: 0.6rem;
-                    }
-
-                    iframe {
-                        width: 100%;
-                        height: 260px;
-                        border-radius: 15px;
-                        border: 2px solid #d9d9d9d1;
-                        box-shadow: 2px 1px 15px rgb(36 37 38 / 44%);
-                    }
-
-                    quote {
-                        padding: 5px 0px 5px 15px;
-                        width: 100%;
-                        display: block;
-                        border-left: 3px solid #856f6f;
-                        background: #f2f2f2;
-                        border-radius: 0px 6px 6px 0px;
-                        margin: 15px 0;
-                    }
-
-                    default-Code {
-                        text-align: center;
-                        width: 100%;
-                        display: block;
-                        color: #ff876c;
-                    }
-
-                    .editormd {
-                        border-radius: 10px;
-                        box-shadow: 0 4px 13px 0 rgb(115 118 120 / 14%);
-                        height: 450px !important;
-                        margin: 40px 0 !important;
-                    }
-
-                    .markdown-body h1 {
-                        color: #383838 !important;
-                        padding-bottom: 0.3em;
-                        font-size: 2.25em;
-                        line-height: 1.2;
-                        border-bottom: 1px solid #eee;
-                    }
-
-                    .margin_left {
-                        margin-left: 10px;
-                    }
-                </style>
 
                 <div class="row">
                     <div class="col-lg-6">
-                        <div class="card">
-                            <div class="card-body">
+                        <div class="layui-card">
+                            <div class="layui-card-body">
                                 <h4 class="header-title mb-3">基本设置</h4>
 
                                 <!-- 原站表单提交至 adminPost.php，提交已改为页面脚本 mock 处理，此处移除 action/method/onsubmit -->
                                 <form class="needs-validation layui-form" novalidate>
                                     <div class="form-group mb-3">
                                         <label for="validationCustom01">站点标题</label>
-                                        <input type="text" class="form-control" placeholder="请输入站点标题"
+                                        <input type="text" class="layui-input" placeholder="请输入站点标题"
                                                name="title" value="龙猫の爱恋" required>
                                     </div>
                                     <div class="form-group mb-3">
                                         <label for="validationCustom02">站点LOGO</label>
-                                        <input type="text" class="form-control" placeholder="请填写站点LOGO文字"
+                                        <input type="text" class="layui-input" placeholder="请填写站点LOGO文字"
                                                name="logo" value="龙猫の爱恋" required>
 
                                     </div>
                                     <div class="form-group mb-3">
                                         <label for="validationCustom03">站点文案</label>
-                                        <input type="text" class="form-control" placeholder="显示在顶部的文案"
+                                        <input type="text" class="layui-input" placeholder="显示在顶部的文案"
                                                name="writing" value="爱晨雾漫过青瓦，爱暮色染透篱笆，更爱与君并肩立，看遍这人间烟火里的朝暮与年华。" required>
                                     </div>
                                     <div class="form-group">
                                         <label for="validationCustom06">是否关闭头像背景高斯模糊</label>
-                                        <select class="form-control" id="example-select" name="WebBlur">
+                                        <select class="layui-select" id="example-select" name="WebBlur">
                                             <option value="1" selected>开启</option>
                                             <option value="2">关闭</option>
                                         </select>
                                     </div>
                                     <div class="form-group">
                                         <label for="validationCustom07">是否开启前端无刷新加载</label>
-                                        <select class="form-control" id="example-select" name="WebPjax">
+                                        <select class="layui-select" id="example-select" name="WebPjax">
                                             <option value="1" selected>开启</option>
                                             <option value="2">关闭</option>
                                         </select>
                                     </div>
                                     <div class="form-group mb-3 text_right">
-                                        <button class="btn btn-primary" type="button" id="adminPost">提交修改</button>
+                                        <button class="layui-btn" type="button" id="adminPost">提交修改</button>
                                     </div>
                                 </form>
 
@@ -547,39 +257,39 @@
                     </div> <!-- end col-->
 
                     <div class="col-lg-6">
-                        <div class="card">
-                            <div class="card-body">
+                        <div class="layui-card">
+                            <div class="layui-card-body">
                                 <h4 class="header-title mb-3">情侣配置</h4>
 
                                 <!-- 原站表单提交至 loveadminPost.php，提交已改为页面脚本 mock 处理，此处移除 action/method -->
                                 <form class="needs-validation layui-form" novalidate>
                                     <div class="form-group mb-3">
                                         <label for="validationCustom02">女主Name</label>
-                                        <input type="text" class="form-control" placeholder="请输入女主Name"
+                                        <input type="text" class="layui-input" placeholder="请输入女主Name"
                                                name="girl" value="Su" required>
                                     </div>
                                     <div class="form-group mb-3">
                                         <label for="validationCustom01">男主Name</label>
-                                        <input type="text" class="form-control" placeholder="请输入男主Name"
+                                        <input type="text" class="layui-input" placeholder="请输入男主Name"
                                                name="boy" value="Li" required>
                                     </div>
                                     <div class="form-group mb-3">
                                         <label for="validationCustom04">女主QQ</label>
-                                        <input type="text" class="form-control" placeholder="请输入女主QQ（用于显示头像）"
+                                        <input type="text" class="layui-input" placeholder="请输入女主QQ（用于显示头像）"
                                                name="girlimg" value="673822943" required>
                                     </div>
                                     <div class="form-group mb-3">
                                         <label for="validationCustom03">男主QQ</label>
-                                        <input type="text" class="form-control" placeholder="请输入男主QQ（用于显示头像）"
+                                        <input type="text" class="layui-input" placeholder="请输入男主QQ（用于显示头像）"
                                                name="boyimg" value="2623669948" required>
                                     </div>
                                     <div class="form-group mb-3">
                                         <label for="validationCustom05">起始时间</label>
-                                        <input type="datetime-local" class="form-control" placeholder="请输入起始时间"
+                                        <input type="datetime-local" class="layui-input" placeholder="请输入起始时间"
                                                name="startTime" value="2018-07-15T00:00" required>
                                     </div>
                                     <div class="form-group mb-3 text_right">
-                                        <button class="btn btn-primary" type="button" id="loveadminPost">提交修改</button>
+                                        <button class="layui-btn" type="button" id="loveadminPost">提交修改</button>
                                     </div>
                                 </form>
 
@@ -588,62 +298,62 @@
                     </div> <!-- end col-->
 
                     <div class="col-lg-12">
-                        <div class="card">
-                            <div class="card-body">
+                        <div class="layui-card">
+                            <div class="layui-card-body">
                                 <h4 class="header-title mb-3">卡片配置&版权配置</h4>
 
                                 <!-- 原站表单提交至 CardadminPost.php，提交已改为页面脚本 mock 处理，此处移除 action/method -->
                                 <form class="needs-validation layui-form" novalidate>
                                     <div class="form-group mb-3">
                                         <label for="validationCustom01">背景图片URL地址</label>
-                                        <input type="text" class="form-control" placeholder="请输入卡片Name"
+                                        <input type="text" class="layui-input" placeholder="请输入卡片Name"
                                                name="bgimg" value="Style/img/bgCover.png" required>
                                     </div>
                                     <div class="form-group mb-3">
                                         <label for="validationCustom01">卡片1Name</label>
-                                        <input type="text" class="form-control" placeholder="请输入卡片Name"
+                                        <input type="text" class="layui-input" placeholder="请输入卡片Name"
                                                name="card1" value="点点滴滴" required>
                                     </div>
                                     <div class="form-group mb-3">
                                         <label for="validationCustom02">卡片1描述</label>
-                                        <input type="text" class="form-control" placeholder="请输入卡片描述"
+                                        <input type="text" class="layui-input" placeholder="请输入卡片描述"
                                                name="deci1" value="有人愿意听你碎碎念念也很浪漫" required>
 
                                     </div>
                                     <div class="form-group mb-3">
                                         <label for="validationCustom03">卡片2Name</label>
-                                        <input type="text" class="form-control" placeholder="请输入卡片Name"
+                                        <input type="text" class="layui-input" placeholder="请输入卡片Name"
                                                name="card2" value="留言板" required>
 
                                     </div>
                                     <div class="form-group mb-3">
                                         <label for="validationCustom04">卡片2描述</label>
-                                        <input type="text" class="form-control" placeholder="请输入卡片描述"
+                                        <input type="text" class="layui-input" placeholder="请输入卡片描述"
                                                name="deci2" value="在这里写下我们的留言祝福" required>
 
                                     </div>
                                     <div class="form-group mb-3">
                                         <label for="validationCustom05">卡片3Name</label>
-                                        <input type="text" class="form-control" placeholder="请输入卡片Name"
+                                        <input type="text" class="layui-input" placeholder="请输入卡片Name"
                                                name="card3" value="关于我们" required>
                                     </div>
                                     <div class="form-group mb-3">
                                         <label for="validationCustom05">卡片3描述</label>
-                                        <input type="text" class="form-control" placeholder="请输入卡片描述"
+                                        <input type="text" class="layui-input" placeholder="请输入卡片描述"
                                                name="deci3" value="我们之间认识的经历回忆" required>
                                     </div>
                                     <div class="form-group mb-3">
                                         <label for="validationCustom05">域名备案号</label>
-                                        <input type="text" class="form-control" placeholder="没有请留空" name="icp"
+                                        <input type="text" class="layui-input" placeholder="没有请留空" name="icp"
                                                value="赣ICP备2026010001号" required>
                                     </div>
                                     <div class="form-group mb-3">
                                         <label for="validationCustom05">站点版权信息</label>
-                                        <input type="text" class="form-control" placeholder="请输入站点版权信息"
+                                        <input type="text" class="layui-input" placeholder="请输入站点版权信息"
                                                name="Copyright" value="Copyright © 2022 - 2026 Like_Girl All Rights Reserved." required>
                                     </div>
                                     <div class="form-group mb-3 text_right">
-                                        <button class="btn btn-primary" type="button" id="CardadminPost">提交修改</button>
+                                        <button class="layui-btn" type="button" id="CardadminPost">提交修改</button>
                                     </div>
                                 </form>
 
@@ -673,10 +383,8 @@
 
 </div>
 <!-- App js -->
-<script src="/admin/assets/js/app.min.js"></script>
 
 <!-- 后台 ESM 入口：登录校验、外壳初始化、pjax 与页面模块调度 -->
-<script type="module" src="/admin/js/main.js"></script>
 
 </body>
 

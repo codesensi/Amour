@@ -43,10 +43,10 @@ export function init() {
             { field: 'date', title: 'Date', width: 180 },
             { field: 'name', title: 'Name', width: 130 },
             { field: 'qq', title: 'QQ', width: 130 },
-            { field: 'ip', title: 'IP', width: 180, templet: function (d) { return '<span class="badge badge-danger-lighten">' + esc(d.ip) + '</span> <i>' + esc(d.region) + '</i>'; } },
+            { field: 'ip', title: 'IP', width: 180, templet: function (d) { return '<span class="layui-badge layui-bg-red">' + esc(d.ip) + '</span> <i>' + esc(d.region) + '</i>'; } },
             { title: 'Action', width: 130, templet: function (d) {
                 return '<a class="delete-btn" data-id="' + esc(d.id) + '" data-content="' + esc(d.content) + '">'
-                    + '<button type="button" class="btn btn-danger btn-rounded" style="white-space: nowrap;">删除</button></a>';
+                    + '<button type="button" class="layui-btn layui-btn-danger layui-btn-radius" style="white-space: nowrap;">删除</button></a>';
             } }
         ]],
         data: MESSAGES

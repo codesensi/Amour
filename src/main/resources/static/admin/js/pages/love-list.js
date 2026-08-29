@@ -105,8 +105,8 @@ export function init() {
             { field: 'title', title: '事件标题', minWidth: 220 },
             { field: 'done', title: '完成状态', width: 110, templet: function (d) {
                 return d.done
-                    ? '<span class="badge badge-success-lighten">已完成</span>'
-                    : '<span class="badge badge-danger-lighten">未完成</span>';
+                    ? '<span class="layui-badge layui-bg-green">已完成</span>'
+                    : '<span class="layui-badge layui-bg-red">未完成</span>';
             } },
             { field: 'img', title: '图片预览', width: 160, templet: function (d) {
                 return d.img ? '<img src="' + d.img + '" style="height:40px;">' : '暂无图片';
@@ -114,9 +114,9 @@ export function init() {
             { title: '操作', width: 200, templet: function (d) {
                 // 删除按钮用 data 属性传参（避免 title 中引号/emoji 破坏 href 字符串），点击行为由下方委托接管
                 return '<a href="javascript:void(0);" class="js-mock-edit">'
-                    + '<button type="button" class="btn btn-secondary btn-rounded"><i class=" mdi mdi-clipboard-text-play-outline mr-1"></i>修改</button></a> '
+                    + '<button type="button" class="layui-btn layui-btn-primary layui-btn-radius"><i class=" layui-icon layui-icon-edit mr-1"></i>修改</button></a> '
                     + '<a href="javascript:void(0);" class="delete-btn" data-id="' + d.id + '" data-title="' + d.title + '">'
-                    + '<button type="button" class="btn btn-danger btn-rounded"><i class=" mdi mdi-delete-empty mr-1"></i>删除</button></a>';
+                    + '<button type="button" class="layui-btn layui-btn-danger layui-btn-radius"><i class=" layui-icon layui-icon-delete mr-1"></i>删除</button></a>';
             } }
         ]],
         data: LOVE_EVENTS

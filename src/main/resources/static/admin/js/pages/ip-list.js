@@ -23,7 +23,7 @@ export function init() {
             { field: 'ip', title: 'IP', width: 180 },
             { title: 'Action', width: 125, templet: function (d) {
                 return '<a class="delete-btn" data-id="' + d.id + '" data-ip="' + d.ip + '">'
-                    + '<button type="button" class="btn btn-danger btn-rounded" style="white-space: nowrap;">解封</button></a>';
+                    + '<button type="button" class="layui-btn layui-btn-danger layui-btn-radius" style="white-space: nowrap;">解封</button></a>';
             } }
         ]],
         data: IP_BANS
