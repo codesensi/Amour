@@ -36,13 +36,8 @@ const PORTAL_API = {
    * 节点两种：{type:'bot', delay, content} 消息（content 支持 "![alt](url)" 图片语法）；
    *          {type:'buttons', delay, options:[{text, value, next:[...]}]} 分支按钮，next 为点选后继续执行的子序列
    */
-  aboutChat: { url: '/love/chat', method: 'GET' },
-  /**
-   * 站点展示配置：GET /site/config -> {logo, slogan, femaleName, maleName, femaleQq,
-   * maleQq, loveStartDate, icpText, copyright}（后台可配置，预留口子；
-   * 男女主头像由前端按 QQ 号拼接 qlogo 地址，ICP 备案链接写死在页脚 href，均不走配置）
-   */
-  siteConfig: { url: '/site/config', method: 'GET' }
+  aboutChat: { url: '/love/chat', method: 'GET' }
+  /* 站点展示类配置不走独立接口：统一经 config.js 的 /config/public 口子读取 sys_config */
 };
 
 /** 示例数据：仅在后端接口未实现时兜底展示 */
@@ -73,18 +68,6 @@ const PORTAL_MOCK = {
     { id: 2, title: '第一次一起去看海', author: 'Ki.', date: '2023-05-21' },
     { id: 3, title: '记录我们的第 1000 天', author: 'Su', date: '2024-05-15' }
   ],
-  /** 站点展示配置默认值（后台实现 /site/config 后自动切换为配置数据） */
-  siteConfig: {
-    logo: '爱慕情侣小站',
-    slogan: '爱晨雾漫过青瓦，爱暮色染透篱笆，更爱与君并肩立，看遍这人间烟火里的朝暮与年华。',
-    femaleName: 'Su',
-    maleName: 'Li',
-    femaleQq: '673822943',
-    maleQq: '2623669948',
-    loveStartDate: '2018-07-15T00:00:00',
-    icpText: '赣ICP备2026010001号',
-    copyright: 'Copyright © 2022 - 2026 Like_Girl All Rights Reserved.'
-  },
   /** 关于页对话默认剧本（后台实现 /love/chat 后自动切换为配置数据） */
   aboutChat: [
     { type: 'bot', delay: 200, content: 'Hi, 欢迎你的来访' },
@@ -142,11 +125,6 @@ function mockPhoto(label) {
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
 }
 
-/** 拼接 QQ 头像地址：nk 为 QQ 号，s 为尺寸（首页英雄区 640，留言列表 100），size 缺省取 640 */
-function qqAvatar(qq, size) {
-  return 'https://q1.qlogo.cn/g?b=qq&nk=' + encodeURIComponent(qq) + '&s=' + (size || 640);
-}
-
 /**
  * 统一请求口子：优先调用后端接口；接口未实现或失败时降级为 mock。
  * @param {string} apiKey PORTAL_API 的键
@@ -180,6 +158,7 @@ async function portalRequest(apiKey, payload) {
 /** 计算并渲染恋爱计时（首次加载与 pjax 换页后立即调用，避免空白延迟） */
 function renderLoveTime(loveStartDate) {
   const birthDay = new Date(loveStartDate || siteConfig.loveStartDate);
+  if (isNaN(birthDay.getTime())) return; // 配置未就绪（计时起点未拉取）时跳过本次渲染
   const today = new Date();
   const timeold = today.getTime() - birthDay.getTime();
   const msPerDay = 24 * 60 * 60 * 1000;
@@ -469,47 +448,64 @@ async function loadLoveList() {
 
 /** 关于页：对话机器人由页面内联脚本驱动（原 BotUI 的自研轻量复刻），无内容接口渲染逻辑 */
 
-/** 站点展示配置（运行时状态）：初始为内置默认值，applySiteConfig 拉取后台配置后整体替换 */
-let siteConfig = PORTAL_MOCK.siteConfig;
+/** 站点展示配置（运行时状态）：初始为空，applySiteConfig 从站点配置（sys_config）组装后填充 */
+let siteConfig = {};
 
 /**
- * 站点展示配置：拉取并应用到 DOM（后台可配置，预留口子）。
+ * 站点展示配置：统一经 ProjectConfig（/config/public 口子，读取 sys_config）拉取，
+ * 组装为站点视图对象后应用到 DOM。
  * 覆盖范围：头部 logo / 右侧文字说明、首屏双方名字与 QQ 头像、
  * 恋爱计时起点、页脚 ICP 备案号与链接、页脚版权行。
- * 接口未实现或失败时 portalRequest 降级为 PORTAL_MOCK.siteConfig，
- * 应用结果与 Thymeleaf 片段内置文案一致，页面无感。
+ * 键名契约：logo←name、slogan←site.slogan、femaleName←site.female-name、maleName←site.male-name、
+ * femaleQq←site.female-qq、maleQq←site.male-qq、loveStartDate←site.love-start-date、
+ * icpText←site.icp-text、copyright←copyright
  */
 async function applySiteConfig() {
-  const config = await portalRequest('siteConfig');
-  if (!config) return;
-  siteConfig = config;
+  const config = await ProjectConfig.load([
+    'name', 'site.slogan', 'site.female-name', 'site.male-name',
+    'site.female-qq', 'site.male-qq', 'site.love-start-date', 'site.icp-text', 'copyright'
+  ]);
+  siteConfig = {
+    logo: config['name'],
+    slogan: config['site.slogan'],
+    femaleName: config['site.female-name'],
+    maleName: config['site.male-name'],
+    femaleQq: config['site.female-qq'],
+    maleQq: config['site.male-qq'],
+    loveStartDate: config['site.love-start-date'],
+    icpText: config['site.icp-text'],
+    copyright: config['copyright']
+  };
   // 浏览器标签标题：站点名（配置 name）+ 页面副标题（head 片段的 title 参数）
-  if (config.logo) {
+  if (siteConfig.logo) {
     const suffix = document.title;
-    if (suffix !== config.logo && suffix.indexOf(config.logo + ' — ') !== 0) {
-      document.title = suffix ? config.logo + ' — ' + suffix : config.logo;
+    if (suffix !== siteConfig.logo && suffix.indexOf(siteConfig.logo + ' — ') !== 0) {
+      document.title = suffix ? siteConfig.logo + ' — ' + suffix : siteConfig.logo;
     }
   }
   const logoEl = document.querySelector('.alogo');
-  if (logoEl && config.logo) logoEl.textContent = config.logo;
+  if (logoEl && siteConfig.logo) logoEl.textContent = siteConfig.logo;
   const sloganEl = document.querySelector('.wenan');
-  if (sloganEl && config.slogan) {
-    sloganEl.textContent = config.slogan;
+  if (sloganEl && siteConfig.slogan) {
+    sloganEl.textContent = siteConfig.slogan;
     const tipEl = sloganEl.closest('.word');
-    if (tipEl) tipEl.setAttribute('data-tip', config.slogan);
+    if (tipEl) tipEl.setAttribute('data-tip', siteConfig.slogan);
   }
   const femaleImg = document.querySelector('.img-female img');
-  if (femaleImg && config.femaleQq) femaleImg.src = qqAvatar(config.femaleQq, 640);
+  if (femaleImg && siteConfig.femaleQq) femaleImg.src = ProjectConfig.qqAvatar(siteConfig.femaleQq, 640);
   const femaleName = document.querySelector('.img-female span');
-  if (femaleName && config.femaleName) femaleName.textContent = config.femaleName;
+  if (femaleName && siteConfig.femaleName) femaleName.textContent = siteConfig.femaleName;
   const maleImg = document.querySelector('.img-male img');
-  if (maleImg && config.maleQq) maleImg.src = qqAvatar(config.maleQq, 640);
+  if (maleImg && siteConfig.maleQq) maleImg.src = ProjectConfig.qqAvatar(siteConfig.maleQq, 640);
   const maleName = document.querySelector('.img-male span');
-  if (maleName && config.maleName) maleName.textContent = config.maleName;
+  if (maleName && siteConfig.maleName) maleName.textContent = siteConfig.maleName;
   const icpLink = document.getElementById('footerIcpLink');
-  if (icpLink && config.icpText) icpLink.textContent = config.icpText;
+  if (icpLink && siteConfig.icpText) icpLink.textContent = siteConfig.icpText;
   const copyEl = document.getElementById('footerCopyright');
-  if (copyEl && config.copyright) copyEl.textContent = config.copyright;
+  if (copyEl && siteConfig.copyright) {
+    // 版权文案：sys_config 的 copyright 为年份，门户端负责拼接完整版权行
+    copyEl.textContent = 'Copyright © ' + siteConfig.copyright + ' All Rights Reserved.';
+  }
   // 计时起点可能被配置改变，配置就绪后重渲染计时器
   renderLoveTime(siteConfig.loveStartDate);
 }
@@ -519,19 +515,9 @@ async function applySiteConfig() {
  * 所有按需初始化均以元素存在性判断，保证在任意页面重复调用安全。
  */
 window.initPortalPage = function () {
-  // 站点展示配置：异步拉取（后台口子 /site/config），就绪后覆盖
+  // 站点展示配置：统一经 ProjectConfig（sys_config）异步拉取，就绪后覆盖
   // logo / 文字说明 / 头像 / 名字 / ICP / 版权，并按配置的计时起点重渲染计时器。
-  // 未就绪期间页面先展示 Thymeleaf 片段内置文案，与默认配置一致，无感切换。
   applySiteConfig();
-  // logo 注入（配置到达前的兜底，站点名不再硬编码在页面里）
-  const logoEl = document.querySelector('.alogo');
-  if (logoEl && !logoEl.textContent.trim()) logoEl.textContent = siteConfig.logo;
-  // slogan 注入（配置到达前的兜底）
-  const sloganEl = document.querySelector('.wenan');
-  if (sloganEl && !sloganEl.textContent.trim()) sloganEl.textContent = siteConfig.slogan;
-  // 页脚版权注入（配置到达前的兜底）
-  const copyEl = document.getElementById('footerCopyright');
-  if (copyEl) copyEl.textContent = siteConfig.copyright;
 
   initHeaderScrollColor();
   initTooltip();
