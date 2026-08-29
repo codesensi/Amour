@@ -16,10 +16,6 @@
     <link href="/admin/assets/css/app.min.css" rel="stylesheet" type="text/css"/>
     <link href="/assets/admin/css/loading.css" rel="stylesheet">
     <!-- DataTables 相关 vendor css（本页访问记录表格使用） -->
-    <link href="/admin/assets/css/vendor/dataTables.bootstrap4.css" rel="stylesheet" type="text/css"/>
-    <link href="/admin/assets/css/vendor/responsive.bootstrap4.css" rel="stylesheet" type="text/css"/>
-    <link href="/admin/assets/css/vendor/buttons.bootstrap4.css" rel="stylesheet" type="text/css"/>
-    <link href="/admin/assets/css/vendor/select.bootstrap4.css" rel="stylesheet" type="text/css"/>
     <!-- third party css end -->
 </head>
 
@@ -511,21 +507,7 @@
                         <div class="card">
                             <div class="card-body">
                                 <h4 class="header-title mb-3 size_18">非法访问列表</h4>
-                                <table id="basic-datatable" class="table dt-responsive nowrap" width="100%">
-                                    <thead>
-                                    <tr>
-                                        <th>序号</th>
-                                        <th>访问时间</th>
-                                        <th>非法文件路径</th>
-                                        <th>IP地址</th>
-                                        <th>IP归属地</th>
-                                    </tr>
-                                    </thead>
-
-                                    <tbody>
-                                    <!-- 演示数据：原站由后端循环输出非法访问记录，后端接口实现后由接口渲染 -->
-                                    </tbody>
-                                </table>
+                                <table id="basic-datatable" lay-filter="basic-datatable"></table>
 
                             </div> <!-- end card body-->
                         </div> <!-- end card -->
@@ -556,17 +538,6 @@
 <script src="/admin/assets/js/app.min.js"></script>
 
 <!-- third party js（DataTables 全套，本页访问记录表格使用） -->
-<script src="/admin/assets/js/vendor/jquery.dataTables.min.js"></script>
-<script src="/admin/assets/js/vendor/dataTables.bootstrap4.js"></script>
-<script src="/admin/assets/js/vendor/dataTables.responsive.min.js"></script>
-<script src="/admin/assets/js/vendor/responsive.bootstrap4.min.js"></script>
-<script src="/admin/assets/js/vendor/dataTables.buttons.min.js"></script>
-<script src="/admin/assets/js/vendor/buttons.bootstrap4.min.js"></script>
-<script src="/admin/assets/js/vendor/buttons.html5.min.js"></script>
-<script src="/admin/assets/js/vendor/buttons.flash.min.js"></script>
-<script src="/admin/assets/js/vendor/buttons.print.min.js"></script>
-<script src="/admin/assets/js/vendor/dataTables.keyTable.min.js"></script>
-<script src="/admin/assets/js/vendor/dataTables.select.min.js"></script>
 <!-- third party js ends -->
 <!-- 后台 ESM 入口：登录完整校验、请求守卫、外壳初始化与 pjax 页面模块调度 -->
 <script type="module" src="/admin/js/main.js"></script>

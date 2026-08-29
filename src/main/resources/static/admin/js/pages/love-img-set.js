@@ -3,24 +3,71 @@
  */
 import { navigate as pjaxNavigate } from '/assets/common/pjax.js';
 import { toast } from '/assets/common/toast.js';
+import { loadLayui } from '/assets/common/layui.js';
+import { renderAdminTable } from '../datatable-init.js';
+
+/** 恋爱相册列表演示数据（原站静态行迁移；后端接口实现后由 table.url 取数） */
+const LOVE_IMG_ROWS = [
+    { id: 2, desc: '我们结婚啦', date: '2022-08-15' }
+];
 
 export function init() {
+    // 恋爱相册列表：layui table 常规页码分页
+    renderAdminTable({
+        cols: [[
+            { type: 'numbers', title: '序号', width: 70 },
+            { field: 'desc', title: '图片描述', minWidth: 200 },
+            { field: 'date', title: '日期', width: 180 },
+            { title: '操作', width: 220, templet: function (d) {
+                return '<a href="javascript:void(0);" class="js-mock-edit">'
+                    + '<button type="button" class="btn btn-secondary btn-rounded"><i class=" mdi mdi-clipboard-text-play-outline mr-1"></i>修改</button></a> '
+                    + '<a href="javascript:void(0);" class="delete-btn" data-id="' + d.id + '" data-desc="' + d.desc + '">'
+                    + '<button type="button" class="btn btn-danger btn-rounded"><i class=" mdi mdi-delete-empty mr-1"></i>删除</button></a>';
+            } }
+        ]],
+        data: LOVE_IMG_ROWS
+    });
+
+    // 表格行内按钮（事件委托）：layui table 动态渲染的行必须用委托才能命中。
+    // 绑定在内容区外壳（pjax 不替换外壳，_rowBtnBound 防重入叠加）
+    const page = document.querySelector('.content-page');
+    if (page && !page._rowBtnBound) {
+        page._rowBtnBound = true;
+        page.addEventListener('click', function (e) {
+            // 修改相册：原站跳转编辑页（modImg.php?id=x），对应页面暂未迁移，走演示提示
+            const editBtn = e.target.closest('.js-mock-edit');
+            if (editBtn) {
+                e.preventDefault();
+                demoTip();
+                return;
+            }
+            // 删除相册：读取 data-id / data-desc 后走 layer.confirm 确认
+            const delBtn = e.target.closest('.delete-btn');
+            if (delBtn) {
+                e.preventDefault();
+                del(delBtn.dataset.id, delBtn.dataset.desc);
+            }
+        });
+    }
+
     // ==================== 页面交互脚本（照搬原站公共提交脚本，mock 化改造） ====================
 
     // 演示提示：原站"新增/修改"按钮为页面跳转（loveImgAdd.php / modImg.php），对应页面暂未迁移
     function demoTip() {
         toast.info("演示数据：新增/编辑相册页面暂未开放", "Like_Girl");
     }
-    window.demoTip = demoTip; // HTML onclick 属性引用，需暴露到全局
+    window.demoTip = demoTip; // HTML 头部"新增"按钮 onclick 属性引用，需暴露到全局
 
-    // 删除相册：原站为跳转 delImg.php?id=... 真实删除，现 mock 为演示提示
+    // 删除相册：原站为跳转 delImg.php?id=... 真实删除；现阶段后端接口未实现，
+    // mock 为 layer.confirm 确认 + 演示提示，接口实现后恢复为真实删除请求
     function del(id, imgText) {
-        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
-        if (confirm('您确认要删除描述为 ' + imgText + ' 的相册图片吗')) {
-            toast.info("演示数据：删除操作暂未开放", "Like_Girl");
-        }
+        loadLayui('layer').then(function (m) {
+            m[0].confirm('您确认要删除描述为 ' + imgText + ' 的相册图片吗', { title: '删除确认' }, function (index) {
+                m[0].close(index);
+                toast.info("演示数据：删除操作暂未开放", "Like_Girl");
+            });
+        });
     }
-    window.del = del; // HTML href="javascript:del(...)" 引用，需暴露到全局
 
     // 原站此脚本末尾的 loadModalContent()（请求 wiki.kikiw.cn/modalData.php 填充版本公告模态框）
     // 属于外部站点依赖且本页无对应模态框，已按改造要求移除。

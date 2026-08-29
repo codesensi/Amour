@@ -1,8 +1,12 @@
 import { toast } from '/assets/common/toast.js';
+import { loadLayui } from '/assets/common/layui.js';
 /**
  * 全局设置 页面模块（由 pjax 页面调度加载）。
  */
 export function init() {
+    // select 下拉改由 layui form 渲染（Webanimation），取值仍走原生 val()
+    loadLayui('form').then(function (m) { m[0].render('select'); });
+
     // 原站遗留的账号/密码格式校验函数，按原样保留（表单未绑定 onsubmit，不会自动触发）
     function check() {
         let adminName = document.getElementsByName('adminName')[0].value.trim();

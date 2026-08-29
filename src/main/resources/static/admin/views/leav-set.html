@@ -16,10 +16,6 @@
     <link href="/admin/assets/css/app.min.css" rel="stylesheet" type="text/css"/>
     <link href="/assets/admin/css/loading.css" rel="stylesheet">
     <!-- 第三方 DataTables 样式（本页表格需要） -->
-    <link href="/admin/assets/css/vendor/dataTables.bootstrap4.css" rel="stylesheet" type="text/css" />
-    <link href="/admin/assets/css/vendor/responsive.bootstrap4.css" rel="stylesheet" type="text/css" />
-    <link href="/admin/assets/css/vendor/buttons.bootstrap4.css" rel="stylesheet" type="text/css" />
-    <link href="/admin/assets/css/vendor/select.bootstrap4.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
@@ -525,66 +521,7 @@
                                         共<b>1</b>条
                                     </button>
                                 </h4>
-                                <table id="basic-datatable" class="table dt-responsive nowrap" width="100%">
-                                    <thead>
-                                        <tr>
-                                            <th>序号</th>
-                                            <th>留言内容</th>
-                                            <th>Date</th>
-                                            <th>Name</th>
-                                            <th>QQ</th>
-                                            <th>IP</th>
-                                            <th style="width: 125px;">Action</th>
-                                        </tr>
-                                    </thead>
-
-                                    <!-- 原站表单提交至 littleupda.php，现为静态演示数据，无提交动作 -->
-                                    <form class="needs-validation">
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <div class="SerialNumber">
-                                                        1
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="textHide">
-                                                        Like Girl 5.2.1-Stable 默认留言
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <small class="text-muted">2025-09-02 16:24:09
-                                                        <div class="color">12月前</div>
-                                                    </small>
-                                                </td>
-                                                <td>
-                                                    <h5><span class="badge badge-success-lighten"><i
-                                                            class="mdi mdi-account-circle mr-1 rihjt-0"></i>
-                                                        Ki.</span>
-                                                    </h5>
-                                                </td>
-                                                <td>
-                                                    3439780232
-                                                </td>
-                                                <td>
-                                                    <h5>
-                                                        <span
-                                                            class="badge badge-danger-lighten">223.104.79.236</span>
-                                                    </h5>
-                                                    <i>广东</i>
-                                                </td>
-                                                <td>
-                                                    <a class="delete-btn" data-id="1" data-content="Like Girl 5.2.1-Stable 默认留言">
-                                                        <button style="white-space: nowrap;" type="button"
-                                                            class="btn btn-danger btn-rounded">
-                                                            <i class=" mdi mdi-delete-empty mr-1"></i>删除
-                                                        </button>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </form>
-                                </table>
+                                <table id="basic-datatable" lay-filter="basic-datatable"></table>
 
                             </div> <!-- end card body-->
                         </div> <!-- end card -->
@@ -623,17 +560,6 @@
 <script src="/admin/assets/js/app.min.js"></script>
 
 <!-- third party js -->
-<script src="/admin/assets/js/vendor/jquery.dataTables.min.js"></script>
-<script src="/admin/assets/js/vendor/dataTables.bootstrap4.js"></script>
-<script src="/admin/assets/js/vendor/dataTables.responsive.min.js"></script>
-<script src="/admin/assets/js/vendor/responsive.bootstrap4.min.js"></script>
-<script src="/admin/assets/js/vendor/dataTables.buttons.min.js"></script>
-<script src="/admin/assets/js/vendor/buttons.bootstrap4.min.js"></script>
-<script src="/admin/assets/js/vendor/buttons.html5.min.js"></script>
-<script src="/admin/assets/js/vendor/buttons.flash.min.js"></script>
-<script src="/admin/assets/js/vendor/buttons.print.min.js"></script>
-<script src="/admin/assets/js/vendor/dataTables.keyTable.min.js"></script>
-<script src="/admin/assets/js/vendor/dataTables.select.min.js"></script>
 <!-- third party js ends -->
 
 <!-- 后台 ESM 入口：登录校验、外壳初始化、pjax 与页面模块调度 -->

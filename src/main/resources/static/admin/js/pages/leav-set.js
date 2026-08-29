@@ -3,6 +3,28 @@
  */
 import { navigate as pjaxNavigate } from '/assets/common/pjax.js';
 import { toast } from '/assets/common/toast.js';
+import { loadLayui } from '/assets/common/layui.js';
+import { renderAdminTable } from '../datatable-init.js';
+
+/** 留言列表演示数据（原站静态行迁移；后端接口实现后由 table.url 取数） */
+const MESSAGES = [
+    {
+        id: 1,
+        content: 'Like Girl 5.2.1-Stable 默认留言',
+        date: '2025-09-02 16:24:09',
+        name: 'Ki.',
+        qq: '3439780232',
+        ip: '223.104.79.236',
+        region: '广东'
+    }
+];
+
+/** HTML 转义（表格 templet 拼接防注入；后端接入真实数据后同样生效） */
+function esc(str) {
+    return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+};
 
 export function init() {
     $(function () {
@@ -13,23 +35,45 @@ export function init() {
         }
     });
 
-    // 删除留言按钮（事件委托）：先弹出原站确认框，确认后给出演示提示，不做真实删除
-    document.addEventListener('click', function (e) {
-        let el = e.target.closest('.delete-btn');
-        if (!el) return;
-
-        e.preventDefault();
-        let id = el.dataset.id;
-        let content = el.dataset.content;
-        del(id, content);
+    // 留言列表：layui table 常规页码分页
+    renderAdminTable({
+        cols: [[
+            { type: 'numbers', title: '序号', width: 70 },
+            { field: 'content', title: '留言内容', minWidth: 200, templet: function (d) { return esc(d.content); } },
+            { field: 'date', title: 'Date', width: 180 },
+            { field: 'name', title: 'Name', width: 130 },
+            { field: 'qq', title: 'QQ', width: 130 },
+            { field: 'ip', title: 'IP', width: 180, templet: function (d) { return '<span class="badge badge-danger-lighten">' + esc(d.ip) + '</span> <i>' + esc(d.region) + '</i>'; } },
+            { title: 'Action', width: 130, templet: function (d) {
+                return '<a class="delete-btn" data-id="' + esc(d.id) + '" data-content="' + esc(d.content) + '">'
+                    + '<button type="button" class="btn btn-danger btn-rounded" style="white-space: nowrap;">删除</button></a>';
+            } }
+        ]],
+        data: MESSAGES
     });
+
+    // 删除留言按钮（事件委托）：layer.confirm 确认后给出演示提示，不做真实删除。
+    // 绑定在内容区外壳（pjax 不替换外壳，_bound 防重入叠加）
+    const page = document.querySelector('.content-page');
+    if (page && !page._deleteBtnBound) {
+        page._deleteBtnBound = true;
+        page.addEventListener('click', function (e) {
+            const el = e.target.closest('.delete-btn');
+            if (!el) return;
+            e.preventDefault();
+            del(el.dataset.id, el.dataset.content);
+        });
+    }
 
     // 原站确认后跳转 delleav.php?id=x 执行删除；现为演示数据，仅给出提示
     function del(id, text) {
-        if (confirm('您确认要删除 ' + text + ' 内容吗')) {
-            // 现阶段后端接口未实现，mock 演示提示；接口实现后恢复为真实删除请求
-            toast.warning("演示数据：删除功能暂未接入后端", "Like_Girl");
-        }
+        loadLayui('layer').then(function (m) {
+            m[0].confirm('您确认要删除 ' + text + ' 内容吗', { title: '删除确认' }, function (index) {
+                m[0].close(index);
+                // 现阶段后端接口未实现，mock 演示提示；接口实现后恢复为真实删除请求
+                toast.warning("演示数据：删除功能暂未接入后端", "Like_Girl");
+            });
+        });
     }
 
     // “留言相关设置”按钮：原站跳转 /admin/leavP.php 留言设置页（暂未迁移），演示环境仅提示

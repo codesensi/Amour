@@ -1,13 +1,50 @@
 /**
  * layui 模块加载器（ES Module，两端通用）—— layui.use 的 Promise 化包装。
  *
- * 页面需已以普通脚本加载 layui.js（全模块一体构建）；
- * 组件内部通过本加载器惰性获取 layer/form/laypage 等模块实例，
+ * 页面通常已以普通脚本加载 layui.js（全模块一体构建）；
+ * 若页面遗漏引入，本加载器会按需动态注入 layui.js 并等待就绪（自愈），
+ * 之后组件内部通过本加载器惰性获取 layer/form/laypage 等模块实例，
  * 调用方以 await/then 使用，无需关心 layui.use 的回调时序。
  *
  * 用法：
  *   const [layer, laypage] = await loadLayui('layer', 'laypage');
  */
+
+/** layui.js 的固定路径（与登录页/后台外壳/门户外壳的引入保持一致） */
+const LAYUI_JS = '/assets/layui/2.13.9/layui.js';
+
+/** 动态注入的加载 Promise 缓存：多组件并发调用时只注入一次 */
+let layuiReady = null;
+
+/**
+ * 确保 window.layui 就绪：已存在直接通过；缺失时动态注入 layui.js 并等待加载完成。
+ * @returns {Promise<void>}
+ */
+function ensureLayui() {
+  if (window.layui) {
+    return Promise.resolve();
+  }
+  if (!layuiReady) {
+    layuiReady = new Promise(function (resolve, reject) {
+      var script = document.createElement('script');
+      script.src = LAYUI_JS;
+      script.onload = function () {
+        if (window.layui) {
+          resolve();
+        } else {
+          reject(new Error('layui.js 加载完成但全局 layui 未就绪'));
+        }
+      };
+      script.onerror = function () {
+        // 失败时清空缓存，允许后续重试
+        layuiReady = null;
+        reject(new Error('layui 未加载：动态引入 ' + LAYUI_JS + ' 失败'));
+      };
+      document.head.appendChild(script);
+    });
+  }
+  return layuiReady;
+}
 
 /**
  * 加载指定的 layui 模块。
@@ -15,13 +52,11 @@
  * @returns {Promise<Array>} 按传入顺序返回模块实例数组
  */
 export function loadLayui(...names) {
-  return new Promise(function (resolve, reject) {
-    if (!window.layui) {
-      reject(new Error('layui 未加载：页面需先以普通脚本引入 /assets/layui/2.13.9/layui.js'));
-      return;
-    }
-    window.layui.use(names, function () {
-      resolve(names.map(function (n) { return window.layui[n]; }));
+  return ensureLayui().then(function () {
+    return new Promise(function (resolve) {
+      window.layui.use(names, function () {
+        resolve(names.map(function (n) { return window.layui[n]; }));
+      });
     });
   });
 }

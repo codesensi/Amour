@@ -1,8 +1,12 @@
 import { toast } from '/assets/common/toast.js';
+import { loadLayui } from '/assets/common/layui.js';
 /**
  * 基本设置 页面模块（由 pjax 页面调度加载）。
  */
 export function init() {
+    // select 下拉改由 layui form 渲染（WebBlur/WebPjax），取值仍走原生 val()
+    loadLayui('form').then(function (m) { m[0].render('select'); });
+
     // 基本设置表单提交（原站通过 $.ajax 提交至 adminPost.php，取值逻辑保留）
     $("#adminPost").click(function () {
         var title = $("input[name='title']").val();

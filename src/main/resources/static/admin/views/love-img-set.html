@@ -17,10 +17,6 @@
     <link href="/admin/assets/css/app.min.css" rel="stylesheet" type="text/css"/>
     <link href="/assets/admin/css/loading.css" rel="stylesheet">
     <!-- 本页表格使用 DataTables：vendor css -->
-    <link href="/admin/assets/css/vendor/dataTables.bootstrap4.css" rel="stylesheet" type="text/css"/>
-    <link href="/admin/assets/css/vendor/responsive.bootstrap4.css" rel="stylesheet" type="text/css"/>
-    <link href="/admin/assets/css/vendor/buttons.bootstrap4.css" rel="stylesheet" type="text/css"/>
-    <link href="/admin/assets/css/vendor/select.bootstrap4.css" rel="stylesheet" type="text/css"/>
 </head>
 
 <body>
@@ -517,41 +513,7 @@
                                         </button>
                                     </a>
                                 </h4>
-                                <table id="basic-datatable" class="table dt-responsive nowrap" width="100%">
-                                    <thead>
-                                    <tr>
-                                        <th>序号</th>
-                                        <th>图片描述</th>
-                                        <th>日期</th>
-                                        <th style="width:150px;">操作</th>
-                                    </tr>
-                                    </thead>
-
-
-                                    <tbody>
-                                    <tr>
-                                        <td>
-                                            <div class="SerialNumber">
-                                                1
-                                            </div>
-                                        </td>
-                                        <td>我们结婚啦</td>
-                                        <td>2022-08-15</td>
-                                        <td>
-                                            <!-- 原站此处跳转编辑页（modImg.php?id=2），对应页面暂未迁移，改为演示提示 -->
-                                            <a href="javascript:void(0);" onclick="demoTip()">
-                                                <button type="button" class="btn btn-secondary btn-rounded">
-                                                    <i class=" mdi mdi-clipboard-text-play-outline mr-1"></i>修改
-                                                </button>
-                                            </a>
-                                            <a href="javascript:del(2,'我们结婚啦');">
-                                                <button type="button" class="btn btn-danger btn-rounded">
-                                                    <i class=" mdi mdi-delete-empty mr-1"></i>删除
-                                                </button>
-                                            </a></td>
-                                    </tr>
-                                    </tbody>
-                                </table>
+                                <table id="basic-datatable" lay-filter="basic-datatable"></table>
 
                             </div> <!-- end card body-->
                         </div> <!-- end card -->
@@ -582,17 +544,6 @@
 <script src="/admin/assets/js/app.min.js"></script>
 
 <!-- 本页表格使用 DataTables：vendor js -->
-<script src="/admin/assets/js/vendor/jquery.dataTables.min.js"></script>
-<script src="/admin/assets/js/vendor/dataTables.bootstrap4.js"></script>
-<script src="/admin/assets/js/vendor/dataTables.responsive.min.js"></script>
-<script src="/admin/assets/js/vendor/responsive.bootstrap4.min.js"></script>
-<script src="/admin/assets/js/vendor/dataTables.buttons.min.js"></script>
-<script src="/admin/assets/js/vendor/buttons.bootstrap4.min.js"></script>
-<script src="/admin/assets/js/vendor/buttons.html5.min.js"></script>
-<script src="/admin/assets/js/vendor/buttons.flash.min.js"></script>
-<script src="/admin/assets/js/vendor/buttons.print.min.js"></script>
-<script src="/admin/assets/js/vendor/dataTables.keyTable.min.js"></script>
-<script src="/admin/assets/js/vendor/dataTables.select.min.js"></script>
 
 <!-- 后台 ESM 入口：登录校验、外壳初始化、pjax 与页面模块调度 -->
 <script type="module" src="/admin/js/main.js"></script>
