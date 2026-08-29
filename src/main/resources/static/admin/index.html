@@ -7,9 +7,9 @@
 
     <!-- 登录态守卫：未登录则跳转登录页（在渲染前同步执行，避免闪屏） -->
     <script src="/admin/js/guard.js"></script>
-    <!-- layui 基础样式（一体构建，含表格/弹层/导航等全部组件样式） -->
+    <!-- layui 基础样式（一体构建，含布局/表格/弹层/导航等全部组件样式） -->
     <link href="/assets/layui/2.13.9/css/layui.css" rel="stylesheet" type="text/css"/>
-    <!-- 管理端自建布局与 layui 适配样式（含分页条、工具类等价实现） -->
+    <!-- 管理端少量辅助样式（中性工具类 + 折叠态，详见 admin.css） -->
     <link href="/assets/admin/css/admin.css" rel="stylesheet" type="text/css"/>
     <link href="/assets/admin/css/loading.css" rel="stylesheet">
 </head>
@@ -28,36 +28,44 @@
     </div>
 </div>
 
-<!-- layui 管理布局：顶栏 + 侧栏 + 内容区 -->
-<div class="layui-layout layui-layout-admin admin-layout">
+<!-- layui 原生管理布局：顶栏 + 侧栏 + 内容区 -->
+<div class="layui-layout layui-layout-admin">
 
-    <!-- 顶栏 -->
-    <div class="layui-header admin-header">
-        <a href="/admin/index.html" class="admin-logo">
-            <span class="js-site-name">后台管理</span>
-        </a>
-        <a href="javascript:;" class="admin-menu-toggle js-menu-toggle" title="收起/展开侧栏">
-            <i class="layui-icon layui-icon-spread-left"></i>
-        </a>
-        <div class="admin-header-right">
-            <a href="/admin/views/user.html" title="全局设置">
-                <i class="layui-icon layui-icon-set"></i>
-            </a>
-            <span class="admin-user">
-                <img src="" alt="user" class="js-user-avatar">
-                <span class="js-username">Admin</span>
-            </span>
-            <a href="javascript:;" class="js-logout" title="退出登录">
-                <i class="layui-icon layui-icon-logout"></i>
-            </a>
-        </div>
+    <!-- 顶栏：logo + 左侧操作 + 右侧用户区（layui 原生导航结构） -->
+    <div class="layui-header">
+        <div class="layui-logo"><span class="js-site-name">后台管理</span></div>
+        <ul class="layui-nav layui-layout-left">
+            <li class="layui-nav-item">
+                <a href="javascript:;" class="js-menu-toggle" title="收起/展开侧栏">
+                    <i class="layui-icon layui-icon-spread-left"></i>
+                </a>
+            </li>
+        </ul>
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item">
+                <a href="/admin/views/user.html" title="全局设置">
+                    <i class="layui-icon layui-icon-set"></i>
+                </a>
+            </li>
+            <li class="layui-nav-item">
+                <a href="javascript:;">
+                    <img src="" alt="user" class="layui-nav-img js-user-avatar">
+                    <span class="js-username">Admin</span>
+                    <i class="layui-icon layui-icon-triangle-d"></i>
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a href="/admin/views/user.html"><i class="layui-icon layui-icon-set"></i> 全局设置</a></dd>
+                    <dd><a href="javascript:;" class="js-logout"><i class="layui-icon layui-icon-logout"></i> 退出登录</a></dd>
+                </dl>
+            </li>
+        </ul>
     </div>
 
     <!-- 侧边导航栏 -->
-    <div class="layui-side admin-side">
+    <div class="layui-side">
         <div class="layui-side-scroll">
             <div class="side-user">
-                <img src="" alt="user" class="js-user-avatar">
+                <img src="" alt="user" class="layui-nav-img js-user-avatar">
                 <span class="js-site-name">后台管理</span>
             </div>
             <ul class="layui-nav layui-nav-tree" lay-filter="adminMenu">
@@ -93,20 +101,20 @@
     </div>
 
     <!-- 内容页面 -->
-    <div class="layui-body admin-body">
+    <div class="layui-body">
         <div class="content-page">
             <div class="content">
 
-                <div class="row">
-                    <div class="col-md-6 col-xl-4">
+                <div class="layui-row layui-col-space15">
+                    <div class="layui-col-sm6 layui-col-lg4">
                         <div class="layui-card">
                             <div class="layui-card-body">
-                                <div class="row align-items-center">
-                                    <div class="col-6">
+                                <div class="layui-row layui-col-space15">
+                                    <div class="layui-col-xs6">
                                         <h5 class="text-muted text-truncate" title="留言祝福">留言祝福</h5>
                                         <h3 class="my-2 py-1">1<i>条</i></h3>
                                     </div>
-                                    <div class="col-6" style="text-align: center;">
+                                    <div class="layui-col-xs6" style="text-align: center;">
                                         <i class="layui-icon layui-icon-message admin-stat-icon" style="color:#FA6666;"></i>
                                     </div>
                                 </div>
@@ -114,15 +122,15 @@
                         </div>
                     </div>
 
-                    <div class="col-md-6 col-xl-4">
+                    <div class="layui-col-sm6 layui-col-lg4">
                         <div class="layui-card">
                             <div class="layui-card-body">
-                                <div class="row align-items-center">
-                                    <div class="col-6">
+                                <div class="layui-row layui-col-space15">
+                                    <div class="layui-col-xs6">
                                         <h5 class="text-muted text-truncate" title="点点滴滴">点点滴滴</h5>
                                         <h3 class="my-2 py-1">1<i>条</i></h3>
                                     </div>
-                                    <div class="col-6" style="text-align: center;">
+                                    <div class="layui-col-xs6" style="text-align: center;">
                                         <i class="layui-icon layui-icon-list admin-stat-icon" style="color:#F779D4;"></i>
                                     </div>
                                 </div>
@@ -130,15 +138,15 @@
                         </div>
                     </div>
 
-                    <div class="col-md-6 col-xl-4">
+                    <div class="layui-col-sm6 layui-col-lg4">
                         <div class="layui-card">
                             <div class="layui-card-body">
-                                <div class="row align-items-center">
-                                    <div class="col-6">
+                                <div class="layui-row layui-col-space15">
+                                    <div class="layui-col-xs6">
                                         <h5 class="text-muted text-truncate" title="恋爱清单">恋爱清单</h5>
                                         <h3 class="my-2 py-1">83<i>条</i></h3>
                                     </div>
-                                    <div class="col-6" style="text-align: center;">
+                                    <div class="layui-col-xs6" style="text-align: center;">
                                         <i class="layui-icon layui-icon-location admin-stat-icon" style="color:#C98FFF;"></i>
                                     </div>
                                 </div>
@@ -147,12 +155,12 @@
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-12">
+                <div class="layui-row layui-col-space15">
+                    <div class="layui-col-md12">
                         <div class="layui-card">
                             <div class="layui-card-body">
-                                <div class="row mb-2">
-                                    <div class="col-lg-4">
+                                <div class="layui-row layui-col-space15 mb-2">
+                                    <div class="layui-col-md4">
                                         <button type="button" class="layui-btn layui-btn-danger layui-btn-sm"><i class="layui-icon layui-icon-message"></i>
                                             最新留言
                                         </button>
@@ -160,7 +168,7 @@
                                 </div>
 
                                 <div class="table-responsive">
-                                    <table class="table table-centered mb-0">
+                                    <table class="layui-table mb-0">
                                         <thead>
                                             <tr>
                                                 <th>评论内容</th>

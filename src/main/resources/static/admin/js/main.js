@@ -107,7 +107,7 @@ initPjax({
 // 按当前地址高亮侧栏菜单项
 function setActiveMenu(url) {
   const path = new URL(url, location.href).pathname;
-  document.querySelectorAll('.admin-side .layui-nav-item').forEach(function (li) {
+  document.querySelectorAll('.layui-side .layui-nav-item').forEach(function (li) {
     const a = li.querySelector('a');
     li.classList.toggle('layui-this', a && a.getAttribute('href') === path);
   });
