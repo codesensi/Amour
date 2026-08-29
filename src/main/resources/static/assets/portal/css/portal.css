@@ -60,14 +60,47 @@ input, textarea {
 }
 
 /* 页面渐变背景：取主题四色（紫 #986fee / 蓝紫 #8695e6 / 蓝 #68b7dd / 青 #18d7d3）
-   的低透明度淡染，纵向柔和过渡保证白底卡片的可读性；
-   另叠两处固定在首屏附近的柔光斑（右上偏紫、左下偏青），呼应首屏壁纸的色彩氛围 */
-body {
+   的低透明度淡染，纵向柔和过渡保证白底卡片的可读性。
+   渐变由 body::before（固定视口大小、z-index -1）承载：
+   两枚大光斑以 20 秒周期沿三关键帧路径巡游（透明度 0.2 档保证肉眼可感知），
+   线性底带静止铺底；重绘区域限定在视口内，不随页面高度增长。 */
+html {
   background-color: #fff;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
   background-image:
-    radial-gradient(120rem 40rem at 85vw 0, rgba(152, 111, 238, 0.09), transparent 70%),
-    radial-gradient(100rem 36rem at 8vw 90vh, rgba(24, 215, 211, 0.07), transparent 70%),
-    linear-gradient(180deg, rgba(134, 149, 230, 0.06), rgba(104, 183, 221, 0.05) 50%, rgba(24, 215, 211, 0.06));
+    radial-gradient(closest-side, rgba(152, 111, 238, 0.32), transparent),
+    radial-gradient(closest-side, rgba(24, 215, 211, 0.26), transparent),
+    linear-gradient(180deg, rgba(134, 149, 230, 0.09), rgba(104, 183, 221, 0.08) 50%, rgba(24, 215, 211, 0.09));
+  background-repeat: no-repeat;
+  background-size: 70rem 70rem, 56rem 56rem, cover;
+  animation: portal-bg-flow 20s ease-in-out infinite;
+}
+
+/* 光斑巡游路径：紫斑（第一层）自屏外左上绕向右侧，
+   青斑（第二层）反向对漂；首尾位置相同保证循环无跳变 */
+@keyframes portal-bg-flow {
+  0%, 100% {
+    background-position: -12rem 22%, calc(100% + 10rem) 78%, 0 0;
+  }
+  33% {
+    background-position: 55% -14rem, 28% 110%, 0 0;
+  }
+  66% {
+    background-position: 110% 50%, 65% -10rem, 0 0;
+  }
+}
+
+/* 系统开启"减少动态效果"时静止，保留静态渐变 */
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    animation: none;
+  }
 }
 
 /* 文本选中色（照搬） */
