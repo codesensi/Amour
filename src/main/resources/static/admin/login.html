@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Amour - 后台登录</title>
+  <title>后台登录</title>
   <link rel="shortcut icon" href="/assets/portal/img/favicon.ico">
   <link rel="stylesheet" href="/assets/layui/2.13.9/css/layui.css">
   <style>
@@ -252,7 +252,7 @@
         </div>
       </div>
       <div class="brand-copy">
-        <div class="brand-name" id="brandName">Amour</div>
+        <div class="brand-name" id="brandName"></div>
         <div class="brand-slogan" id="brandSlogan"></div>
         <div class="brand-days" id="brandDays"></div>
       </div>
@@ -443,7 +443,11 @@
 
       // 左屏品牌信息：站名/标语/双头像/恋爱计时，全部来自项目配置（mock 阶段读 config.js 内置表）
       ProjectConfig.load(['name', 'site.slogan', 'site.female-qq', 'site.male-qq', 'site.love-start-date']).then(function (config) {
-        $('#brandName').text(config['name'] || 'Amour');
+        // 站名与标签标题均取自配置（name），页面内不硬编码站点名
+        if (config['name']) {
+          $('#brandName').text(config['name']);
+          document.title = config['name'] + ' - 后台登录';
+        }
         // 标语以打字机效果逐字呈现（偏好减弱动效时直接显示完整文案）
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
           $('#brandSlogan').text(config['site.slogan'] || '');

@@ -3,15 +3,25 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Amour - 后台管理</title>
+  <title>后台管理</title>
   <!-- 登录态守卫：未登录则跳转登录页；已登录停留在后台管理首页（在 layui 渲染前执行，避免闪屏） -->
   <script src="/admin/js/auth.js"></script>
+  <script src="/assets/common/config.js?v=2"></script>
+  <script>
+    // 站点名（浏览器标签 + 顶栏 Logo）取自站点配置 name，页面内不硬编码
+    ProjectConfig.get('name').then(function (name) {
+      if (!name) return;
+      document.title = name + ' - 后台管理';
+      const siteNameEl = document.getElementById('adminSiteName');
+      if (siteNameEl) siteNameEl.textContent = name + ' 后台管理';
+    });
+  </script>
   <script>
     if (!AdminAuth.isLoggedIn()) {
       location.replace('/admin/login.html');
     }
   </script>
-  <link rel="icon" href="data:,">
+  <link rel="shortcut icon" href="/assets/portal/img/favicon.ico">
   <link rel="stylesheet" href="/assets/layui/2.13.9/css/layui.css">
   <style>
     /* 后台主框架布局样式 */
@@ -55,7 +65,7 @@
 <body>
   <!-- 顶部栏 -->
   <div class="admin-header">
-    <div class="admin-logo"><i class="layui-icon layui-icon-heart-fill"></i>Amour 后台管理</div>
+    <div class="admin-logo"><i class="layui-icon layui-icon-heart-fill"></i><span id="adminSiteName">后台管理</span></div>
     <div class="admin-user" id="btnLogout" title="退出登录">
       <i class="layui-icon layui-icon-username"></i> <span id="adminUsername">sadmin</span>
       <i class="layui-icon layui-icon-down"></i>
