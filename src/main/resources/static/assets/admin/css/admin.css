@@ -190,14 +190,7 @@
 }
 
 .admin-body .content {
-    min-height: calc(100% - 60px);
-}
-
-.admin-body .footer {
-    padding: 20px 0 8px;
-    color: #9aa3af;
-    font-size: .82rem;
-    text-align: center;
+    min-height: 100%;
 }
 
 /* 侧栏折叠态：内容区占满全宽 */
@@ -511,10 +504,3 @@ ul.text {
 }
 
 .margin_0 { margin: 0 !important; }
-
-.footer_center {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    text-align: center;
-}
