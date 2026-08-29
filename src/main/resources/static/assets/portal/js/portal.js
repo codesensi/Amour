@@ -2,16 +2,14 @@
  * Amour 门户脚本 —— 照搬 Like Girl 5.2.1（ES Module）
  * 职责：站点配置、恋爱计时器、data-tip 悬浮提示、顶栏滚动变色、
  *       右侧悬浮栏交互、以及"未实现后端接口"的统一请求口子（mock 降级）。
- * 依赖：common/config.js（项目配置）、common/pjax.js（编程式导航）；
- *       toastr 为页面上以普通脚本加载的全局库。
+ * 依赖：common/config.js（项目配置）、common/pjax.js（编程式导航）、
+ *       common/toast.js（消息提示）。
  * 原站版权：Copyright (c) 2023 - 2025 by Ki（Like Girl）
  * ===================================================================== */
 
 import { loadConfig, qqAvatar } from '/assets/common/config.js';
 import { navigate as pjaxNavigate } from '/assets/common/pjax.js';
-
-/** 全局 toastr（页面上以普通脚本加载，此处显式桥接） */
-const toastr = window.toastr;
+import { toast } from '/assets/common/toast.js';
 
 /** 侧栏悬浮栏的 HTML onclick 属性引用的函数，模块化后统一挂回全局 */
 window.scrollToTop = function scrollToTop() {
@@ -376,20 +374,20 @@ async function submitMessage() {
   const name = nameInput.value.trim();
   const text = textInput.value.trim();
 
-  if (qq.length === 0) { toastr.warning('请填写QQ号码！', 'Like_Girl'); return false; }
-  if (name.length === 0) { toastr.warning('请填写您的昵称！', 'Like_Girl'); return false; }
+  if (qq.length === 0) { toast.warning('请填写QQ号码！', 'Like_Girl'); return false; }
+  if (name.length === 0) { toast.warning('请填写您的昵称！', 'Like_Girl'); return false; }
   const qqReg = /^[0-9]{6,12}$/;
-  if (!qqReg.test(qq)) { toastr.warning('您的QQ号码格式错误<br/>请输入由6-12位的数字<br/>组成的QQ号码！', 'Like_Girl'); return false; }
-  if (qq === '123456' || qq === '100000' || qq === '1234567') { toastr.warning('我想也许这并不是您的QQ号码...', 'Like_Girl'); return false; }
-  if (text.length === 0) { toastr.warning('请填写您要留言的内容！', 'Like_Girl'); return false; }
-  if (text.length <= 2) { toastr.warning('请填写两个字符以上的内容！', 'Like_Girl'); return false; }
-  if (/^[0-9]+$/.test(text)) { toastr.warning('内容为纯数字 已被拦截！', 'Like_Girl'); return false; }
-  if (new RegExp('[操垃圾傻逼妈]').test(text)) { toastr.warning('您输入的内容是违禁词<br/>请注意您的发言不文明的留言<br/>会被管理员拉进小黑屋喔', 'Like_Girl'); return false; }
+  if (!qqReg.test(qq)) { toast.warning('您的QQ号码格式错误<br/>请输入由6-12位的数字<br/>组成的QQ号码！', 'Like_Girl'); return false; }
+  if (qq === '123456' || qq === '100000' || qq === '1234567') { toast.warning('我想也许这并不是您的QQ号码...', 'Like_Girl'); return false; }
+  if (text.length === 0) { toast.warning('请填写您要留言的内容！', 'Like_Girl'); return false; }
+  if (text.length <= 2) { toast.warning('请填写两个字符以上的内容！', 'Like_Girl'); return false; }
+  if (/^[0-9]+$/.test(text)) { toast.warning('内容为纯数字 已被拦截！', 'Like_Girl'); return false; }
+  if (new RegExp('[操垃圾傻逼妈]').test(text)) { toast.warning('您输入的内容是违禁词<br/>请注意您的发言不文明的留言<br/>会被管理员拉进小黑屋喔', 'Like_Girl'); return false; }
 
   btn.textContent = '留言提交中...';
   btn.disabled = true;
   await portalRequest('sendMessage', { qq: qq, name: name, text: text });
-  toastr.success('留言提交成功！', 'Like_Girl');
+  toast.success('留言提交成功！', 'Like_Girl');
   btn.textContent = '留言成功';
   setTimeout(function () { btn.disabled = false; btn.textContent = '提交留言'; }, 5000);
   loadMessages();
@@ -415,12 +413,12 @@ function initQqAvatar() {
         if (result && result.code === 0 && result.data && result.data.name) {
           document.getElementById('nickname').value = result.data.name;
         } else {
-          toastr.warning('请手动填写昵称', 'Like_Girl');
+          toast.warning('请手动填写昵称', 'Like_Girl');
         }
       })
       .catch(function () {
         clearTimeout(timer);
-        toastr.warning('请手动填写昵称', 'Like_Girl');
+        toast.warning('请手动填写昵称', 'Like_Girl');
       });
   });
 }
