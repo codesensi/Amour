@@ -7,61 +7,80 @@
  * 在此提供等价实现，页面 HTML 无需改动。
  */
 
+/* ===== 设计令牌：主题色 / 圆角 / 阴影统一来源 ===== */
+:root {
+    --admin-primary: #16b777;
+    --admin-primary-soft: rgba(22, 183, 119, .10);
+    --admin-radius: 10px;
+    --admin-shadow-card: 0 1px 2px rgba(16, 34, 60, .04), 0 2px 10px rgba(16, 34, 60, .05);
+    --admin-shadow-hover: 0 4px 16px rgba(16, 34, 60, .10);
+}
+
 /* ===== 管理布局：顶栏 60px + 侧栏 220px ===== */
 .admin-layout {
     height: 100vh;
 }
 
-/* 顶栏 */
+/* 顶栏：白底 + 极淡投影，滚动内容时层次清晰但不生硬 */
 .admin-header {
     background: #fff;
-    box-shadow: 0 1px 4px rgba(0, 21, 41, .08);
+    box-shadow: 0 1px 0 rgba(16, 34, 60, .06);
     display: flex;
     align-items: center;
-    padding: 0 16px;
+    padding: 0 20px;
 }
 
 .admin-logo {
-    color: #16b777;
-    font-size: 1.2rem;
+    color: var(--admin-primary);
+    font-size: 1.15rem;
     font-weight: 700;
+    letter-spacing: .02em;
     margin-right: 16px;
     white-space: nowrap;
 }
 
 .admin-menu-toggle {
-    color: #555;
+    color: #6b7280;
     font-size: 18px;
     padding: 8px 10px;
+    border-radius: 8px;
     cursor: pointer;
+    transition: background .2s, color .2s;
 }
 
 .admin-menu-toggle:hover {
-    color: #16b777;
+    color: var(--admin-primary);
+    background: var(--admin-primary-soft);
 }
 
 .admin-header-right {
     margin-left: auto;
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 8px;
 }
 
 .admin-header-right a {
-    color: #555;
+    color: #6b7280;
     font-size: 16px;
     cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background .2s, color .2s;
 }
 
 .admin-header-right a:hover {
-    color: #16b777;
+    color: var(--admin-primary);
+    background: var(--admin-primary-soft);
 }
 
 .admin-header-right .admin-user {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    color: #555;
+    gap: 8px;
+    color: #4b5563;
+    font-size: .9rem;
+    padding: 4px 8px;
 }
 
 .admin-header-right .admin-user img {
@@ -69,11 +88,12 @@
     height: 30px;
     border-radius: 50%;
     object-fit: cover;
+    box-shadow: 0 0 0 2px rgba(22, 183, 119, .15);
 }
 
-/* 侧栏 */
+/* 侧栏：深蓝灰底 + 微渐变增加纵深 */
 .admin-side {
-    background: #2f3a4a;
+    background: linear-gradient(180deg, #2b3546, #2f3a4a 240px);
 }
 
 .admin-side .layui-side-scroll {
@@ -98,29 +118,37 @@
     object-fit: cover;
 }
 
-/* 侧栏菜单：layui-nav-tree 深色，覆盖绿色主题色 */
+/* 侧栏菜单：layui-nav-tree 深色，菜单项做成带左右留白的圆角条形，
+   选中项加 3px 主题色指示条 */
 .admin-side .layui-nav-tree {
     background-color: transparent;
+    padding: 0 2px;
 }
 
 .admin-side .layui-nav-tree .layui-nav-item a {
-    color: rgba(255, 255, 255, .78);
-    height: 44px;
-    line-height: 44px;
+    color: rgba(255, 255, 255, .72);
+    height: 42px;
+    line-height: 42px;
+    margin: 2px 10px;
+    border-radius: 8px;
+    transition: background .2s, color .2s;
 }
 
 .admin-side .layui-nav-tree .layui-nav-item a:hover {
-    background: rgba(255, 255, 255, .06);
+    background: rgba(255, 255, 255, .07);
+    color: #fff;
 }
 
 .admin-side .layui-nav-tree .layui-nav-itemed > a,
 .admin-side .layui-nav-tree .layui-nav-item a.layui-this {
-    background: rgba(22, 183, 119, .18);
+    background: var(--admin-primary-soft);
     color: #fff;
+    box-shadow: inset 3px 0 0 var(--admin-primary);
 }
 
 .admin-side .layui-nav-tree .layui-nav-item a .layui-icon {
     margin-right: 8px;
+    font-size: 16px;
 }
 
 .admin-side .layui-nav-tree .layui-badge {
@@ -129,12 +157,12 @@
 
 /* 侧栏底部帮助盒 */
 .side-help {
-    margin: 16px 12px;
+    margin: 16px 14px;
     padding: 14px;
     text-align: center;
     color: rgba(255, 255, 255, .66);
     background: rgba(255, 255, 255, .06);
-    border-radius: 8px;
+    border-radius: 12px;
 }
 
 .side-help h5 {
@@ -142,12 +170,12 @@
     margin-bottom: 6px;
 }
 
-/* 内容区 */
+/* 内容区：微冷调浅灰底，衬白卡片 */
 .admin-body {
     left: 220px;
     top: 60px;
-    padding: 20px;
-    background: #f5f6f8;
+    padding: 24px;
+    background: #f6f7f9;
     overflow: auto;
 }
 
@@ -156,9 +184,10 @@
 }
 
 .admin-body .footer {
-    padding: 16px 0;
-    color: #999;
-    font-size: .85rem;
+    padding: 20px 0 8px;
+    color: #9aa3af;
+    font-size: .82rem;
+    text-align: center;
 }
 
 /* 侧栏折叠态：内容区占满全宽 */
@@ -170,9 +199,101 @@ body.side-collapsed .admin-body {
     left: 0;
 }
 
-/* 首页统计卡图标 */
+/* 首页统计卡图标：大字图标重塑为"圆角淡色底 + 中号彩色图标"，
+   底色取图标自身的颜色（内嵌 style 的 color）自动生成淡底 */
 .admin-stat-icon {
-    font-size: 64px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    font-size: 30px !important;
+    border-radius: 16px;
+    background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+/* 统计卡悬停轻微上浮，增强可点暗示 */
+.admin-body .layui-card {
+    border-radius: var(--admin-radius);
+    box-shadow: var(--admin-shadow-card);
+    border: 1px solid rgba(16, 34, 60, .05);
+    transition: box-shadow .25s, transform .25s;
+}
+
+.admin-body .layui-card:hover {
+    box-shadow: var(--admin-shadow-hover);
+    transform: translateY(-2px);
+}
+
+.admin-body .layui-card .layui-card-body {
+    padding: 20px;
+}
+
+/* ===== 数据表格：圆角外壳 + 淡表头 + 行悬停 ===== */
+.admin-body .layui-table-view {
+    border-radius: var(--admin-radius);
+    border-color: rgba(16, 34, 60, .06);
+    box-shadow: var(--admin-shadow-card);
+    margin: 0;
+}
+
+.admin-body .layui-table-view .layui-table-box {
+    border-radius: var(--admin-radius) var(--admin-radius) 0 0;
+    overflow: hidden;
+}
+
+.admin-body .layui-table thead th {
+    background: #fafbfc;
+    color: #5b6472;
+    font-weight: 600;
+}
+
+.admin-body .layui-table tbody tr:hover > td {
+    background: rgba(22, 183, 119, .04);
+}
+
+/* ===== 按钮：圆角化 + 统一过渡 ===== */
+.admin-body .layui-btn {
+    border-radius: 6px;
+    transition: opacity .2s, box-shadow .2s, transform .1s;
+}
+
+.admin-body .layui-btn:not(.layui-btn-disabled):active {
+    transform: translateY(1px);
+}
+
+/* ===== 表单控件：圆角化 + 主题色聚焦描边 ===== */
+.admin-body .layui-input,
+.admin-body .layui-select,
+.admin-body .layui-textarea {
+    border-radius: 6px;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.admin-body .layui-input:focus,
+.admin-body .layui-select:focus,
+.admin-body .layui-textarea:focus {
+    border-color: var(--admin-primary) !important;
+    box-shadow: 0 0 0 3px var(--admin-primary-soft);
+}
+
+/* ===== 内容区滚动条：细圆角、悬停显色 ===== */
+.admin-body::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.admin-body::-webkit-scrollbar-thumb {
+    background: rgba(16, 34, 60, .12);
+    border-radius: 4px;
+}
+
+.admin-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(16, 34, 60, .22);
+}
+
+.admin-body::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 /* ===== 表格分页条：右下角布局 ===== */
@@ -192,12 +313,13 @@ body.side-collapsed .admin-body {
     background-color: #fff !important;
     color: #555 !important;
     margin-left: 4px;
-    border-radius: 3px;
+    border-radius: 6px;
     min-width: 28px;
     text-align: center;
     height: 28px;
     line-height: 26px;
     box-sizing: border-box;
+    transition: color .2s, border-color .2s;
 }
 
 /* 悬停态 */
@@ -209,7 +331,7 @@ body.side-collapsed .admin-body {
 /* 当前页高亮：layui 通过 .layui-laypage-em 色块实现，恢复其圆角胶囊形态 */
 .layui-table-page .layui-laypage .layui-laypage-curr .layui-laypage-em {
     background-color: #16b777 !important;
-    border-radius: 3px;
+    border-radius: 6px;
 }
 
 .layui-table-page .layui-laypage .layui-laypage-curr em {
