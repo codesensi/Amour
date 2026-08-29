@@ -101,9 +101,17 @@
     return get(key).then(function (value) { return String(value).toLowerCase() === 'true'; });
   }
 
+  /**
+   * 拼接 QQ 头像地址：nk 为 QQ 号，s 为尺寸（门户首页 640、留言列表 100），size 缺省 640。
+   */
+  function qqAvatar(qq, size) {
+    return 'https://q1.qlogo.cn/g?b=qq&nk=' + encodeURIComponent(qq) + '&s=' + (size || 640);
+  }
+
   global.ProjectConfig = {
     load: load,
     get: get,
-    isOn: isOn
+    isOn: isOn,
+    qqAvatar: qqAvatar
   };
 })(window);
