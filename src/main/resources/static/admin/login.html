@@ -79,7 +79,7 @@
                  autocomplete="current-password" class="layui-input" lay-affix="eye">
         </div>
       </div>
-      <div class="layui-form-item">
+      <div class="layui-form-item" id="captchaItem" style="display: none;">
         <div class="captcha-row">
           <div class="captcha-box" id="captchaBox" title="点击刷新验证码">
             <img id="captchaImg" src="" alt="验证码" style="display: none;">
@@ -99,6 +99,7 @@
     </form>
   </div>
 
+  <script src="/assets/common/config.js"></script>
   <script src="/admin/js/auth.js"></script>
   <script src="/assets/layui/2.13.9/layui.js"></script>
   <script>
@@ -109,6 +110,9 @@
       AdminAuth.setupAjaxGuard();
 
       let captchaKey = '';
+
+      // 验证码开关当前生效状态：开启时显示验证码并验证必填，关闭时不显示验证码相关内容
+      let captchaEnabled = false;
 
       // 加载验证码：GET /captcha -> Result{success, code, msg, data:{captchaKey, captchaValue}}
       // captchaValue 为 base64 图片 data URI，直接作为 <img> 展示
@@ -134,6 +138,22 @@
       // 点击图片刷新验证码
       $('#captchaBox').on('click', loadCaptcha);
 
+      // 根据项目配置应用验证码开关：
+      // 开启 -> 显示验证码行、输入框必填并加载验证码；关闭 -> 整行隐藏，不显示也不校验验证码
+      function applyCaptchaConfig(enabled) {
+        captchaEnabled = enabled;
+        const $item = $('#captchaItem');
+        const $input = $item.find('input[name="captcha"]');
+        if (captchaEnabled) {
+          $item.show();
+          $input.attr('lay-verify', 'required');
+          loadCaptcha();
+        } else {
+          $item.hide();
+          $input.removeAttr('lay-verify');
+        }
+      }
+
       // MOCK_LOGIN = true：后端 /auth/login 尚未实现，表单校验通过后直接 mock 登录成功，
       // 写入本地登录态并跳转后台管理首页；后端登录接口实现后将其改为 false 即恢复走真实接口
       const MOCK_LOGIN = true;
@@ -157,7 +177,15 @@
           });
           return false; // 阻止表单默认提交
         }
-        const payload = Object.assign({}, data.field, { captchaKey: captchaKey });
+        // 仅在验证码开启时携带验证码参数
+        const payload = {
+          username: data.field.username,
+          password: data.field.password
+        };
+        if (captchaEnabled) {
+          payload.captcha = data.field.captcha;
+          payload.captchaKey = captchaKey;
+        }
         $.ajax({
           url: '/auth/login',
           type: 'POST',
@@ -184,7 +212,9 @@
         return false; // 阻止表单默认提交
       });
 
-      loadCaptcha();
+      // 应用项目配置的验证码开关：mock 阶段读取 config.js 内置配置表，
+      // 后端公开配置接口实现后 ProjectConfig 自动切换为真实数据（sys_config: captcha.enabled）
+      ProjectConfig.isOn('captcha.enabled').then(applyCaptchaConfig);
     });
   </script>
 </body>

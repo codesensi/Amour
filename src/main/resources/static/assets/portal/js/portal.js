@@ -38,8 +38,9 @@ const PORTAL_API = {
    */
   aboutChat: { url: '/love/chat', method: 'GET' },
   /**
-   * 站点展示配置：GET /site/config -> {logo, slogan, femaleName, maleName, femaleAvatar,
-   * maleAvatar, loveStartDate, icpText, icpUrl, copyright}（后台可配置，预留口子）
+   * 站点展示配置：GET /site/config -> {logo, slogan, femaleName, maleName, femaleQq,
+   * maleQq, loveStartDate, icpText, copyright}（后台可配置，预留口子；
+   * 男女主头像由前端按 QQ 号拼接 qlogo 地址，ICP 备案链接写死在页脚 href，均不走配置）
    */
   siteConfig: { url: '/site/config', method: 'GET' }
 };
@@ -78,11 +79,10 @@ const PORTAL_MOCK = {
     slogan: '爱晨雾漫过青瓦，爱暮色染透篱笆，更爱与君并肩立，看遍这人间烟火里的朝暮与年华。',
     femaleName: 'Su',
     maleName: 'Li',
-    femaleAvatar: 'https://q1.qlogo.cn/g?b=qq&nk=673822943&s=640',
-    maleAvatar: 'https://q1.qlogo.cn/g?b=qq&nk=2623669948&s=640',
+    femaleQq: '673822943',
+    maleQq: '2623669948',
     loveStartDate: '2018-07-15T00:00:00',
     icpText: '赣ICP备2026010001号',
-    icpUrl: 'https://beian.miit.gov.cn/#/Integrated/index',
     copyright: 'Copyright © 2022 - 2026 Like_Girl All Rights Reserved.'
   },
   /** 关于页对话默认剧本（后台实现 /love/chat 后自动切换为配置数据） */
@@ -140,6 +140,11 @@ function mockPhoto(label) {
     + '<rect width="600" height="400" fill="url(#g)"/>'
     + '<text x="300" y="205" font-size="26" fill="#ffffff" text-anchor="middle" font-family="serif">' + label + '</text></svg>';
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+
+/** 拼接 QQ 头像地址：nk 为 QQ 号，s 为尺寸（首页英雄区 640，留言列表 100），size 缺省取 640 */
+function qqAvatar(qq, size) {
+  return 'https://q1.qlogo.cn/g?b=qq&nk=' + encodeURIComponent(qq) + '&s=' + (size || 640);
 }
 
 /**
@@ -487,16 +492,15 @@ async function applySiteConfig() {
     if (tipEl) tipEl.setAttribute('data-tip', config.slogan);
   }
   const femaleImg = document.querySelector('.img-female img');
-  if (femaleImg && config.femaleAvatar) femaleImg.src = config.femaleAvatar;
+  if (femaleImg && config.femaleQq) femaleImg.src = qqAvatar(config.femaleQq, 640);
   const femaleName = document.querySelector('.img-female span');
   if (femaleName && config.femaleName) femaleName.textContent = config.femaleName;
   const maleImg = document.querySelector('.img-male img');
-  if (maleImg && config.maleAvatar) maleImg.src = config.maleAvatar;
+  if (maleImg && config.maleQq) maleImg.src = qqAvatar(config.maleQq, 640);
   const maleName = document.querySelector('.img-male span');
   if (maleName && config.maleName) maleName.textContent = config.maleName;
   const icpLink = document.getElementById('footerIcpLink');
   if (icpLink && config.icpText) icpLink.textContent = config.icpText;
-  if (icpLink && config.icpUrl) icpLink.href = config.icpUrl;
   const copyEl = document.getElementById('footerCopyright');
   if (copyEl && config.copyright) copyEl.textContent = config.copyright;
   // 计时起点可能被配置改变，配置就绪后重渲染计时器

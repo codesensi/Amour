@@ -56,7 +56,14 @@ FROM (
              (1006, 'demo-mode', 'false', 'BOOLEAN', 'app', '演示模式开关'),
              (1007, 'captcha.enabled', 'false', 'BOOLEAN', 'captcha', '验证码开关'),
              (1009, 'captcha.image-type', 'arithmetic', 'STRING', 'captcha', '图形验证码类型'),
-             (1010, 'captcha.image-expire', '300', 'INTEGER', 'captcha', '图形验证码过期秒')
+             (1010, 'captcha.image-expire', '300', 'INTEGER', 'captcha', '图形验证码过期秒'),
+             (1011, 'site.slogan', '爱晨雾漫过青瓦，爱暮色染透篱笆，更爱与君并肩立，看遍这人间烟火里的朝暮与年华。', 'STRING', 'site', '门户站点标语'),
+             (1012, 'site.female-name', 'Su', 'STRING', 'site', '门户女主昵称'),
+             (1013, 'site.male-name', 'Li', 'STRING', 'site', '门户男主昵称'),
+             (1014, 'site.female-qq', '673822943', 'STRING', 'site', '门户女主 QQ 号（头像由前端拼接）'),
+             (1015, 'site.male-qq', '2623669948', 'STRING', 'site', '门户男主 QQ 号（头像由前端拼接）'),
+             (1016, 'site.love-start-date', '2018-07-15T00:00:00', 'STRING', 'site', '门户恋爱计时起点'),
+             (1017, 'site.icp-text', '赣ICP备2026010001号', 'STRING', 'site', '门户 ICP 备案文案')
      ) AS t(id, c_key, c_value, v_type, c_group, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_config` WHERE `sys_config`.`id` = t.id
