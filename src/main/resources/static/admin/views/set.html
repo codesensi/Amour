@@ -10,18 +10,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400&display=swap" rel="stylesheet">
     <!-- 登录态守卫：未登录则跳转登录页（在渲染前同步执行，避免闪屏） -->
-    <script src="/admin/js/auth.js"></script>
-    <script src="/assets/common/config.js?v=2"></script>
-    <script>
-        if (!AdminAuth.isLoggedIn()) {
-            location.replace('/admin/login.html');
-        }
-    </script>
+    <script src="/admin/js/guard.js"></script>
     <!-- App css -->
     <link href="/admin/assets/css/icons.min.css" rel="stylesheet" type="text/css"/>
     <link href="/admin/assets/css/app.min.css" rel="stylesheet" type="text/css"/>
-    <link href="/Style/css/loading.css" rel="stylesheet">
-    <link href="/Style/toastr/toastr.css" rel="stylesheet">
+    <link href="/assets/admin/css/loading.css" rel="stylesheet">
+    <link href="/assets/lib/toastr/toastr.css" rel="stylesheet">
 </head>
 
 <body>
@@ -36,7 +30,7 @@
         </div>
     </div>
 </div>
-<script src="/Style/jquery/jquery.min.js"></script>
+<script src="/assets/lib/jquery/jquery.min.js"></script>
 <script>
     $(function () {
         $("#Loadanimation").fadeOut(1000);
@@ -416,11 +410,11 @@
                     }
 
                     body {
-                        cursor: url(/Style/cur/cursor.cur), default;
+                        cursor: url(/assets/admin/cur/cursor.cur), default;
                     }
 
                     a:hover {
-                        cursor: url(/Style/cur/hover.cur), pointer;
+                        cursor: url(/assets/admin/cur/hover.cur), pointer;
                     }
 
                     @media (min-width: 992px) {
@@ -673,74 +667,6 @@
 
             <!-- content End -->
 
-<!-- 页面级脚本置于内容区容器内：整页加载与 pjax 局部注入两个场景均会执行 -->
-<!-- 页面交互脚本：照搬原站 Set.php 的交互逻辑并 mock 化（原站为多个页面共用一段脚本，此处仅保留本页用到的提交处理） -->
-<script>
-    $(function () {
-        toastr.options = {
-            "closeButton": true,
-            "debug": false,
-            "newestOnTop": false,
-            "progressBar": true,
-            "rtl": false,
-            "positionClass": "toast-top-right",
-            "preventDuplicates": false,
-            "onclick": null,
-            "showDuration": 300,
-            "hideDuration": 1000,
-            "timeOut": 5000,
-            "extendedTimeOut": 1000,
-            "showEasing": "swing",
-            "hideEasing": "linear",
-            "showMethod": "fadeIn",
-            "hideMethod": "fadeOut"
-        };
-    });
-
-    // 基本设置表单提交（原站通过 $.ajax 提交至 adminPost.php，取值逻辑保留）
-    $("#adminPost").click(function () {
-        var title = $("input[name='title']").val();
-        var logo = $("input[name='logo']").val();
-        var writing = $("input[name='writing']").val();
-        var WebBlur = $("select[name='WebBlur']").val();
-        var WebPjax = $("select[name='WebPjax']").val();
-
-        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
-        toastr["success"]("基本信息修改成功！", "Like_Girl");
-        toastr["success"]("开关设置成功！", "Like_Girl");
-    })
-
-    // 情侣配置表单提交（原站通过 $.ajax 提交至 loveadminPost.php，取值逻辑保留）
-    $("#loveadminPost").click(function () {
-        var boy = $("input[name='boy']").val();
-        var girl = $("input[name='girl']").val();
-        var boyimg = $("input[name='boyimg']").val();
-        var girlimg = $("input[name='girlimg']").val();
-        var startTime = $("input[name='startTime']").val();
-
-        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
-        toastr["success"]("情侣信息修改成功！", "Like_Girl");
-    })
-
-    // 卡片配置&版权配置表单提交（原站通过 $.ajax 提交至 CardadminPost.php，取值逻辑保留）
-    $("#CardadminPost").click(function () {
-        var bgimg = $("input[name='bgimg']").val();
-        var card1 = $("input[name='card1']").val();
-        var deci1 = $("input[name='deci1']").val();
-        var card2 = $("input[name='card2']").val();
-        var deci2 = $("input[name='deci2']").val();
-        var card3 = $("input[name='card3']").val();
-        var deci3 = $("input[name='deci3']").val();
-        var icp = $("input[name='icp']").val();
-        var Copyright = $("input[name='Copyright']").val();
-
-        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
-        toastr["success"]("卡片信息修改成功！", "Like_Girl");
-    })
-
-    // 原站此处的 loadModalContent() 会请求 wiki.kikiw.cn 外部数据，属于外部站点依赖，已按规范移除
-</script>
-
 <!-- Footer Start -->
 <footer class="footer">
     <div class="row footer_center">
@@ -758,53 +684,12 @@
 
 </div>
 
-<script>
-    console.log("%c Amour 后台管理 | Powered by codesensi", "color:#fff;background:linear-gradient(270deg,#986fee,#8695e6,#68b7dd,#18d7d3);padding:8px 15px;border-radius:15px");
-</script>
-
-
-<script src="/Style/toastr/toastr.js"></script>
+<script src="/assets/lib/toastr/toastr.js"></script>
 <!-- App js -->
 <script src="/admin/assets/js/app.min.js"></script>
 
-<!-- end demo js-->
-<script src="/admin/assets/js/pages/demo.toastr.js"></script>
-<!-- 局部刷新（pjax）：拦截后台 .html 链接，仅替换内容区 -->
-<script src="/admin/js/admin-pjax.js"></script>
-
-<!-- 外壳适配脚本 -->
-<script>
-    (function () {
-        'use strict';
-
-        var auth = AdminAuth.getAuth();
-
-        // 顶栏与侧栏展示当前登录用户名
-        $('.js-username').text(auth && auth.username ? auth.username : 'Admin');
-
-        // 站点名称：浏览器标签 + 顶栏 Logo + 侧栏用户名均取自站点配置 name
-        ProjectConfig.get('name').then(function (name) {
-            if (!name) return;
-            document.title = name + ' - 基本设置';
-            $('.js-site-name').text(name);
-        });
-
-        // 用户头像：站点配置的男主 QQ -> QQ 头像；加载失败回退占位图，避免破图
-        ProjectConfig.get('site.male-qq').then(function (qq) {
-            var fallback = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
-                '<svg xmlns="http://www.w3.org/2000/svg" width="104" height="104"><rect width="104" height="104" fill="#ff5295"/><text x="52" y="66" font-size="46" fill="#fff" text-anchor="middle" font-family="serif">\u2665</text></svg>');
-            $('.js-user-avatar')
-                .on('error', function () { $(this).off('error').attr('src', fallback); })
-                .attr('src', ProjectConfig.qqAvatar(qq, 640));
-        });
-
-        // 退出登录：清除本地登录态并回到登录页
-        $('.js-logout').on('click', function () {
-            AdminAuth.clearAuth();
-            location.href = '/admin/login.html';
-        });
-    })();
-</script>
+<!-- 后台 ESM 入口：登录校验、外壳初始化、pjax 与页面模块调度 -->
+<script type="module" src="/admin/js/main.js"></script>
 
 </body>
 

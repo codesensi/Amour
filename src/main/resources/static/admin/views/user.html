@@ -10,18 +10,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400&display=swap" rel="stylesheet">
     <!-- 登录态守卫：未登录则跳转登录页（在渲染前同步执行，避免闪屏） -->
-    <script src="/admin/js/auth.js"></script>
-    <script src="/assets/common/config.js?v=2"></script>
-    <script>
-        if (!AdminAuth.isLoggedIn()) {
-            location.replace('/admin/login.html');
-        }
-    </script>
+    <script src="/admin/js/guard.js"></script>
     <!-- App css -->
     <link href="/admin/assets/css/icons.min.css" rel="stylesheet" type="text/css"/>
     <link href="/admin/assets/css/app.min.css" rel="stylesheet" type="text/css"/>
-    <link href="/Style/css/loading.css" rel="stylesheet">
-    <link href="/Style/toastr/toastr.css" rel="stylesheet">
+    <link href="/assets/admin/css/loading.css" rel="stylesheet">
+    <link href="/assets/lib/toastr/toastr.css" rel="stylesheet">
 </head>
 
 <body>
@@ -36,7 +30,7 @@
         </div>
     </div>
 </div>
-<script src="/Style/jquery/jquery.min.js"></script>
+<script src="/assets/lib/jquery/jquery.min.js"></script>
 <script>
     $(function () {
         $("#Loadanimation").fadeOut(1000);
@@ -416,11 +410,11 @@
                     }
 
                     body {
-                        cursor: url(/Style/cur/cursor.cur), default;
+                        cursor: url(/assets/admin/cur/cursor.cur), default;
                     }
 
                     a:hover {
-                        cursor: url(/Style/cur/hover.cur), pointer;
+                        cursor: url(/assets/admin/cur/hover.cur), pointer;
                     }
 
                     @media (min-width: 992px) {
@@ -595,81 +589,6 @@
 
             <!-- content End -->
 
-<!-- 页面级脚本置于内容区容器内：整页加载与 pjax 局部注入两个场景均会执行 -->
-<!-- 页面交互脚本：照搬原站 user.php 的交互逻辑并 mock 化（原站为多个页面共用一段脚本，此处仅保留本页用到的提交处理） -->
-<script>
-    // 原站遗留的账号/密码格式校验函数，按原样保留（表单未绑定 onsubmit，不会自动触发）
-    function check() {
-        let adminName = document.getElementsByName('adminName')[0].value.trim();
-        let pw = document.getElementsByName('pw')[0].value.trim();
-        // 判断adminName长度是否为0 如果为0则提示弹窗
-        if (adminName.length == 0) {
-            alert("请填写用户名");
-            return false;
-        }
-        let user = /[a-zA-Z0-9]/g;
-        let character = new RegExp("[`~!#$^&*()=|{}':;',\\[\\].<>/?~！#￥……&*（）——|{}【】‘；：”“'。，、？]");
-        if (character.test(adminName)) {
-            alert("用户名含有特殊字符 本次修改已拦截")
-            return false;
-        } else if (!(user.test(adminName))) {
-            alert("用户名只支持数字与英文大小写字母")
-            return false;
-        }
-        if (pw.length >= 1) {
-            if (pw.length <= 6) {
-                alert("密码长度需大于六位数")
-                return false;
-            }
-            if (character.test(pw)) {
-                alert("密码含有特殊字符为了过滤SQL注入已拦截\n请输入大小写字母与数字组成的密码")
-                return false;
-            }
-        }
-    }
-
-    // 信息配置表单提交（原站通过 $.ajax 提交至 userPost.php，取值逻辑保留）
-    $("#userPost").click(function () {
-        var Webanimation = $("select[name='Webanimation']").val();
-        var userName = $("input[name='userName']").val();
-        var userQQ = $("input[name='userQQ']").val();
-        var adminName = $("input[name='adminName']").val();
-        var pw = $("input[name='pw']").val();
-        var SCode = $("input[name='SCode']").val();
-        var cssCon = $("textarea[name='cssCon']").val();
-        var headCon = $("textarea[name='headCon']").val();
-        var footerCon = $("textarea[name='footerCon']").val();
-
-        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
-        toastr["success"]("更新登录信息成功！", "Like_Girl");
-        toastr["success"]("更新全局信息成功", "Like_Girl");
-        toastr["success"]("更新自定义内容成功", "Like_Girl");
-    })
-
-    // 原站此处的 loadModalContent() 会请求 wiki.kikiw.cn 外部数据，属于外部站点依赖，已按规范移除
-
-    $(function () {
-        toastr.options = {
-            "closeButton": true,
-            "debug": false,
-            "newestOnTop": false,
-            "progressBar": true,
-            "rtl": false,
-            "positionClass": "toast-top-right",
-            "preventDuplicates": false,
-            "onclick": null,
-            "showDuration": 300,
-            "hideDuration": 1000,
-            "timeOut": 5000,
-            "extendedTimeOut": 1000,
-            "showEasing": "swing",
-            "hideEasing": "linear",
-            "showMethod": "fadeIn",
-            "hideMethod": "fadeOut"
-        };
-    })
-</script>
-
 <!-- Footer Start -->
 <footer class="footer">
     <div class="row footer_center">
@@ -687,53 +606,12 @@
 
 </div>
 
-<script>
-    console.log("%c Amour 后台管理 | Powered by codesensi", "color:#fff;background:linear-gradient(270deg,#986fee,#8695e6,#68b7dd,#18d7d3);padding:8px 15px;border-radius:15px");
-</script>
-
-
-<script src="/Style/toastr/toastr.js"></script>
+<script src="/assets/lib/toastr/toastr.js"></script>
 <!-- App js -->
 <script src="/admin/assets/js/app.min.js"></script>
 
-<!-- end demo js-->
-<script src="/admin/assets/js/pages/demo.toastr.js"></script>
-<!-- 局部刷新（pjax）：拦截后台 .html 链接，仅替换内容区 -->
-<script src="/admin/js/admin-pjax.js"></script>
-
-<!-- 外壳适配脚本 -->
-<script>
-    (function () {
-        'use strict';
-
-        var auth = AdminAuth.getAuth();
-
-        // 顶栏与侧栏展示当前登录用户名
-        $('.js-username').text(auth && auth.username ? auth.username : 'Admin');
-
-        // 站点名称：浏览器标签 + 顶栏 Logo + 侧栏用户名均取自站点配置 name
-        ProjectConfig.get('name').then(function (name) {
-            if (!name) return;
-            document.title = name + ' - 全局设置';
-            $('.js-site-name').text(name);
-        });
-
-        // 用户头像：站点配置的男主 QQ -> QQ 头像；加载失败回退占位图，避免破图
-        ProjectConfig.get('site.male-qq').then(function (qq) {
-            var fallback = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
-                '<svg xmlns="http://www.w3.org/2000/svg" width="104" height="104"><rect width="104" height="104" fill="#ff5295"/><text x="52" y="66" font-size="46" fill="#fff" text-anchor="middle" font-family="serif">\u2665</text></svg>');
-            $('.js-user-avatar')
-                .on('error', function () { $(this).off('error').attr('src', fallback); })
-                .attr('src', ProjectConfig.qqAvatar(qq, 640));
-        });
-
-        // 退出登录：清除本地登录态并回到登录页
-        $('.js-logout').on('click', function () {
-            AdminAuth.clearAuth();
-            location.href = '/admin/login.html';
-        });
-    })();
-</script>
+<!-- 后台 ESM 入口：登录校验、外壳初始化、pjax 与页面模块调度 -->
+<script type="module" src="/admin/js/main.js"></script>
 
 </body>
 

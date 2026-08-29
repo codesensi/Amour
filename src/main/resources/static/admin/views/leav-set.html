@@ -10,18 +10,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400&display=swap" rel="stylesheet">
     <!-- 登录态守卫：未登录则跳转登录页（在渲染前同步执行，避免闪屏） -->
-    <script src="/admin/js/auth.js"></script>
-    <script src="/assets/common/config.js?v=2"></script>
-    <script>
-        if (!AdminAuth.isLoggedIn()) {
-            location.replace('/admin/login.html');
-        }
-    </script>
+    <script src="/admin/js/guard.js"></script>
     <!-- App css -->
     <link href="/admin/assets/css/icons.min.css" rel="stylesheet" type="text/css"/>
     <link href="/admin/assets/css/app.min.css" rel="stylesheet" type="text/css"/>
-    <link href="/Style/css/loading.css" rel="stylesheet">
-    <link href="/Style/toastr/toastr.css" rel="stylesheet">
+    <link href="/assets/admin/css/loading.css" rel="stylesheet">
+    <link href="/assets/lib/toastr/toastr.css" rel="stylesheet">
     <!-- 第三方 DataTables 样式（本页表格需要） -->
     <link href="/admin/assets/css/vendor/dataTables.bootstrap4.css" rel="stylesheet" type="text/css" />
     <link href="/admin/assets/css/vendor/responsive.bootstrap4.css" rel="stylesheet" type="text/css" />
@@ -41,7 +35,7 @@
         </div>
     </div>
 </div>
-<script src="/Style/jquery/jquery.min.js"></script>
+<script src="/assets/lib/jquery/jquery.min.js"></script>
 <script>
     $(function () {
         $("#Loadanimation").fadeOut(1000);
@@ -421,11 +415,11 @@
                     }
 
                     body {
-                        cursor: url(/Style/cur/cursor.cur), default;
+                        cursor: url(/assets/admin/cur/cursor.cur), default;
                     }
 
                     a:hover {
-                        cursor: url(/Style/cur/hover.cur), pointer;
+                        cursor: url(/assets/admin/cur/hover.cur), pointer;
                     }
 
                     @media (min-width: 992px) {
@@ -620,264 +614,6 @@
 
             <!-- content End -->
 
-<script>
-    $(function () {
-        toastr.options = {
-            "closeButton": true,
-            "debug": false,
-            "newestOnTop": false,
-            "progressBar": true,
-            "rtl": false,
-            "positionClass": "toast-top-right",
-            "preventDuplicates": false,
-            "onclick": null,
-            "showDuration": 300,
-            "hideDuration": 1000,
-            "timeOut": 5000,
-            "extendedTimeOut": 1000,
-            "showEasing": "swing",
-            "hideEasing": "linear",
-            "showMethod": "fadeIn",
-            "hideMethod": "fadeOut"
-        };
-
-        // 登录成功欢迎提示（仅从登录页跳转过来时展示一次）
-        if (sessionStorage.getItem('ADMIN_LOGIN_WELCOME') === '1') {
-            sessionStorage.removeItem('ADMIN_LOGIN_WELCOME');
-            toastr.success('登录成功！欢迎回来~');
-        }
-    });
-</script>
-
-<!-- 页面级脚本置于内容区容器内：整页加载与 pjax 局部注入两个场景均会执行 -->
-<!-- ===== 页面交互脚本（照搬原站并 mock 化） ===== -->
-<script>
-    // 删除留言按钮（事件委托）：先弹出原站确认框，确认后给出演示提示，不做真实删除
-    document.addEventListener('click', function (e) {
-        let el = e.target.closest('.delete-btn');
-        if (!el) return;
-
-        e.preventDefault();
-        let id = el.dataset.id;
-        let content = el.dataset.content;
-        del(id, content);
-    });
-
-    // 原站确认后跳转 delleav.php?id=x 执行删除；现为演示数据，仅给出提示
-    function del(id, text) {
-        if (confirm('您确认要删除 ' + text + ' 内容吗')) {
-            // 现阶段后端接口未实现，mock 演示提示；接口实现后恢复为真实删除请求
-            toastr["warning"]("演示数据：删除功能暂未接入后端", "Like_Girl");
-        }
-    }
-
-    // “留言相关设置”按钮：原站跳转 /admin/leavP.php 留言设置页（暂未迁移），演示环境仅提示
-    $(".fabu").on('click', function () {
-        toastr["info"]("演示数据：留言设置页面暂未迁移", "Like_Girl");
-    });
-
-    // ==================== 原站公共提交脚本（异步 Ajax 处理）mock 化 ====================
-    // 原站以下各表单提交均通过 $.ajax POST 到对应 xxxPost.php；
-    // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求。
-
-    $("#userPost").click(function () {
-        // 原提交：$.ajax -> userPost.php（登录信息/全局信息/自定义内容）
-        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
-        toastr["success"]("更新登录信息成功！", "Like_Girl");
-        toastr["success"]("更新全局信息成功", "Like_Girl");
-        toastr["success"]("更新自定义内容成功", "Like_Girl");
-    })
-    $("#adminPost").click(function () {
-        // 原提交：$.ajax -> adminPost.php（基本信息/开关设置）
-        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
-        toastr["success"]("基本信息修改成功！", "Like_Girl");
-        toastr["success"]("开关设置成功！", "Like_Girl");
-    })
-    $("#loveadminPost").click(function () {
-        // 原提交：$.ajax -> loveadminPost.php（情侣信息）
-        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
-        toastr["success"]("情侣信息修改成功！", "Like_Girl");
-    })
-
-    $("#CardadminPost").click(function () {
-        // 原提交：$.ajax -> CardadminPost.php（卡片信息）
-        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
-        toastr["success"]("卡片信息修改成功！", "Like_Girl");
-    })
-
-    $("#leavPPost").click(function () {
-        // 原提交：$.ajax -> leavPPost.php（留言设置：截取条数/拦截字符）
-        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
-        toastr["success"]("留言设置修改成功！", "Like_Girl");
-    })
-
-    $("#littleupda").click(function () {
-        var articletitle = $("input[name='articletitle']").val();
-        var articletext = $("textarea[name='articletext']").val();
-
-        // 保留原站表单校验逻辑
-        if ($.trim(articletitle) === '') {
-            toastr["error"]("文章标题不能为空！", "Like_Girl");
-            return false;
-        }
-
-        if ($.trim(articletext) === '') {
-            toastr["error"]("文章内容不能为空！", "Like_Girl");
-            return false;
-        }
-
-        // 原提交：$.ajax -> littleupda.php（修改文章）
-        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
-        toastr["success"]("文章修改成功！", "Like_Girl");
-        $('#littleupda').text('修改中...');
-        $("#littleupda").attr("disabled", "disabled");
-        // 原站用 setInterval 存在重复触发问题，改为 setTimeout 并走 pjax 局部刷新
-        setTimeout(function () { AdminPjax.load('/admin/views/little-set.html'); }, 1000);
-    })
-    $("#littleAddPost").click(function () {
-        var articlename = $("select[name='articlename']").val();
-        var articletitle = $("input[name='articletitle']").val();
-        var articletext = $("textarea[name='articletext']").val();
-
-        // 保留原站表单校验逻辑
-        if ($.trim(articlename) === '') {
-            toastr["error"]("发布人不能为空！", "Like_Girl");
-            return false;
-        }
-
-        if ($.trim(articletitle) === '') {
-            toastr["error"]("文章标题不能为空！", "Like_Girl");
-            return false;
-        }
-
-        if ($.trim(articletext) === '') {
-            toastr["error"]("文章内容不能为空！", "Like_Girl");
-            return false;
-        }
-
-        // 原提交：$.ajax -> littleAddPost.php（新增文章）
-        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
-        toastr["success"]("新增文章成功！", "Like_Girl");
-        $('#littleAddPost').text('发布中...');
-        $("#littleAddPost").attr("disabled", "disabled");
-        // 原站用 setInterval 存在重复触发问题，改为 setTimeout 并走 pjax 局部刷新
-        setTimeout(function () { AdminPjax.load('/admin/views/little-set.html'); }, 1000);
-    })
-    $("#ImgUpdaPost").click(function () {
-        var imgDatd = $("input[name='imgDatd']").val();
-        var imgText = $("input[name='imgText']").val();
-        var imgUrl = $("input[name='imgUrl']").val();
-
-        // 保留原站表单校验逻辑
-        if ($.trim(imgDatd) === '') {
-            toastr["error"]("日期不能为空！", "Like_Girl");
-            return false;
-        }
-        if ($.trim(imgText) === '') {
-            toastr["error"]("图片描述不能为空！", "Like_Girl");
-            return false;
-        }
-        if ($.trim(imgUrl) === '') {
-            toastr["error"]("图片地址不能为空！", "Like_Girl");
-            return false;
-        }
-
-        // 原提交：$.ajax -> ImgUpdaPost.php（修改相册）
-        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
-        toastr["success"]("相册修改成功！", "Like_Girl");
-        $('#ImgUpdaPost').text('修改中...');
-        $("#ImgUpdaPost").attr("disabled", "disabled");
-        // 原站用 setInterval 存在重复触发问题，改为 setTimeout 并走 pjax 局部刷新
-        setTimeout(function () { AdminPjax.load('/admin/views/love-img-set.html'); }, 1000);
-    })
-    $("#ImgAddPost").click(function () {
-        var imgDatd = $("input[name='imgDatd']").val();
-        var imgText = $("input[name='imgText']").val();
-        var imgUrl = $("input[name='imgUrl']").val();
-
-        // 保留原站表单校验逻辑
-        if ($.trim(imgDatd) === '') {
-            toastr["error"]("日期不能为空！", "Like_Girl");
-            return false;
-        }
-        if ($.trim(imgText) === '') {
-            toastr["error"]("图片描述不能为空！", "Like_Girl");
-            return false;
-        }
-        if ($.trim(imgUrl) === '') {
-            toastr["error"]("图片地址不能为空！", "Like_Girl");
-            return false;
-        }
-
-        // 原提交：$.ajax -> ImgAddPost.php（新增相册）
-        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
-        toastr["success"]("新增相册成功！", "Like_Girl");
-        $('#ImgUpdaPost').text('新增中...');
-        $("#ImgUpdaPost").attr("disabled", "disabled");
-        // 原站用 setInterval 存在重复触发问题，改为 setTimeout 并走 pjax 局部刷新
-        setTimeout(function () { AdminPjax.load('/admin/views/love-img-set.html'); }, 1000);
-    })
-    $("#listaddPost").click(function () {
-        var eventname = $("input[name='eventname']").val();
-
-        // 保留原站表单校验逻辑
-        if ($.trim(eventname) === '') {
-            toastr["error"]("事件标题不能为空！", "Like_Girl");
-            return false;
-        }
-
-        // 原提交：$.ajax -> listaddPost.php（新增事件）
-        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
-        toastr["success"]("新增事件成功！", "Like_Girl");
-        $('#listaddPost').text('新增中...');
-        $("#listaddPost").attr("disabled", "disabled");
-        // 原站用 setInterval 存在重复触发问题，改为 setTimeout 并走 pjax 局部刷新
-        setTimeout(function () { AdminPjax.load('/admin/views/love-list.html'); }, 1000);
-    })
-    $("#ipAddPost").click(function () {
-        var ipdz = $("input[name='ipdz']").val();
-
-        // 保留原站表单校验逻辑
-        if ($.trim(ipdz) === '') {
-            toastr["error"]("IP地址不能为空！", "Like_Girl");
-            return false;
-        }
-
-        // 原提交：$.ajax -> ipAddPost.php（IP 封禁）
-        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
-        toastr["success"]("IP封禁成功！", "Like_Girl");
-        $('#listupda').text('提交中...');
-        $("#listupda").attr("disabled", "disabled");
-        // 原站用 setInterval 存在重复触发问题，改为 setTimeout 并走 pjax 局部刷新
-        setTimeout(function () { AdminPjax.load('/admin/views/ip-list.html'); }, 1000);
-    })
-    $("#listupda").click(function () {
-        var eventname = $("input[name='eventname']").val();
-
-        // 保留原站表单校验逻辑
-        if ($.trim(eventname) === '') {
-            toastr["error"]("事件标题不能为空！", "Like_Girl");
-            return false;
-        }
-
-        // 原提交：$.ajax -> listupda.php（修改事件）
-        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
-        toastr["success"]("修改事件成功！", "Like_Girl");
-        $('#listupda').text('修改中...');
-        $("#listupda").attr("disabled", "disabled");
-        // 原站用 setInterval 存在重复触发问题，改为 setTimeout 并走 pjax 局部刷新
-        setTimeout(function () { AdminPjax.load('/admin/views/love-list.html'); }, 1000);
-    })
-    $("#aboutPost").click(function () {
-        // 原提交：$.ajax -> aboutPost.php（关于页面对话配置，共 24 个字段）
-        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
-        toastr["success"]("修改对话配置成功！", "Like_Girl");
-    })
-
-    // 原站此处会异步加载 wiki.kikiw.cn 的版本信息弹窗（loadModalContent），
-    // 属外部站点依赖，已按项目要求整体移除。
-</script>
-
 <!-- Footer Start -->
 <footer class="footer">
     <div class="row footer_center">
@@ -895,12 +631,7 @@
 
 </div>
 
-<script>
-    console.log("%c Amour 后台管理 | Powered by codesensi", "color:#fff;background:linear-gradient(270deg,#986fee,#8695e6,#68b7dd,#18d7d3);padding:8px 15px;border-radius:15px");
-</script>
-
-
-<script src="/Style/toastr/toastr.js"></script>
+<script src="/assets/lib/toastr/toastr.js"></script>
 <!-- App js -->
 <script src="/admin/assets/js/app.min.js"></script>
 
@@ -917,44 +648,9 @@
 <script src="/admin/assets/js/vendor/dataTables.keyTable.min.js"></script>
 <script src="/admin/assets/js/vendor/dataTables.select.min.js"></script>
 <!-- third party js ends -->
-<!-- demo app -->
-<script src="/admin/assets/js/pages/demo.datatable-init.js"></script>
-<!-- end demo js-->
-<script src="/admin/assets/js/pages/demo.toastr.js"></script>
-<!-- 局部刷新（pjax）：拦截后台 .html 链接，仅替换内容区 -->
-<script src="/admin/js/admin-pjax.js"></script>
 
-<script>
-    (function () {
-        'use strict';
-
-        var auth = AdminAuth.getAuth();
-
-        // 顶栏与侧栏展示当前登录用户名
-        $('.js-username').text(auth && auth.username ? auth.username : 'Admin');
-
-        // 站点名称：浏览器标签 + 顶栏 Logo + 侧栏用户名均取自站点配置 name
-        ProjectConfig.get('name').then(function (name) {
-            if (!name) return;
-            document.title = name + ' - 留言管理';
-            $('.js-site-name').text(name);
-        });
-
-        // 用户头像：站点配置的男主 QQ -> QQ 头像；加载失败回退占位图，避免破图
-        ProjectConfig.get('site.male-qq').then(function (qq) {
-            var fallback = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="104" height="104"><rect width="104" height="104" fill="#ff5295"/><text x="52" y="66" font-size="46" fill="#fff" text-anchor="middle" font-family="serif">\u2665</text></svg>');
-            $('.js-user-avatar')
-                .on('error', function () { $(this).off('error').attr('src', fallback); })
-                .attr('src', ProjectConfig.qqAvatar(qq, 640));
-        });
-
-        // 退出登录：清除本地登录态并回到登录页
-        $('.js-logout').on('click', function () {
-            AdminAuth.clearAuth();
-            location.href = '/admin/login.html';
-        });
-    })();
-</script>
+<!-- 后台 ESM 入口：登录校验、外壳初始化、pjax 与页面模块调度 -->
+<script type="module" src="/admin/js/main.js"></script>
 
 </body>
 

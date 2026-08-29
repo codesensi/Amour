@@ -1,9 +1,31 @@
 /* =====================================================================
- * Amour 门户脚本 —— 照搬 Like Girl 5.2.1
+ * Amour 门户脚本 —— 照搬 Like Girl 5.2.1（ES Module）
  * 职责：站点配置、恋爱计时器、data-tip 悬浮提示、顶栏滚动变色、
  *       右侧悬浮栏交互、以及"未实现后端接口"的统一请求口子（mock 降级）。
+ * 依赖：common/config.js（项目配置）、common/pjax.js（编程式导航）；
+ *       toastr 为页面上以普通脚本加载的全局库。
  * 原站版权：Copyright (c) 2023 - 2025 by Ki（Like Girl）
  * ===================================================================== */
+
+import { loadConfig, qqAvatar } from '/assets/common/config.js';
+import { navigate as pjaxNavigate } from '/assets/common/pjax.js';
+
+/** 全局 toastr（页面上以普通脚本加载，此处显式桥接） */
+const toastr = window.toastr;
+
+/** 侧栏悬浮栏的 HTML onclick 属性引用的函数，模块化后统一挂回全局 */
+window.scrollToTop = function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+window.portalNavigate = function portalNavigate(url) {
+  pjaxNavigate(url, true);
+};
+window.portalGoAdmin = function portalGoAdmin() {
+  window.open(PORTAL_CONFIG.adminUrl, '_blank');
+};
+window.portalGoRepo = function portalGoRepo() {
+  window.open(PORTAL_CONFIG.repoUrl, '_blank');
+};
 
 /** 站点配置：纯前端路由类配置；站点展示类配置（logo/文案/头像/计时起点/ICP 等）走 siteConfig 口子 */
 const PORTAL_CONFIG = {
@@ -40,8 +62,8 @@ const PORTAL_API = {
   /* 站点展示类配置不走独立接口：统一经 config.js 的 /config/public 口子读取 sys_config */
 };
 
-/** 示例数据：仅在后端接口未实现时兜底展示 */
-const PORTAL_MOCK = {
+/** 示例数据：仅在后端接口未实现时兜底展示（关于页对话模块复用 aboutChat 剧本） */
+export const PORTAL_MOCK = {
   photos: [
     { img: mockPhoto('第一次旅行的海边'), text: '第一次旅行的海边', date: '2023-05-20' },
     { img: mockPhoto('巷口的黄昏'), text: '巷口的黄昏', date: '2023-08-13' },
@@ -131,7 +153,7 @@ function mockPhoto(label) {
  * @param {object} [payload] 请求参数（GET 拼查询串，POST 为 JSON body）
  * @returns {Promise<any>} 成功且 success=true 时返回 data，否则返回 mock 数据
  */
-async function portalRequest(apiKey, payload) {
+export async function portalRequest(apiKey, payload) {
   const api = PORTAL_API[apiKey];
   try {
     let url = api.url;
@@ -245,16 +267,7 @@ function initTooltip() {
   window.addEventListener('scroll', hide);
 }
 
-/** 右侧悬浮栏动作 */
-function scrollToTop() {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-/** 打开管理后台 */
-function portalGoAdmin() { window.open(PORTAL_CONFIG.adminUrl, '_blank'); }
-
-/** 打开开源地址 */
-function portalGoRepo() { window.open(PORTAL_CONFIG.repoUrl, '_blank'); }
+/** 右侧悬浮栏动作：scrollToTop 已在文件头部挂到 window（侧栏 HTML onclick 引用） */
 
 /** Love Photo 相册：分页加载 + 逐张浮现动画（照搬原站模板，接口走 portalRequest 口子） */
 let photoPage = 1;
@@ -457,7 +470,7 @@ async function loadLoveList() {
 let siteConfig = {};
 
 /**
- * 站点展示配置：统一经 ProjectConfig（/config/public 口子，读取 sys_config）拉取，
+ * 站点展示配置：统一经 common/config.js（/config/public 口子，读取 sys_config）拉取，
  * 组装为站点视图对象后应用到 DOM。
  * 覆盖范围：头部 logo / 右侧文字说明、首屏双方名字与 QQ 头像、
  * 恋爱计时起点、页脚 ICP 备案号与链接、页脚版权行。
@@ -466,7 +479,7 @@ let siteConfig = {};
  * icpText←site.icp-text、copyright←copyright
  */
 async function applySiteConfig() {
-  const config = await ProjectConfig.load([
+  const config = await loadConfig([
     'name', 'site.slogan', 'site.female-name', 'site.male-name',
     'site.female-qq', 'site.male-qq', 'site.love-start-date', 'site.icp-text', 'copyright'
   ]);
@@ -497,11 +510,11 @@ async function applySiteConfig() {
     if (tipEl) tipEl.setAttribute('data-tip', siteConfig.slogan);
   }
   const femaleImg = document.querySelector('.img-female img');
-  if (femaleImg && siteConfig.femaleQq) femaleImg.src = ProjectConfig.qqAvatar(siteConfig.femaleQq, 640);
+  if (femaleImg && siteConfig.femaleQq) femaleImg.src = qqAvatar(siteConfig.femaleQq, 640);
   const femaleName = document.querySelector('.img-female span');
   if (femaleName && siteConfig.femaleName) femaleName.textContent = siteConfig.femaleName;
   const maleImg = document.querySelector('.img-male img');
-  if (maleImg && siteConfig.maleQq) maleImg.src = ProjectConfig.qqAvatar(siteConfig.maleQq, 640);
+  if (maleImg && siteConfig.maleQq) maleImg.src = qqAvatar(siteConfig.maleQq, 640);
   const maleName = document.querySelector('.img-male span');
   if (maleName && siteConfig.maleName) maleName.textContent = siteConfig.maleName;
   const icpLink = document.getElementById('footerIcpLink');
@@ -519,8 +532,8 @@ async function applySiteConfig() {
  * 页面初始化 —— 首次加载与每次 pjax 局部刷新后都会调用。
  * 所有按需初始化均以元素存在性判断，保证在任意页面重复调用安全。
  */
-window.initPortalPage = function () {
-  // 站点展示配置：统一经 ProjectConfig（sys_config）异步拉取，就绪后覆盖
+export function initPortalPage() {
+  // 站点展示配置：统一经 common/config.js（sys_config）异步拉取，就绪后覆盖
   // logo / 文字说明 / 头像 / 名字 / ICP / 版权，并按配置的计时起点重渲染计时器。
   applySiteConfig();
 
@@ -575,8 +588,4 @@ window.initPortalPage = function () {
 
   // 清单页
   if (document.getElementById('loveListBox')) loadLoveList();
-};
-
-document.addEventListener('DOMContentLoaded', function () {
-  window.initPortalPage();
-});
+}
