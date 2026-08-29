@@ -14,8 +14,10 @@
 /** layui.js 的固定路径（与登录页/后台外壳/门户外壳的引入保持一致） */
 const LAYUI_JS = '/assets/layui/2.13.9/layui.js';
 
-/** layui 基础样式（两端共用） */
-const LAYUI_CSS = ['/assets/layui/2.13.9/css/layui.css'];
+/** layui 基础样式目录（两端共用）。外壳经 resourceUrlProvider 引入的是内容指纹 URL，
+ *  就位检查须按目录匹配而非精确文件名：否则指纹版判定不到会重复注入一份无指纹
+ *  layui.css 追加在文档末尾，把门户/管理端的定制样式全部盖回 layui 默认形态。 */
+const LAYUI_CSS_DIR = '/assets/layui/2.13.9/css/';
 
 /** 管理端专属样式：仅管理端路径下自愈注入，避免污染门户布局 */
 const ADMIN_CSS = '/assets/admin/css/admin.css';
@@ -30,10 +32,11 @@ let layuiReady = null;
  */
 function ensureStyles() {
   const paths = location.pathname.indexOf('/admin') === 0
-    ? LAYUI_CSS.concat(ADMIN_CSS)
-    : LAYUI_CSS;
+    ? [LAYUI_CSS_DIR + 'layui.css', ADMIN_CSS]
+    : [LAYUI_CSS_DIR + 'layui.css'];
   paths.forEach(function (href) {
-    if (!document.querySelector('link[href="' + href + '"]')) {
+    // 按目录匹配：指纹文件名（layui-<hash>.css）不影响就位判定
+    if (!document.querySelector('link[href*="' + LAYUI_CSS_DIR + '"]')) {
       var link = document.createElement('link');
       link.rel = 'stylesheet';
       link.href = href;
