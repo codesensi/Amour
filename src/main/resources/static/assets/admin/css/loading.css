@@ -3,7 +3,8 @@
     height:100%;
     width:100%;
     position:fixed;
-    z-index:1;
+    /* 覆盖一切页面内容（原以内联样式写在各页遮罩上，归拢至此） */
+    z-index:999999;
     margin-top:0px;top:0px;
 
 }

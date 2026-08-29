@@ -82,17 +82,12 @@ body.side-collapsed .layui-body {
     -webkit-line-clamp: 2;
 }
 
-.toast-title {
-    font-size: 1.1rem;
-    margin-bottom: .3rem;
-}
+/* 统计卡图标色（首页三张卡片） */
+.stat-color-danger { color: #FA6666; }
+.stat-color-pink { color: #F779D4; }
+.stat-color-purple { color: #C98FFF; }
 
+/* 首页留言时间的灰色辅助文本 */
 .color { color: #999; }
-.hhtext { white-space: normal !important; }
-
-ul.text {
-    line-height: 2rem;
-    font-size: .9rem;
-}
 
 .margin_0 { margin: 0 !important; }

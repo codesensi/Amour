@@ -1,0 +1,244 @@
+/**
+ * 登录页专属样式（从 login.html 内嵌 <style> 抽取）。
+ *
+ * 夜幕渐变 + 心跳星河品牌动画 + 毛玻璃登录卡片，均为登录页独立设计，
+ * 不依赖也不影响管理内页的 layui 原生样式体系。
+ */
+
+/* ===== 整体布局：夜幕渐变铺满全屏，左屏品牌动画 + 右屏登录卡片同处一片星河 ===== */
+html, body { height: 100%; }
+body { margin: 0; background: #0b1f2a; }
+.login-page {
+  position: relative;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background:
+    radial-gradient(600px 400px at 15% 18%, rgba(22,183,119,.35), transparent 70%),
+    radial-gradient(520px 380px at 85% 82%, rgba(47,155,224,.30), transparent 70%),
+    linear-gradient(160deg, #0b1f2a 0%, #123a2e 55%, #16b777 150%);
+}
+
+/* ---- 左屏：心跳星河品牌动画 ---- */
+.login-brand {
+  position: relative;
+  flex: none;
+  width: clamp(480px, 54%, 900px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+/* 星空：两组不同尺度的随机星点，交错闪烁 */
+.stars {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 25px 35px, rgba(255,255,255,.9), transparent),
+    radial-gradient(1px 1px at 80px 120px, rgba(255,255,255,.7), transparent),
+    radial-gradient(2px 2px at 150px 60px, rgba(255,255,255,.5), transparent),
+    radial-gradient(1px 1px at 200px 160px, rgba(255,255,255,.8), transparent),
+    radial-gradient(1px 1px at 120px 210px, rgba(255,255,255,.6), transparent);
+  background-size: 260px 260px;
+  animation: twinkle 3.5s ease-in-out infinite alternate;
+}
+.stars-2 {
+  background-image:
+    radial-gradient(1px 1px at 60px 90px, rgba(255,255,255,.5), transparent),
+    radial-gradient(2px 2px at 180px 20px, rgba(255,255,255,.4), transparent),
+    radial-gradient(1px 1px at 110px 170px, rgba(255,255,255,.7), transparent);
+  background-size: 340px 340px;
+  animation: twinkle 5s ease-in-out infinite alternate-reverse;
+}
+@keyframes twinkle { from { opacity: .25; } to { opacity: 1; } }
+
+/* 双星轨道：两只头像沿环形轨道公转，自身反向自转保持头像始终端正 */
+.brand-scene { position: relative; width: 400px; height: 400px; flex: none; }
+/* 粒子心形画布：细小碎片聚合成红色爱心，是左屏的视觉主体 */
+#heartCanvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.orbit {
+  position: absolute;
+  inset: 0;
+  border: 1px dashed rgba(255,255,255,.18);
+  border-radius: 50%;
+  animation: spin 16s linear infinite;
+}
+.orbit-avatar {
+  position: absolute;
+  top: -26px;
+  left: calc(50% - 26px);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.85);
+  box-shadow: 0 0 18px rgba(255,77,109,.45);
+  background: #fff;
+  object-fit: cover;
+  animation: spin 16s linear infinite reverse;
+}
+.orbit-avatar-b { top: auto; bottom: -26px; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* 缓缓上浮的小爱心 */
+.brand-hearts { position: absolute; inset: 0; pointer-events: none; }
+.brand-hearts i {
+  position: absolute;
+  bottom: -40px;
+  color: rgba(255,255,255,.35);
+  animation-name: float-up;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+/* 每颗心形的位置/尺寸/节奏参数（原内嵌 style 归拢） */
+.brand-hearts i:nth-child(1) { left: 8%; font-size: 12px; animation-duration: 11s; }
+.brand-hearts i:nth-child(2) { left: 26%; font-size: 16px; animation-duration: 13s; animation-delay: -4s; }
+.brand-hearts i:nth-child(3) { left: 47%; font-size: 10px; animation-duration: 10s; animation-delay: -7s; }
+.brand-hearts i:nth-child(4) { left: 68%; font-size: 15px; animation-duration: 14s; animation-delay: -2s; }
+.brand-hearts i:nth-child(5) { left: 86%; font-size: 12px; animation-duration: 12s; animation-delay: -9s; }
+@keyframes float-up {
+  0% { transform: translateY(0); opacity: 0; }
+  12% { opacity: .55; }
+  85% { opacity: .35; }
+  100% { transform: translateY(-110vh); opacity: 0; }
+}
+
+/* 文案层：站名 / 标语 / 恋爱计时 */
+.brand-copy {
+  position: relative;
+  z-index: 2;
+  margin-top: 46px;
+  text-align: center;
+  color: #fff;
+}
+.brand-name { font-size: 26px; font-weight: 700; letter-spacing: 2px; }
+.brand-slogan { margin-top: 12px; max-width: 420px; font-size: 13px; line-height: 1.8; opacity: .72; }
+/* 打字机光标：逐字输入期间显示并闪烁，完成后停留 2s 再隐藏 */
+.brand-slogan.typing::after {
+  content: '▍';
+  margin-left: 2px;
+  color: #7dffc4;
+  animation: cursor-blink .8s step-end infinite;
+}
+@keyframes cursor-blink { 50% { opacity: 0; } }
+.brand-days {
+  margin-top: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 20px;
+  font-size: 13px;
+  line-height: 1; /* 归一行高：图标/汉字/数字的字形盒等高，垂直居中即视觉居中 */
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 999px;
+  background: rgba(255,255,255,.08);
+  backdrop-filter: blur(4px);
+}
+.brand-days .num { font-size: 15px; font-weight: 700; color: #7dffc4; }
+.brand-days-heart { flex: none; width: 14px; height: 14px; fill: #ff7a9e; }
+
+/* 降低动效偏好：关闭全部装饰动画 */
+@media (prefers-reduced-motion: reduce) {
+  .stars, .orbit, .orbit-avatar, .brand-hearts i, .login-card { animation: none; }
+}
+/* 窄屏：隐藏左屏动画，登录卡片全屏居中 */
+@media (max-width: 900px) {
+  .login-brand { display: none; }
+}
+
+/* ---- 右屏：登录卡片（毛玻璃浮层） ---- */
+.login-panel {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+.login-card {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  /* 星河玻璃：与夜幕同材质的深色半透明卡 */
+  background: rgba(255,255,255,.07);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 20px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 24px 80px rgba(0, 0, 0, .45);
+  padding: 38px 36px 30px;
+  animation: card-in .8s ease-out both;
+}
+/* 入场：从星空中淡入上浮（仅首次） */
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: none; }
+}
+.login-card .login-title {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  color: #f2f7f5;
+  margin-bottom: 6px;
+}
+.login-card .login-sub {
+  text-align: center;
+  color: rgba(255,255,255,.45);
+  font-size: 12px;
+  margin-bottom: 28px;
+}
+.login-card .layui-icon { color: rgba(255,255,255,.45); }
+/* 标题爱心：与左屏粒子心同款粉红，形成前后色彩呼应 */
+.login-card .login-title .layui-icon { color: #ff7a9e; }
+
+/* 输入框：深色玻璃质感，聚焦时品牌绿辉光 */
+.login-card .layui-input-wrap .layui-input {
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.14);
+  color: #eaf2f5;
+}
+.login-card .layui-input-wrap .layui-input::placeholder { color: rgba(255,255,255,.35); }
+.login-card .layui-input-wrap .layui-input:focus {
+  border-color: rgba(22,183,119,.75);
+  background: rgba(255,255,255,.11);
+  box-shadow: 0 0 0 3px rgba(22,183,119,.18);
+}
+/* 自动填充时保持深色底（Chrome autofill 会强刷白底） */
+.login-card .layui-input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px rgba(16,38,43,.9) inset;
+  -webkit-text-fill-color: #eaf2f5;
+}
+.login-card .login-btn {
+  border: none;
+  box-shadow: 0 8px 24px rgba(22,183,119,.35);
+  transition: box-shadow .2s ease, transform .2s ease;
+}
+.login-card .login-btn:hover {
+  box-shadow: 0 10px 28px rgba(22,183,119,.5);
+  transform: translateY(-1px);
+}
+
+/* 验证码行：验证码图在左、输入框在右，两者等分整行（左右边缘与用户名/密码行对齐） */
+.captcha-row { display: flex; gap: 10px; }
+/* 验证码：/captcha 返回 captchaValue 为 base64 图片 data URI，点击图片刷新 */
+.captcha-box {
+  flex: 1;
+  min-width: 0;
+  height: 38px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.08);
+}
+/* 图片铺满显示框（aj-captcha 默认 130x48，38px 行高下轻微压扁，视觉更饱满） */
+.captcha-box img { width: 100%; height: 100%; }
+.captcha-input { flex: 1; min-width: 0; }
+.login-btn { display: block; min-width: 160px; margin: 6px auto 0; background: #16b777; }
+
+/* 验证码默认隐藏：开启验证码开关时由 login.js 以内联样式接管显示 */
+#captchaItem, #captchaImg { display: none; }
