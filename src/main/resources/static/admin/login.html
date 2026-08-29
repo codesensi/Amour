@@ -37,13 +37,13 @@
       margin-bottom: 28px;
     }
     .login-card .layui-icon { color: #bbb; }
-    /* 验证码行：验证码图在左、输入框在右，整体宽度与用户名/密码输入框对齐 */
+    /* 验证码行：验证码图在左、输入框在右，两者等分整行（左右边缘与用户名/密码行对齐） */
     .captcha-row { display: flex; gap: 10px; }
     /* 验证码：/captcha 返回 captchaValue 为 base64 图片 data URI，点击图片刷新 */
     .captcha-box {
-      width: 110px;
+      flex: 1;
+      min-width: 0;
       height: 38px;
-      flex: none;
       box-sizing: border-box;
       display: flex;
       align-items: center;
@@ -54,7 +54,8 @@
       border: 1px solid #eee;
       background: #f2f6f3;
     }
-    .captcha-box img { max-width: 100%; height: 100%; }
+    /* 图片铺满显示框（aj-captcha 默认 130x48，38px 行高下轻微压扁，视觉更饱满） */
+    .captcha-box img { width: 100%; height: 100%; }
     .captcha-input { flex: 1; min-width: 0; }
     .login-btn { width: 100%; margin-top: 6px; }
   </style>
