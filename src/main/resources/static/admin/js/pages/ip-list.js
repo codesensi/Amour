@@ -15,6 +15,7 @@ const IP_BANS = [
 export function init() {
     // IP 封禁列表：layui table 常规页码分页（原站列：序号/IP归属地/Date/备注/IP/Action）
     renderAdminTable({
+            elem: '#ip-ban-table',
         cols: [[
             { type: 'numbers', title: '序号', width: 70 },
             { field: 'region', title: 'IP归属地', width: 130 },
@@ -38,12 +39,12 @@ export function init() {
             const el = e.target.closest('.delete-btn');
             if (!el) return;
             e.preventDefault();
-            del(el.dataset.id, el.dataset.ip);
+            removeRow(el.dataset.id, el.dataset.ip);
         });
     }
 
     // 解封 IP：原站跳转 delip.php?id=x 执行删除，现阶段后端接口未实现，改为演示提示
-    function del(id, ip) {
+    function removeRow(id, ip) {
         loadLayui('layer').then(function (m) {
             m[0].confirm('您确认要删除IP为 ' + ip + ' 吗', { title: '解封确认' }, function (index) {
                 m[0].close(index);
@@ -54,7 +55,7 @@ export function init() {
     }
 
     // 新增 IP 封禁入口：原站跳转 ipSet.php（新增页），现阶段该页面未实现，改为演示提示
-    $(".fabu").on("click", function () {
+    $('.js-add-ip').on("click", function () {
         // 现阶段后端接口未实现，mock 演示提示；接口实现后恢复为真实跳转（ipSet.php）
         toast.info("演示数据：新增 IP 封禁页面暂未开放！", "Like_Girl");
     });

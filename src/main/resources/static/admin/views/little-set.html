@@ -16,13 +16,13 @@
 
 <body>
 
-<div id="Loadanimation">
-    <div id="Loadanimation-center">
-        <div id="Loadanimation-center-absolute">
-            <div class="xccx_object" id="xccx_four"></div>
-            <div class="xccx_object" id="xccx_three"></div>
-            <div class="xccx_object" id="xccx_two"></div>
-            <div class="xccx_object" id="xccx_one"></div>
+<div id="loading-mask">
+    <div id="loading-layer">
+        <div id="loading-spinner">
+            <div class="loading-ring" id="loading-ring-4"></div>
+            <div class="loading-ring" id="loading-ring-3"></div>
+            <div class="loading-ring" id="loading-ring-2"></div>
+            <div class="loading-ring" id="loading-ring-1"></div>
         </div>
     </div>
 </div><!--内容页面 Start-->
@@ -37,14 +37,14 @@
                         <div class="layui-card">
                             <div class="layui-card-body">
 
-                                <h4 class="header-title mb-3 size_18">点点滴滴
+                                <h4 class="header-title mb-3">点点滴滴
                                     <!-- 原站跳转 /admin/littleAdd.php 新增文章页（暂未迁移），演示环境仅给出提示 -->
-                                    <a class="fabu" href="javascript:void(0);">
+                                    <a class="js-add-little" href="javascript:void(0);">
                                         <button type="button" class="layui-btn layui-btn-normal layui-btn-sm">
                                             <i class="layui-icon layui-icon-edit"></i>新增
                                         </button>
                                     </a></h4>
-                                <table id="basic-datatable" lay-filter="basic-datatable"></table>
+                                <table id="little-table" lay-filter="little-table"></table>
 
                             </div> <!-- end card body-->
                         </div> <!-- end card -->

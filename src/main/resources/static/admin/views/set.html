@@ -15,13 +15,13 @@
 
 <body>
 
-<div id="Loadanimation">
-    <div id="Loadanimation-center">
-        <div id="Loadanimation-center-absolute">
-            <div class="xccx_object" id="xccx_four"></div>
-            <div class="xccx_object" id="xccx_three"></div>
-            <div class="xccx_object" id="xccx_two"></div>
-            <div class="xccx_object" id="xccx_one"></div>
+<div id="loading-mask">
+    <div id="loading-layer">
+        <div id="loading-spinner">
+            <div class="loading-ring" id="loading-ring-4"></div>
+            <div class="loading-ring" id="loading-ring-3"></div>
+            <div class="loading-ring" id="loading-ring-2"></div>
+            <div class="loading-ring" id="loading-ring-1"></div>
         </div>
     </div>
 </div><!--内容页面 Start-->
@@ -40,36 +40,36 @@
                                 <!-- 原站表单提交至 adminPost.php，提交已改为页面脚本 mock 处理，此处移除 action/method/onsubmit -->
                                 <form class="needs-validation layui-form" novalidate>
                                     <div class="form-group mb-3">
-                                        <label for="validationCustom01">站点标题</label>
+                                        <label>站点标题</label>
                                         <input type="text" class="layui-input" placeholder="请输入站点标题"
                                                name="title" value="龙猫の爱恋" required>
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label for="validationCustom02">站点LOGO</label>
+                                        <label>站点LOGO</label>
                                         <input type="text" class="layui-input" placeholder="请填写站点LOGO文字"
                                                name="logo" value="龙猫の爱恋" required>
 
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label for="validationCustom03">站点文案</label>
+                                        <label>站点文案</label>
                                         <input type="text" class="layui-input" placeholder="显示在顶部的文案"
                                                name="writing" value="爱晨雾漫过青瓦，爱暮色染透篱笆，更爱与君并肩立，看遍这人间烟火里的朝暮与年华。" required>
                                     </div>
                                     <div class="form-group">
-                                        <label for="validationCustom06">是否关闭头像背景高斯模糊</label>
-                                        <select class="layui-select" id="example-select" name="WebBlur">
+                                        <label>是否关闭头像背景高斯模糊</label>
+                                        <select class="layui-select" name="WebBlur">
                                             <option value="1" selected>开启</option>
                                             <option value="2">关闭</option>
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label for="validationCustom07">是否开启前端无刷新加载</label>
-                                        <select class="layui-select" id="example-select" name="WebPjax">
+                                        <label>是否开启前端无刷新加载</label>
+                                        <select class="layui-select" name="WebPjax">
                                             <option value="1" selected>开启</option>
                                             <option value="2">关闭</option>
                                         </select>
                                     </div>
-                                    <div class="form-group mb-3 text_right">
+                                    <div class="form-group mb-3">
                                         <button class="layui-btn" type="button" id="adminPost">提交修改</button>
                                     </div>
                                 </form>
@@ -86,31 +86,31 @@
                                 <!-- 原站表单提交至 loveadminPost.php，提交已改为页面脚本 mock 处理，此处移除 action/method -->
                                 <form class="needs-validation layui-form" novalidate>
                                     <div class="form-group mb-3">
-                                        <label for="validationCustom02">女主Name</label>
+                                        <label>女主Name</label>
                                         <input type="text" class="layui-input" placeholder="请输入女主Name"
                                                name="girl" value="Su" required>
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label for="validationCustom01">男主Name</label>
+                                        <label>男主Name</label>
                                         <input type="text" class="layui-input" placeholder="请输入男主Name"
                                                name="boy" value="Li" required>
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label for="validationCustom04">女主QQ</label>
+                                        <label>女主QQ</label>
                                         <input type="text" class="layui-input" placeholder="请输入女主QQ（用于显示头像）"
                                                name="girlimg" value="673822943" required>
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label for="validationCustom03">男主QQ</label>
+                                        <label>男主QQ</label>
                                         <input type="text" class="layui-input" placeholder="请输入男主QQ（用于显示头像）"
                                                name="boyimg" value="2623669948" required>
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label for="validationCustom05">起始时间</label>
+                                        <label>起始时间</label>
                                         <input type="datetime-local" class="layui-input" placeholder="请输入起始时间"
                                                name="startTime" value="2018-07-15T00:00" required>
                                     </div>
-                                    <div class="form-group mb-3 text_right">
+                                    <div class="form-group mb-3">
                                         <button class="layui-btn" type="button" id="loveadminPost">提交修改</button>
                                     </div>
                                 </form>
@@ -127,54 +127,54 @@
                                 <!-- 原站表单提交至 CardadminPost.php，提交已改为页面脚本 mock 处理，此处移除 action/method -->
                                 <form class="needs-validation layui-form" novalidate>
                                     <div class="form-group mb-3">
-                                        <label for="validationCustom01">背景图片URL地址</label>
+                                        <label>背景图片URL地址</label>
                                         <input type="text" class="layui-input" placeholder="请输入卡片Name"
                                                name="bgimg" value="Style/img/bgCover.png" required>
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label for="validationCustom01">卡片1Name</label>
+                                        <label>卡片1Name</label>
                                         <input type="text" class="layui-input" placeholder="请输入卡片Name"
                                                name="card1" value="点点滴滴" required>
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label for="validationCustom02">卡片1描述</label>
+                                        <label>卡片1描述</label>
                                         <input type="text" class="layui-input" placeholder="请输入卡片描述"
                                                name="deci1" value="有人愿意听你碎碎念念也很浪漫" required>
 
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label for="validationCustom03">卡片2Name</label>
+                                        <label>卡片2Name</label>
                                         <input type="text" class="layui-input" placeholder="请输入卡片Name"
                                                name="card2" value="留言板" required>
 
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label for="validationCustom04">卡片2描述</label>
+                                        <label>卡片2描述</label>
                                         <input type="text" class="layui-input" placeholder="请输入卡片描述"
                                                name="deci2" value="在这里写下我们的留言祝福" required>
 
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label for="validationCustom05">卡片3Name</label>
+                                        <label>卡片3Name</label>
                                         <input type="text" class="layui-input" placeholder="请输入卡片Name"
                                                name="card3" value="关于我们" required>
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label for="validationCustom05">卡片3描述</label>
+                                        <label>卡片3描述</label>
                                         <input type="text" class="layui-input" placeholder="请输入卡片描述"
                                                name="deci3" value="我们之间认识的经历回忆" required>
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label for="validationCustom05">域名备案号</label>
+                                        <label>域名备案号</label>
                                         <input type="text" class="layui-input" placeholder="没有请留空" name="icp"
                                                value="赣ICP备2026010001号" required>
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label for="validationCustom05">站点版权信息</label>
+                                        <label>站点版权信息</label>
                                         <input type="text" class="layui-input" placeholder="请输入站点版权信息"
                                                name="Copyright" value="Copyright © 2022 - 2026 Like_Girl All Rights Reserved." required>
                                     </div>
-                                    <div class="form-group mb-3 text_right">
+                                    <div class="form-group mb-3">
                                         <button class="layui-btn" type="button" id="CardadminPost">提交修改</button>
                                     </div>
                                 </form>

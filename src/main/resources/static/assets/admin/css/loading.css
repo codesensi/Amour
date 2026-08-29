@@ -1,4 +1,4 @@
-#Loadanimation{
+#loading-mask{
     background-color:#fff;
     height:100%;
     width:100%;
@@ -8,13 +8,13 @@
     margin-top:0px;top:0px;
 
 }
-#Loadanimation-center{
+#loading-layer{
     width:100%;
     height:100%;
     position:relative;
 
 }
-#Loadanimation-center-absolute{
+#loading-spinner{
     position:absolute;
     left:50%;
     top:50%;
@@ -24,7 +24,7 @@
     margin-left:-100px;
 
 }
-.xccx_object{
+.loading-ring{
     -moz-border-radius:50% 50% 50% 50%;
     -webkit-border-radius:50% 50% 50% 50%;
     border-radius:50% 50% 50% 50%;
@@ -37,14 +37,14 @@
     animation:animate 2.5s infinite;
 
 }
-#xccx_one{
+#loading-ring-1{
     left:75px;
     top:75px;
     width:50px;
     height:50px;
 
 }
-#xccx_two{
+#loading-ring-2{
     left:65px;
     top:65px;
     width:70px;
@@ -53,7 +53,7 @@
     animation-delay:0.1s;
 
 }
-#xccx_three{
+#loading-ring-3{
     left:55px;
     top:55px;
     width:90px;
@@ -61,7 +61,7 @@
     -webkit-animation-delay:0.2s;animation-delay:0.2s;
 
 }
-#xccx_four{
+#loading-ring-4{
     left:45px;
     top:45px;
     width:110px;

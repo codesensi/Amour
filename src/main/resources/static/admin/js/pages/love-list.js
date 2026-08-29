@@ -100,6 +100,7 @@ const IMG_SELECTOR = 'img[src$=jpg],img[src$=gif],img[src$=JPG],img[src$=png],im
 export function init() {
     // 恋爱清单列表：layui table 常规页码分页（83 条演示数据）
     renderAdminTable({
+            elem: '#love-event-table',
         cols: [[
             { type: 'numbers', title: '序号', width: 70 },
             { field: 'title', title: '事件标题', minWidth: 220 },
@@ -156,16 +157,16 @@ export function init() {
             const delBtn = e.target.closest('.delete-btn');
             if (delBtn) {
                 e.preventDefault();
-                del(delBtn.dataset.id, delBtn.dataset.title);
+                removeRow(delBtn.dataset.id, delBtn.dataset.title);
             }
         });
     }
 
     // 删除事件：原站 confirm 确认后跳转 dellist.php?id=x 真实删除；
     // 现阶段后端接口未实现，mock 处理：layer.confirm 确认后仅弹出演示提示，不真正删除数据
-    function del(id, eventname) {
+    function removeRow(id, title) {
         loadLayui('layer').then(function (m) {
-            m[0].confirm('您确认要删除内容为 ' + eventname + ' 的事件吗', { title: '删除确认' }, function (index) {
+            m[0].confirm('您确认要删除内容为 ' + title + ' 的事件吗', { title: '删除确认' }, function (index) {
                 m[0].close(index);
                 // 原站此处为 location.href = 'dellist.php?id=' + id（真实删除），现按演示数据处理
                 toast.warning("演示数据：删除功能暂未接入后端", "Like_Girl");

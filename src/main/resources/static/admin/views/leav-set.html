@@ -16,13 +16,13 @@
 
 <body>
 
-<div id="Loadanimation">
-    <div id="Loadanimation-center">
-        <div id="Loadanimation-center-absolute">
-            <div class="xccx_object" id="xccx_four"></div>
-            <div class="xccx_object" id="xccx_three"></div>
-            <div class="xccx_object" id="xccx_two"></div>
-            <div class="xccx_object" id="xccx_one"></div>
+<div id="loading-mask">
+    <div id="loading-layer">
+        <div id="loading-spinner">
+            <div class="loading-ring" id="loading-ring-4"></div>
+            <div class="loading-ring" id="loading-ring-3"></div>
+            <div class="loading-ring" id="loading-ring-2"></div>
+            <div class="loading-ring" id="loading-ring-1"></div>
         </div>
     </div>
 </div><!--内容页面 Start-->
@@ -40,7 +40,7 @@
                                     <div class="layui-col-md4">
                                         <div class="text-lg-right">
                                             <!-- 原站跳转 /admin/leavP.php 留言设置页（暂未迁移），演示环境仅给出提示 -->
-                                            <a class="fabu" href="javascript:void(0);">
+                                            <a class="js-leav-config" href="javascript:void(0);">
                                                 <button type="button" class="layui-btn layui-btn-normal layui-btn-sm"><i
                                                         class=" layui-icon layui-icon-chart"></i> 留言相关设置
                                                 </button>
@@ -48,12 +48,12 @@
                                         </div>
                                     </div><!-- end col-->
                                 </div>
-                                <h4 class="header-title mb-3 size_18">留言管理
+                                <h4 class="header-title mb-3">留言管理
                                     <button type="button" class="layui-btn layui-btn-primary layui-btn-sm layui-btn-radius">
                                         共<b>1</b>条
                                     </button>
                                 </h4>
-                                <table id="basic-datatable" lay-filter="basic-datatable"></table>
+                                <table id="leav-table" lay-filter="leav-table"></table>
 
                             </div> <!-- end card body-->
                         </div> <!-- end card -->

@@ -15,13 +15,13 @@
 
 <body>
 
-<div id="Loadanimation">
-    <div id="Loadanimation-center">
-        <div id="Loadanimation-center-absolute">
-            <div class="xccx_object" id="xccx_four"></div>
-            <div class="xccx_object" id="xccx_three"></div>
-            <div class="xccx_object" id="xccx_two"></div>
-            <div class="xccx_object" id="xccx_one"></div>
+<div id="loading-mask">
+    <div id="loading-layer">
+        <div id="loading-spinner">
+            <div class="loading-ring" id="loading-ring-4"></div>
+            <div class="loading-ring" id="loading-ring-3"></div>
+            <div class="loading-ring" id="loading-ring-2"></div>
+            <div class="loading-ring" id="loading-ring-1"></div>
         </div>
     </div>
 </div><!--内容页面 Start-->
@@ -41,60 +41,60 @@
                                 <!-- 原站表单提交至 userPost.php，提交已改为页面脚本 mock 处理，此处移除 action/method -->
                                 <form class="needs-validation layui-form" novalidate>
                                     <div class="form-group">
-                                        <label for="validationCustom01">是否开启前端加载动画</label>
-                                        <select class="layui-select" id="example-select" name="Webanimation">
+                                        <label>是否开启前端加载动画</label>
+                                        <select class="layui-select" name="Webanimation">
                                             <option value="1" selected>开启</option>
                                             <option value="2">关闭</option>
                                         </select>
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label for="validationCustom05">管理员姓名</label>
-                                        <input type="text" class="layui-input" id="validationCustom05" placeholder="请输入管理员Name"
+                                        <label>管理员姓名</label>
+                                        <input type="text" class="layui-input" placeholder="请输入管理员Name"
                                                name="userName" value="龙猫汪汪汪" required>
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label for="validationCustom05">管理员QQ</label>
-                                        <input type="text" class="layui-input" id="validationCustom05" placeholder="请输入管理员QQ"
+                                        <label>管理员QQ</label>
+                                        <input type="text" class="layui-input" placeholder="请输入管理员QQ"
                                                name="userQQ" value="2623669948" required>
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label for="validationCustom04">管理员登录账号</label>
+                                        <label>管理员登录账号</label>
                                         <span class="layui-badge layui-bg-green">账号由大小写字母与数字组成</span>
                                         <input type="text" class="layui-input" placeholder="请输入需修改的管理员账号"
                                                name="adminName" value="codesensi" required>
 
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label for="validationCustom05">管理员登录密码</label>
+                                        <label>管理员登录密码</label>
                                         <span class="layui-badge layui-bg-green">密码由大小写字母与数字组成</span>
                                         <input class="layui-input" name="pw" type="password" value="" placeholder="不修改请留空">
                                     </div>
 
                                     <div class="form-group mb-3">
-                                        <label for="validationCustom05">自定义前端全局CSS样式
+                                        <label>自定义前端全局CSS样式
                                             <span class="layui-badge layui-bg-blue">请按CSS格式填写你的代码</span></label>
                                         <textarea name="cssCon" class="layui-textarea" rows="5"
                                                   placeholder=""></textarea>
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label for="validationCustom05">自定义头部标签
+                                        <label>自定义头部标签
                                             <span class="layui-badge layui-bg-blue">可填写HTML标签 CSS外链</span></label>
                                         <textarea name="headCon" class="layui-textarea" rows="5"
                                                   placeholder=""></textarea>
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label for="validationCustom05">自定义底部标签
+                                        <label>自定义底部标签
                                             <span class="layui-badge layui-bg-blue">可填写HTML标签 js外链</span></label>
                                         <textarea name="footerCon" class="layui-textarea" rows="5"
                                                   placeholder="">&lt;!--&lt;script src=&quot;https://img-love.kikiw.cn/jsxg/yh/yinghua.js&quot;&gt;&lt;/script&gt;--&gt;</textarea>
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label for="validationCustom05">安全码</label>
-                                        <span class="layui-badge layui-bg-red>修改敏感信息必须填写</span>
+                                        <label>安全码</label>
+                                        <span class="layui-badge layui-bg-red">修改敏感信息必须填写</span>
                                         <input type="password" class="layui-input" name="SCode" value="" placeholder="请输入安全码">
                                     </div>
 
-                                    <div class="form-group mb-3 text_right">
+                                    <div class="form-group mb-3">
                                         <button class="layui-btn" type="button" id="userPost">提交修改</button>
                                     </div>
                                 </form>

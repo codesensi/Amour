@@ -17,13 +17,13 @@
 
 <body>
 
-<div id="Loadanimation">
-    <div id="Loadanimation-center">
-        <div id="Loadanimation-center-absolute">
-            <div class="xccx_object" id="xccx_four"></div>
-            <div class="xccx_object" id="xccx_three"></div>
-            <div class="xccx_object" id="xccx_two"></div>
-            <div class="xccx_object" id="xccx_one"></div>
+<div id="loading-mask">
+    <div id="loading-layer">
+        <div id="loading-spinner">
+            <div class="loading-ring" id="loading-ring-4"></div>
+            <div class="loading-ring" id="loading-ring-3"></div>
+            <div class="loading-ring" id="loading-ring-2"></div>
+            <div class="loading-ring" id="loading-ring-1"></div>
         </div>
     </div>
 </div><!--内容页面 Start-->
@@ -38,14 +38,14 @@
                     <div class="layui-col-md12">
                         <div class="layui-card">
                             <div class="layui-card-body">
-                                <h4 class="header-title mb-3 size_18">IP封禁管理
+                                <h4 class="header-title mb-3">IP封禁管理
                                     <!-- 原站跳转 /admin/ipSet.php（新增 IP 封禁页），现阶段该页面未实现，改为演示提示 -->
-                                    <a class="fabu" href="javascript:void(0);">
+                                    <a class="js-add-ip" href="javascript:void(0);">
                                         <button type="button" class="layui-btn layui-btn-normal layui-btn-sm">
                                             <i class="layui-icon layui-icon-edit"></i>新增
                                         </button>
                                     </a></h4>
-                                <table id="basic-datatable" lay-filter="basic-datatable"></table>
+                                <table id="ip-ban-table" lay-filter="ip-ban-table"></table>
 
                             </div> <!-- end card body-->
                         </div> <!-- end card -->

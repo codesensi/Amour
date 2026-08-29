@@ -16,13 +16,13 @@
 
 <body>
 
-<div id="Loadanimation">
-    <div id="Loadanimation-center">
-        <div id="Loadanimation-center-absolute">
-            <div class="xccx_object" id="xccx_four"></div>
-            <div class="xccx_object" id="xccx_three"></div>
-            <div class="xccx_object" id="xccx_two"></div>
-            <div class="xccx_object" id="xccx_one"></div>
+<div id="loading-mask">
+    <div id="loading-layer">
+        <div id="loading-spinner">
+            <div class="loading-ring" id="loading-ring-4"></div>
+            <div class="loading-ring" id="loading-ring-3"></div>
+            <div class="loading-ring" id="loading-ring-2"></div>
+            <div class="loading-ring" id="loading-ring-1"></div>
         </div>
     </div>
 </div><!--内容页面 Start-->
@@ -40,41 +40,41 @@
                 <div class="layui-card-body">
                     <h4 class="header-title mb-3">对话配置——1</h4>
                     <div class="form-group mb-3">
-                        <label for="validationCustom01">对话标题</label>
-                        <input type="text" class="layui-input" id="validationCustom01" placeholder="请输入标题" name="title"
+                        <label>对话标题</label>
+                        <input type="text" class="layui-input" placeholder="请输入标题" name="title"
                                value="Ki_About" required>
                     </div>
                     <div class="form-group mb-3">
-                        <label for="validationCustom01">对话模块背景图片地址</label>
-                        <input type="text" class="layui-input" id="validationCustom01" placeholder="请输入图片URL地址"
+                        <label>对话模块背景图片地址</label>
+                        <input type="text" class="layui-input" placeholder="请输入图片URL地址"
                                name="aboutimg" value="https://ice.frostsky.com/2024/11/06/570374efdc2bb75a8b722c969118afb5.webp" required>
                     </div>
                     <div class="form-group mb-3">
-                        <label for="validationCustom02">对话1文本</label>
-                        <input type="text" class="layui-input" id="validationCustom02" placeholder="请填写对话内容"
+                        <label>对话1文本</label>
+                        <input type="text" class="layui-input" placeholder="请填写对话内容"
                                name="info1" value="Hi, 欢迎你的来访" required>
 
                     </div>
                     <div class="form-group mb-3">
-                        <label for="validationCustom03">对话2文本</label>
-                        <input type="text" class="layui-input" id="validationCustom03" placeholder="请填写对话内容"
+                        <label>对话2文本</label>
+                        <input type="text" class="layui-input" placeholder="请填写对话内容"
                                name="info2" value="愿得一人心 白首不相离" required>
 
                     </div>
                     <div class="form-group mb-3">
-                        <label for="validationCustom04">对话3文本</label>
-                        <input type="text" class="layui-input" id="validationCustom04" placeholder="请填写对话内容"
+                        <label>对话3文本</label>
+                        <input type="text" class="layui-input" placeholder="请填写对话内容"
                                name="info3" value="记录日常生活 留住感动" required>
 
                     </div>
                     <div class="form-group mb-3">
-                        <label for="validationCustom05">对话1按钮确认文本</label>
-                        <input type="text" class="layui-input" id="validationCustom05" name="btn1"
+                        <label>对话1按钮确认文本</label>
+                        <input type="text" class="layui-input" name="btn1"
                                value="听我介绍" placeholder="请填写确认按钮文本">
                     </div>
                     <div class="form-group mb-3">
-                        <label for="validationCustom05">对话1按钮取消文本</label>
-                        <input type="text" class="layui-input" id="validationCustom05" name="btn2"
+                        <label>对话1按钮取消文本</label>
+                        <input type="text" class="layui-input" name="btn2"
                                value="结束介绍" placeholder="请填写取消按钮文本">
                     </div>
                 </div> <!-- end card-body-->
@@ -87,41 +87,41 @@
                     <h4 class="header-title mb-3">对话配置——2</h4>
 
                     <div class="form-group mb-3">
-                        <label for="validationCustom01">对话2-1文本</label>
-                        <input type="text" class="layui-input" id="validationCustom01" placeholder="请填写对话内容"
+                        <label>对话2-1文本</label>
+                        <input type="text" class="layui-input" placeholder="请填写对话内容"
                                name="infox1" value="情侣小站Like Girl是 Ki 的原创项目" required>
                     </div>
                     <div class="form-group mb-3">
-                        <label for="validationCustom02">对话2-2文本</label>
-                        <input type="text" class="layui-input" id="validationCustom02" placeholder="请填写对话内容"
+                        <label>对话2-2文本</label>
+                        <input type="text" class="layui-input" placeholder="请填写对话内容"
                                name="infox2" value="在2022年暑假的假期最后几天里发布了1.0版本" required>
 
                     </div>
                     <div class="form-group mb-3">
-                        <label for="validationCustom03">对话2-3文本</label>
-                        <input type="text" class="layui-input" id="validationCustom03" placeholder="请填写对话内容"
+                        <label>对话2-3文本</label>
+                        <input type="text" class="layui-input" placeholder="请填写对话内容"
                                name="infox3" value="最新版本为 v5.2.0 亦是最终版本 目前已开源到码云" required>
 
                     </div>
                     <div class="form-group mb-3">
-                        <label for="validationCustom04">对话2-4文本</label>
-                        <input type="text" class="layui-input" id="validationCustom04" placeholder="请填写对话内容"
+                        <label>对话2-4文本</label>
+                        <input type="text" class="layui-input" placeholder="请填写对话内容"
                                name="infox4" value="PHP确实是 “世界上最好的语言”  我非常喜欢（痛苦" required>
 
                     </div>
                     <div class="form-group mb-3">
-                        <label for="validationCustom05">对话2-5文本</label>
-                        <input type="text" class="layui-input" id="validationCustom05" name="infox5"
+                        <label>对话2-5文本</label>
+                        <input type="text" class="layui-input" name="infox5"
                                value="在开发过程中遇到了许多奇葩问题 也是只能自己探索解决..." placeholder="请填写对话内容">
                     </div>
                     <div class="form-group mb-3">
-                        <label for="validationCustom05">对话2-6文本</label>
-                        <input type="text" class="layui-input" id="validationCustom05" name="infox6"
+                        <label>对话2-6文本</label>
+                        <input type="text" class="layui-input" name="infox6"
                                value="喜欢探索编程领域 热爱学习新知识 热爱开源文化" placeholder="请填写对话内容">
                     </div>
                     <div class="form-group mb-3">
-                        <label for="validationCustom05">对话2-1按钮文本</label>
-                        <input type="text" class="layui-input" id="validationCustom05" name="btnx2"
+                        <label>对话2-1按钮文本</label>
+                        <input type="text" class="layui-input" name="btnx2"
                                value="为什么叫 Ki？" placeholder="请填写按钮文本">
                     </div>
                 </div> <!-- end card-body-->
@@ -137,31 +137,31 @@
                 <div class="layui-card-body">
                     <h4 class="header-title mb-3">对话配置——3</h4>
                     <div class="form-group mb-3">
-                        <label for="validationCustom01">对话3-1文本</label>
-                        <input type="text" class="layui-input" id="validationCustom01" placeholder="请填写对话内容"
+                        <label>对话3-1文本</label>
+                        <input type="text" class="layui-input" placeholder="请填写对话内容"
                                name="infof1" value="不知道你有没有看过《比悲伤更悲伤的故事》" required>
                     </div>
                     <div class="form-group mb-3">
-                        <label for="validationCustom02">对话3-2文本</label>
-                        <input type="text" class="layui-input" id="validationCustom02" placeholder="请填写对话内容"
+                        <label>对话3-2文本</label>
+                        <input type="text" class="layui-input" placeholder="请填写对话内容"
                                name="infof2" value="嗨，我是k，如果有下辈子的话，" required>
 
                     </div>
                     <div class="form-group mb-3">
-                        <label for="validationCustom03">对话3-3文本</label>
-                        <input type="text" class="layui-input" id="validationCustom03" placeholder="请填写对话内容"
+                        <label>对话3-3文本</label>
+                        <input type="text" class="layui-input" placeholder="请填写对话内容"
                                name="infof3" value="“我想当戒指，眼镜，床和笔记本，这样的话，我就可以...”" required>
 
                     </div>
                     <div class="form-group mb-3">
-                        <label for="validationCustom04">对话3-4文本</label>
-                        <input type="text" class="layui-input" id="validationCustom04" placeholder="请填写对话内容"
+                        <label>对话3-4文本</label>
+                        <input type="text" class="layui-input" placeholder="请填写对话内容"
                                name="infof4" value="当然跟这个没有关系哈哈" required>
 
                     </div>
                     <div class="form-group mb-3">
-                        <label for="validationCustom05">对话3-1按钮文本</label>
-                        <input type="text" class="layui-input" id="validationCustom05" name="btnf3"
+                        <label>对话3-1按钮文本</label>
+                        <input type="text" class="layui-input" name="btnf3"
                                value="本站前端所有页面" placeholder="请填写按钮文本">
                     </div>
                 </div> <!-- end card-body-->
@@ -174,31 +174,31 @@
                 <div class="layui-card-body">
                     <h4 class="header-title mb-3">对话配置——4</h4>
                     <div class="form-group mb-3">
-                        <label for="validationCustom01">对话4-1文本</label>
-                        <input type="text" class="layui-input" id="validationCustom01" placeholder="请填写对话内容"
+                        <label>对话4-1文本</label>
+                        <input type="text" class="layui-input" placeholder="请填写对话内容"
                                name="infod1" value="首页 index" required>
                     </div>
                     <div class="form-group mb-3">
-                        <label for="validationCustom02">对话4-2文本</label>
-                        <input type="text" class="layui-input" id="validationCustom02" placeholder="请填写对话内容"
+                        <label>对话4-2文本</label>
+                        <input type="text" class="layui-input" placeholder="请填写对话内容"
                                name="infod2" value="点点滴滴 little" required>
 
                     </div>
                     <div class="form-group mb-3">
-                        <label for="validationCustom03">对话4-3文本</label>
-                        <input type="text" class="layui-input" id="validationCustom03" placeholder="请填写对话内容"
+                        <label>对话4-3文本</label>
+                        <input type="text" class="layui-input" placeholder="请填写对话内容"
                                name="infod3" value="留言板 leaving" required>
 
                     </div>
                     <div class="form-group mb-3">
-                        <label for="validationCustom04">对话4-4文本</label>
-                        <input type="text" class="layui-input" id="validationCustom04" placeholder="请填写对话内容"
+                        <label>对话4-4文本</label>
+                        <input type="text" class="layui-input" placeholder="请填写对话内容"
                                name="infod4" value="关于 about" required>
 
                     </div>
                     <div class="form-group mb-3">
-                        <label for="validationCustom05">对话4-5文本</label>
-                        <input type="text" class="layui-input" id="validationCustom05" name="infod5"
+                        <label>对话4-5文本</label>
+                        <input type="text" class="layui-input" name="infod5"
                                value="欢迎您的来访 IP已记录 请尽情浏览本站～" placeholder="请填写对话内容">
                     </div>
                 </div> <!-- end card-body-->
@@ -206,7 +206,7 @@
         </div> <!-- end col-->
     </div>
 
-    <div class="form-group mb-3 text_right">
+    <div class="form-group mb-3">
         <button class="layui-btn" type="button" id="aboutPost">提交修改</button>
     </div>
 </form>

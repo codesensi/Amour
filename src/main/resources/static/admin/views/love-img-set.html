@@ -17,13 +17,13 @@
 
 <body>
 
-<div id="Loadanimation">
-    <div id="Loadanimation-center">
-        <div id="Loadanimation-center-absolute">
-            <div class="xccx_object" id="xccx_four"></div>
-            <div class="xccx_object" id="xccx_three"></div>
-            <div class="xccx_object" id="xccx_two"></div>
-            <div class="xccx_object" id="xccx_one"></div>
+<div id="loading-mask">
+    <div id="loading-layer">
+        <div id="loading-spinner">
+            <div class="loading-ring" id="loading-ring-4"></div>
+            <div class="loading-ring" id="loading-ring-3"></div>
+            <div class="loading-ring" id="loading-ring-2"></div>
+            <div class="loading-ring" id="loading-ring-1"></div>
         </div>
     </div>
 </div><!--内容页面 Start-->
@@ -37,15 +37,15 @@
                     <div class="layui-col-md12">
                         <div class="layui-card">
                             <div class="layui-card-body">
-                                <h4 class="header-title mb-3 size_18">恋爱相册
+                                <h4 class="header-title mb-3">恋爱相册
                                     <!-- 原站此处跳转新增相册页（loveImgAdd.php），对应页面暂未迁移，改为演示提示 -->
-                                    <a href="javascript:void(0);" onclick="demoTip()">
+                                    <a href="javascript:void(0);" class="js-add-img">
                                         <button type="button" class="layui-btn layui-btn-normal layui-btn-sm">
                                             <i class="layui-icon layui-icon-edit"></i>新增
                                         </button>
                                     </a>
                                 </h4>
-                                <table id="basic-datatable" lay-filter="basic-datatable"></table>
+                                <table id="love-img-table" lay-filter="love-img-table"></table>
 
                             </div> <!-- end card body-->
                         </div> <!-- end card -->

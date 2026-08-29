@@ -14,6 +14,7 @@ const LOVE_IMG_ROWS = [
 export function init() {
     // 恋爱相册列表：layui table 常规页码分页
     renderAdminTable({
+            elem: '#love-img-table',
         cols: [[
             { type: 'numbers', title: '序号', width: 70 },
             { field: 'desc', title: '图片描述', minWidth: 200 },
@@ -45,7 +46,7 @@ export function init() {
             const delBtn = e.target.closest('.delete-btn');
             if (delBtn) {
                 e.preventDefault();
-                del(delBtn.dataset.id, delBtn.dataset.desc);
+                removeRow(delBtn.dataset.id, delBtn.dataset.desc);
             }
         });
     }
@@ -56,13 +57,18 @@ export function init() {
     function demoTip() {
         toast.info("演示数据：新增/编辑相册页面暂未开放", "Like_Girl");
     }
-    window.demoTip = demoTip; // HTML 头部"新增"按钮 onclick 属性引用，需暴露到全局
+
+    // 头部"新增"按钮：经 js- 类委托到演示提示（替代原 onclick 内联事件）
+    $('.js-add-img').on('click', function (e) {
+        e.preventDefault();
+        demoTip();
+    });
 
     // 删除相册：原站为跳转 delImg.php?id=... 真实删除；现阶段后端接口未实现，
     // mock 为 layer.confirm 确认 + 演示提示，接口实现后恢复为真实删除请求
-    function del(id, imgText) {
+    function removeRow(id, title) {
         loadLayui('layer').then(function (m) {
-            m[0].confirm('您确认要删除描述为 ' + imgText + ' 的相册图片吗', { title: '删除确认' }, function (index) {
+            m[0].confirm('您确认要删除描述为 ' + title + ' 的相册图片吗', { title: '删除确认' }, function (index) {
                 m[0].close(index);
                 toast.info("演示数据：删除操作暂未开放", "Like_Girl");
             });

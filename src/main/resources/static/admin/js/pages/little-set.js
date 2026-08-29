@@ -22,6 +22,7 @@ export function init() {
 
     // 文章列表：layui table 常规页码分页（原站列：序号/标题/发布时间/发布者/操作）
     renderAdminTable({
+            elem: '#little-table',
         cols: [[
             { type: 'numbers', title: '序号', width: 70 },
             { field: 'title', title: '标题', minWidth: 200 },
@@ -39,9 +40,9 @@ export function init() {
     });
 
     // 删除文章：原站确认后跳转 dellitt.php?id=x 执行删除；现为演示数据，仅给出提示
-    function del(id, articletitle) {
+    function removeRow(id, title) {
         loadLayui('layer').then(function (m) {
-            m[0].confirm('您确认要删除标题为 ' + articletitle + ' 的文章吗', { title: '删除确认' }, function (index) {
+            m[0].confirm('您确认要删除标题为 ' + title + ' 的文章吗', { title: '删除确认' }, function (index) {
                 m[0].close(index);
                 // 现阶段后端接口未实现，mock 演示提示；接口实现后恢复为真实删除请求
                 toast.warning("演示数据：删除功能暂未接入后端", "Like_Girl");
@@ -58,7 +59,7 @@ export function init() {
             const delEl = e.target.closest('.delete-btn');
             if (delEl) {
                 e.preventDefault();
-                del(delEl.dataset.id, delEl.dataset.title);
+                removeRow(delEl.dataset.id, delEl.dataset.title);
                 return;
             }
             // “修改”按钮：原站跳转 modlitt.php?id=x 文章编辑页（暂未迁移），演示环境仅提示
@@ -71,7 +72,7 @@ export function init() {
     }
 
     // “新增”按钮：原站跳转 /admin/littleAdd.php 新增文章页（暂未迁移），演示环境仅提示
-    $(".fabu").on('click', function () {
+    $('.js-add-little').on('click', function () {
         toast.info("演示数据：新增文章页面暂未迁移", "Like_Girl");
     });
 

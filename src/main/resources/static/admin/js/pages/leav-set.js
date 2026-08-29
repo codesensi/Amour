@@ -5,6 +5,7 @@ import { navigate as pjaxNavigate } from '/assets/common/pjax.js';
 import { toast } from '/assets/common/toast.js';
 import { loadLayui } from '/assets/common/layui.js';
 import { renderAdminTable } from '../datatable-init.js';
+import { loadLayui as _ll } from '/assets/common/layui.js';
 
 /** 留言列表演示数据（原站静态行迁移；后端接口实现后由 table.url 取数） */
 const MESSAGES = [
@@ -27,6 +28,7 @@ function esc(str) {
 };
 
 export function init() {
+    console.log('[埋点] leav-set init 进入');
     $(function () {
         // 登录成功欢迎提示（仅从登录页跳转过来时展示一次）
         if (sessionStorage.getItem('ADMIN_LOGIN_WELCOME') === '1') {
@@ -36,7 +38,9 @@ export function init() {
     });
 
     // 留言列表：layui table 常规页码分页
+    console.log('[埋点] renderAdminTable 即将调用', !!document.getElementById('leav-table'));
     renderAdminTable({
+            elem: '#leav-table',
         cols: [[
             { type: 'numbers', title: '序号', width: 70 },
             { field: 'content', title: '留言内容', minWidth: 200, templet: function (d) { return esc(d.content); } },
@@ -61,12 +65,12 @@ export function init() {
             const el = e.target.closest('.delete-btn');
             if (!el) return;
             e.preventDefault();
-            del(el.dataset.id, el.dataset.content);
+            removeRow(el.dataset.id, el.dataset.content);
         });
     }
 
     // 原站确认后跳转 delleav.php?id=x 执行删除；现为演示数据，仅给出提示
-    function del(id, text) {
+    function removeRow(id, text) {
         loadLayui('layer').then(function (m) {
             m[0].confirm('您确认要删除 ' + text + ' 内容吗', { title: '删除确认' }, function (index) {
                 m[0].close(index);
@@ -77,7 +81,7 @@ export function init() {
     }
 
     // “留言相关设置”按钮：原站跳转 /admin/leavP.php 留言设置页（暂未迁移），演示环境仅提示
-    $(".fabu").on('click', function () {
+    $('.js-leav-config').on('click', function () {
         toast.info("演示数据：留言设置页面暂未迁移", "Like_Girl");
     });
 

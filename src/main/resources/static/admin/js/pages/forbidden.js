@@ -15,6 +15,7 @@ const FORBIDDEN_ROWS = [
 export function init() {
     // 非法访问记录列表：layui table 常规页码分页（原站列：序号/访问时间/非法文件路径/IP地址/IP归属地）
     renderAdminTable({
+            elem: '#forbidden-table',
         cols: [[
             { type: 'numbers', title: '序号', width: 70 },
             { field: 'time', title: '访问时间', width: 180 },
