@@ -26,14 +26,3 @@ export async function renderAdminTable(config) {
     page: { limit: TABLE_PAGE_SIZE, limits: [10, 20, 30, 50] }
   }, config));
 }
-
-/**
- * 兼容外壳装配调用：列表表格已改由各页面模块经 renderAdminTable 渲染，
- * 此处保留空实现以维持 main.js 的装配流程不变。
- */
-export function initAdminDataTables() {}
-
-/**
- * 兼容外壳装配调用：pjax 换页丢弃旧节点即释放表格状态，无需显式销毁。
- */
-export function destroyAdminDataTables() {}

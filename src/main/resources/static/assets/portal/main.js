@@ -3,7 +3,7 @@
  *
  * 依赖关系：common/pjax.js（局部刷新核心）、common/config.js（项目配置）
  * 与 portal/js/portal.js（门户业务）均为 ES Module，经本入口统一加载；
- * 页面上仅保留 toastr 等第三方库的普通脚本。
+ * 页面（Thymeleaf 模板）只保留 layui 与图标字体等基础库的普通脚本。
  *
  * 页面模块约定：/portal/<name>.html 的模块为 js/pages/<name>.js（导出 init()），
  * 在 PAGE_MODULES 清单中登记后，整页加载与 pjax 局部注入后均会调度执行。

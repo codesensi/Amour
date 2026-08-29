@@ -16,7 +16,6 @@ import { getAuth, isLoggedIn, clearAuth, redirectToLogin, setupAjaxGuard } from 
 import { getConfig, qqAvatar } from '/assets/common/config.js';
 import { initPjax, navigate as pjaxNavigate } from '/assets/common/pjax.js';
 import { loadLayui } from '/assets/common/layui.js';
-import { initAdminDataTables, destroyAdminDataTables } from './datatable-init.js';
 
 /* ---------- jQuery 桥接 ---------- */
 // 独立 jquery.min.js 已移除：layui 一体构建内置 jQuery（2.2.6），
@@ -89,14 +88,8 @@ initPjax({
     return siteName ? siteName + ' - ' + pageTitle : pageTitle;
   },
 
-  // 交换前销毁旧表格状态
-  onBeforeSwap: function (target) {
-    destroyAdminDataTables($(target));
-  },
-
   // 注入后：重渲染表格 + 调度目标页模块 + 侧栏高亮同步
   onPageReady: function () {
-    initAdminDataTables();
     setActiveMenu(location.href);
     loadPageModule(location.href);
   }
@@ -162,7 +155,6 @@ if (deepView && initialUrl === deepView) {
   // 深链接模式：跳过首页模块初始化，直接由 pjax 装载目标页
   pjaxNavigate(initialUrl, false);
 } else {
-  initAdminDataTables();
   setActiveMenu(location.href);
   loadPageModule(location.href);
 }
