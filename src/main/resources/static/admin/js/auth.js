@@ -77,7 +77,7 @@
       : NEVER_EXPIRES;
     localStorage.setItem(AUTH_KEY, JSON.stringify({
       accessToken: (loginData && loginData.accessToken) || '',
-      username: username || 'sadmin',
+      username: username || '',
       loginAt: now,
       // -1 代表永不过期，其余按秒换算为绝对过期时间戳（毫秒）
       expiresAt: expiresIn === NEVER_EXPIRES ? NEVER_EXPIRES : now + expiresIn * 1000

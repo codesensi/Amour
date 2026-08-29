@@ -70,6 +70,10 @@
       .then(function (response) { return response.json(); })
       .then(function (res) {
         return res && res.success && res.data ? res.data : {};
+      })
+      .catch(function () {
+        // 接口未实现或响应异常时返回空映射，调用方按配置缺失安全降级
+        return {};
       });
   }
 

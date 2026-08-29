@@ -36,8 +36,9 @@
       <div class="logo">
         <h1><a class="alogo" href="/"></a></h1>
       </div>
-      <div class="word" data-tip="爱晨雾漫过青瓦，爱暮色染透篱笆，更爱与君并肩立，看遍这人间烟火里的朝暮与年华。" data-tip-position="bottom">
-        <span class="wenan">爱晨雾漫过青瓦，爱暮色染透篱笆，更爱与君并肩立，看遍这人间烟火里的朝暮与年华。</span>
+      <!-- 文案由 portal.js 从站点配置（sys_config）注入，页面内不硬编码 -->
+      <div class="word" data-tip="" data-tip-position="bottom">
+        <span class="wenan"></span>
       </div>
     </div>
   </div>
@@ -106,11 +107,11 @@
   </div>
 </div>
 
-<!-- 页脚：ICP 备案 + 版权（备案链接为固定地址写死在下方 href；备案文案与版权文案由 portal.js siteConfig 口子注入，下方为默认值） -->
+<!-- 页脚：ICP 备案 + 版权（备案链接为固定地址写死在下方 href；备案文案与版权行由 portal.js 从站点配置注入） -->
 <div th:fragment="footer">
   <div class="footer-warp">
     <div class="footer">
-      <p><img src="/assets/portal/img/icp.svg"><a id="footerIcpLink" href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank">赣ICP备2026010001号</a></p>
+      <p><img src="/assets/portal/img/icp.svg"><a id="footerIcpLink" href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank"></a></p>
       <p id="footerCopyright"></p>
     </div>
   </div>

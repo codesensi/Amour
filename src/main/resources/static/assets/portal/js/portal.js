@@ -192,14 +192,16 @@ function showLoveTime() {
   }, 1000);
 }
 
-/** 顶栏文字随滚动变色（照搬） */
+/** 顶栏文字随滚动变色（照搬；只绑定一次，passive 监听保证滚动流畅） */
 function initHeaderScrollColor() {
-  window.onscroll = function () {
+  if (initHeaderScrollColor._bound) return;
+  initHeaderScrollColor._bound = true;
+  window.addEventListener('scroll', function () {
     const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
     document.querySelectorAll('.wenan, .alogo').forEach(function (el) {
       el.style.color = scrollTop > 500 ? '#333333' : 'rgb(97 97 97)';
     });
-  };
+  }, { passive: true });
 }
 
 /** data-tip 自定义悬浮提示（照搬；事件委托方式绑定一次，pjax 换页后自动生效） */
@@ -244,15 +246,8 @@ function initTooltip() {
 }
 
 /** 右侧悬浮栏动作 */
-function scrollToTop(duration) {
-  const d = duration || 500;
-  const start = window.pageYOffset;
-  const step = start / (d / 15);
-  const timer = setInterval(function () {
-    const cur = window.pageYOffset - step;
-    if (cur <= 0) { window.scrollTo(0, 0); clearInterval(timer); }
-    else { window.scrollTo(0, cur); }
-  }, 15);
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 /** 打开管理后台 */
@@ -265,13 +260,16 @@ function portalGoRepo() { window.open(PORTAL_CONFIG.repoUrl, '_blank'); }
 let photoPage = 1;
 const photoLimit = 6;
 
-/** 照片卡片模板（照搬原站 createPhotoElement） */
+/** 照片卡片模板（照搬原站 createPhotoElement；后端数据统一经 htmlEscape 转义防注入） */
 function createPhotoElement(photo) {
+  const img = htmlEscape(photo.img || '');
+  const text = htmlEscape(photo.text || '');
+  const date = htmlEscape(photo.date || '');
   return '<div class="img_card col-lg-4 col-md-6 col-sm-12 col-sm-x-12 photo-item">'
     + '<div class="love_img">'
-    + '<img src="' + photo.img + '" alt="' + (photo.text || '') + '" loading="lazy" data-description="' + (photo.date || '') + '">'
-    + '<div class="words" data-tip="' + (photo.text || '') + '" data-tip-position="top">'
-    + '<i>' + (photo.date || '') + '</i><span>' + (photo.text || '') + '</span>'
+    + '<img src="' + img + '" alt="' + text + '" loading="lazy" data-description="' + date + '">'
+    + '<div class="words" data-tip="' + text + '" data-tip-position="top">'
+    + '<i>' + date + '</i><span>' + text + '</span>'
     + '</div></div></div>';
 }
 
@@ -344,7 +342,7 @@ async function loadMessages() {
       + htmlEscape(m.date || '') + (m.location ? '<b class="yuan"></b>' + htmlEscape(m.location) : '')
       + '</i></div>'
       + '<div class="user_info">'
-      + '<img src="' + (m.avatar || mockPhoto('游客')) + '">'
+      + '<img src="' + htmlEscape(m.avatar || mockPhoto('游客')) + '">'
       + '<div class="head_content"><div class="level">访客 <b>#' + (i + 1) + '</b></div>'
       + '<span class="name">' + htmlEscape(m.nickname || '游客') + '</span></div>'
       + '</div>'
@@ -394,16 +392,23 @@ function initQqAvatar() {
     if (QQ.length <= 0) return;
     const avatar = document.querySelector('.inputbox .avatar');
     if (avatar) avatar.src = 'https://q1.qlogo.cn/g?b=qq&nk=' + QQ + '&s=100';
-    fetch('https://v1.apizero.cn/api/qq?qq=' + encodeURIComponent(QQ), { timeout: 8000 })
+    // fetch 原生不支持 timeout 选项，使用 AbortController 实现 8 秒超时
+    const controller = new AbortController();
+    const timer = setTimeout(function () { controller.abort(); }, 8000);
+    fetch('https://v1.apizero.cn/api/qq?qq=' + encodeURIComponent(QQ), { signal: controller.signal })
       .then(function (r) { return r.json(); })
       .then(function (result) {
+        clearTimeout(timer);
         if (result && result.code === 0 && result.data && result.data.name) {
           document.getElementById('nickname').value = result.data.name;
         } else {
           toastr.warning('请手动填写昵称', 'Like_Girl');
         }
       })
-      .catch(function () { toastr.warning('请手动填写昵称', 'Like_Girl'); });
+      .catch(function () {
+        clearTimeout(timer);
+        toastr.warning('请手动填写昵称', 'Like_Girl');
+      });
   });
 }
 
@@ -439,7 +444,7 @@ async function loadLoveList() {
     const span = it.done
       ? '<span class="success">' + htmlEscape(it.text || '') + '</span>'
       : '<span class="unfinished">' + htmlEscape(it.text || '') + '</span>';
-    const img = it.img ? '<ul><li><img src="' + it.img + '" alt="' + htmlEscape(it.text || '') + '" loading="lazy"></li></ul>' : '<ul><li></li></ul>';
+    const img = it.img ? '<ul><li><img src="' + htmlEscape(it.img) + '" alt="' + htmlEscape(it.text || '') + '" loading="lazy"></li></ul>' : '<ul><li></li></ul>';
     return '<li class="cike">' + (it.done ? '<i class="iconfont icon-chenggong2 com"></i>' + span
       + '<svg class="icon" aria-hidden="true"><use xlink:href="#icon-tupian"></use></svg>'
       : '<i class="iconfont icon-chenggong2 air"></i>' + span) + img + '</li>';
