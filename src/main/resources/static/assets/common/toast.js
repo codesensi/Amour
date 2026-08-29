@@ -39,6 +39,8 @@ function show(type, message, title) {
   const text = title ? title + ' · ' + message : message;
   getLayer().then(function (layer) {
     layer.msg(text, { icon: ICONS[type] ?? -1, time: DURATION });
+  }).catch(function (e) {
+    console.error('[toast] layui layer 加载失败（页面需引入 /assets/layui/2.13.9/layui.js）：', e && e.message);
   });
 }
 

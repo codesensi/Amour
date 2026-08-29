@@ -1,3 +1,4 @@
+import { toast } from '/assets/common/toast.js';
 /**
  * 全局设置 页面模块（由 pjax 页面调度加载）。
  */
@@ -45,9 +46,9 @@ export function init() {
         var footerCon = $("textarea[name='footerCon']").val();
 
         // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
-        toastr["success"]("更新登录信息成功！", "Like_Girl");
-        toastr["success"]("更新全局信息成功", "Like_Girl");
-        toastr["success"]("更新自定义内容成功", "Like_Girl");
+        toast.success("更新登录信息成功！", "Like_Girl");
+        toast.success("更新全局信息成功", "Like_Girl");
+        toast.success("更新自定义内容成功", "Like_Girl");
     })
 
     // 原站此处的 loadModalContent() 会请求 wiki.kikiw.cn 外部数据，属于外部站点依赖，已按规范移除

@@ -3,7 +3,7 @@
  *
  * 承接 login.html 的全部页面逻辑：layui 登录表单处理（验证码开关、mock 登录）、
  * 左屏品牌信息（站名/标语打字机/双头像/恋爱计时）与粒子心形动画。
- * 依赖页面上以普通脚本加载的 layui 与全局 toastr（未用时）；
+ * 依赖页面上以普通脚本加载的 layui；
  * 登录态与项目配置经 common 组件（ES Module）读写。
  */
 import { saveAuth, setupAjaxGuard } from '/assets/common/auth.js';

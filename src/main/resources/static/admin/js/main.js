@@ -20,9 +20,6 @@ import { initAdminDataTables, destroyAdminDataTables } from './datatable-init.js
 /** 后台页面依赖的全局 jQuery（主题与 vendor 脚本以普通脚本形式加载） */
 const $ = window.jQuery;
 
-/** 全局 toastr（页面上以普通脚本加载，此处显式桥接） */
-const toastr = window.toastr;
-
 /* ---------- 登录完整校验 ---------- */
 if (!isLoggedIn()) {
   redirectToLogin();
@@ -30,26 +27,6 @@ if (!isLoggedIn()) {
 
 /* ---------- 请求守卫：token 注入 + 401 统一处理 ---------- */
 setupAjaxGuard();
-
-/* ---------- toastr 全局默认配置（原各页面重复配置归口此处） ---------- */
-toastr.options = {
-  closeButton: true,
-  debug: false,
-  newestOnTop: false,
-  progressBar: true,
-  rtl: false,
-  positionClass: 'toast-top-right',
-  preventDuplicates: false,
-  onclick: null,
-  showDuration: 300,
-  hideDuration: 1000,
-  timeOut: 5000,
-  extendedTimeOut: 1000,
-  showEasing: 'swing',
-  hideEasing: 'linear',
-  showMethod: 'fadeIn',
-  hideMethod: 'fadeOut'
-};
 
 /* ---------- 页面模块调度 ---------- */
 

@@ -12,10 +12,11 @@
     <!-- 登录态守卫：未登录则跳转登录页（在渲染前同步执行，避免闪屏） -->
     <script src="/admin/js/guard.js"></script>
     <!-- App css -->
+    <!-- layui 基础样式：置于主题样式之前，layer 弹层（toast/tooltip 等 common 组件）按需使用 -->
+    <link href="/assets/layui/2.13.9/css/layui.css" rel="stylesheet" type="text/css"/>
     <link href="/admin/assets/css/icons.min.css" rel="stylesheet" type="text/css"/>
     <link href="/admin/assets/css/app.min.css" rel="stylesheet" type="text/css"/>
     <link href="/assets/admin/css/loading.css" rel="stylesheet">
-    <link href="/assets/lib/toastr/toastr.css" rel="stylesheet">
 </head>
 
 <body>
@@ -305,10 +306,6 @@
                         padding-left: 0;
                     }
 
-                    #spotlight .header div {
-                        padding-right: 40px;
-                    }
-
                     .table td,
                     .table th {
                         padding: 0.95rem;
@@ -584,9 +581,8 @@
 </div>
 
 </div>
-
-<script src="/assets/lib/toastr/toastr.js"></script>
 <!-- App js -->
+<script src="/assets/layui/2.13.9/layui.js"></script>
 <script src="/admin/assets/js/app.min.js"></script>
 
 <!-- 后台 ESM 入口：登录校验、外壳初始化、pjax 与页面模块调度 -->

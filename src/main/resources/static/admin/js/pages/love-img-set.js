@@ -2,13 +2,14 @@
  * 恋爱相册 页面模块（由 pjax 页面调度加载）。
  */
 import { navigate as pjaxNavigate } from '/assets/common/pjax.js';
+import { toast } from '/assets/common/toast.js';
 
 export function init() {
     // ==================== 页面交互脚本（照搬原站公共提交脚本，mock 化改造） ====================
 
     // 演示提示：原站"新增/修改"按钮为页面跳转（loveImgAdd.php / modImg.php），对应页面暂未迁移
     function demoTip() {
-        toastr["info"]("演示数据：新增/编辑相册页面暂未开放", "Like_Girl");
+        toast.info("演示数据：新增/编辑相册页面暂未开放", "Like_Girl");
     }
     window.demoTip = demoTip; // HTML onclick 属性引用，需暴露到全局
 
@@ -16,7 +17,7 @@ export function init() {
     function del(id, imgText) {
         // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
         if (confirm('您确认要删除描述为 ' + imgText + ' 的相册图片吗')) {
-            toastr["info"]("演示数据：删除操作暂未开放", "Like_Girl");
+            toast.info("演示数据：删除操作暂未开放", "Like_Girl");
         }
     }
     window.del = del; // HTML href="javascript:del(...)" 引用，需暴露到全局
@@ -37,9 +38,9 @@ export function init() {
         var footerCon = $("textarea[name='footerCon']").val();
 
         // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求（原请求：POST userPost.php）
-        toastr["success"]("更新登录信息成功！", "Like_Girl");
-        toastr["success"]("更新全局信息成功", "Like_Girl");
-        toastr["success"]("更新自定义内容成功", "Like_Girl");
+        toast.success("更新登录信息成功！", "Like_Girl");
+        toast.success("更新全局信息成功", "Like_Girl");
+        toast.success("更新自定义内容成功", "Like_Girl");
     })
     $("#adminPost").click(function () {
         var title = $("input[name='title']").val();
@@ -49,8 +50,8 @@ export function init() {
         var WebPjax = $("select[name='WebPjax']").val();
 
         // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求（原请求：POST adminPost.php）
-        toastr["success"]("基本信息修改成功！", "Like_Girl");
-        toastr["success"]("开关设置成功！", "Like_Girl");
+        toast.success("基本信息修改成功！", "Like_Girl");
+        toast.success("开关设置成功！", "Like_Girl");
     })
     $("#loveadminPost").click(function () {
         var boy = $("input[name='boy']").val();
@@ -60,7 +61,7 @@ export function init() {
         var startTime = $("input[name='startTime']").val();
 
         // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求（原请求：POST loveadminPost.php）
-        toastr["success"]("情侣信息修改成功！", "Like_Girl");
+        toast.success("情侣信息修改成功！", "Like_Girl");
     })
 
     $("#CardadminPost").click(function () {
@@ -75,7 +76,7 @@ export function init() {
         var Copyright = $("input[name='Copyright']").val();
 
         // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求（原请求：POST CardadminPost.php）
-        toastr["success"]("卡片信息修改成功！", "Like_Girl");
+        toast.success("卡片信息修改成功！", "Like_Girl");
     })
 
     $("#leavPPost").click(function () {
@@ -83,7 +84,7 @@ export function init() {
         var lanjiezf = $("textarea[name='lanjiezf']").val();
 
         // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求（原请求：POST leavPPost.php）
-        toastr["success"]("留言设置修改成功！", "Like_Girl");
+        toast.success("留言设置修改成功！", "Like_Girl");
     })
 
     $("#littleupda").click(function () {
@@ -92,17 +93,17 @@ export function init() {
         var articletext = $("textarea[name='articletext']").val();
 
         if ($.trim(articletitle) === '') {
-            toastr["error"]("文章标题不能为空！", "Like_Girl");
+            toast.error("文章标题不能为空！", "Like_Girl");
             return false;
         }
 
         if ($.trim(articletext) === '') {
-            toastr["error"]("文章内容不能为空！", "Like_Girl");
+            toast.error("文章内容不能为空！", "Like_Girl");
             return false;
         }
 
         // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求（原请求：POST littleupda.php）
-        toastr["success"]("文章修改成功！", "Like_Girl");
+        toast.success("文章修改成功！", "Like_Girl");
         $('#littleupda').text('修改中...');
         $("#littleupda").attr("disabled", "disabled");
         // 原站用 setInterval 存在重复触发问题，改为 setTimeout 并走 pjax 局部刷新
@@ -114,22 +115,22 @@ export function init() {
         var articletext = $("textarea[name='articletext']").val();
 
         if ($.trim(articlename) === '') {
-            toastr["error"]("发布人不能为空！", "Like_Girl");
+            toast.error("发布人不能为空！", "Like_Girl");
             return false;
         }
 
         if ($.trim(articletitle) === '') {
-            toastr["error"]("文章标题不能为空！", "Like_Girl");
+            toast.error("文章标题不能为空！", "Like_Girl");
             return false;
         }
 
         if ($.trim(articletext) === '') {
-            toastr["error"]("文章内容不能为空！", "Like_Girl");
+            toast.error("文章内容不能为空！", "Like_Girl");
             return false;
         }
 
         // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求（原请求：POST littleAddPost.php）
-        toastr["success"]("新增文章成功！", "Like_Girl");
+        toast.success("新增文章成功！", "Like_Girl");
         $('#littleAddPost').text('发布中...');
         $("#littleAddPost").attr("disabled", "disabled");
         // 原站用 setInterval 存在重复触发问题，改为 setTimeout 并走 pjax 局部刷新
@@ -142,20 +143,20 @@ export function init() {
         var imgUrl = $("input[name='imgUrl']").val();
 
         if ($.trim(imgDatd) === '') {
-            toastr["error"]("日期不能为空！", "Like_Girl");
+            toast.error("日期不能为空！", "Like_Girl");
             return false;
         }
         if ($.trim(imgText) === '') {
-            toastr["error"]("图片描述不能为空！", "Like_Girl");
+            toast.error("图片描述不能为空！", "Like_Girl");
             return false;
         }
         if ($.trim(imgUrl) === '') {
-            toastr["error"]("图片地址不能为空！", "Like_Girl");
+            toast.error("图片地址不能为空！", "Like_Girl");
             return false;
         }
 
         // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求（原请求：POST ImgUpdaPost.php）
-        toastr["success"]("相册修改成功！", "Like_Girl");
+        toast.success("相册修改成功！", "Like_Girl");
         $('#ImgUpdaPost').text('修改中...');
         $("#ImgUpdaPost").attr("disabled", "disabled");
         // 原站用 setInterval 存在重复触发问题，改为 setTimeout 并走 pjax 局部刷新
@@ -167,21 +168,21 @@ export function init() {
         var imgUrl = $("input[name='imgUrl']").val();
 
         if ($.trim(imgDatd) === '') {
-            toastr["error"]("日期不能为空！", "Like_Girl");
+            toast.error("日期不能为空！", "Like_Girl");
             return false;
         }
         if ($.trim(imgText) === '') {
-            toastr["error"]("图片描述不能为空！", "Like_Girl");
+            toast.error("图片描述不能为空！", "Like_Girl");
             return false;
         }
         if ($.trim(imgUrl) === '') {
-            toastr["error"]("图片地址不能为空！", "Like_Girl");
+            toast.error("图片地址不能为空！", "Like_Girl");
             return false;
         }
 
         // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求（原请求：POST ImgAddPost.php）
         // 注：原站成功分支操作的是 #ImgUpdaPost 按钮，此处保持原逻辑不变
-        toastr["success"]("新增相册成功！", "Like_Girl");
+        toast.success("新增相册成功！", "Like_Girl");
         $('#ImgUpdaPost').text('新增中...');
         $("#ImgUpdaPost").attr("disabled", "disabled");
         // 原站用 setInterval 存在重复触发问题，改为 setTimeout 并走 pjax 局部刷新
@@ -193,12 +194,12 @@ export function init() {
         var img = $("input[name='img']").val();
 
         if ($.trim(eventname) === '') {
-            toastr["error"]("事件标题不能为空！", "Like_Girl");
+            toast.error("事件标题不能为空！", "Like_Girl");
             return false;
         }
 
         // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求（原请求：POST listaddPost.php）
-        toastr["success"]("新增事件成功！", "Like_Girl");
+        toast.success("新增事件成功！", "Like_Girl");
         $('#listaddPost').text('新增中...');
         $("#listaddPost").attr("disabled", "disabled");
         // 原站用 setInterval 存在重复触发问题，改为 setTimeout 并走 pjax 局部刷新
@@ -209,13 +210,13 @@ export function init() {
         var bz = $("input[name='bz']").val();
 
         if ($.trim(ipdz) === '') {
-            toastr["error"]("IP地址不能为空！", "Like_Girl");
+            toast.error("IP地址不能为空！", "Like_Girl");
             return false;
         }
 
         // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求（原请求：POST ipAddPost.php）
         // 注：原站成功分支操作的是 #listupda 按钮，此处保持原逻辑不变
-        toastr["success"]("IP封禁成功！", "Like_Girl");
+        toast.success("IP封禁成功！", "Like_Girl");
         $('#listupda').text('提交中...');
         $("#listupda").attr("disabled", "disabled");
         // 原站用 setInterval 存在重复触发问题，改为 setTimeout 并走 pjax 局部刷新
@@ -228,12 +229,12 @@ export function init() {
         var id = $("input[name='id']").val();
 
         if ($.trim(eventname) === '') {
-            toastr["error"]("事件标题不能为空！", "Like_Girl");
+            toast.error("事件标题不能为空！", "Like_Girl");
             return false;
         }
 
         // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求（原请求：POST listupda.php）
-        toastr["success"]("修改事件成功！", "Like_Girl");
+        toast.success("修改事件成功！", "Like_Girl");
         $('#listupda').text('修改中...');
         $("#listupda").attr("disabled", "disabled");
         // 原站用 setInterval 存在重复触发问题，改为 setTimeout 并走 pjax 局部刷新
@@ -266,6 +267,6 @@ export function init() {
         var infod5 = $("input[name='infod5']").val();
 
         // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求（原请求：POST aboutPost.php）
-        toastr["success"]("修改对话配置成功！", "Like_Girl");
+        toast.success("修改对话配置成功！", "Like_Girl");
     })
 }
