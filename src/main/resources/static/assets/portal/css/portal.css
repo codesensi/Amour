@@ -59,10 +59,15 @@ input, textarea {
   outline: none;
 }
 
-/* 页面网格纹理背景（照搬） */
+/* 页面渐变背景：取主题四色（紫 #986fee / 蓝紫 #8695e6 / 蓝 #68b7dd / 青 #18d7d3）
+   的低透明度淡染，纵向柔和过渡保证白底卡片的可读性；
+   另叠两处固定在首屏附近的柔光斑（右上偏紫、左下偏青），呼应首屏壁纸的色彩氛围 */
 body {
-  background-image: linear-gradient(to right, rgba(37, 82, 110, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(37, 82, 110, 0.1) 1px, transparent 1px);
-  background-size: 1.5rem 1.5rem;
+  background-color: #fff;
+  background-image:
+    radial-gradient(120rem 40rem at 85vw 0, rgba(152, 111, 238, 0.09), transparent 70%),
+    radial-gradient(100rem 36rem at 8vw 90vh, rgba(24, 215, 211, 0.07), transparent 70%),
+    linear-gradient(180deg, rgba(134, 149, 230, 0.06), rgba(104, 183, 221, 0.05) 50%, rgba(24, 215, 211, 0.06));
 }
 
 /* 文本选中色（照搬） */
