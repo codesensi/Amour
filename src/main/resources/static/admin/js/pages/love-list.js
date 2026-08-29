@@ -1,7 +1,8 @@
 /**
  * 恋爱清单 页面模块（由 pjax 页面调度加载）。
  */
-import { navigate as pjaxNavigate } from '/assets/common/pjax.js';
+import { escapeHtml as esc } from '../escape.js';
+import { bindMockSubmissions } from '../mock-submit.js';
 import { toast } from '/assets/common/toast.js';
 import { openPhotoViewer } from '/assets/common/photoviewer.js';
 import { loadLayui } from '/assets/common/layui.js';
@@ -114,10 +115,10 @@ export function init() {
             } },
             { title: '操作', width: 200, templet: function (d) {
                 // 删除按钮用 data 属性传参（避免 title 中引号/emoji 破坏 href 字符串），点击行为由下方委托接管
-                return '<a href="javascript:void(0);" class="js-mock-edit">'
-                    + '<button type="button" class="layui-btn layui-btn-xs"><i class=" layui-icon layui-icon-edit"></i>修改</button></a> '
-                    + '<a href="javascript:void(0);" class="delete-btn" data-id="' + d.id + '" data-title="' + d.title + '">'
-                    + '<button type="button" class="layui-btn layui-btn-xs layui-btn-danger"><i class=" layui-icon layui-icon-delete"></i>删除</button></a>';
+                return '<a href="javascript:void(0);" class="layui-btn layui-btn-xs js-mock-edit">'
+                    + '<i class=" layui-icon layui-icon-edit"></i>修改</a> '
+                    + '<a href="javascript:void(0);" class="layui-btn layui-btn-xs layui-btn-danger delete-btn" data-id="' + d.id + '" data-title="' + esc(d.title) + '">'
+                    + '<i class=" layui-icon layui-icon-delete"></i>删除</a>';
             } }
         ]],
         data: LOVE_EVENTS
@@ -174,47 +175,6 @@ export function init() {
         });
     }
 
-    // 说明：原站该位置为多个后台页面复用的公共提交脚本，
-    // 此处仅保留恋爱清单页相关的两个提交处理（新增事件 / 修改事件），
-    // 其余页面（基本设置/相册/文章等）的提交逻辑为复用代码，已按需精简。
-    // 新增事件提交：原站为 $.ajax({url: "listaddPost.php", ...})
-    $("#listaddPost").click(function () {
-        var eventname = $("input[name='eventname']").val();
-        var icon = $("input[name='icon']").val();
-        var img = $("input[name='img']").val();
-
-        // 表单校验（保留原站逻辑）：事件标题非空校验
-        if ($.trim(eventname) === '') {
-            toast.error("事件标题不能为空！", "Like_Girl");
-            return false;
-        }
-
-        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
-        toast.success("新增事件成功！", "Like_Girl");
-        $('#listaddPost').text('新增中...');
-        $("#listaddPost").attr("disabled", "disabled");
-        // 原站用 setInterval 存在重复触发问题，改为 setTimeout 并走 pjax 局部刷新
-        setTimeout(function () { pjaxNavigate('/admin/views/love-list.html'); }, 1000);
-    });
-
-    // 修改事件提交：原站为 $.ajax({url: "listupda.php", ...})
-    $("#listupda").click(function () {
-        var eventname = $("input[name='eventname']").val();
-        var icon = $("input[name='icon']").val();
-        var imgurl = $("input[name='imgurl']").val();
-        var id = $("input[name='id']").val();
-
-        // 表单校验（保留原站逻辑）：事件标题非空校验
-        if ($.trim(eventname) === '') {
-            toast.error("事件标题不能为空！", "Like_Girl");
-            return false;
-        }
-
-        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
-        toast.success("修改事件成功！", "Like_Girl");
-        $('#listupda').text('修改中...');
-        $("#listupda").attr("disabled", "disabled");
-        // 原站用 setInterval 存在重复触发问题，改为 setTimeout 并走 pjax 局部刷新
-        setTimeout(function () { pjaxNavigate('/admin/views/love-list.html'); }, 1000);
-    });
+    // 全站 mock 提交处理器统一由 mock-submit.js 挂载（document 委托 + 防重入）
+    bindMockSubmissions();
 }

@@ -40,31 +40,31 @@
                                 <!-- 原站表单提交至 adminPost.php，提交已改为页面脚本 mock 处理，此处移除 action/method/onsubmit -->
                                 <form class="needs-validation layui-form" novalidate>
                                     <div class="form-group mb-3">
-                                        <label>站点标题</label>
+                                        <label for="set-title">站点标题</label>
                                         <input type="text" class="layui-input" placeholder="请输入站点标题"
-                                               name="title" value="龙猫の爱恋" required>
+                                               name="title" value="龙猫の爱恋" required id="set-title">
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label>站点LOGO</label>
+                                        <label for="set-logo">站点LOGO</label>
                                         <input type="text" class="layui-input" placeholder="请填写站点LOGO文字"
-                                               name="logo" value="龙猫の爱恋" required>
+                                               name="logo" value="龙猫の爱恋" required id="set-logo">
 
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label>站点文案</label>
+                                        <label for="set-writing">站点文案</label>
                                         <input type="text" class="layui-input" placeholder="显示在顶部的文案"
-                                               name="writing" value="爱晨雾漫过青瓦，爱暮色染透篱笆，更爱与君并肩立，看遍这人间烟火里的朝暮与年华。" required>
+                                               name="writing" value="爱晨雾漫过青瓦，爱暮色染透篱笆，更爱与君并肩立，看遍这人间烟火里的朝暮与年华。" required id="set-writing">
                                     </div>
                                     <div class="form-group">
-                                        <label>是否关闭头像背景高斯模糊</label>
-                                        <select class="layui-select" name="WebBlur">
+                                        <label for="set-WebBlur">是否关闭头像背景高斯模糊</label>
+                                        <select class="layui-select" name="WebBlur" id="set-WebBlur">
                                             <option value="1" selected>开启</option>
                                             <option value="2">关闭</option>
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label>是否开启前端无刷新加载</label>
-                                        <select class="layui-select" name="WebPjax">
+                                        <label for="set-WebPjax">是否开启前端无刷新加载</label>
+                                        <select class="layui-select" name="WebPjax" id="set-WebPjax">
                                             <option value="1" selected>开启</option>
                                             <option value="2">关闭</option>
                                         </select>
@@ -86,29 +86,29 @@
                                 <!-- 原站表单提交至 loveadminPost.php，提交已改为页面脚本 mock 处理，此处移除 action/method -->
                                 <form class="needs-validation layui-form" novalidate>
                                     <div class="form-group mb-3">
-                                        <label>女主Name</label>
+                                        <label for="set-girl">女主Name</label>
                                         <input type="text" class="layui-input" placeholder="请输入女主Name"
-                                               name="girl" value="Su" required>
+                                               name="girl" value="Su" required id="set-girl">
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label>男主Name</label>
+                                        <label for="set-boy">男主Name</label>
                                         <input type="text" class="layui-input" placeholder="请输入男主Name"
-                                               name="boy" value="Li" required>
+                                               name="boy" value="Li" required id="set-boy">
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label>女主QQ</label>
+                                        <label for="set-girlimg">女主QQ</label>
                                         <input type="text" class="layui-input" placeholder="请输入女主QQ（用于显示头像）"
-                                               name="girlimg" value="673822943" required>
+                                               name="girlimg" value="673822943" required id="set-girlimg">
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label>男主QQ</label>
+                                        <label for="set-boyimg">男主QQ</label>
                                         <input type="text" class="layui-input" placeholder="请输入男主QQ（用于显示头像）"
-                                               name="boyimg" value="2623669948" required>
+                                               name="boyimg" value="2623669948" required id="set-boyimg">
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label>起始时间</label>
+                                        <label for="set-startTime">起始时间</label>
                                         <input type="datetime-local" class="layui-input" placeholder="请输入起始时间"
-                                               name="startTime" value="2018-07-15T00:00" required>
+                                               name="startTime" value="2018-07-15T00:00" required id="set-startTime">
                                     </div>
                                     <div class="form-group mb-3">
                                         <button class="layui-btn" type="button" id="loveadminPost">提交修改</button>
@@ -127,52 +127,52 @@
                                 <!-- 原站表单提交至 CardadminPost.php，提交已改为页面脚本 mock 处理，此处移除 action/method -->
                                 <form class="needs-validation layui-form" novalidate>
                                     <div class="form-group mb-3">
-                                        <label>背景图片URL地址</label>
+                                        <label for="set-bgimg">背景图片URL地址</label>
                                         <input type="text" class="layui-input" placeholder="请输入卡片Name"
-                                               name="bgimg" value="Style/img/bgCover.png" required>
+                                               name="bgimg" value="Style/img/bgCover.png" required id="set-bgimg">
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label>卡片1Name</label>
+                                        <label for="set-card1">卡片1Name</label>
                                         <input type="text" class="layui-input" placeholder="请输入卡片Name"
-                                               name="card1" value="点点滴滴" required>
+                                               name="card1" value="点点滴滴" required id="set-card1">
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label>卡片1描述</label>
+                                        <label for="set-deci1">卡片1描述</label>
                                         <input type="text" class="layui-input" placeholder="请输入卡片描述"
-                                               name="deci1" value="有人愿意听你碎碎念念也很浪漫" required>
+                                               name="deci1" value="有人愿意听你碎碎念念也很浪漫" required id="set-deci1">
 
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label>卡片2Name</label>
+                                        <label for="set-card2">卡片2Name</label>
                                         <input type="text" class="layui-input" placeholder="请输入卡片Name"
-                                               name="card2" value="留言板" required>
+                                               name="card2" value="留言板" required id="set-card2">
 
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label>卡片2描述</label>
+                                        <label for="set-deci2">卡片2描述</label>
                                         <input type="text" class="layui-input" placeholder="请输入卡片描述"
-                                               name="deci2" value="在这里写下我们的留言祝福" required>
+                                               name="deci2" value="在这里写下我们的留言祝福" required id="set-deci2">
 
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label>卡片3Name</label>
+                                        <label for="set-card3">卡片3Name</label>
                                         <input type="text" class="layui-input" placeholder="请输入卡片Name"
-                                               name="card3" value="关于我们" required>
+                                               name="card3" value="关于我们" required id="set-card3">
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label>卡片3描述</label>
+                                        <label for="set-deci3">卡片3描述</label>
                                         <input type="text" class="layui-input" placeholder="请输入卡片描述"
-                                               name="deci3" value="我们之间认识的经历回忆" required>
+                                               name="deci3" value="我们之间认识的经历回忆" required id="set-deci3">
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label>域名备案号</label>
+                                        <label for="set-icp">域名备案号</label>
                                         <input type="text" class="layui-input" placeholder="没有请留空" name="icp"
-                                               value="赣ICP备2026010001号" required>
+                                               value="赣ICP备2026010001号" required id="set-icp">
                                     </div>
                                     <div class="form-group mb-3">
-                                        <label>站点版权信息</label>
+                                        <label for="set-Copyright">站点版权信息</label>
                                         <input type="text" class="layui-input" placeholder="请输入站点版权信息"
-                                               name="Copyright" value="Copyright © 2022 - 2026 Like_Girl All Rights Reserved." required>
+                                               name="Copyright" value="Copyright © 2022 - 2026 Like_Girl All Rights Reserved." required id="set-Copyright">
                                     </div>
                                     <div class="form-group mb-3">
                                         <button class="layui-btn" type="button" id="CardadminPost">提交修改</button>

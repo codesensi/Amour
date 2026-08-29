@@ -9,15 +9,15 @@ export function init() {
 
     // 信息配置表单提交（原站通过 $.ajax 提交至 userPost.php，取值逻辑保留）
     $("#userPost").click(function () {
-        var Webanimation = $("select[name='Webanimation']").val();
-        var userName = $("input[name='userName']").val();
-        var userQQ = $("input[name='userQQ']").val();
-        var adminName = $("input[name='adminName']").val();
-        var pw = $("input[name='pw']").val();
-        var SCode = $("input[name='SCode']").val();
-        var cssCon = $("textarea[name='cssCon']").val();
-        var headCon = $("textarea[name='headCon']").val();
-        var footerCon = $("textarea[name='footerCon']").val();
+        const Webanimation = $("select[name='Webanimation']").val();
+        const userName = $("input[name='userName']").val();
+        const userQQ = $("input[name='userQQ']").val();
+        const adminName = $("input[name='adminName']").val();
+        const pw = $("input[name='pw']").val();
+        const SCode = $("input[name='SCode']").val();
+        const cssCon = $("textarea[name='cssCon']").val();
+        const headCon = $("textarea[name='headCon']").val();
+        const footerCon = $("textarea[name='footerCon']").val();
 
         // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
         toast.success("更新登录信息成功！", "Like_Girl");
