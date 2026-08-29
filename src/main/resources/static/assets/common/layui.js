@@ -14,20 +14,25 @@
 /** layui.js 的固定路径（与登录页/后台外壳/门户外壳的引入保持一致） */
 const LAYUI_JS = '/assets/layui/2.13.9/layui.js';
 
-/** 自愈时需要确保就位的样式表（layui 基础样式 + 管理端适配覆盖） */
-const LAYUI_CSS = [
-  '/assets/layui/2.13.9/css/layui.css',
-  '/assets/admin/css/admin.css'
-];
+/** layui 基础样式（两端共用） */
+const LAYUI_CSS = ['/assets/layui/2.13.9/css/layui.css'];
+
+/** 管理端专属样式：仅管理端路径下自愈注入，避免污染门户布局 */
+const ADMIN_CSS = '/assets/admin/css/admin.css';
 
 /** 动态注入的加载 Promise 缓存：多组件并发调用时只注入一次 */
 let layuiReady = null;
 
 /**
  * 确保样式表就位（幂等）：浏览器缓存旧版外壳时自动补齐缺失的样式引用。
+ * 管理端 admin.css 按路径区分注入——门户页面不引入管理端样式，
+ * 其中的 .row 网格等价实现会破坏门户 content.css 的居中布局。
  */
 function ensureStyles() {
-  LAYUI_CSS.forEach(function (href) {
+  const paths = location.pathname.indexOf('/admin') === 0
+    ? LAYUI_CSS.concat(ADMIN_CSS)
+    : LAYUI_CSS;
+  paths.forEach(function (href) {
     if (!document.querySelector('link[href="' + href + '"]')) {
       var link = document.createElement('link');
       link.rel = 'stylesheet';
