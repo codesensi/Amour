@@ -75,7 +75,7 @@ const PORTAL_MOCK = {
   ],
   /** 站点展示配置默认值（后台实现 /site/config 后自动切换为配置数据） */
   siteConfig: {
-    logo: '龙猫の爱恋',
+    logo: '爱慕情侣小站',
     slogan: '爱晨雾漫过青瓦，爱暮色染透篱笆，更爱与君并肩立，看遍这人间烟火里的朝暮与年华。',
     femaleName: 'Su',
     maleName: 'Li',
@@ -483,6 +483,13 @@ async function applySiteConfig() {
   const config = await portalRequest('siteConfig');
   if (!config) return;
   siteConfig = config;
+  // 浏览器标签标题：站点名（配置 name）+ 页面副标题（head 片段的 title 参数）
+  if (config.logo) {
+    const suffix = document.title;
+    if (suffix !== config.logo && suffix.indexOf(config.logo + ' — ') !== 0) {
+      document.title = suffix ? config.logo + ' — ' + suffix : config.logo;
+    }
+  }
   const logoEl = document.querySelector('.alogo');
   if (logoEl && config.logo) logoEl.textContent = config.logo;
   const sloganEl = document.querySelector('.wenan');
@@ -516,6 +523,9 @@ window.initPortalPage = function () {
   // logo / 文字说明 / 头像 / 名字 / ICP / 版权，并按配置的计时起点重渲染计时器。
   // 未就绪期间页面先展示 Thymeleaf 片段内置文案，与默认配置一致，无感切换。
   applySiteConfig();
+  // logo 注入（配置到达前的兜底，站点名不再硬编码在页面里）
+  const logoEl = document.querySelector('.alogo');
+  if (logoEl && !logoEl.textContent.trim()) logoEl.textContent = siteConfig.logo;
   // slogan 注入（配置到达前的兜底）
   const sloganEl = document.querySelector('.wenan');
   if (sloganEl && !sloganEl.textContent.trim()) sloganEl.textContent = siteConfig.slogan;
