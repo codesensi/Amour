@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8"/>
-    <title>全局设置</title>
+    <title>留言管理</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description"/>
     <meta content="Coderthemes" name="author"/>
@@ -22,6 +22,11 @@
     <link href="/admin/assets/css/app.min.css" rel="stylesheet" type="text/css"/>
     <link href="/Style/css/loading.css" rel="stylesheet">
     <link href="/Style/toastr/toastr.css" rel="stylesheet">
+    <!-- 第三方 DataTables 样式（本页表格需要） -->
+    <link href="/admin/assets/css/vendor/dataTables.bootstrap4.css" rel="stylesheet" type="text/css" />
+    <link href="/admin/assets/css/vendor/responsive.bootstrap4.css" rel="stylesheet" type="text/css" />
+    <link href="/admin/assets/css/vendor/buttons.bootstrap4.css" rel="stylesheet" type="text/css" />
+    <link href="/admin/assets/css/vendor/select.bootstrap4.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
@@ -441,7 +446,7 @@
                     }
                 </style>
 
-                <!-- 页面特有样式：照搬原站 user.php 内容区样式，追加在全站样式之后 -->
+                <!-- ===== 页面特有样式（照搬原站留言管理页） ===== -->
                 <style>
                     div#test-editor {
                         z-index: 10;
@@ -517,83 +522,132 @@
                 </style>
 
                 <div class="row">
-
-                    <div class="col-lg-12">
+                    <div class="col-12">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="header-title mb-3">信息配置</h4>
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="text-lg-right">
+                                            <!-- 原站跳转 /admin/leavP.php 留言设置页（暂未迁移），演示环境仅给出提示 -->
+                                            <a class="fabu" href="javascript:void(0);">
+                                                <button type="button" class="btn btn-success mb-2 mr-2"><i
+                                                        class=" mdi mdi-brightness-5"></i> 留言相关设置
+                                                </button>
+                                            </a>
+                                        </div>
+                                    </div><!-- end col-->
+                                </div>
+                                <h4 class="header-title mb-3 size_18">留言管理
+                                    <button type="button" class="btn btn-secondary btn-sm btn-rounded margin_left">
+                                        共<b>1</b>条
+                                    </button>
+                                </h4>
+                                <table id="basic-datatable" class="table dt-responsive nowrap" width="100%">
+                                    <thead>
+                                        <tr>
+                                            <th>序号</th>
+                                            <th>留言内容</th>
+                                            <th>Date</th>
+                                            <th>Name</th>
+                                            <th>QQ</th>
+                                            <th>IP</th>
+                                            <th style="width: 125px;">Action</th>
+                                        </tr>
+                                    </thead>
 
-                                <!-- 原站表单提交至 userPost.php，提交已改为页面脚本 mock 处理，此处移除 action/method -->
-                                <form class="needs-validation" novalidate>
-                                    <div class="form-group">
-                                        <label for="validationCustom01">是否开启前端加载动画</label>
-                                        <select class="form-control" id="example-select" name="Webanimation">
-                                            <option value="1" selected>开启</option>
-                                            <option value="2">关闭</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label for="validationCustom05">管理员姓名</label>
-                                        <input type="text" class="form-control" id="validationCustom05" placeholder="请输入管理员Name"
-                                               name="userName" value="龙猫汪汪汪" required>
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label for="validationCustom05">管理员QQ</label>
-                                        <input type="text" class="form-control" id="validationCustom05" placeholder="请输入管理员QQ"
-                                               name="userQQ" value="2623669948" required>
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label for="validationCustom04">管理员登录账号</label>
-                                        <span class="badge badge-success-lighten" style="font-size: 0.8rem;">账号由大小写字母与数字组成</span>
-                                        <input type="text" class="form-control" placeholder="请输入需修改的管理员账号"
-                                               name="adminName" value="codesensi" required>
+                                    <!-- 原站表单提交至 littleupda.php，现为静态演示数据，无提交动作 -->
+                                    <form class="needs-validation">
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <div class="SerialNumber">
+                                                        1
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="textHide">
+                                                        Like Girl 5.2.1-Stable 默认留言
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <small class="text-muted">2025-09-02 16:24:09
+                                                        <div class="color">12月前</div>
+                                                    </small>
+                                                </td>
+                                                <td>
+                                                    <h5><span class="badge badge-success-lighten"><i
+                                                            class="mdi mdi-account-circle mr-1 rihjt-0"></i>
+                                                        Ki.</span>
+                                                    </h5>
+                                                </td>
+                                                <td>
+                                                    3439780232
+                                                </td>
+                                                <td>
+                                                    <h5>
+                                                        <span
+                                                            class="badge badge-danger-lighten">223.104.79.236</span>
+                                                    </h5>
+                                                    <i>广东</i>
+                                                </td>
+                                                <td>
+                                                    <a class="delete-btn" data-id="1" data-content="Like Girl 5.2.1-Stable 默认留言">
+                                                        <button style="white-space: nowrap;" type="button"
+                                                            class="btn btn-danger btn-rounded">
+                                                            <i class=" mdi mdi-delete-empty mr-1"></i>删除
+                                                        </button>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </form>
+                                </table>
 
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label for="validationCustom05">管理员登录密码</label>
-                                        <span class="badge badge-success-lighten" style="font-size: 0.8rem;">密码由大小写字母与数字组成</span>
-                                        <input class="form-control" name="pw" type="password" value="" placeholder="不修改请留空">
-                                    </div>
-
-                                    <div class="form-group mb-3">
-                                        <label for="validationCustom05">自定义前端全局CSS样式
-                                            <span class="badge badge-primary-lighten">请按CSS格式填写你的代码</span></label>
-                                        <textarea name="cssCon" class="form-control" rows="5"
-                                                  placeholder=""></textarea>
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label for="validationCustom05">自定义头部标签
-                                            <span class="badge badge-primary-lighten">可填写HTML标签 CSS外链</span></label>
-                                        <textarea name="headCon" class="form-control" rows="5"
-                                                  placeholder=""></textarea>
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label for="validationCustom05">自定义底部标签
-                                            <span class="badge badge-primary-lighten">可填写HTML标签 js外链</span></label>
-                                        <textarea name="footerCon" class="form-control" rows="5"
-                                                  placeholder="">&lt;!--&lt;script src=&quot;https://img-love.kikiw.cn/jsxg/yh/yinghua.js&quot;&gt;&lt;/script&gt;--&gt;</textarea>
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label for="validationCustom05">安全码</label>
-                                        <span class="badge badge-danger-lighten" style="font-size: 0.8rem;">修改敏感信息必须填写</span>
-                                        <input type="password" class="form-control" name="SCode" value="" placeholder="请输入安全码">
-                                    </div>
-
-                                    <div class="form-group mb-3 text_right">
-                                        <button class="btn btn-primary" type="button" id="userPost">提交修改</button>
-                                    </div>
-                                </form>
-
-                            </div> <!-- end card-body-->
-                        </div> <!-- end card-->
-                    </div> <!-- end col-->
-
-
+                            </div> <!-- end card body-->
+                        </div> <!-- end card -->
+                    </div><!-- end col-->
                 </div>
+
+
+                <style>
+                    .table td,
+                    .table th {
+                        white-space: nowrap;
+                    }
+                </style>
 
             </div>
 
             <!-- content End -->
+
+<script>
+    $(function () {
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": true,
+            "rtl": false,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": 300,
+            "hideDuration": 1000,
+            "timeOut": 5000,
+            "extendedTimeOut": 1000,
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+
+        // 登录成功欢迎提示（仅从登录页跳转过来时展示一次）
+        if (sessionStorage.getItem('ADMIN_LOGIN_WELCOME') === '1') {
+            sessionStorage.removeItem('ADMIN_LOGIN_WELCOME');
+            toastr.success('登录成功！欢迎回来~');
+        }
+    });
+</script>
 
 <!-- Footer Start -->
 <footer class="footer">
@@ -621,84 +675,245 @@
 <!-- App js -->
 <script src="/admin/assets/js/app.min.js"></script>
 
+<!-- third party js -->
+<script src="/admin/assets/js/vendor/jquery.dataTables.min.js"></script>
+<script src="/admin/assets/js/vendor/dataTables.bootstrap4.js"></script>
+<script src="/admin/assets/js/vendor/dataTables.responsive.min.js"></script>
+<script src="/admin/assets/js/vendor/responsive.bootstrap4.min.js"></script>
+<script src="/admin/assets/js/vendor/dataTables.buttons.min.js"></script>
+<script src="/admin/assets/js/vendor/buttons.bootstrap4.min.js"></script>
+<script src="/admin/assets/js/vendor/buttons.html5.min.js"></script>
+<script src="/admin/assets/js/vendor/buttons.flash.min.js"></script>
+<script src="/admin/assets/js/vendor/buttons.print.min.js"></script>
+<script src="/admin/assets/js/vendor/dataTables.keyTable.min.js"></script>
+<script src="/admin/assets/js/vendor/dataTables.select.min.js"></script>
+<!-- third party js ends -->
+<!-- demo app -->
+<script src="/admin/assets/js/pages/demo.datatable-init.js"></script>
 <!-- end demo js-->
 <script src="/admin/assets/js/pages/demo.toastr.js"></script>
 
-<!-- 页面交互脚本：照搬原站 user.php 的交互逻辑并 mock 化（原站为多个页面共用一段脚本，此处仅保留本页用到的提交处理） -->
+<!-- ===== 页面交互脚本（照搬原站并 mock 化） ===== -->
 <script>
-    // 原站遗留的账号/密码格式校验函数，按原样保留（表单未绑定 onsubmit，不会自动触发）
-    function check() {
-        let adminName = document.getElementsByName('adminName')[0].value.trim();
-        let pw = document.getElementsByName('pw')[0].value.trim();
-        // 判断adminName长度是否为0 如果为0则提示弹窗
-        if (adminName.length == 0) {
-            alert("请填写用户名");
-            return false;
-        }
-        let user = /[a-zA-Z0-9]/g;
-        let character = new RegExp("[`~!#$^&*()=|{}':;',\\[\\].<>/?~！#￥……&*（）——|{}【】‘；：”“'。，、？]");
-        if (character.test(adminName)) {
-            alert("用户名含有特殊字符 本次修改已拦截")
-            return false;
-        } else if (!(user.test(adminName))) {
-            alert("用户名只支持数字与英文大小写字母")
-            return false;
-        }
-        if (pw.length >= 1) {
-            if (pw.length <= 6) {
-                alert("密码长度需大于六位数")
-                return false;
-            }
-            if (character.test(pw)) {
-                alert("密码含有特殊字符为了过滤SQL注入已拦截\n请输入大小写字母与数字组成的密码")
-                return false;
-            }
+    // 删除留言按钮（事件委托）：先弹出原站确认框，确认后给出演示提示，不做真实删除
+    document.addEventListener('click', function (e) {
+        let el = e.target.closest('.delete-btn');
+        if (!el) return;
+
+        e.preventDefault();
+        let id = el.dataset.id;
+        let content = el.dataset.content;
+        del(id, content);
+    });
+
+    // 原站确认后跳转 delleav.php?id=x 执行删除；现为演示数据，仅给出提示
+    function del(id, text) {
+        if (confirm('您确认要删除 ' + text + ' 内容吗')) {
+            // 现阶段后端接口未实现，mock 演示提示；接口实现后恢复为真实删除请求
+            toastr["warning"]("演示数据：删除功能暂未接入后端", "Like_Girl");
         }
     }
 
-    // 信息配置表单提交（原站通过 $.ajax 提交至 userPost.php，取值逻辑保留）
-    $("#userPost").click(function () {
-        var Webanimation = $("select[name='Webanimation']").val();
-        var userName = $("input[name='userName']").val();
-        var userQQ = $("input[name='userQQ']").val();
-        var adminName = $("input[name='adminName']").val();
-        var pw = $("input[name='pw']").val();
-        var SCode = $("input[name='SCode']").val();
-        var cssCon = $("textarea[name='cssCon']").val();
-        var headCon = $("textarea[name='headCon']").val();
-        var footerCon = $("textarea[name='footerCon']").val();
+    // “留言相关设置”按钮：原站跳转 /admin/leavP.php 留言设置页（暂未迁移），演示环境仅提示
+    $(".fabu").on('click', function () {
+        toastr["info"]("演示数据：留言设置页面暂未迁移", "Like_Girl");
+    });
 
+    // ==================== 原站公共提交脚本（异步 Ajax 处理）mock 化 ====================
+    // 原站以下各表单提交均通过 $.ajax POST 到对应 xxxPost.php；
+    // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求。
+
+    $("#userPost").click(function () {
+        // 原提交：$.ajax -> userPost.php（登录信息/全局信息/自定义内容）
         // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
         toastr["success"]("更新登录信息成功！", "Like_Girl");
         toastr["success"]("更新全局信息成功", "Like_Girl");
         toastr["success"]("更新自定义内容成功", "Like_Girl");
     })
-
-    // 原站此处的 loadModalContent() 会请求 wiki.kikiw.cn 外部数据，属于外部站点依赖，已按规范移除
-
-    $(function () {
-        toastr.options = {
-            "closeButton": true,
-            "debug": false,
-            "newestOnTop": false,
-            "progressBar": true,
-            "rtl": false,
-            "positionClass": "toast-top-right",
-            "preventDuplicates": false,
-            "onclick": null,
-            "showDuration": 300,
-            "hideDuration": 1000,
-            "timeOut": 5000,
-            "extendedTimeOut": 1000,
-            "showEasing": "swing",
-            "hideEasing": "linear",
-            "showMethod": "fadeIn",
-            "hideMethod": "fadeOut"
-        };
+    $("#adminPost").click(function () {
+        // 原提交：$.ajax -> adminPost.php（基本信息/开关设置）
+        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
+        toastr["success"]("基本信息修改成功！", "Like_Girl");
+        toastr["success"]("开关设置成功！", "Like_Girl");
     })
+    $("#loveadminPost").click(function () {
+        // 原提交：$.ajax -> loveadminPost.php（情侣信息）
+        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
+        toastr["success"]("情侣信息修改成功！", "Like_Girl");
+    })
+
+    $("#CardadminPost").click(function () {
+        // 原提交：$.ajax -> CardadminPost.php（卡片信息）
+        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
+        toastr["success"]("卡片信息修改成功！", "Like_Girl");
+    })
+
+    $("#leavPPost").click(function () {
+        // 原提交：$.ajax -> leavPPost.php（留言设置：截取条数/拦截字符）
+        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
+        toastr["success"]("留言设置修改成功！", "Like_Girl");
+    })
+
+    $("#littleupda").click(function () {
+        var articletitle = $("input[name='articletitle']").val();
+        var articletext = $("textarea[name='articletext']").val();
+
+        // 保留原站表单校验逻辑
+        if ($.trim(articletitle) === '') {
+            toastr["error"]("文章标题不能为空！", "Like_Girl");
+            return false;
+        }
+
+        if ($.trim(articletext) === '') {
+            toastr["error"]("文章内容不能为空！", "Like_Girl");
+            return false;
+        }
+
+        // 原提交：$.ajax -> littleupda.php（修改文章）
+        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
+        toastr["success"]("文章修改成功！", "Like_Girl");
+        $('#littleupda').text('修改中...');
+        $("#littleupda").attr("disabled", "disabled");
+        setInterval("window.location.href='/admin/views/little-set.html'", 1000);
+    })
+    $("#littleAddPost").click(function () {
+        var articlename = $("select[name='articlename']").val();
+        var articletitle = $("input[name='articletitle']").val();
+        var articletext = $("textarea[name='articletext']").val();
+
+        // 保留原站表单校验逻辑
+        if ($.trim(articlename) === '') {
+            toastr["error"]("发布人不能为空！", "Like_Girl");
+            return false;
+        }
+
+        if ($.trim(articletitle) === '') {
+            toastr["error"]("文章标题不能为空！", "Like_Girl");
+            return false;
+        }
+
+        if ($.trim(articletext) === '') {
+            toastr["error"]("文章内容不能为空！", "Like_Girl");
+            return false;
+        }
+
+        // 原提交：$.ajax -> littleAddPost.php（新增文章）
+        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
+        toastr["success"]("新增文章成功！", "Like_Girl");
+        $('#littleAddPost').text('发布中...');
+        $("#littleAddPost").attr("disabled", "disabled");
+        setInterval("window.location.href='/admin/views/little-set.html'", 1000);
+    })
+    $("#ImgUpdaPost").click(function () {
+        var imgDatd = $("input[name='imgDatd']").val();
+        var imgText = $("input[name='imgText']").val();
+        var imgUrl = $("input[name='imgUrl']").val();
+
+        // 保留原站表单校验逻辑
+        if ($.trim(imgDatd) === '') {
+            toastr["error"]("日期不能为空！", "Like_Girl");
+            return false;
+        }
+        if ($.trim(imgText) === '') {
+            toastr["error"]("图片描述不能为空！", "Like_Girl");
+            return false;
+        }
+        if ($.trim(imgUrl) === '') {
+            toastr["error"]("图片地址不能为空！", "Like_Girl");
+            return false;
+        }
+
+        // 原提交：$.ajax -> ImgUpdaPost.php（修改相册）
+        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
+        toastr["success"]("相册修改成功！", "Like_Girl");
+        $('#ImgUpdaPost').text('修改中...');
+        $("#ImgUpdaPost").attr("disabled", "disabled");
+        setInterval("window.location.href='/admin/views/love-img-set.html'", 1000);
+    })
+    $("#ImgAddPost").click(function () {
+        var imgDatd = $("input[name='imgDatd']").val();
+        var imgText = $("input[name='imgText']").val();
+        var imgUrl = $("input[name='imgUrl']").val();
+
+        // 保留原站表单校验逻辑
+        if ($.trim(imgDatd) === '') {
+            toastr["error"]("日期不能为空！", "Like_Girl");
+            return false;
+        }
+        if ($.trim(imgText) === '') {
+            toastr["error"]("图片描述不能为空！", "Like_Girl");
+            return false;
+        }
+        if ($.trim(imgUrl) === '') {
+            toastr["error"]("图片地址不能为空！", "Like_Girl");
+            return false;
+        }
+
+        // 原提交：$.ajax -> ImgAddPost.php（新增相册）
+        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
+        toastr["success"]("新增相册成功！", "Like_Girl");
+        $('#ImgUpdaPost').text('新增中...');
+        $("#ImgUpdaPost").attr("disabled", "disabled");
+        setInterval("window.location.href='/admin/views/love-img-set.html'", 1000);
+    })
+    $("#listaddPost").click(function () {
+        var eventname = $("input[name='eventname']").val();
+
+        // 保留原站表单校验逻辑
+        if ($.trim(eventname) === '') {
+            toastr["error"]("事件标题不能为空！", "Like_Girl");
+            return false;
+        }
+
+        // 原提交：$.ajax -> listaddPost.php（新增事件）
+        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
+        toastr["success"]("新增事件成功！", "Like_Girl");
+        $('#listaddPost').text('新增中...');
+        $("#listaddPost").attr("disabled", "disabled");
+        setInterval("window.location.href='/admin/views/love-list.html'", 1000);
+    })
+    $("#ipAddPost").click(function () {
+        var ipdz = $("input[name='ipdz']").val();
+
+        // 保留原站表单校验逻辑
+        if ($.trim(ipdz) === '') {
+            toastr["error"]("IP地址不能为空！", "Like_Girl");
+            return false;
+        }
+
+        // 原提交：$.ajax -> ipAddPost.php（IP 封禁）
+        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
+        toastr["success"]("IP封禁成功！", "Like_Girl");
+        $('#listupda').text('提交中...');
+        $("#listupda").attr("disabled", "disabled");
+        setInterval("window.location.href='/admin/views/ip-list.html'", 1000);
+    })
+    $("#listupda").click(function () {
+        var eventname = $("input[name='eventname']").val();
+
+        // 保留原站表单校验逻辑
+        if ($.trim(eventname) === '') {
+            toastr["error"]("事件标题不能为空！", "Like_Girl");
+            return false;
+        }
+
+        // 原提交：$.ajax -> listupda.php（修改事件）
+        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
+        toastr["success"]("修改事件成功！", "Like_Girl");
+        $('#listupda').text('修改中...');
+        $("#listupda").attr("disabled", "disabled");
+        setInterval("window.location.href='/admin/views/love-list.html'", 1000);
+    })
+    $("#aboutPost").click(function () {
+        // 原提交：$.ajax -> aboutPost.php（关于页面对话配置，共 24 个字段）
+        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
+        toastr["success"]("修改对话配置成功！", "Like_Girl");
+    })
+
+    // 原站此处会异步加载 wiki.kikiw.cn 的版本信息弹窗（loadModalContent），
+    // 属外部站点依赖，已按项目要求整体移除。
 </script>
 
-<!-- 外壳适配脚本 -->
 <script>
     (function () {
         'use strict';
@@ -711,14 +926,13 @@
         // 站点名称：浏览器标签 + 顶栏 Logo + 侧栏用户名均取自站点配置 name
         ProjectConfig.get('name').then(function (name) {
             if (!name) return;
-            document.title = name + ' - 全局设置';
+            document.title = name + ' - 留言管理';
             $('.js-site-name').text(name);
         });
 
         // 用户头像：站点配置的男主 QQ -> QQ 头像；加载失败回退占位图，避免破图
         ProjectConfig.get('site.male-qq').then(function (qq) {
-            var fallback = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
-                '<svg xmlns="http://www.w3.org/2000/svg" width="104" height="104"><rect width="104" height="104" fill="#ff5295"/><text x="52" y="66" font-size="46" fill="#fff" text-anchor="middle" font-family="serif">\u2665</text></svg>');
+            var fallback = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="104" height="104"><rect width="104" height="104" fill="#ff5295"/><text x="52" y="66" font-size="46" fill="#fff" text-anchor="middle" font-family="serif">\u2665</text></svg>');
             $('.js-user-avatar')
                 .on('error', function () { $(this).off('error').attr('src', fallback); })
                 .attr('src', ProjectConfig.qqAvatar(qq, 640));

@@ -382,6 +382,8 @@
             }
           };
           AdminAuth.saveAuth(mockRes.data, data.field.username);
+          // 首页读取该标记后展示一次欢迎提示
+          sessionStorage.setItem('ADMIN_LOGIN_WELCOME', '1');
           layer.msg('登录成功，正在跳转…', { icon: 1, time: 800 }, function () {
             location.href = '/admin/index.html';
           });

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8"/>
-    <title>全局设置</title>
+    <title>基本设置</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description"/>
     <meta content="Coderthemes" name="author"/>
@@ -441,7 +441,7 @@
                     }
                 </style>
 
-                <!-- 页面特有样式：照搬原站 user.php 内容区样式，追加在全站样式之后 -->
+                <!-- 页面特有样式：照搬原站 Set.php 内容区样式，追加在全站样式之后 -->
                 <style>
                     div#test-editor {
                         z-index: 10;
@@ -517,70 +517,45 @@
                 </style>
 
                 <div class="row">
-
-                    <div class="col-lg-12">
+                    <div class="col-lg-6">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="header-title mb-3">信息配置</h4>
+                                <h4 class="header-title mb-3">基本设置</h4>
 
-                                <!-- 原站表单提交至 userPost.php，提交已改为页面脚本 mock 处理，此处移除 action/method -->
+                                <!-- 原站表单提交至 adminPost.php，提交已改为页面脚本 mock 处理，此处移除 action/method/onsubmit -->
                                 <form class="needs-validation" novalidate>
+                                    <div class="form-group mb-3">
+                                        <label for="validationCustom01">站点标题</label>
+                                        <input type="text" class="form-control" placeholder="请输入站点标题"
+                                               name="title" value="龙猫の爱恋" required>
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <label for="validationCustom02">站点LOGO</label>
+                                        <input type="text" class="form-control" placeholder="请填写站点LOGO文字"
+                                               name="logo" value="龙猫の爱恋" required>
+
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <label for="validationCustom03">站点文案</label>
+                                        <input type="text" class="form-control" placeholder="显示在顶部的文案"
+                                               name="writing" value="爱晨雾漫过青瓦，爱暮色染透篱笆，更爱与君并肩立，看遍这人间烟火里的朝暮与年华。" required>
+                                    </div>
                                     <div class="form-group">
-                                        <label for="validationCustom01">是否开启前端加载动画</label>
-                                        <select class="form-control" id="example-select" name="Webanimation">
+                                        <label for="validationCustom06">是否关闭头像背景高斯模糊</label>
+                                        <select class="form-control" id="example-select" name="WebBlur">
                                             <option value="1" selected>开启</option>
                                             <option value="2">关闭</option>
                                         </select>
                                     </div>
-                                    <div class="form-group mb-3">
-                                        <label for="validationCustom05">管理员姓名</label>
-                                        <input type="text" class="form-control" id="validationCustom05" placeholder="请输入管理员Name"
-                                               name="userName" value="龙猫汪汪汪" required>
+                                    <div class="form-group">
+                                        <label for="validationCustom07">是否开启前端无刷新加载</label>
+                                        <select class="form-control" id="example-select" name="WebPjax">
+                                            <option value="1" selected>开启</option>
+                                            <option value="2">关闭</option>
+                                        </select>
                                     </div>
-                                    <div class="form-group mb-3">
-                                        <label for="validationCustom05">管理员QQ</label>
-                                        <input type="text" class="form-control" id="validationCustom05" placeholder="请输入管理员QQ"
-                                               name="userQQ" value="2623669948" required>
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label for="validationCustom04">管理员登录账号</label>
-                                        <span class="badge badge-success-lighten" style="font-size: 0.8rem;">账号由大小写字母与数字组成</span>
-                                        <input type="text" class="form-control" placeholder="请输入需修改的管理员账号"
-                                               name="adminName" value="codesensi" required>
-
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label for="validationCustom05">管理员登录密码</label>
-                                        <span class="badge badge-success-lighten" style="font-size: 0.8rem;">密码由大小写字母与数字组成</span>
-                                        <input class="form-control" name="pw" type="password" value="" placeholder="不修改请留空">
-                                    </div>
-
-                                    <div class="form-group mb-3">
-                                        <label for="validationCustom05">自定义前端全局CSS样式
-                                            <span class="badge badge-primary-lighten">请按CSS格式填写你的代码</span></label>
-                                        <textarea name="cssCon" class="form-control" rows="5"
-                                                  placeholder=""></textarea>
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label for="validationCustom05">自定义头部标签
-                                            <span class="badge badge-primary-lighten">可填写HTML标签 CSS外链</span></label>
-                                        <textarea name="headCon" class="form-control" rows="5"
-                                                  placeholder=""></textarea>
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label for="validationCustom05">自定义底部标签
-                                            <span class="badge badge-primary-lighten">可填写HTML标签 js外链</span></label>
-                                        <textarea name="footerCon" class="form-control" rows="5"
-                                                  placeholder="">&lt;!--&lt;script src=&quot;https://img-love.kikiw.cn/jsxg/yh/yinghua.js&quot;&gt;&lt;/script&gt;--&gt;</textarea>
-                                    </div>
-                                    <div class="form-group mb-3">
-                                        <label for="validationCustom05">安全码</label>
-                                        <span class="badge badge-danger-lighten" style="font-size: 0.8rem;">修改敏感信息必须填写</span>
-                                        <input type="password" class="form-control" name="SCode" value="" placeholder="请输入安全码">
-                                    </div>
-
                                     <div class="form-group mb-3 text_right">
-                                        <button class="btn btn-primary" type="button" id="userPost">提交修改</button>
+                                        <button class="btn btn-primary" type="button" id="adminPost">提交修改</button>
                                     </div>
                                 </form>
 
@@ -588,7 +563,110 @@
                         </div> <!-- end card-->
                     </div> <!-- end col-->
 
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="header-title mb-3">情侣配置</h4>
 
+                                <!-- 原站表单提交至 loveadminPost.php，提交已改为页面脚本 mock 处理，此处移除 action/method -->
+                                <form class="needs-validation" novalidate>
+                                    <div class="form-group mb-3">
+                                        <label for="validationCustom02">女主Name</label>
+                                        <input type="text" class="form-control" placeholder="请输入女主Name"
+                                               name="girl" value="Su" required>
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <label for="validationCustom01">男主Name</label>
+                                        <input type="text" class="form-control" placeholder="请输入男主Name"
+                                               name="boy" value="Li" required>
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <label for="validationCustom04">女主QQ</label>
+                                        <input type="text" class="form-control" placeholder="请输入女主QQ（用于显示头像）"
+                                               name="girlimg" value="673822943" required>
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <label for="validationCustom03">男主QQ</label>
+                                        <input type="text" class="form-control" placeholder="请输入男主QQ（用于显示头像）"
+                                               name="boyimg" value="2623669948" required>
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <label for="validationCustom05">起始时间</label>
+                                        <input type="datetime-local" class="form-control" placeholder="请输入起始时间"
+                                               name="startTime" value="2018-07-15T00:00" required>
+                                    </div>
+                                    <div class="form-group mb-3 text_right">
+                                        <button class="btn btn-primary" type="button" id="loveadminPost">提交修改</button>
+                                    </div>
+                                </form>
+
+                            </div> <!-- end card-body-->
+                        </div> <!-- end card-->
+                    </div> <!-- end col-->
+
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="header-title mb-3">卡片配置&版权配置</h4>
+
+                                <!-- 原站表单提交至 CardadminPost.php，提交已改为页面脚本 mock 处理，此处移除 action/method -->
+                                <form class="needs-validation" novalidate>
+                                    <div class="form-group mb-3">
+                                        <label for="validationCustom01">背景图片URL地址</label>
+                                        <input type="text" class="form-control" placeholder="请输入卡片Name"
+                                               name="bgimg" value="Style/img/bgCover.png" required>
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <label for="validationCustom01">卡片1Name</label>
+                                        <input type="text" class="form-control" placeholder="请输入卡片Name"
+                                               name="card1" value="点点滴滴" required>
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <label for="validationCustom02">卡片1描述</label>
+                                        <input type="text" class="form-control" placeholder="请输入卡片描述"
+                                               name="deci1" value="有人愿意听你碎碎念念也很浪漫" required>
+
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <label for="validationCustom03">卡片2Name</label>
+                                        <input type="text" class="form-control" placeholder="请输入卡片Name"
+                                               name="card2" value="留言板" required>
+
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <label for="validationCustom04">卡片2描述</label>
+                                        <input type="text" class="form-control" placeholder="请输入卡片描述"
+                                               name="deci2" value="在这里写下我们的留言祝福" required>
+
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <label for="validationCustom05">卡片3Name</label>
+                                        <input type="text" class="form-control" placeholder="请输入卡片Name"
+                                               name="card3" value="关于我们" required>
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <label for="validationCustom05">卡片3描述</label>
+                                        <input type="text" class="form-control" placeholder="请输入卡片描述"
+                                               name="deci3" value="我们之间认识的经历回忆" required>
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <label for="validationCustom05">域名备案号</label>
+                                        <input type="text" class="form-control" placeholder="没有请留空" name="icp"
+                                               value="赣ICP备2026010001号" required>
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <label for="validationCustom05">站点版权信息</label>
+                                        <input type="text" class="form-control" placeholder="请输入站点版权信息"
+                                               name="Copyright" value="Copyright © 2022 - 2026 Like_Girl All Rights Reserved." required>
+                                    </div>
+                                    <div class="form-group mb-3 text_right">
+                                        <button class="btn btn-primary" type="button" id="CardadminPost">提交修改</button>
+                                    </div>
+                                </form>
+
+                            </div> <!-- end card-body-->
+                        </div> <!-- end card-->
+                    </div> <!-- end col-->
                 </div>
 
             </div>
@@ -624,58 +702,8 @@
 <!-- end demo js-->
 <script src="/admin/assets/js/pages/demo.toastr.js"></script>
 
-<!-- 页面交互脚本：照搬原站 user.php 的交互逻辑并 mock 化（原站为多个页面共用一段脚本，此处仅保留本页用到的提交处理） -->
+<!-- 页面交互脚本：照搬原站 Set.php 的交互逻辑并 mock 化（原站为多个页面共用一段脚本，此处仅保留本页用到的提交处理） -->
 <script>
-    // 原站遗留的账号/密码格式校验函数，按原样保留（表单未绑定 onsubmit，不会自动触发）
-    function check() {
-        let adminName = document.getElementsByName('adminName')[0].value.trim();
-        let pw = document.getElementsByName('pw')[0].value.trim();
-        // 判断adminName长度是否为0 如果为0则提示弹窗
-        if (adminName.length == 0) {
-            alert("请填写用户名");
-            return false;
-        }
-        let user = /[a-zA-Z0-9]/g;
-        let character = new RegExp("[`~!#$^&*()=|{}':;',\\[\\].<>/?~！#￥……&*（）——|{}【】‘；：”“'。，、？]");
-        if (character.test(adminName)) {
-            alert("用户名含有特殊字符 本次修改已拦截")
-            return false;
-        } else if (!(user.test(adminName))) {
-            alert("用户名只支持数字与英文大小写字母")
-            return false;
-        }
-        if (pw.length >= 1) {
-            if (pw.length <= 6) {
-                alert("密码长度需大于六位数")
-                return false;
-            }
-            if (character.test(pw)) {
-                alert("密码含有特殊字符为了过滤SQL注入已拦截\n请输入大小写字母与数字组成的密码")
-                return false;
-            }
-        }
-    }
-
-    // 信息配置表单提交（原站通过 $.ajax 提交至 userPost.php，取值逻辑保留）
-    $("#userPost").click(function () {
-        var Webanimation = $("select[name='Webanimation']").val();
-        var userName = $("input[name='userName']").val();
-        var userQQ = $("input[name='userQQ']").val();
-        var adminName = $("input[name='adminName']").val();
-        var pw = $("input[name='pw']").val();
-        var SCode = $("input[name='SCode']").val();
-        var cssCon = $("textarea[name='cssCon']").val();
-        var headCon = $("textarea[name='headCon']").val();
-        var footerCon = $("textarea[name='footerCon']").val();
-
-        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
-        toastr["success"]("更新登录信息成功！", "Like_Girl");
-        toastr["success"]("更新全局信息成功", "Like_Girl");
-        toastr["success"]("更新自定义内容成功", "Like_Girl");
-    })
-
-    // 原站此处的 loadModalContent() 会请求 wiki.kikiw.cn 外部数据，属于外部站点依赖，已按规范移除
-
     $(function () {
         toastr.options = {
             "closeButton": true,
@@ -695,7 +723,50 @@
             "showMethod": "fadeIn",
             "hideMethod": "fadeOut"
         };
+    });
+
+    // 基本设置表单提交（原站通过 $.ajax 提交至 adminPost.php，取值逻辑保留）
+    $("#adminPost").click(function () {
+        var title = $("input[name='title']").val();
+        var logo = $("input[name='logo']").val();
+        var writing = $("input[name='writing']").val();
+        var WebBlur = $("select[name='WebBlur']").val();
+        var WebPjax = $("select[name='WebPjax']").val();
+
+        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
+        toastr["success"]("基本信息修改成功！", "Like_Girl");
+        toastr["success"]("开关设置成功！", "Like_Girl");
     })
+
+    // 情侣配置表单提交（原站通过 $.ajax 提交至 loveadminPost.php，取值逻辑保留）
+    $("#loveadminPost").click(function () {
+        var boy = $("input[name='boy']").val();
+        var girl = $("input[name='girl']").val();
+        var boyimg = $("input[name='boyimg']").val();
+        var girlimg = $("input[name='girlimg']").val();
+        var startTime = $("input[name='startTime']").val();
+
+        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
+        toastr["success"]("情侣信息修改成功！", "Like_Girl");
+    })
+
+    // 卡片配置&版权配置表单提交（原站通过 $.ajax 提交至 CardadminPost.php，取值逻辑保留）
+    $("#CardadminPost").click(function () {
+        var bgimg = $("input[name='bgimg']").val();
+        var card1 = $("input[name='card1']").val();
+        var deci1 = $("input[name='deci1']").val();
+        var card2 = $("input[name='card2']").val();
+        var deci2 = $("input[name='deci2']").val();
+        var card3 = $("input[name='card3']").val();
+        var deci3 = $("input[name='deci3']").val();
+        var icp = $("input[name='icp']").val();
+        var Copyright = $("input[name='Copyright']").val();
+
+        // 现阶段后端接口未实现，mock 成功提示；接口实现后恢复为真实请求
+        toastr["success"]("卡片信息修改成功！", "Like_Girl");
+    })
+
+    // 原站此处的 loadModalContent() 会请求 wiki.kikiw.cn 外部数据，属于外部站点依赖，已按规范移除
 </script>
 
 <!-- 外壳适配脚本 -->
@@ -711,7 +782,7 @@
         // 站点名称：浏览器标签 + 顶栏 Logo + 侧栏用户名均取自站点配置 name
         ProjectConfig.get('name').then(function (name) {
             if (!name) return;
-            document.title = name + ' - 全局设置';
+            document.title = name + ' - 基本设置';
             $('.js-site-name').text(name);
         });
 
