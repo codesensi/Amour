@@ -11,7 +11,7 @@ import java.util.List;
  * 系统配置转换器 —— {@link SysConfig} 实体转 {@link ConfigDTO}（MapStruct 编译期生成实现类）。
  * <p>
  * 以 Spring Bean 方式注入使用（生成的 {@code ConfigConvertImpl} 为 Spring 组件）；
- * 两侧字段（{@code cKey}、{@code cValue}、{@code vType}、{@code cGroup}）同名，
+ * 两侧字段（{@code configKey}、{@code configValue}、{@code valueType}、{@code configGroup}）同名，
  * 由 MapStruct 自动映射，无需显式 {@code @Mapping}。
  *
  * @author codesensi

@@ -64,7 +64,7 @@ public class LoginServiceImpl implements LoginService {
 
         // 校验验证码（开关缺失/停用时视为关闭）
         boolean captchaEnabled = configService.listByKeys(List.of(ConfigKeyEnum.CAPTCHA_ENABLED.getCode())).stream()
-                .anyMatch(config -> Boolean.parseBoolean(config.getCValue()));
+                .anyMatch(config -> Boolean.parseBoolean(config.getConfigValue()));
         if (captchaEnabled) {
             checkCaptcha(loginDTO);
         }

@@ -12,50 +12,50 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 系统配置实体。
+ * 角色信息实体。
  * <p>
- * 存储 {@code app.*} 业务可调配置，运行期由 {@code ConfigService} 实时查库读取（热更新）。
+ * 对应 {@code sys_role} 表，存储后台角色定义及其启停状态。
  */
 @Data
 @Accessors(chain = true)
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@Table("sys_config")
-public class SysConfig extends BaseEntity implements Serializable {
+@Table("sys_role")
+public class SysRole extends BaseEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
-     * 主键ID
+     * 角色ID
      */
     @Id
     private Long id;
 
     /**
-     * 配置键
+     * 角色名称
      */
-    private String configKey;
+    private String name;
 
     /**
-     * 配置值（统一字符串存储）
+     * 角色编码
      */
-    private String configValue;
+    private String code;
 
     /**
-     * 值类型:STRING,INTEGER,LONG,BOOLEAN
+     * 角色排序
      */
-    private String valueType;
+    private Integer sort;
 
     /**
-     * 分组（app 的一级子项，如 name、captcha 等）
-     */
-    private String configGroup;
-
-    /**
-     * 配置状态:0-启用,1-禁用
+     * 角色状态:0-启用,1-禁用
      */
     private Integer status;
+
+    /**
+     * 内置标识:0-非内置,1-内置
+     */
+    private Integer builtin;
 
     /**
      * 备注

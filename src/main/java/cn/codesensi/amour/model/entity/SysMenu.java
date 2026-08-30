@@ -12,70 +12,76 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 用户信息实体。
+ * 菜单实体。
  * <p>
- * 对应 {@code sys_user} 表，存储系统用户的账号凭据与基本资料。
+ * 对应 {@code sys_menu} 表，存储后台导航菜单、路由信息与按钮权限点，
+ * 通过 {@code pid} 构建树形结构。
  */
 @Data
 @Accessors(chain = true)
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@Table("sys_user")
-public class SysUser extends BaseEntity implements Serializable {
+@Table("sys_menu")
+public class SysMenu extends BaseEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
-     * 用户ID
+     * 菜单ID
      */
     @Id
     private Long id;
 
     /**
-     * 用户名称
+     * 父级菜单ID
      */
-    private String username;
+    private Long pid;
 
     /**
-     * 用户密码
+     * 菜单名称
      */
-    private String password;
+    private String title;
 
     /**
-     * 用户昵称
+     * 菜单类型:D-目录,M-菜单,B-按钮
      */
-    private String nickname;
+    private String type;
 
     /**
-     * 用户身份证号码
+     * 路由路径
      */
-    private String idCard;
+    private String path;
 
     /**
-     * 用户邮箱
+     * 组件路径
      */
-    private String email;
+    private String component;
 
     /**
-     * 用户手机号码
+     * 菜单排序:数字越小越靠前
      */
-    private String phone;
+    private Integer sort;
 
     /**
-     * 用户性别:U-未知,M-男,F-女
+     * 菜单图标
      */
-    private String gender;
+    private String icon;
 
     /**
-     * 用户头像地址
+     * 权限编码
      */
-    private String avatar;
+    private String perms;
 
     /**
-     * 用户状态:0-启用,1-禁用
+     * 菜单状态:0-启用,1-禁用
      */
     private Integer status;
+
+    /**
+     * 显隐标识:0-显示,1-隐藏
+     */
+    private Integer hidden;
 
     /**
      * 内置标识:0-非内置,1-内置

@@ -45,7 +45,7 @@ public class DemoModeInterceptor implements HandlerInterceptor {
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
         // 读取演示模式开关（配置缺失/停用时结果为空列表，开关视为 false）
         boolean demoMode = configService.listByKeys(List.of(ConfigKeyEnum.DEMO_MODE.getCode())).stream()
-                .anyMatch(config -> Boolean.parseBoolean(config.getCValue()));
+                .anyMatch(config -> Boolean.parseBoolean(config.getConfigValue()));
         if (demoMode) {
             String method = request.getMethod();
             if (!RequestMethod.GET.name().equals(method) && !RequestMethod.HEAD.name().equals(method)) {

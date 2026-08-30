@@ -75,7 +75,7 @@ public class CaptchaServiceImpl implements CaptchaService {
         // 读取图形验证码类型配置（实时读取支持热更新；未配置时默认算术验证码）
         String imageTypeCode = configService.listByKeys(List.of(ConfigKeyEnum.CAPTCHA_IMAGE_TYPE.getCode()))
                 .stream().findFirst()
-                .map(ConfigDTO::getCValue)
+                .map(ConfigDTO::getConfigValue)
                 .orElse(ImageType.ARITHMETIC.getCode());
         ImageType imageType = BaseEnum.fromCode(ImageType.class, imageTypeCode);
         if (imageType == null) {

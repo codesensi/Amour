@@ -140,7 +140,7 @@ public class ConfigServiceImpl implements ConfigService {
      */
     private SysConfig oneConfigByKeyFromDb(String key) {
         return QueryChain.of(sysConfigMapper)
-                .where(SYS_CONFIG.C_KEY.eq(key))
+                .where(SYS_CONFIG.CONFIG_KEY.eq(key))
                 .and(SYS_CONFIG.STATUS.eq(EnableEnum.ENABLE.getCode()))
                 .one();
     }
@@ -159,7 +159,7 @@ public class ConfigServiceImpl implements ConfigService {
         // 缓存就绪时逐条回填缓存，顺带完成常用配置点的预热
         if (cache != null) {
             for (SysConfig config : configs) {
-                cache.put(config.getCKey(), config);
+                cache.put(config.getConfigKey(), config);
             }
         }
         return configConverter.toDTOList(configs);
