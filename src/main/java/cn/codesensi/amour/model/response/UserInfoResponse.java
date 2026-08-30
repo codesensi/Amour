@@ -48,7 +48,7 @@ public class UserInfoResponse implements Serializable {
     private String phone;
 
     /**
-     * 用户性别:0-保密,1-男,2-女
+     * 用户性别:U-未知,M-男,F-女
      */
     private String gender;
 
@@ -58,9 +58,9 @@ public class UserInfoResponse implements Serializable {
     private String remark;
 
     /**
-     * 系统内置标识:0-非内置,1-内置
+     * 内置标识:0-非内置,1-内置
      */
-    private Integer sysFlag;
+    private Integer builtin;
 
     /**
      * 角色

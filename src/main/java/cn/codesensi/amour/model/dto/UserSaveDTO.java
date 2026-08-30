@@ -43,9 +43,9 @@ public class UserSaveDTO implements Serializable {
     private String phone;
 
     /**
-     * 用户性别:0-保密,1-男,2-女
+     * 用户性别:U-未知,M-男,F-女
      */
-    private Integer gender;
+    private String gender;
 
     /**
      * 用户头像地址

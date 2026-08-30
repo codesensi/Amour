@@ -35,19 +35,9 @@ public class MenuResponse implements Serializable {
     private Long pid;
 
     /**
-     * 路由名称(外链地址)
-     */
-    private String name;
-
-    /**
      * 路由路径
      */
     private String path;
-
-    /**
-     * 路由参数
-     */
-    private String param;
 
     /**
      * 组件路径
@@ -60,7 +50,7 @@ public class MenuResponse implements Serializable {
     private String title;
 
     /**
-     * 菜单类型:1-目录,2-菜单,3-按钮
+     * 菜单类型:D-目录,M-菜单,B-按钮
      */
     private String type;
 
@@ -80,42 +70,23 @@ public class MenuResponse implements Serializable {
     private String perms;
 
     /**
-     * 是否外链:0-否,1-是
-     */
-    private Integer isLink;
-
-    /**
-     * 是否内嵌iframe:0-否,1-是
-     */
-    private Integer isFrame;
-
-    /**
-     * 内嵌iframe地址
-     */
-    private String frameSrc;
-
-    /**
-     * 是否显示:0-否,1-是
-     */
-    private Integer isShow;
-
-    /**
-     * 是否显示父级菜单:0-否,1-是
-     */
-    private Integer isShowParent;
-
-    /**
      * 菜单状态:0-启用,1-禁用
      */
     private Integer status;
+
+    /**
+     * 显隐标识:0-显示,1-隐藏
+     */
+    private Integer hidden;
+
+    /**
+     * 内置标识:0-非内置,1-内置
+     */
+    private Integer builtin;
 
     /**
      * 备注
      */
     private String remark;
 
-    /**
-     * 系统内置标识:0-非内置,1-内置
-     */
-    private Integer sysFlag;
 }

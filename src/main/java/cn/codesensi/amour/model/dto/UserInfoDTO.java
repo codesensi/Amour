@@ -59,9 +59,9 @@ public class UserInfoDTO implements Serializable {
     private String remark;
 
     /**
-     * 系统内置标识:0-自定义,1-内置
+     * 内置标识:0-非内置,1-内置
      */
-    private Integer sysFlag;
+    private Integer builtin;
 
     /**
      * 角色
