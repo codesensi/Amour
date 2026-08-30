@@ -2,15 +2,11 @@ package cn.codesensi.amour.config;
 
 import cn.codesensi.amour.common.consts.RbacConst;
 import cn.codesensi.amour.interceptor.DemoModeInterceptor;
-import cn.codesensi.amour.interceptor.FrontendResourceInterceptor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.resource.VersionResourceResolver;
 
 /**
  * Web MVC 拦截器链配置 —— 统一注册应用的拦截器与页面跳转视图控制器。
@@ -24,7 +20,6 @@ import org.springframework.web.servlet.resource.VersionResourceResolver;
 public class WebMvcConfig implements WebMvcConfigurer {
 
     private final DemoModeInterceptor demoModeInterceptor;
-    private final FrontendResourceInterceptor frontendResourceInterceptor;
 
     /**
      * 注册应用级拦截器链。
@@ -54,48 +49,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 // 获取验证码、登录、登出接口不受演示模式限制
                 .excludePathPatterns(RbacConst.CAPTCHA_PATH, RbacConst.LOGIN_PATH, RbacConst.LOGOUT_PATH)
                 .order(2);
-
-        // 3. 前端资源 URL 拦截器：为门户视图注入 resourceUrlProvider（配合内容指纹版本策略生成资源 URL）
-        registry.addInterceptor(frontendResourceInterceptor)
-                .addPathPatterns("/", "/index.html", "/portal/**")
-                .order(3);
-    }
-
-    /**
-     * 注册页面跳转视图控制器 —— 无业务逻辑的纯跳转路由。
-     *
-     * <p>门户页已由静态 HTML 迁移为 Thymeleaf 模板（公共外壳见 templates/fragments/layout.html），
-     * 此处以视图控制器直连模板渲染，渲染产物与原静态页等价，pjax 局部刷新行为不变。</p>
-     */
-    @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        // 前端展示首页：/ 与 /index.html 均渲染首页模板（旧 .html 链接保持可用）
-        registry.addViewController("/").setViewName("index");
-        registry.addViewController("/index.html").setViewName("index");
-        // 门户子页：点点滴滴 / 留言板 / 关于我们 / 恋爱相册 / 恋爱列表
-        registry.addViewController("/portal/moments.html").setViewName("portal/moments");
-        registry.addViewController("/portal/message.html").setViewName("portal/message");
-        registry.addViewController("/portal/about.html").setViewName("portal/about");
-        registry.addViewController("/portal/love-photo.html").setViewName("portal/love-photo");
-        registry.addViewController("/portal/love-list.html").setViewName("portal/love-list");
-        // 后台管理入口：/admin 总是进入后台管理首页，登录态由首页前端脚本判断
-        registry.addRedirectViewController("/admin", "/admin/index.html");
-    }
-
-    /**
-     * 注册静态资源处理器 —— 为 /assets/** 启用内容指纹版本策略。
-     *
-     * <p>资源 URL 形如 /assets/portal/css/portal-{内容hash}.css：文件内容变更后
-     * 指纹自动变化，浏览器缓存随之失效，无需手工维护 ?v=N 版本参数；
-     * 模板端经 resourceUrlProvider bean 生成带指纹的 URL；
-     * 不带指纹的原始 URL 依然可正常解析，兼容未指纹化的引用。</p>
-     */
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/assets/**")
-                .addResourceLocations("classpath:/static/assets/")
-                .resourceChain(true)
-                .addResolver(new VersionResourceResolver().addContentVersionStrategy("/**"));
     }
 
     /**
