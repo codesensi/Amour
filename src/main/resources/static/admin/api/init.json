@@ -5,7 +5,7 @@
   "data": {
     "homeInfo": {
       "title": "首页",
-      "href": "page/welcome-1.html?t=1"
+      "href": "page/welcome-1.html"
     },
     "logoInfo": {
       "title": "LAYUI MINI",
@@ -20,30 +20,10 @@
         "target": "_self",
         "child": [
           {
-            "title": "主页模板",
-            "href": "",
+            "title": "首页",
+            "href": "page/welcome-1.html",
             "icon": "layui-icon layui-icon-home",
-            "target": "_self",
-            "child": [
-              {
-                "title": "主页一",
-                "href": "page/welcome-1.html",
-                "icon": "layui-icon layui-icon-console",
-                "target": "_self"
-              },
-              {
-                "title": "主页二",
-                "href": "page/welcome-2.html",
-                "icon": "layui-icon layui-icon-console",
-                "target": "_self"
-              },
-              {
-                "title": "主页三",
-                "href": "page/welcome-3.html",
-                "icon": "layui-icon layui-icon-console",
-                "target": "_self"
-              }
-            ]
+            "target": "_self"
           },
           {
             "title": "菜单管理",

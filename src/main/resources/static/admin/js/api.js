@@ -36,7 +36,8 @@ layui.define(['jquery', 'layer'], function (exports) {
         captcha:     {mock: 'api/captcha.json',     real: '/captcha',            method: 'get'},
         upload:      {mock: 'api/upload.json',      real: '/upload',             method: 'post'},
         passwordChange: {mock: 'api/success.json',  real: '/user/password',      method: 'post'},
-        profileSave:    {mock: 'api/success.json',  real: '/user/profile',       method: 'post'}
+        profileSave:    {mock: 'api/success.json',  real: '/user/profile',       method: 'post'},
+        statistics:     {mock: 'api/statistics.json', real: '/admin/dashboard',  method: 'get'}
     };
 
     /** token 本地存取 —— 全站统一入口 */
