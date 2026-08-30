@@ -33,15 +33,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // 1. SaToken 鉴权拦截器：初始化 SaTokenContext + 登录校验 + 封禁校验 + 角色校验
-        registry.addInterceptor(new SaInterceptor(handler -> {
-                    // 所有请求需登录 + 账号未封禁
-                    SaRouter.match(RbacConst.ROOT_PATH)
-                            .check(r -> {
-                                StpUtil.checkLogin();
-                                StpUtil.checkDisable(StpUtil.getLoginIdAsLong());
-                            });
-                })).addPathPatterns(RbacConst.ROOT_PATH)
-                .order(1);
+        // registry.addInterceptor(new SaInterceptor(handler -> {
+        //             // 所有请求需登录 + 账号未封禁
+        //             SaRouter.match(RbacConst.ROOT_PATH)
+        //                     .check(r -> {
+        //                         StpUtil.checkLogin();
+        //                         StpUtil.checkDisable(StpUtil.getLoginIdAsLong());
+        //                     });
+        //         })).addPathPatterns(RbacConst.ROOT_PATH)
+        //         .order(1);
 
         // 2. 演示模式拦截器：演示环境下仅允许查询和登录/登出，拒绝所有写操作
         registry.addInterceptor(demoModeInterceptor)

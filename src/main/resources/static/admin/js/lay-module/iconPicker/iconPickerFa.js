@@ -87,16 +87,16 @@ layui.define(['laypage', 'form'], function (exports) {
              * 绘制select下拉选择框
              */
             createSelect: function () {
-                var oriIcon = '<i class="fa">';
+                var oriIcon = '<i class="layui-icon">';
 
                 // 默认图标
                 if (ORIGINAL_ELEM_VALUE === '') {
-                    ORIGINAL_ELEM_VALUE = 'fa-adjust';
+                    ORIGINAL_ELEM_VALUE = 'layui-icon-set';
 
                 }
 
 
-                oriIcon = '<i class="fa ' + ORIGINAL_ELEM_VALUE + '">';
+                oriIcon = '<i class="layui-icon ' + ORIGINAL_ELEM_VALUE + '">';
 
                 oriIcon += '</i>';
 
@@ -194,7 +194,7 @@ layui.define(['laypage', 'form'], function (exports) {
                     // 每个图标dom
                     var icon = '<div class="layui-iconpicker-icon-item" title="' + obj + '" ' + style + '>';
 
-                    icon += '<i class="fa ' + obj + '"></i>';
+                    icon += '<i class="layui-icon ' + obj + '"></i>';
 
                     icon += '</div>';
 
@@ -298,13 +298,13 @@ layui.define(['laypage', 'form'], function (exports) {
             check: function () {
                 var item = '#' + PICKER_BODY + ' .layui-iconpicker-icon-item';
                 a.event('click', item, function (e) {
-                    var el = $(e.currentTarget).find('.fa'),
+                    var el = $(e.currentTarget).find('.layui-icon'),
                         icon = '';
 
                     var clsArr = el.attr('class').split(/[\s\n]/),
                         cls = clsArr[1],
                         icon = cls;
-                    $('#' + TITLE_ID).find('.layui-iconpicker-item .fa').html('').attr('class', clsArr.join(' '));
+                    $('#' + TITLE_ID).find('.layui-iconpicker-item .layui-icon').html('').attr('class', clsArr.join(' '));
 
 
                     $('#' + ICON_BODY).removeClass(selected).addClass(unselect);
@@ -349,6 +349,7 @@ layui.define(['laypage', 'form'], function (exports) {
 
             /**
              * 获取数据
+             * url 指向 layui.css，解析其中 .layui-icon-xxx:before 的图标码表
              */
             getData: function (url) {
                 var iconlist = [];
@@ -358,14 +359,14 @@ layui.define(['laypage', 'form'], function (exports) {
                     contentType: "application/x-www-form-urlencoded; charset=UTF-8",
                     async: false,
                     success: function (ret) {
-                        var exp = /fa-var-(.*):/ig;
+                        var exp = /\.layui-icon-([a-z0-9-]+):before/ig;
                         var result;
                         while ((result = exp.exec(ret)) != null) {
-                            iconlist.push('fa-' + result[1]);
+                            iconlist.push('layui-icon-' + result[1]);
                         }
                     },
                     error: function (xhr, textstatus, thrown) {
-                        layer.msg('fa图标接口有误');
+                        layer.msg('图标数据接口有误');
                     }
                 });
                 return iconlist;
@@ -383,13 +384,13 @@ layui.define(['laypage', 'form'], function (exports) {
      */
     IconPicker.prototype.checkIcon = function (filter, iconName) {
         var el = $('*[lay-filter=' + filter + ']'),
-            p = el.next().find('.layui-iconpicker-item .fa'),
+            p = el.next().find('.layui-iconpicker-item .layui-icon'),
             c = iconName;
 
         if (c.indexOf('#xe') > 0) {
             p.html(c);
         } else {
-            p.html('').attr('class', 'fa ' + c);
+            p.html('').attr('class', 'layui-icon ' + c);
         }
         el.attr('value', c).val(c);
     };

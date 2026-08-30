@@ -1,0 +1,12 @@
+{
+  "success": true,
+  "code": 200,
+  "msg": "登录成功",
+  "data": {
+    "accessToken": "mock-token-amour-admin",
+    "expires": 2592000000,
+    "tokenName": "Authorization",
+    "tokenPrefix": "Bearer"
+  },
+  "timestamp": 1700000000000
+}

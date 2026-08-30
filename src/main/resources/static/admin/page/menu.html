@@ -19,20 +19,22 @@
     <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
 </script>
 <script>
-    layui.use(['table', 'treetable'], function () {
+    layui.use(['table', 'treetable', 'api'], function () {
         var $ = layui.jquery;
         var table = layui.table;
         var treetable = layui.treetable;
+        var api = layui.api;
 
-        // 渲染表格
+        // 渲染表格：经统一请求层取数后直传 data（统一响应解包与错误处理）
         layer.load(2);
+        api.request('menuTree').done(function (data) {
         treetable.render({
             treeColIndex: 1,
             treeSpid: -1,
             treeIdName: 'authorityId',
             treePidName: 'parentId',
             elem: '#munu-table',
-            url: 'api/menus.json',
+            data: data.list,
             page: false,
             cols: [[
                 {type: 'numbers'},
@@ -57,6 +59,7 @@
             done: function () {
                 layer.closeAll('loading');
             }
+        });
         });
 
         $('#btn-expand').click(function () {

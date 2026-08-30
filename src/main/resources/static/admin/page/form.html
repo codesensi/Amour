@@ -476,6 +476,7 @@
         });
 
         //监听提交
+        // 演示表单：本页为组件演示，不对应后端接口；业务提交请经统一请求层 api.request(...) 实现
         form.on('submit(demo1)', function (data) {
             layer.alert(JSON.stringify(data.field), {
                 title: '最终的提交信息'

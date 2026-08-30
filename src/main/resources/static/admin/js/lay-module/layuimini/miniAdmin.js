@@ -4,13 +4,14 @@
  * version:2.0
  * description:layuimini 主体框架扩展
  */
-layui.define(["jquery", "miniMenu", "element","miniPage", "miniTheme"], function (exports) {
+layui.define(["jquery", "miniMenu", "element","miniPage", "miniTheme", "api"], function (exports) {
     var $ = layui.$,
         element = layui.element,
         layer = layui.layer,
         miniMenu = layui.miniMenu,
         miniTheme = layui.miniTheme,
-        miniPage = layui.miniPage;
+        miniPage = layui.miniPage,
+        api = layui.api;
 
     if (!/http(s*):\/\//.test(location.href)) {
         var tips = "请先将项目部署至web容器（Apache/Tomcat/Nginx/IIS/等），否则部分数据将无法显示";
@@ -20,9 +21,7 @@ layui.define(["jquery", "miniMenu", "element","miniPage", "miniTheme"], function
     var miniAdmin = {
 
         /**
-         * 后台框架初始化
-         * @param options.iniUrl   后台初始化接口地址
-         * @param options.clearUrl   后台清理缓存接口
+         * 后台框架初始化（经统一请求层获取数据，mock/真实模式统一处理解包与鉴权头）
          * @param options.renderPageVersion 初始化页面是否加版本号
          * @param options.bgColorDefault 默认皮肤
          * @param options.multiModule 是否开启多模块
@@ -31,47 +30,45 @@ layui.define(["jquery", "miniMenu", "element","miniPage", "miniTheme"], function
          * @param options.pageAnim 切换菜单动画
          */
         render: function (options) {
-            options.iniUrl = options.iniUrl || null;
-            options.clearUrl = options.clearUrl || null;
             options.renderPageVersion = options.renderPageVersion || false;
             options.bgColorDefault = options.bgColorDefault || 0;
             options.multiModule = options.multiModule || false;
             options.menuChildOpen = options.menuChildOpen || false;
             options.loadingTime = options.loadingTime || 1;
             options.pageAnim = options.pageAnim || false;
-            $.getJSON(options.iniUrl, function (data) {
+            api.request('init').then(function (data) {
                 if (data == null) {
-                    miniAdmin.error('暂无菜单信息')
-                } else {
-                    miniAdmin.renderLogo(data.logoInfo);
-                    miniAdmin.renderClear(options.clearUrl);
-                    miniAdmin.renderAnim(options.pageAnim);
-                    miniAdmin.listen({
-                        homeInfo:data.homeInfo,
-                        multiModule: options.multiModule,
-                    });
-                    miniMenu.render({
-                        menuList: data.menuInfo,
-                        multiModule: options.multiModule,
-                        menuChildOpen: options.menuChildOpen
-                    });
-                    miniPage.render({
-                        homeInfo:data.homeInfo,
-                        menuList: data.menuInfo,
-                        multiModule: options.multiModule,
-                        renderPageVersion: options.renderPageVersion,
-                        menuChildOpen: options.menuChildOpen,
-                        listenSwichCallback: function () {
-                            miniAdmin.renderDevice();
-                        }
-                    });
-                    miniTheme.render({
-                        bgColorDefault: options.bgColorDefault,
-                        listen: true,
-                    });
                     miniAdmin.deleteLoader(options.loadingTime);
+                    return miniAdmin.error('暂无菜单信息');
                 }
-            }).fail(function () {
+                miniAdmin.renderLogo(data.logoInfo);
+                miniAdmin.renderAnim(options.pageAnim);
+                miniAdmin.listen({
+                    homeInfo:data.homeInfo,
+                    multiModule: options.multiModule,
+                });
+                miniMenu.render({
+                    menuList: data.menuInfo,
+                    multiModule: options.multiModule,
+                    menuChildOpen: options.menuChildOpen
+                });
+                miniPage.render({
+                    homeInfo:data.homeInfo,
+                    menuList: data.menuInfo,
+                    multiModule: options.multiModule,
+                    renderPageVersion: options.renderPageVersion,
+                    menuChildOpen: options.menuChildOpen,
+                    listenSwichCallback: function () {
+                        miniAdmin.renderDevice();
+                    }
+                });
+                miniTheme.render({
+                    bgColorDefault: options.bgColorDefault,
+                    listen: true,
+                });
+                miniAdmin.deleteLoader(options.loadingTime);
+            }, function () {
+                miniAdmin.deleteLoader(options.loadingTime);
                 miniAdmin.error('菜单接口有误');
             });
         },
@@ -83,14 +80,6 @@ layui.define(["jquery", "miniMenu", "element","miniPage", "miniTheme"], function
         renderLogo: function (data) {
             var html = '<a href="javascript:;"><img src="' + data.image + '" alt="logo"><h1>' + data.title + '</h1></a>';
             $('.layuimini-logo').html(html);
-        },
-
-        /**
-         * 初始化缓存地址
-         * @param clearUrl
-         */
-        renderClear: function (clearUrl) {
-            $('.layuimini-clear').attr('data-href',clearUrl);
         },
 
         /**
@@ -166,7 +155,7 @@ layui.define(["jquery", "miniMenu", "element","miniPage", "miniTheme"], function
         renderDevice: function () {
             if (miniAdmin.checkMobile()) {
                 $('.layuimini-tool i').attr('data-side-fold', 1);
-                $('.layuimini-tool i').attr('class', 'fa fa-outdent');
+                $('.layuimini-tool i').attr('class', 'layui-icon layui-icon-spread-left');
                 $('.layui-layout-body').removeClass('layuimini-mini');
                 $('.layui-layout-body').addClass('layuimini-all');
             }
@@ -234,24 +223,11 @@ layui.define(["jquery", "miniMenu", "element","miniPage", "miniTheme"], function
                 var loading = layer.load(0, {shade: false, time: 2 * 1000});
                 sessionStorage.clear();
 
-                // 判断是否清理服务端
-                var clearUrl = $(this).attr('data-href');
-                if (clearUrl != undefined && clearUrl != '' && clearUrl != null) {
-                    $.getJSON(clearUrl, function (data, status) {
-                        layer.close(loading);
-                        if (data.code != 1) {
-                            return miniAdmin.error(data.msg);
-                        } else {
-                            return miniAdmin.success(data.msg);
-                        }
-                    }).fail(function () {
-                        layer.close(loading);
-                        return miniAdmin.error('清理缓存接口有误');
-                    });
-                } else {
+                // 经统一请求层清理服务端缓存（Result 校验与错误提示由 api 层统一处理）
+                api.request('clearCache').always(function () {
                     layer.close(loading);
-                    return miniAdmin.success('清除缓存成功');
-                }
+                    miniAdmin.success('清除缓存成功');
+                });
             });
 
             /**
@@ -309,11 +285,11 @@ layui.define(["jquery", "miniMenu", "element","miniPage", "miniTheme"], function
                 if (check == 'full') {
                     miniAdmin.fullScreen();
                     $(this).attr('data-check-screen', 'exit');
-                    $(this).html('<i class="fa fa-compress"></i>');
+                    $(this).html('<i class="layui-icon layui-icon-screen-restore"></i>');
                 } else {
                     miniAdmin.exitFullScreen();
                     $(this).attr('data-check-screen', 'full');
-                    $(this).html('<i class="fa fa-arrows-alt"></i>');
+                    $(this).html('<i class="layui-icon layui-icon-screen-full"></i>');
                 }
             });
 

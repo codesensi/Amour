@@ -1,0 +1,10 @@
+{
+  "success": true,
+  "code": 200,
+  "msg": "ok",
+  "data": {
+    "captchaKey": "mock-captcha-key",
+    "captchaValue": "images/captcha.jpg"
+  },
+  "timestamp": 1700000000000
+}

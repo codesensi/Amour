@@ -1,98 +1,91 @@
-<!--<link rel="stylesheet" href="../lib/layui-v2.5.5/css/layui.css" media="all">-->
-<link rel="stylesheet" href="lib/jq-module/zyupload/zyupload-1.0.0.min.css" media="all">
 <div class="layuimini-container layuimini-page-anim">
     <div class="layuimini-main">
         <blockquote class="layui-elem-quote">
-            上传组件使用开源项目：zyupload<br>
-            <a href="http://www.jq22.com/jquery-info14213" target="_blank" class="layui-btn layui-btn-danger">zyupload</a>
+            使用 layui 自带 upload 组件，上传地址经统一请求层管理。<br>
+            <span id="mockTip" style="display:none;">当前为 mock 模式：静态资源容器不支持 POST 上传，请将 js/api-config.js 中 mock 设为 false 后对接真实后端体验完整上传。</span>
         </blockquote>
-        <div id="zyupload" class="zyupload"></div>
+
+        <div class="layui-card">
+            <div class="layui-card-header">选择文件</div>
+            <div class="layui-card-body">
+                <button type="button" class="layui-btn" id="uploadBtn">
+                    <i class="layui-icon">&#xe67c;</i>上传文件
+                </button>
+                <button type="button" class="layui-btn" id="uploadDrag">
+                    <i class="layui-icon">&#xe681;</i>拖拽上传
+                </button>
+                <div class="layui-upload-list" id="uploadPreview"></div>
+            </div>
+        </div>
+
         <pre class="layui-code">
-        // 初始化插件
-        $("#zyupload").zyUpload({
-            width: "650px",                 // 宽度
-            height: "400px",                 // 宽度
-            itemWidth: "140px",                 // 文件项的宽度
-            itemHeight: "115px",                 // 文件项的高度
-            url: "api/upload",  // 上传文件的路径
-            fileType: ["jpg", "png", "txt", "js", "exe"],// 上传文件的类型
-            fileSize: 51200000,                // 上传文件的大小
-            multiple: true,                    // 是否可以多个文件上传
-            dragDrop: true,                    // 是否可以拖动上传文件
-            tailor: true,                    // 是否可以裁剪图片
-            del: true,                    // 是否可以删除文件
-            finishDel: false,  				  // 是否在上传文件完成后删除预览
-            /* 外部获得的回调接口 */
-            onSelect: function (selectFiles, allFiles) {    // 选择文件的回调方法  selectFile:当前选中的文件  allFiles:还没上传的全部文件
-                console.info("当前选择了以下文件：");
-                console.info(selectFiles);
-            },
-            onDelete: function (file, files) {              // 删除一个文件的回调方法 file:当前删除的文件  files:删除之后的文件
-                console.info("当前删除了此文件：");
-                console.info(file.name);
-            },
-            onSuccess: function (file, response) {          // 文件上传成功的回调方法
-                console.info("此文件上传成功：");
-                console.info(file.name);
-                console.info("此文件上传到服务器地址：");
-                console.info(response);
-                $("#uploadInf").append("<p>上传成功，文件地址是：" + response + "</p>");
-            },
-            onFailure: function (file, response) {          // 文件上传失败的回调方法
-                console.info("此文件上传失败：");
-                console.info(file.name);
-            },
-            onComplete: function (response) {           	  // 上传完成的回调方法
-                console.info("文件上传完成");
-                console.info(response);
-            }
+        // 组件经统一请求层接入：真实模式请求 /upload，自动携带 token
+        upload.render({
+            elem: '#uploadBtn',
+            url: layui.api.url('upload'),
+            field: 'file',               // 与后端 multipart 字段名一致
+            accept: 'file',
+            multiple: true,
+            drag: true,
+            done: function (res) { /* 统一响应 Result 由 parseData 解析 */ },
+            error: function () { layer.msg('上传失败'); }
         });
         </pre>
     </div>
 </div>
-<script src="lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
-<script src="lib/jq-module/zyupload/zyupload-1.0.0.min.js" charset="utf-8"></script>
-<script type="text/javascript">
-    $(function () {
-        // 初始化插件
-        $("#zyupload").zyUpload({
-            width: "650px",                 // 宽度
-            height: "400px",                 // 宽度
-            itemWidth: "140px",                 // 文件项的宽度
-            itemHeight: "115px",                 // 文件项的高度
-            url: "api/upload",  // 上传文件的路径
-            fileType: ["jpg", "png", "txt", "js", "exe"],// 上传文件的类型
-            fileSize: 51200000,                // 上传文件的大小
-            multiple: true,                    // 是否可以多个文件上传
-            dragDrop: true,                    // 是否可以拖动上传文件
-            tailor: true,                    // 是否可以裁剪图片
-            del: true,                    // 是否可以删除文件
-            finishDel: false,  				  // 是否在上传文件完成后删除预览
-            /* 外部获得的回调接口 */
-            onSelect: function (selectFiles, allFiles) {    // 选择文件的回调方法  selectFile:当前选中的文件  allFiles:还没上传的全部文件
-                console.info("当前选择了以下文件：");
-                console.info(selectFiles);
-            },
-            onDelete: function (file, files) {              // 删除一个文件的回调方法 file:当前删除的文件  files:删除之后的文件
-                console.info("当前删除了此文件：");
-                console.info(file.name);
-            },
-            onSuccess: function (file, response) {          // 文件上传成功的回调方法
-                console.info("此文件上传成功：");
-                console.info(file.name);
-                console.info("此文件上传到服务器地址：");
-                console.info(response);
-                $("#uploadInf").append("<p>上传成功，文件地址是：" + response + "</p>");
-            },
-            onFailure: function (file, response) {          // 文件上传失败的回调方法
-                console.info("此文件上传失败：");
-                console.info(file.name);
-            },
-            onComplete: function (response) {           	  // 上传完成的回调方法
-                console.info("文件上传完成");
-                console.info(response);
-            }
-        });
+<script>
+    layui.use(['upload', 'layer', 'jquery', 'api'], function () {
+        var upload = layui.upload,
+            layer = layui.layer,
+            $ = layui.jquery,
+            api = layui.api,
+            cfg = window.APP_API;
 
+        // mock 模式下静态容器不支持 POST，仅展示配置与提示
+        if (cfg.mock) {
+            $('#uploadBtn, #uploadDrag').addClass('layui-btn-disabled').prop('disabled', true);
+            $('#uploadDrag').off('click');
+            $('#uploadBtn').on('click', function () {
+                layer.msg('当前为 mock 模式，上传请切换 mock=false', {icon: 0});
+            });
+            $('#uploadDrag').on('click', function () {
+                layer.msg('当前为 mock 模式，请将 mock 设为 false', {icon: 0});
+            });
+            $('#uploadPreview').before('<div class="layui-bg-gray" style="padding:8px;">mock 模式下上传按钮已禁用，此处仅演示接口配置方式。</div>');
+            return;
+        }
+
+        // 真实模式：标准上传 + 拖拽上传，统一响应 Result 解包
+        var renderUpload = function (elem, drag) {
+            upload.render({
+                elem: elem,
+                url: api.url('upload'),
+                field: 'file',
+                accept: 'file',
+                multiple: true,
+                drag: drag,
+                headers: api.headers(),
+                parseData: function (res) {
+                    return {
+                        code: res.code === cfg.successCode ? 0 : res.code,
+                        msg: res.msg,
+                        data: res.data
+                    };
+                },
+                done: function (res) {
+                    layer.msg('上传成功', {icon: 1});
+                    if (res.data && res.data.url) {
+                        layui.each([].concat(res.data.url), function (i, u) {
+                            $('#uploadPreview').append('<a class="layui-btn layui-btn-primary layui-btn-xs" href="' + u + '" target="_blank">' + u + '</a> ');
+                        });
+                    }
+                },
+                error: function () {
+                    layer.msg('上传失败', {icon: 2});
+                }
+            });
+        };
+        renderUpload('#uploadBtn', false);
+        renderUpload('#uploadDrag', true);
     });
 </script>

@@ -46,26 +46,26 @@
     </div>
 </div>
 <script>
-    layui.use(['table', 'form', 'tableSelect'], function () {
+    layui.use(['table', 'form', 'tableSelect', 'api'], function () {
         var $ = layui.jquery,
             table = layui.table,
             form = layui.form,
-            tableSelect = layui.tableSelect;
+            tableSelect = layui.tableSelect,
+            api = layui.api;
 
         tableSelect.render({
             elem: '#demo',
             searchKey: 'my',
             checkedKey: 'id',
             searchPlaceholder: '自定义文字和name',
-            table: {
-                url: 'api/tableSelect.json',
+            table: api.table('tableSelect', {
                 cols: [[
                     { type: 'checkbox' },
                     { field: 'id', title: 'ID', width: 100 },
                     { field: 'username', title: '姓名', width: 300 },
                     { field: 'sex', title: '性别', width: 100 }
-                ]]
-            },
+                ]])
+            }),
             done: function (elem, data) {
                 var NEWJSON = []
                 layui.each(data.data, function (index, item) {
@@ -79,15 +79,14 @@
         tableSelect.render({
             elem: '#demo2',
             checkedKey: 'id',
-            table: {
-                url: 'api/tableSelect.json',
+            table: api.table('tableSelect', {
                 cols: [[
                     { type: 'radio' },
                     { field: 'id', title: 'ID' },
                     { field: 'username', title: '姓名' },
                     { field: 'sex', title: '性别' }
-                ]]
-            },
+                ]])
+            }),
             done: function (elem, data) {
                 var NEWJSON = []
                 layui.each(data.data, function (index, item) {

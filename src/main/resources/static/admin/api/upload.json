@@ -1,10 +1,12 @@
 {
-  "code": 1,
-  "msg": "上传成功",
+  "success": true,
+  "code": 200,
+  "msg": "ok",
   "data": {
     "url": [
       "../images/logo.png",
       "../images/captcha.jpg"
     ]
-  }
+  },
+  "timestamp": 1788079815777
 }

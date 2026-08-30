@@ -117,7 +117,7 @@ layui.define(["element", "jquery"], function (exports) {
                 dataType: 'html',
                 success: function (data) {
                     $(container).html(data);
-                    element.init();
+                    element.render();
                 },
                 error: function (xhr, textstatus, thrown) {
                     return layer.msg('Status:' + xhr.status + '，' + xhr.statusText + '，请稍后再试！');
@@ -165,26 +165,22 @@ layui.define(["element", "jquery"], function (exports) {
         },
 
         /**
-         * 获取指定链接内容
+         * 获取指定链接内容（异步回调式，避免同步 AJAX 阻塞主线程）
          * @param href
-         * @returns {string}
+         * @param callback 拿到内容后的回调，参数为 html 字符串
          */
-        getHrefContent: function (href) {
-            var content = '';
-            var v = new Date().getTime();
+        getHrefContent: function (href, callback) {
             $.ajax({
-                url: href.indexOf("?") > -1 ? href + '&v=' + v : href + '?v=' + v,
+                url: href.indexOf("?") > -1 ? href + '&v=' + Date.now() : href + '?v=' + Date.now(),
                 type: 'get',
                 dataType: 'html',
-                async: false,
                 success: function (data) {
-                    content = data;
+                    callback && callback(data);
                 },
                 error: function (xhr, textstatus, thrown) {
                     return layer.msg('Status:' + xhr.status + '，' + xhr.statusText + '，请稍后再试！');
                 }
             });
-            return content;
         },
 
         /**

@@ -47,23 +47,23 @@ layui.define(["element","laytpl" ,"jquery"], function (exports) {
             $('.layuimini-header-menu').remove();
             $('.layuimini-menu-left').html(leftMenuHtml);
 
-            element.init();
+            element.render();
         },
 
         /**
          * 渲染一级菜单
          */
         compileMenu: function(menu,isSub){
-            var menuHtml = '<li {{#if( d.menu){ }}  data-menu="{{d.menu}}" {{#}}} class="layui-nav-item menu-li {{d.childOpenClass}} {{d.className}}"  {{#if( d.id){ }}  id="{{d.id}}" {{#}}}> <a {{#if( d.href){ }} layuimini-href="{{d.href}}" {{#}}} {{#if( d.target){ }}  target="{{d.target}}" {{#}}} href="javascript:;">{{#if( d.icon){ }}  <i class="{{d.icon}}"></i> {{#}}} <span class="layui-left-nav">{{d.title}}</span></a>  {{# if(d.children){}} {{d.children}} {{#}}} </li>' ;
+            var menuHtml = '<li {{#if( d.menu){ }}  data-menu="{{d.menu}}" {{#}}} class="layui-nav-item menu-li {{d.childOpenClass}} {{d.className}}"  {{#if( d.id){ }}  id="{{d.id}}" {{#}}}> <a {{#if( d.href){ }} layuimini-href="{{d.href}}" {{#}}} {{#if( d.target){ }}  target="{{d.target}}" {{#}}} href="javascript:;">{{#if( d.icon){ }}  <i class="{{d.icon}}"></i> {{#}}} <span class="layui-left-nav">{{d.title}}</span></a>  {{# if(d.children){}} {{- d.children }} {{#}}} </li>' ;
             if(isSub){
-                menuHtml = '<dd class="menu-dd {{d.childOpenClass}} {{ d.className }}"> <a href="javascript:;"  {{#if( d.menu){ }}  data-menu="{{d.menu}}" {{#}}} {{#if( d.id){ }}  id="{{d.id}}" {{#}}} {{#if(( !d.child || !d.child.length ) && d.href){ }} layuimini-href="{{d.href}}" {{#}}} {{#if( d.target){ }}  target="{{d.target}}" {{#}}}> {{#if( d.icon){ }}  <i class="{{d.icon}}"></i> {{#}}} <span class="layui-left-nav"> {{d.title}}</span></a> {{# if(d.children){}} {{d.children}} {{#}}}</dd>'
+                menuHtml = '<dd class="menu-dd {{d.childOpenClass}} {{ d.className }}"> <a href="javascript:;"  {{#if( d.menu){ }}  data-menu="{{d.menu}}" {{#}}} {{#if( d.id){ }}  id="{{d.id}}" {{#}}} {{#if(( !d.child || !d.child.length ) && d.href){ }} layuimini-href="{{d.href}}" {{#}}} {{#if( d.target){ }}  target="{{d.target}}" {{#}}}> {{#if( d.icon){ }}  <i class="{{d.icon}}"></i> {{#}}} <span class="layui-left-nav"> {{d.title}}</span></a> {{# if(d.children){}} {{- d.children }} {{#}}}</dd>'
             }
             return laytpl(menuHtml).render(menu);
         },
         compileMenuContainer :function(menu,isSub){
-            var wrapperHtml = '<ul class="layui-nav layui-nav-tree layui-left-nav-tree {{d.className}}" id="{{d.id}}">{{d.children}}</ul>' ;
+            var wrapperHtml = '<ul class="layui-nav layui-nav-tree layui-left-nav-tree {{d.className}}" id="{{d.id}}">{{- d.children }}</ul>' ;
             if(isSub){
-                wrapperHtml = '<dl class="layui-nav-child ">{{d.children}}</dl>' ;
+                wrapperHtml = '<dl class="layui-nav-child ">{{- d.children }}</dl>' ;
             }
             if(!menu.children){
                 return "";
@@ -153,7 +153,7 @@ layui.define(["element","laytpl" ,"jquery"], function (exports) {
             $('.layuimini-menu-header-pc').html(headerMenuHtml); //电脑
             $('.layuimini-menu-left').html(leftMenuHtml);
             $('.layuimini-menu-header-mobile').html(headerMobileMenuHtml); //手机
-            element.init();
+            element.render();
         },
 
         /**
@@ -186,17 +186,17 @@ layui.define(["element","laytpl" ,"jquery"], function (exports) {
                 var isShow = $('.layuimini-tool [data-side-fold]').attr('data-side-fold');
                 if (isShow == 1) { // 缩放
                     $('.layuimini-tool [data-side-fold]').attr('data-side-fold', 0);
-                    $('.layuimini-tool [data-side-fold]').attr('class', 'fa fa-indent');
+                    $('.layuimini-tool [data-side-fold]').attr('class', 'layui-icon layui-icon-shrink-right');
                     $('.layui-layout-body').removeClass('layuimini-all');
                     $('.layui-layout-body').addClass('layuimini-mini');
                 } else { // 正常
                     $('.layuimini-tool [data-side-fold]').attr('data-side-fold', 1);
-                    $('.layuimini-tool [data-side-fold]').attr('class', 'fa fa-outdent');
+                    $('.layuimini-tool [data-side-fold]').attr('class', 'layui-icon layui-icon-spread-left');
                     $('.layui-layout-body').removeClass('layuimini-mini');
                     $('.layui-layout-body').addClass('layuimini-all');
                     layer.close(window.openTips);
                 }
-                element.init();
+                element.render();
                 layer.close(loading);
             });
             /**
@@ -207,7 +207,7 @@ layui.define(["element","laytpl" ,"jquery"], function (exports) {
                 var isShow = $('.layuimini-tool [data-side-fold]').attr('data-side-fold');
                 if (isShow == 1) { // 缩放
                     $('.layuimini-tool [data-side-fold]').attr('data-side-fold', 0);
-                    $('.layuimini-tool [data-side-fold]').attr('class', 'fa fa-indent');
+                    $('.layuimini-tool [data-side-fold]').attr('class', 'layui-icon layui-icon-shrink-right');
                     $('.layui-layout-body').removeClass('layuimini-all');
                     $('.layui-layout-body').addClass('layuimini-mini');
                     // $(".menu-li").each(function (idx,el) {
@@ -216,7 +216,7 @@ layui.define(["element","laytpl" ,"jquery"], function (exports) {
 
                 } else { // 正常
                     $('.layuimini-tool [data-side-fold]').attr('data-side-fold', 1);
-                    $('.layuimini-tool [data-side-fold]').attr('class', 'fa fa-outdent');
+                    $('.layuimini-tool [data-side-fold]').attr('class', 'layui-icon layui-icon-spread-left');
                     $('.layui-layout-body').removeClass('layuimini-mini');
                     $('.layui-layout-body').addClass('layuimini-all');
                     // $(".menu-li").each(function (idx,el) {
@@ -224,7 +224,7 @@ layui.define(["element","laytpl" ,"jquery"], function (exports) {
                     // });
                     layer.close(window.openTips);
                 }
-                element.init();
+                element.render();
                 layer.close(loading);
             });
 
@@ -236,7 +236,7 @@ layui.define(["element","laytpl" ,"jquery"], function (exports) {
                 var check = $('.layuimini-tool [data-side-fold]').attr('data-side-fold');
                 if(check === "1"){
                     $('.layuimini-site-mobile').trigger("click");
-                    element.init();
+                    element.render();
                 }
                 layer.close(loading);
             });
