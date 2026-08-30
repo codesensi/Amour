@@ -16,7 +16,7 @@ import java.util.List;
  * @author codesensi
  * @since 1.0
  */
-public interface ConfigService {
+public interface SysConfigService {
 
     /**
      * 按配置键集合批量查询配置。

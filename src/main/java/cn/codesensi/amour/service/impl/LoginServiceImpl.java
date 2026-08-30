@@ -8,9 +8,9 @@ import cn.codesensi.amour.common.util.CacheUtil;
 import cn.codesensi.amour.model.dto.LoginDTO;
 import cn.codesensi.amour.model.dto.LoginResultDTO;
 import cn.codesensi.amour.model.entity.SysUser;
-import cn.codesensi.amour.service.ConfigService;
 import cn.codesensi.amour.service.LoginService;
-import cn.codesensi.amour.service.UserService;
+import cn.codesensi.amour.service.SysConfigService;
+import cn.codesensi.amour.service.SysUserService;
 import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.ObjUtil;
@@ -39,8 +39,8 @@ import static cn.codesensi.amour.model.entity.table.SysUserTableDef.SYS_USER;
 @Service
 public class LoginServiceImpl implements LoginService {
 
-    private final UserService userService;
-    private final ConfigService configService;
+    private final SysUserService sysUserService;
+    private final SysConfigService sysConfigService;
     private final CacheManager cacheManager;
 
     /**
@@ -63,14 +63,14 @@ public class LoginServiceImpl implements LoginService {
         }
 
         // 校验验证码（开关缺失/停用时视为关闭）
-        boolean captchaEnabled = configService.listByKeys(List.of(ConfigKeyEnum.CAPTCHA_ENABLED.getCode())).stream()
+        boolean captchaEnabled = sysConfigService.listByKeys(List.of(ConfigKeyEnum.CAPTCHA_ENABLED.getCode())).stream()
                 .anyMatch(config -> Boolean.parseBoolean(config.getConfigValue()));
         if (captchaEnabled) {
             checkCaptcha(loginDTO);
         }
 
         // 校验用户及密码（用户名/手机号/邮箱任一匹配即可登录）
-        SysUser sysUser = userService.queryChain()
+        SysUser sysUser = sysUserService.queryChain()
                 .select(SYS_USER.ID, SYS_USER.USERNAME, SYS_USER.PHONE, SYS_USER.EMAIL, SYS_USER.NICKNAME, SYS_USER.PASSWORD)
                 .where(SYS_USER.USERNAME.eq(username))
                 .or(SYS_USER.PHONE.eq(username))

@@ -1,24 +1,25 @@
 package cn.codesensi.amour.common.enums;
 
-import cn.codesensi.amour.common.consts.AppConst;
 import lombok.Getter;
 
 /**
- * 系统内置标识枚举
- * 1-内置
- * 0-非内置
+ * 菜单类型枚举
+ * D-目录
+ * M-菜单
+ * B-按钮
  */
 @Getter
-public enum SysFlagEnum implements BaseEnum<Integer> {
+public enum MenuType implements BaseEnum<String> {
 
-    YES(AppConst.ONE_INT, "内置"),
-    NO(AppConst.ZERO_INT, "非内置"),
+    D("D", "目录"),
+    M("M", "菜单"),
+    B("B", "按钮"),
     ;
 
     /**
      * 编码
      */
-    private final Integer code;
+    private final String code;
 
     /**
      * 说明
@@ -31,13 +32,13 @@ public enum SysFlagEnum implements BaseEnum<Integer> {
      * @param code 编码
      * @param desc 说明
      */
-    SysFlagEnum(Integer code, String desc) {
+    MenuType(String code, String desc) {
         this.code = code;
         this.desc = desc;
     }
 
     @Override
-    public Integer getCode() {
+    public String getCode() {
         return code;
     }
 

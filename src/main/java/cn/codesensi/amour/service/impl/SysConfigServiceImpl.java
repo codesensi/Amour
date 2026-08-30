@@ -7,7 +7,7 @@ import cn.codesensi.amour.model.converter.ConfigConverter;
 import cn.codesensi.amour.model.dto.ConfigDTO;
 import cn.codesensi.amour.model.entity.SysConfig;
 import cn.codesensi.amour.mapper.SysConfigMapper;
-import cn.codesensi.amour.service.ConfigService;
+import cn.codesensi.amour.service.SysConfigService;
 import com.mybatisflex.core.query.QueryChain;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.Cache;
@@ -34,7 +34,7 @@ import static cn.codesensi.amour.model.entity.table.SysConfigTableDef.SYS_CONFIG
  */
 @Service
 @RequiredArgsConstructor
-public class ConfigServiceImpl implements ConfigService {
+public class SysConfigServiceImpl implements SysConfigService {
 
     private final SysConfigMapper sysConfigMapper;
     private final CacheManager cacheManager;

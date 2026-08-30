@@ -11,7 +11,7 @@ import cn.codesensi.amour.common.util.IdUtil;
 import cn.codesensi.amour.model.dto.CaptchaResultDTO;
 import cn.codesensi.amour.model.dto.ConfigDTO;
 import cn.codesensi.amour.service.CaptchaService;
-import cn.codesensi.amour.service.ConfigService;
+import cn.codesensi.amour.service.SysConfigService;
 import com.wf.captcha.ArithmeticCaptcha;
 import com.wf.captcha.ChineseCaptcha;
 import com.wf.captcha.ChineseGifCaptcha;
@@ -58,7 +58,7 @@ public class CaptchaServiceImpl implements CaptchaService {
         CAPTCHA_FACTORY.put(ImageType.ARITHMETIC, ArithmeticCaptcha::new);
     }
 
-    private final ConfigService configService;
+    private final SysConfigService sysConfigService;
     private final CacheManager cacheManager;
 
     /**
@@ -73,7 +73,7 @@ public class CaptchaServiceImpl implements CaptchaService {
     @Override
     public CaptchaResultDTO captcha() {
         // 读取图形验证码类型配置（实时读取支持热更新；未配置时默认算术验证码）
-        String imageTypeCode = configService.listByKeys(List.of(ConfigKeyEnum.CAPTCHA_IMAGE_TYPE.getCode()))
+        String imageTypeCode = sysConfigService.listByKeys(List.of(ConfigKeyEnum.CAPTCHA_IMAGE_TYPE.getCode()))
                 .stream().findFirst()
                 .map(ConfigDTO::getConfigValue)
                 .orElse(ImageType.ARITHMETIC.getCode());

@@ -2,7 +2,7 @@ package cn.codesensi.amour.interceptor;
 
 import cn.codesensi.amour.common.enums.ConfigKeyEnum;
 import cn.codesensi.amour.common.exception.AuthorizationException;
-import cn.codesensi.amour.service.ConfigService;
+import cn.codesensi.amour.service.SysConfigService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DemoModeInterceptor implements HandlerInterceptor {
 
-    private final ConfigService configService;
+    private final SysConfigService sysConfigService;
 
     /**
      * 演示模式写操作拦截。
@@ -44,7 +44,7 @@ public class DemoModeInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
         // 读取演示模式开关（配置缺失/停用时结果为空列表，开关视为 false）
-        boolean demoMode = configService.listByKeys(List.of(ConfigKeyEnum.DEMO_MODE.getCode())).stream()
+        boolean demoMode = sysConfigService.listByKeys(List.of(ConfigKeyEnum.DEMO_MODE.getCode())).stream()
                 .anyMatch(config -> Boolean.parseBoolean(config.getConfigValue()));
         if (demoMode) {
             String method = request.getMethod();
