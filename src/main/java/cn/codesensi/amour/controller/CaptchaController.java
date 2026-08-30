@@ -5,6 +5,7 @@ import cn.codesensi.amour.model.converter.CaptchaConverter;
 import cn.codesensi.amour.model.dto.CaptchaResultDTO;
 import cn.codesensi.amour.model.response.CaptchaResponse;
 import cn.codesensi.amour.service.CaptchaService;
+import cn.dev33.satoken.annotation.SaIgnore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +27,7 @@ public class CaptchaController {
     /**
      * 生成验证码
      */
+    @SaIgnore
     @GetMapping("/captcha")
     public CaptchaResponse captcha() {
         CaptchaResultDTO captchaResultDTO = captchaService.captcha();
