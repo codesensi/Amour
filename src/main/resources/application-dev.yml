@@ -69,3 +69,9 @@ app:
     # 请求缓存限制 5M
     request-cache-limit: 5242880
 
+# sa-token配置
+sa-token:
+  # 是否输出操作日志
+  is-log: true
+  # jwt秘钥
+  jwt-secret-key: f3c55ed9e4f54edfa8867f904aef6742

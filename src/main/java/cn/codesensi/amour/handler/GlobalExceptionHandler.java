@@ -5,6 +5,8 @@ import cn.codesensi.amour.common.exception.AuthorizationException;
 import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.exception.SystemException;
 import cn.codesensi.amour.common.exception.ValidationException;
+import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.exception.SaTokenException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -75,28 +77,18 @@ public class GlobalExceptionHandler {
         return Result.error(e.getCode(), e.getMsg());
     }
 
-    // ------- 备用代码：Sa-Token 异常细分处理（待 Sa-Token 整合恢复后启用） -------
-    // @ExceptionHandler(SaTokenException.class)
-    // public Result<Void> handleSaTokenException(SaTokenException e) {
-    //     log.error("授权异常：", e);
-    //     switch (e) {
-    //         case NotLoginException notLoginException -> {
-    //             if (NotLoginException.TOKEN_FREEZE.equals(notLoginException.getType())) {
-    //                 return Result.forbidden("账号已被冻结");
-    //             }
-    //             return Result.unauthorized("未登录或登录已过期");
-    //         }
-    //         case NotRoleException ignored1 -> {
-    //             return Result.forbidden("角色认证校验未通过");
-    //         }
-    //         case NotPermissionException ignored2 -> {
-    //             return Result.forbidden("权限认证校验未通过");
-    //         }
-    //         default -> {
-    //             return Result.forbidden(e.getMessage());
-    //         }
-    //     }
-    // }
+    // Sa-Token 异常细分处理
+    @ExceptionHandler(SaTokenException.class)
+    public Result<Void> handleSaTokenException(SaTokenException e) {
+        log.error("授权异常：", e);
+        if (e instanceof NotLoginException notLoginException) {
+            if (NotLoginException.TOKEN_FREEZE.equals(notLoginException.getType())) {
+                return Result.forbidden("账号已被冻结");
+            }
+            return Result.unauthorized("未登录或登录已过期");
+        }
+        return Result.forbidden(e.getMessage());
+    }
 
     /**
      * 处理表单绑定/参数校验异常，优先取首个字段错误的提示信息。

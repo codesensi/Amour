@@ -2,8 +2,14 @@ package cn.codesensi.amour.config;
 
 import cn.codesensi.amour.common.consts.RbacConst;
 import cn.codesensi.amour.interceptor.DemoModeInterceptor;
+import cn.dev33.satoken.interceptor.SaInterceptor;
+import cn.dev33.satoken.jwt.StpLogicJwtForSimple;
+import cn.dev33.satoken.router.SaRouter;
+import cn.dev33.satoken.stp.StpLogic;
+import cn.dev33.satoken.stp.StpUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -27,21 +33,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // 1. SaToken 鉴权拦截器：初始化 SaTokenContext + 登录校验 + 封禁校验 + 角色校验
-        // registry.addInterceptor(new SaInterceptor(handler -> {
-        //             // 所有请求（排除 swagger 等公开路径）需登录 + 账号未封禁
-        //             SaRouter.match(RbacConst.ROOT_PATH)
-        //                     .notMatch(RbacConst.SWAGGER_PATH)
-        //                     .check(r -> {
-        //                         StpUtil.checkLogin();
-        //                         StpUtil.checkDisable(StpUtil.getLoginIdAsLong());
-        //                     });
-        //             // 系统管理类接口（/sys/**、/log/**、/conf/**）需 superadmin 角色
-        //             SaRouter.match(RbacConst.SYS_PATH, RbacConst.LOG_PATH, RbacConst.CONF_PATH)
-        //                     // 排除用户基本信息接口（登录后即可访问）
-        //                     .notMatch(RbacConst.SYS_USER_INFO_PATH)
-        //                     .check(r -> StpUtil.checkRole(RbacConst.ROLE_ADMIN_CODE));
-        //         })).addPathPatterns(RbacConst.ROOT_PATH)
-        //         .order(1);
+        registry.addInterceptor(new SaInterceptor(handler -> {
+                    // 所有请求需登录 + 账号未封禁
+                    SaRouter.match(RbacConst.ROOT_PATH)
+                            .check(r -> {
+                                StpUtil.checkLogin();
+                                StpUtil.checkDisable(StpUtil.getLoginIdAsLong());
+                            });
+                })).addPathPatterns(RbacConst.ROOT_PATH)
+                .order(1);
 
         // 2. 演示模式拦截器：演示环境下仅允许查询和登录/登出，拒绝所有写操作
         registry.addInterceptor(demoModeInterceptor)
@@ -54,9 +54,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
     /**
      * Sa-Token 整合 jwt (Simple 简单模式)
      */
-    // @Bean
-    // public StpLogic getStpLogicJwt() {
-    //     return new StpLogicJwtForSimple();
-    // }
+    @Bean
+    public StpLogic getStpLogicJwt() {
+        return new StpLogicJwtForSimple();
+    }
 
 }
