@@ -12,6 +12,7 @@ import { navigate as pjaxNavigate } from '/assets/common/pjax.js';
 import { toast } from '/assets/common/toast.js';
 import { loadLayui } from '/assets/common/layui.js';
 import { initTooltip } from '/assets/common/tooltip.js';
+import { isLoggedIn } from '/assets/common/auth.js';
 
 /** 侧栏悬浮栏的 HTML onclick 属性引用的函数，模块化后统一挂回全局 */
 window.scrollToTop = function scrollToTop() {
@@ -20,8 +21,11 @@ window.scrollToTop = function scrollToTop() {
 window.portalNavigate = function portalNavigate(url) {
   pjaxNavigate(url, true);
 };
+// 管理后台入口：按登录态分流——已登录直达管理首页，未登录去登录页；
+// 登录态经 common/auth.js 与管理后台外壳共用同一份数据与过期判定，
+// 即使判断与实际状态有偏差，外壳 main.js 的守卫也会兜底重定向
 window.portalGoAdmin = function portalGoAdmin() {
-  window.open(PORTAL_CONFIG.adminUrl, '_blank');
+  window.open(isLoggedIn() ? '/admin/index.html' : '/admin/login.html', '_blank');
 };
 window.portalGoRepo = function portalGoRepo() {
   window.open(PORTAL_CONFIG.repoUrl, '_blank');
@@ -29,8 +33,6 @@ window.portalGoRepo = function portalGoRepo() {
 
 /** 站点配置：纯前端路由类配置；站点展示类配置（logo/文案/头像/计时起点/ICP 等）走 siteConfig 口子 */
 const PORTAL_CONFIG = {
-  /** 管理后台入口 */
-  adminUrl: '/admin/login.html',
   /** 开源地址 */
   repoUrl: 'https://github.com/codesensi/Amour',
   /** 本地化静态资源根 */
