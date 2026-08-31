@@ -1,6 +1,8 @@
 package cn.codesensi.amour.common.util;
 
 import cn.codesensi.amour.common.context.AppEnvContext;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * 缓存工具类。
@@ -34,5 +36,29 @@ public class CacheUtil {
     public static String withAppEnv(String cacheName) {
         AppEnvContext ctx = AppEnvContext.getInstance();
         return ctx.getAppName() + SEPARATOR + ctx.getFirstActiveProfile() + SEPARATOR + cacheName;
+    }
+
+    /**
+     * 在当前事务提交后执行缓存失效动作。
+     * <p>
+     * 写库事务内直接失效缓存存在时序窗口：事务提交前，其他请求回源查库读不到未提交数据，
+     * 会把旧值重新写回缓存，使失效落空。因此写侧应在完成全部写库操作后调用本方法，
+     * 将失效动作注册到事务提交后执行。
+     * <p>
+     * 当前不存在活跃的事务同步时（如被内部调用绕过了事务代理），退化为立即执行。
+     *
+     * @param action 缓存失效动作
+     */
+    public static void evictAfterCommit(Runnable action) {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    action.run();
+                }
+            });
+        } else {
+            action.run();
+        }
     }
 }

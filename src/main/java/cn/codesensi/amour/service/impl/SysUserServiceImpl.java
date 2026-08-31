@@ -141,7 +141,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     /**
      * 配置用户角色。
      * <p>
-     * 删除旧关联与写入新关联处于同一事务，原子提交，避免中途失败留下"旧关联已删、新关联未插"的半状态。
+     * 删除旧关联与写入新关联处于同一事务，原子提交，避免中途失败留下"旧关联已删、新关联未插"的半状态；
+     * 缓存失效注册在事务提交后执行，避免提交前其他请求回源查库把中间状态重新写入缓存。
      *
      * @param assignRolesDTO 分配角色信息
      */
@@ -165,11 +166,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
         // 3. 删除旧关联
         sysUserRoleService.remove(SYS_USER_ROLE.USER_ID.eq(userId));
-        // 4. 失效该用户的角色/权限/路由菜单/用户信息缓存（角色变更必然影响权限码与可访问菜单）
-        sysUserRoleService.evictRoleCache(userId);
-        sysMenuService.evictPermCache(List.of(userId));
-        sysMenuService.evictMenuCache(List.of(userId));
-        evictUserCache(userId);
 
         List<Long> roleIds = assignRolesDTO.getRoleIds();
         // 如果角色列表为空，则仅删除旧关联
@@ -187,6 +183,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             // 批量插入
             sysUserRoleService.saveBatch(entities);
         }
+
+        // 5. 失效该用户的角色/权限/路由菜单/用户信息缓存（角色变更必然影响权限码与可访问菜单）；
+        //    注册到事务提交后执行，避免提交前其他请求回源查库把中间状态重新写入缓存
+        CacheUtil.evictAfterCommit(() -> {
+            sysUserRoleService.evictRoleCache(userId);
+            sysMenuService.evictPermCache(List.of(userId));
+            sysMenuService.evictMenuCache(List.of(userId));
+            evictUserCache(userId);
+        });
     }
 
     /**

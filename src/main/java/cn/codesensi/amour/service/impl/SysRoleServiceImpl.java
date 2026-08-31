@@ -2,6 +2,7 @@ package cn.codesensi.amour.service.impl;
 
 import cn.codesensi.amour.common.enums.BuiltinEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
+import cn.codesensi.amour.common.util.CacheUtil;
 import cn.codesensi.amour.mapper.SysRoleMapper;
 import cn.codesensi.amour.model.converter.SysRoleConverter;
 import cn.codesensi.amour.model.dto.AssignMenusDTO;
@@ -66,7 +67,8 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     /**
      * 分配角色菜单权限。
      * <p>
-     * 删除旧关联与写入新关联处于同一事务，原子提交，避免中途失败留下"旧关联已删、新关联未插"的半状态。
+     * 删除旧关联与写入新关联处于同一事务，原子提交，避免中途失败留下"旧关联已删、新关联未插"的半状态；
+     * 缓存失效注册在事务提交后执行，避免提交前其他请求回源查库把中间状态重新写入缓存。
      *
      * @param assignMenusDTO 角色菜单权限信息
      */
@@ -120,10 +122,13 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             sysRoleMenuService.saveBatch(entities);
         }
 
-        // 5. 失效角色下属所有用户的权限/路由菜单/用户信息缓存（菜单关联变更影响权限码与可访问菜单；角色码不变，role 缓存无需清理）
-        sysMenuService.evictPermCache(userIds);
-        sysMenuService.evictMenuCache(userIds);
-        userIds.forEach(sysUserService::evictUserCache);
+        // 5. 失效角色下属所有用户的权限/路由菜单/用户信息缓存（菜单关联变更影响权限码与可访问菜单；角色码不变，role 缓存无需清理）；
+        //    注册到事务提交后执行，避免提交前其他请求回源查库把中间状态重新写入缓存
+        CacheUtil.evictAfterCommit(() -> {
+            sysMenuService.evictPermCache(userIds);
+            sysMenuService.evictMenuCache(userIds);
+            userIds.forEach(sysUserService::evictUserCache);
+        });
     }
 
 }
