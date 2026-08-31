@@ -51,6 +51,14 @@ logging:
   level:
     cn.codesensi.amour: trace
 
+# Logbook配置（dev 覆盖）
+logbook:
+  filter:
+    # 表单请求体处理模式：PARAMETER = 先解析 Servlet 参数、再从参数重建表单体。
+    # 修复 H2 控制台（form POST）请求体被 Logbook 以 BODY 模式提前消费、
+    # 导致表单参数丢失而报 "No suitable driver found for 08001/0" 的问题
+    form-request-mode: PARAMETER
+
 # 自定义缓存配置（单位：秒）
 app:
   # caches 中 name 为基础缓存名，实际注册时会自动拼接「项目名_运行环境」前缀（见 CacheUtil）
