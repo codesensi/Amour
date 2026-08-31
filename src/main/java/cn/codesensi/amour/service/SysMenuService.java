@@ -31,14 +31,6 @@ public interface SysMenuService extends IService<SysMenu> {
     List<SysMenu> listMenuByUserId(Long userId);
 
     /**
-     * 获取菜单的所有祖先ID（包含自身）
-     *
-     * @param menuId 菜单ID
-     * @return 菜单的所有祖先ID（包含自身）
-     */
-    Set<Long> listAncestorIdsById(Long menuId);
-
-    /**
      * 批量获取多个菜单的所有祖先ID（并集，去重）
      *
      * @param menuIds 菜单ID列表

@@ -174,16 +174,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     }
 
     /**
-     * 获取菜单的所有祖先ID（包含自身）。
-     * <p>
-     * 委托 {@link #listAncestorIdsByIds(List)} 的批量实现（单元素列表），共享"一次加载 + 内存爬树"的实现。
-     */
-    @Override
-    public Set<Long> listAncestorIdsById(Long menuId) {
-        return listAncestorIdsByIds(List.of(menuId));
-    }
-
-    /**
      * 批量获取多个菜单的所有祖先ID（并集，去重）。
      * <p>
      * 菜单表数据量小，一次性加载后在内存中沿 pid 向上遍历，将原来 M×深度 次的逐层点查优化为 1 条 SQL。
