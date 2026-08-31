@@ -2,7 +2,7 @@ package cn.codesensi.amour.common.advice;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.common.core.Result;
-import cn.codesensi.amour.common.util.JsonUtil;
+import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.core.MethodParameter;
@@ -84,7 +84,7 @@ public class ApiResponseBodyAdvice implements ResponseBodyAdvice<Object> {
         // 处理 String 类型 —— StringHttpMessageConverter 绕过 JSON 序列化，
         // 必须手动将 Result 转为 JSON 字符串写入响应流
         if (body instanceof String) {
-            return JsonUtil.toJsonString(Result.success(body));
+            return JSONUtil.toJsonStr(Result.success(body));
         }
         // 如果已经被包装过（Result 类型），则直接放行，避免双重包装
         if (body instanceof Result) {

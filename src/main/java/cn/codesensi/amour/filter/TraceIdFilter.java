@@ -1,7 +1,7 @@
 package cn.codesensi.amour.filter;
 
 import cn.codesensi.amour.common.consts.AppConst;
-import cn.codesensi.amour.common.util.IdUtil;
+import cn.hutool.core.util.IdUtil;
 import jakarta.servlet.*;
 import org.slf4j.MDC;
 import org.springframework.core.Ordered;
