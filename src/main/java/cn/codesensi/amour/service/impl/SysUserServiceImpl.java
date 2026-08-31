@@ -9,7 +9,10 @@ import cn.codesensi.amour.common.util.CacheUtil;
 import cn.codesensi.amour.mapper.SysRoleMapper;
 import cn.codesensi.amour.mapper.SysUserMapper;
 import cn.codesensi.amour.model.converter.SysUserConverter;
-import cn.codesensi.amour.model.dto.*;
+import cn.codesensi.amour.model.dto.AssignRolesDTO;
+import cn.codesensi.amour.model.dto.ConfigDTO;
+import cn.codesensi.amour.model.dto.UserInfoDTO;
+import cn.codesensi.amour.model.dto.UserSaveDTO;
 import cn.codesensi.amour.model.entity.SysMenu;
 import cn.codesensi.amour.model.entity.SysUser;
 import cn.codesensi.amour.model.entity.SysUserRole;
@@ -17,7 +20,6 @@ import cn.codesensi.amour.service.SysConfigService;
 import cn.codesensi.amour.service.SysMenuService;
 import cn.codesensi.amour.service.SysUserRoleService;
 import cn.codesensi.amour.service.SysUserService;
-import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
@@ -56,8 +58,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     /**
      * 获取当前用户信息。
      * <p>
-     * 结果经 userInfo 缓存加速（Key 为用户ID），写后 30 天兜底过期，写侧显式失效；
-     * 缓存未注册/未就绪时降级为直接查库。
+     * 资料部分经 userInfo 缓存加速（Key 为用户ID），写后 30 天兜底过期，写侧显式失效，
+     * 缓存未注册/未就绪时降级为直接查库；角色/权限/菜单不进该缓存，每次实时装配——
+     * 它们各自拥有独立缓存与失效路径，避免会话维度数据被烤进资料快照后因漏失效而不一致。
      *
      * @param userId 用户ID
      * @return 用户信息
@@ -65,21 +68,26 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Override
     public UserInfoDTO getCurrentUser(Long userId) {
         Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.USER));
-        if (cache == null) {
-            // 缓存未注册/未就绪：降级为直接查库
-            return loadCurrentUser(userId);
-        }
-        // 原子回源：未命中时执行 loader 查库并写入，防止缓存击穿
-        return cache.get(userId, () -> loadCurrentUser(userId));
+        // 资料部分走 user 缓存（仅 DB 维度的用户资料，不含角色/权限/菜单）
+        UserInfoDTO userInfo = cache == null
+                ? loadUserProfile(userId)
+                : cache.get(userId, () -> loadUserProfile(userId));
+        // 角色与权限：实时装配（各自有 role/perm 缓存加速；StpInterfaceImpl 即转发至这两个方法，行为与 StpUtil 等价）
+        userInfo.setRoles(sysUserRoleService.listRoleCodeByUserId(userId));
+        userInfo.setPerms(sysMenuService.listPermCodeByUserId(userId));
+        // 拥有的菜单（menu 缓存加速）
+        List<SysMenu> menus = sysMenuService.listMenuByUserId(userId);
+        userInfo.setMenus(sysUserConverter.toMenuDTOList(menus));
+        return userInfo;
     }
 
     /**
-     * 从库中组装当前用户信息（资料 + 角色 + 权限 + 菜单）。
+     * 从库中加载用户资料（仅 DB 维度字段，不含角色/权限/菜单等聚合维度数据）。
      *
      * @param userId 用户ID
-     * @return 用户信息
+     * @return 用户资料
      */
-    private UserInfoDTO loadCurrentUser(Long userId) {
+    private UserInfoDTO loadUserProfile(Long userId) {
         SysUser sysUser = QueryChain.of(sysUserMapper)
                 .select(SYS_USER.ALL_COLUMNS)
                 .where(SYS_USER.ID.eq(userId))
@@ -87,18 +95,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         if (ObjUtil.isNull(sysUser)) {
             throw new BusinessException("用户不存在");
         }
-        UserInfoDTO userInfoDTO = sysUserConverter.toUserInfoDTO(sysUser);
-        // 角色集合
-        List<String> roles = StpUtil.getRoleList();
-        userInfoDTO.setRoles(roles);
-        // 权限码集合
-        List<String> perms = StpUtil.getPermissionList();
-        userInfoDTO.setPerms(perms);
-        // 拥有的菜单
-        List<SysMenu> menus = sysMenuService.listMenuByUserId(userId);
-        List<MenuDTO> menuDTOS = sysUserConverter.toMenuDTOList(menus);
-        userInfoDTO.setMenus(menuDTOS);
-        return userInfoDTO;
+        return sysUserConverter.toUserInfoDTO(sysUser);
     }
 
     /**
