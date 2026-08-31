@@ -6,6 +6,8 @@ import cn.codesensi.amour.model.dto.UserSaveDTO;
 import cn.codesensi.amour.model.entity.SysUser;
 import com.mybatisflex.core.service.IService;
 
+import java.util.List;
+
 /**
  * 用户信息 Service。
  * <p>
@@ -38,8 +40,8 @@ public interface SysUserService extends IService<SysUser> {
     /**
      * 失效指定用户的用户信息缓存（userInfo 缓存）
      *
-     * @param userId 用户ID
+     * @param userIds 用户ID列表
      */
-    void evictUserCache(Long userId);
+    void evictUserCache(List<Long> userIds);
 
 }

@@ -33,8 +33,8 @@ public interface SysUserRoleService extends IService<SysUserRole> {
     /**
      * 失效指定用户的角色编码缓存（role 缓存）
      *
-     * @param userId 用户ID
+     * @param userIds 用户ID列表
      */
-    void evictRoleCache(Long userId);
+    void evictRoleCache(List<Long> userIds);
 
 }

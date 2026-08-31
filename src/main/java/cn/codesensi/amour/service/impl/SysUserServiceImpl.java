@@ -191,10 +191,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         // 6. 失效该用户的角色/权限/路由菜单/用户信息缓存（角色变更必然影响权限码与可访问菜单）；
         //    注册到事务提交后执行，避免提交前其他请求回源查库把中间状态重新写入缓存
         CacheUtil.evictAfterCommit(() -> {
-            sysUserRoleService.evictRoleCache(userId);
+            sysUserRoleService.evictRoleCache(List.of(userId));
             sysMenuService.evictPermCache(List.of(userId));
             sysMenuService.evictMenuCache(List.of(userId));
-            evictUserCache(userId);
+            evictUserCache(List.of(userId));
         });
     }
 
@@ -225,7 +225,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     public boolean updateById(SysUser sysUser) {
         boolean success = super.updateById(sysUser);
         if (success) {
-            evictUserCache(sysUser.getId());
+            evictUserCache(List.of(sysUser.getId()));
         }
         return success;
     }
@@ -233,12 +233,18 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     /**
      * 失效指定用户的用户信息缓存。
      *
-     * @param userId 用户ID
+     * @param userIds 用户ID列表
      */
     @Override
-    public void evictUserCache(Long userId) {
+    public void evictUserCache(List<Long> userIds) {
+        if (CollUtil.isEmpty(userIds)) {
+            return;
+        }
         Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.USER));
-        if (cache != null) {
+        if (cache == null) {
+            return;
+        }
+        for (Long userId : userIds) {
             cache.evict(userId);
         }
     }

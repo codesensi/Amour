@@ -133,7 +133,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         CacheUtil.evictAfterCommit(() -> {
             sysMenuService.evictPermCache(userIds);
             sysMenuService.evictMenuCache(userIds);
-            userIds.forEach(sysUserService::evictUserCache);
+            sysUserService.evictUserCache(userIds);
         });
     }
 

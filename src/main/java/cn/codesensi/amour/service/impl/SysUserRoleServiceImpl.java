@@ -98,12 +98,18 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
     /**
      * 失效指定用户的角色编码缓存。
      *
-     * @param userId 用户ID
+     * @param userIds 用户ID列表
      */
     @Override
-    public void evictRoleCache(Long userId) {
+    public void evictRoleCache(List<Long> userIds) {
+        if (CollUtil.isEmpty(userIds)) {
+            return;
+        }
         Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.ROLE));
-        if (cache != null) {
+        if (cache == null) {
+            return;
+        }
+        for (Long userId : userIds) {
             cache.evict(userId);
         }
     }
