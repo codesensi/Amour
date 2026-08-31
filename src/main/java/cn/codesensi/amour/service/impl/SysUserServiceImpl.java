@@ -6,6 +6,7 @@ import cn.codesensi.amour.common.enums.BuiltinEnum;
 import cn.codesensi.amour.common.enums.ConfigKeyEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.util.CacheUtil;
+import cn.codesensi.amour.mapper.SysRoleMapper;
 import cn.codesensi.amour.mapper.SysUserMapper;
 import cn.codesensi.amour.model.converter.SysUserConverter;
 import cn.codesensi.amour.model.dto.*;
@@ -31,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static cn.codesensi.amour.model.entity.table.SysRoleTableDef.SYS_ROLE;
 import static cn.codesensi.amour.model.entity.table.SysUserRoleTableDef.SYS_USER_ROLE;
 import static cn.codesensi.amour.model.entity.table.SysUserTableDef.SYS_USER;
 
@@ -45,6 +47,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     private final SysMenuService sysMenuService;
     private final SysUserMapper sysUserMapper;
+    private final SysRoleMapper sysRoleMapper;
     private final SysUserConverter sysUserConverter;
     private final SysUserRoleService sysUserRoleService;
     private final SysConfigService sysConfigService;
@@ -164,15 +167,19 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             throw new BusinessException("系统内置用户不允许修改角色");
         }
 
-        // 3. 删除旧关联
-        sysUserRoleService.remove(SYS_USER_ROLE.USER_ID.eq(userId));
-
         List<Long> roleIds = assignRolesDTO.getRoleIds();
-        // 如果角色列表为空，则仅删除旧关联
+        // 3. 校验待分配的角色是否存在（避免产生悬空关联）
         if (CollUtil.isNotEmpty(roleIds)) {
             // 角色ID去重
             roleIds = roleIds.stream().distinct().toList();
-            // 4. 插入新关联（如果角色列表为空，则仅删除）
+            checkRolesExist(roleIds);
+        }
+
+        // 4. 删除旧关联
+        sysUserRoleService.remove(SYS_USER_ROLE.USER_ID.eq(userId));
+
+        // 5. 插入新关联（如果角色列表为空，则仅删除）
+        if (CollUtil.isNotEmpty(roleIds)) {
             List<SysUserRole> entities = roleIds.stream()
                     .map(roleId -> {
                         SysUserRole sysUserRole = new SysUserRole();
@@ -184,7 +191,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             sysUserRoleService.saveBatch(entities);
         }
 
-        // 5. 失效该用户的角色/权限/路由菜单/用户信息缓存（角色变更必然影响权限码与可访问菜单）；
+        // 6. 失效该用户的角色/权限/路由菜单/用户信息缓存（角色变更必然影响权限码与可访问菜单）；
         //    注册到事务提交后执行，避免提交前其他请求回源查库把中间状态重新写入缓存
         CacheUtil.evictAfterCommit(() -> {
             sysUserRoleService.evictRoleCache(userId);
@@ -192,6 +199,24 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             sysMenuService.evictMenuCache(List.of(userId));
             evictUserCache(userId);
         });
+    }
+
+    /**
+     * 校验待分配的角色是否都存在（逻辑删除的角色视为不存在），避免产生悬空关联。
+     *
+     * @param roleIds 去重后的角色ID列表
+     */
+    private void checkRolesExist(List<Long> roleIds) {
+        List<Long> existingIds = QueryChain.of(sysRoleMapper)
+                .select(SYS_ROLE.ID)
+                .where(SYS_ROLE.ID.in(roleIds))
+                .listAs(Long.class);
+        List<Long> missingIds = roleIds.stream()
+                .filter(id -> !existingIds.contains(id))
+                .toList();
+        if (CollUtil.isNotEmpty(missingIds)) {
+            throw new BusinessException("角色不存在：" + missingIds);
+        }
     }
 
     /**

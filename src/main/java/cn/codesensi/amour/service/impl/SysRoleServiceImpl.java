@@ -7,6 +7,7 @@ import cn.codesensi.amour.mapper.SysRoleMapper;
 import cn.codesensi.amour.model.converter.SysRoleConverter;
 import cn.codesensi.amour.model.dto.AssignMenusDTO;
 import cn.codesensi.amour.model.dto.RoleSaveDTO;
+import cn.codesensi.amour.model.entity.SysMenu;
 import cn.codesensi.amour.model.entity.SysRole;
 import cn.codesensi.amour.model.entity.SysRoleMenu;
 import cn.codesensi.amour.service.*;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static cn.codesensi.amour.model.entity.table.SysRoleMenuTableDef.SYS_ROLE_MENU;
 import static cn.codesensi.amour.model.entity.table.SysRoleTableDef.SYS_ROLE;
@@ -90,7 +92,15 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             throw new BusinessException("系统内置角色不允许修改权限");
         }
 
-        // 2. 删除旧关联
+        List<Long> menuIds = assignMenusDTO.getMenuIds();
+        // 2. 校验待分配的菜单是否存在（避免产生悬空关联）
+        if (CollUtil.isNotEmpty(menuIds)) {
+            // 菜单ID去重
+            menuIds = menuIds.stream().distinct().toList();
+            checkMenusExist(menuIds);
+        }
+
+        // 3. 删除旧关联
         sysRoleMenuService.remove(SYS_ROLE_MENU.ROLE_ID.eq(roleId));
         // 查询角色下属所有用户ID，用于在关联变更后失效其权限缓存
         List<Long> userIds = sysUserRoleService.queryChain()
@@ -98,19 +108,15 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
                 .where(SYS_USER_ROLE.ROLE_ID.eq(roleId))
                 .listAs(Long.class);
 
-        List<Long> menuIds = assignMenusDTO.getMenuIds();
-        // 3. 补全所有父菜单
+        // 4. 补全所有父菜单
         Set<Long> allMenuIds = new HashSet<>();
-        // 如果菜单列表为空，则仅删除旧关联
         if (CollUtil.isNotEmpty(menuIds)) {
-            // 菜单ID去重
-            menuIds = menuIds.stream().distinct().toList();
             // 获取所有菜单的祖先ID（包含自身）
             Set<Long> ancestors = sysMenuService.listAncestorIdsByIds(menuIds);
             allMenuIds.addAll(ancestors);
         }
         if (CollUtil.isNotEmpty(allMenuIds)) {
-            // 4. 插入新关联（如果菜单列表为空，则仅删除）
+            // 5. 插入新关联（如果菜单列表为空，则仅删除）
             List<SysRoleMenu> entities = allMenuIds.stream()
                     .map(menuId -> {
                         SysRoleMenu sysRoleMenu = new SysRoleMenu();
@@ -122,13 +128,30 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             sysRoleMenuService.saveBatch(entities);
         }
 
-        // 5. 失效角色下属所有用户的权限/路由菜单/用户信息缓存（菜单关联变更影响权限码与可访问菜单；角色码不变，role 缓存无需清理）；
+        // 6. 失效角色下属所有用户的权限/路由菜单/用户信息缓存（菜单关联变更影响权限码与可访问菜单；角色码不变，role 缓存无需清理）；
         //    注册到事务提交后执行，避免提交前其他请求回源查库把中间状态重新写入缓存
         CacheUtil.evictAfterCommit(() -> {
             sysMenuService.evictPermCache(userIds);
             sysMenuService.evictMenuCache(userIds);
             userIds.forEach(sysUserService::evictUserCache);
         });
+    }
+
+    /**
+     * 校验待分配的菜单是否都存在（逻辑删除的菜单视为不存在），避免产生悬空关联。
+     *
+     * @param menuIds 去重后的菜单ID列表
+     */
+    private void checkMenusExist(List<Long> menuIds) {
+        Set<Long> existingIds = sysMenuService.listByIds(menuIds).stream()
+                .map(SysMenu::getId)
+                .collect(Collectors.toSet());
+        List<Long> missingIds = menuIds.stream()
+                .filter(id -> !existingIds.contains(id))
+                .toList();
+        if (CollUtil.isNotEmpty(missingIds)) {
+            throw new BusinessException("菜单不存在：" + missingIds);
+        }
     }
 
 }
