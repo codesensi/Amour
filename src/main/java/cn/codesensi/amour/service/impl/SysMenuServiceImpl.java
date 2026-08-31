@@ -20,10 +20,8 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static cn.codesensi.amour.model.entity.table.SysMenuTableDef.SYS_MENU;
@@ -176,40 +174,58 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     }
 
     /**
-     * 获取菜单的所有祖先ID（包含自身）
+     * 获取菜单的所有祖先ID（包含自身）。
+     * <p>
+     * 委托 {@link #listAncestorIdsByIds(List)} 的批量实现（单元素列表），共享"一次加载 + 内存爬树"的实现。
      */
     @Override
     public Set<Long> listAncestorIdsById(Long menuId) {
-        Set<Long> ancestorIds = new HashSet<>();
-        SysMenu sysMenu = QueryChain.of(sysMenuMapper)
-                .select(SYS_MENU.ALL_COLUMNS)
-                .where(SYS_MENU.ID.eq(menuId))
-                .one();
-        while (sysMenu != null && !AppConst.ZERO_LONG.equals(sysMenu.getId())) {
-            ancestorIds.add(sysMenu.getId());
-            if (AppConst.ZERO_LONG.equals(sysMenu.getPid())) {
-                break;
-            }
-            sysMenu = QueryChain.of(sysMenuMapper)
-                    .select(SYS_MENU.ALL_COLUMNS)
-                    .where(SYS_MENU.ID.eq(sysMenu.getPid()))
-                    .one();
-        }
-        return ancestorIds;
+        return listAncestorIdsByIds(List.of(menuId));
     }
 
     /**
-     * 批量获取多个菜单的所有祖先ID（并集，去重）
+     * 批量获取多个菜单的所有祖先ID（并集，去重）。
+     * <p>
+     * 菜单表数据量小，一次性加载后在内存中沿 pid 向上遍历，将原来 M×深度 次的逐层点查优化为 1 条 SQL。
      */
     @Override
     public Set<Long> listAncestorIdsByIds(List<Long> menuIds) {
         if (CollUtil.isEmpty(menuIds)) {
             return Collections.emptySet();
         }
-        return menuIds.stream()
-                .map(this::listAncestorIdsById)
-                .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+        // 一次加载全部菜单，构建 id -> 菜单 映射
+        Map<Long, SysMenu> menuMap = QueryChain.of(sysMenuMapper)
+                .select(SYS_MENU.ALL_COLUMNS)
+                .list()
+                .stream()
+                .collect(Collectors.toMap(SysMenu::getId, Function.identity(), (a, b) -> a));
+
+        Set<Long> ancestorIds = new HashSet<>();
+        for (Long menuId : menuIds) {
+            collectAncestorIds(menuId, menuMap, ancestorIds);
+        }
+        return ancestorIds;
+    }
+
+    /**
+     * 沿 pid 向上遍历，收集 menuId 自身与所有祖先ID。
+     * <p>
+     * visited 的 add 返回值兼作防环终止条件：同一 ID 第二次出现（pid 环脏数据）时立即终止，
+     * 避免死循环；pid 指向的菜单不存在时正常结束。
+     *
+     * @param menuId  起始菜单ID
+     * @param menuMap id -> 菜单 映射
+     * @param visited 已访问ID集合（跨菜单共享，保证并集去重）
+     */
+    private void collectAncestorIds(Long menuId, Map<Long, SysMenu> menuMap, Set<Long> visited) {
+        Long current = menuId;
+        while (current != null && !AppConst.ZERO_LONG.equals(current) && visited.add(current)) {
+            SysMenu menu = menuMap.get(current);
+            if (menu == null) {
+                break;
+            }
+            current = menu.getPid();
+        }
     }
 
 }
