@@ -8,11 +8,7 @@ import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.util.CacheUtil;
 import cn.codesensi.amour.mapper.SysUserMapper;
 import cn.codesensi.amour.model.converter.SysUserConverter;
-import cn.codesensi.amour.model.dto.AssignRolesDTO;
-import cn.codesensi.amour.model.dto.ConfigDTO;
-import cn.codesensi.amour.model.dto.MenuDTO;
-import cn.codesensi.amour.model.dto.UserInfoDTO;
-import cn.codesensi.amour.model.dto.UserSaveDTO;
+import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.SysMenu;
 import cn.codesensi.amour.model.entity.SysUser;
 import cn.codesensi.amour.model.entity.SysUserRole;
@@ -31,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -142,10 +139,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     /**
-     * 配置用户角色
+     * 配置用户角色。
+     * <p>
+     * 删除旧关联与写入新关联处于同一事务，原子提交，避免中途失败留下"旧关联已删、新关联未插"的半状态。
      *
      * @param assignRolesDTO 分配角色信息
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void assignRoles(AssignRolesDTO assignRolesDTO) {
         Long userId = assignRolesDTO.getUserId();

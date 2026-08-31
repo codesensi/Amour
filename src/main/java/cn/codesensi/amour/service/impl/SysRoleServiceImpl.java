@@ -15,6 +15,7 @@ import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -63,10 +64,13 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     }
 
     /**
-     * 分配角色菜单权限
+     * 分配角色菜单权限。
+     * <p>
+     * 删除旧关联与写入新关联处于同一事务，原子提交，避免中途失败留下"旧关联已删、新关联未插"的半状态。
      *
      * @param assignMenusDTO 角色菜单权限信息
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void assignMenus(AssignMenusDTO assignMenusDTO) {
         Long roleId = assignMenusDTO.getRoleId();
