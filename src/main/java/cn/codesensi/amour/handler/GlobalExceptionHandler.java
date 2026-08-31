@@ -7,14 +7,13 @@ import cn.codesensi.amour.common.exception.SystemException;
 import cn.codesensi.amour.common.exception.ValidationException;
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.SaTokenException;
+import cn.hutool.core.util.ObjUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
-
-import java.util.Objects;
 
 /**
  * 全局异常处理器
@@ -101,7 +100,7 @@ public class GlobalExceptionHandler {
         log.error("参数异常：", e);
         FieldError fieldError = e.getBindingResult().getFieldError();
         String message = "参数校验未通过";
-        if (Objects.nonNull(fieldError)) {
+        if (ObjUtil.isNotNull(fieldError)) {
             message = fieldError.getDefaultMessage();
         }
         return Result.badRequest(message);

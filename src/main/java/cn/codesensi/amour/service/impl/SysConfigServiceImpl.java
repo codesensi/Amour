@@ -3,11 +3,12 @@ package cn.codesensi.amour.service.impl;
 import cn.codesensi.amour.common.consts.CacheConst;
 import cn.codesensi.amour.common.enums.EnableEnum;
 import cn.codesensi.amour.common.util.CacheUtil;
+import cn.codesensi.amour.mapper.SysConfigMapper;
 import cn.codesensi.amour.model.converter.ConfigConverter;
 import cn.codesensi.amour.model.dto.ConfigDTO;
 import cn.codesensi.amour.model.entity.SysConfig;
-import cn.codesensi.amour.mapper.SysConfigMapper;
 import cn.codesensi.amour.service.SysConfigService;
+import cn.hutool.core.collection.CollUtil;
 import com.mybatisflex.core.query.QueryChain;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.Cache;
@@ -51,7 +52,7 @@ public class SysConfigServiceImpl implements SysConfigService {
      */
     @Override
     public List<ConfigDTO> listByKeys(List<String> keys) {
-        if (keys == null || keys.isEmpty()) {
+        if (CollUtil.isEmpty(keys)) {
             return listAllFromDb();
         }
         List<ConfigDTO> result = new ArrayList<>();
@@ -79,7 +80,7 @@ public class SysConfigServiceImpl implements SysConfigService {
         if (cache == null) {
             return;
         }
-        if (keys == null || keys.isEmpty()) {
+        if (CollUtil.isEmpty(keys)) {
             cache.clear();
             return;
         }

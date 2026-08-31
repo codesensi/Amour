@@ -1,6 +1,7 @@
 package cn.codesensi.amour.filter;
 
 import cn.codesensi.amour.common.properties.AppSecurityProperties;
+import cn.hutool.core.util.StrUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,7 +50,7 @@ public class CacheRequestBodyFilter extends OncePerRequestFilter {
                                  @NonNull HttpServletResponse response,
                                  @NonNull FilterChain filterChain) throws ServletException, IOException {
         // 文件上传请求跳过包装，避免大文件缓存导致内存溢出
-        if (request.getContentType() != null && request.getContentType().toLowerCase().contains("multipart/form-data")) {
+        if (StrUtil.containsIgnoreCase(request.getContentType(), "multipart/form-data")) {
             filterChain.doFilter(request, response);
             return;
         }
