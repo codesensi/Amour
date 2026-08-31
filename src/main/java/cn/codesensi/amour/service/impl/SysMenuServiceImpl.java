@@ -1,8 +1,10 @@
 package cn.codesensi.amour.service.impl;
 
 import cn.codesensi.amour.common.consts.AppConst;
+import cn.codesensi.amour.common.consts.CacheConst;
 import cn.codesensi.amour.common.consts.RbacConst;
 import cn.codesensi.amour.common.enums.MenuType;
+import cn.codesensi.amour.common.util.CacheUtil;
 import cn.codesensi.amour.mapper.SysMenuMapper;
 import cn.codesensi.amour.model.entity.SysMenu;
 import cn.codesensi.amour.model.entity.SysRole;
@@ -14,6 +16,8 @@ import cn.hutool.core.util.StrUtil;
 import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -37,15 +41,35 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     private final SysMenuMapper sysMenuMapper;
     private final SysRoleMenuService sysRoleMenuService;
     private final SysUserRoleService sysUserRoleService;
+    private final CacheManager cacheManager;
 
     /**
-     * 返回一个账号所拥有的权限编码列表
+     * 返回一个账号所拥有的权限编码列表。
+     * <p>
+     * 结果经 perm 缓存加速（Key 为用户ID），写后 30 天兜底过期，写侧显式失效；
+     * 缓存未注册/未就绪时降级为直接查库。
      *
      * @param userId 用户ID
      * @return 权限编码列表
      */
     @Override
     public List<String> listPermCodeByUserId(Long userId) {
+        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.PERM));
+        if (cache == null) {
+            // 缓存未注册/未就绪：降级为直接查库
+            return loadPermCodes(userId);
+        }
+        // 原子回源：未命中时执行 loader 查库并写入，防止缓存击穿
+        return cache.get(userId, () -> loadPermCodes(userId));
+    }
+
+    /**
+     * 从库中加载权限编码列表（超级管理员短路）。
+     *
+     * @param userId 用户ID
+     * @return 权限编码列表
+     */
+    private List<String> loadPermCodes(Long userId) {
         // 获取去重后的角色列表
         List<SysRole> sysRoles = sysUserRoleService.listRoleByUserId(userId);
         // 获取角色编码列表
@@ -67,13 +91,51 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     }
 
     /**
-     * 查询用户路由菜单列表
+     * 失效指定用户的权限编码缓存。
+     *
+     * @param userIds 用户ID列表
+     */
+    @Override
+    public void evictPermCache(List<Long> userIds) {
+        if (CollUtil.isEmpty(userIds)) {
+            return;
+        }
+        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.PERM));
+        if (cache == null) {
+            return;
+        }
+        for (Long userId : userIds) {
+            cache.evict(userId);
+        }
+    }
+
+    /**
+     * 查询用户路由菜单列表。
+     * <p>
+     * 结果经 menu 缓存加速（Key 为用户ID），写后 30 天兜底过期，写侧显式失效；
+     * 缓存未注册/未就绪时降级为直接查库。
      *
      * @param userId 用户id
      * @return 路由菜单列表
      */
     @Override
     public List<SysMenu> listMenuByUserId(Long userId) {
+        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.MENU));
+        if (cache == null) {
+            // 缓存未注册/未就绪：降级为直接查库
+            return loadMenus(userId);
+        }
+        // 原子回源：未命中时执行 loader 查库并写入，防止缓存击穿
+        return cache.get(userId, () -> loadMenus(userId));
+    }
+
+    /**
+     * 从库中加载用户路由菜单列表（超级管理员查看全部非按钮菜单）。
+     *
+     * @param userId 用户id
+     * @return 路由菜单列表
+     */
+    private List<SysMenu> loadMenus(Long userId) {
         // 获取用户的角色编码列表
         List<String> roleCodeList = sysUserRoleService.listRoleCodeByUserId(userId);
         if (CollUtil.isEmpty(roleCodeList)) {
@@ -92,6 +154,25 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
 
         // 获取角色拥有的路由菜单列表（不包含按钮级别）
         return sysRoleMenuService.listMenuByRoleCodeList(roleCodeList);
+    }
+
+    /**
+     * 失效指定用户的路由菜单缓存。
+     *
+     * @param userIds 用户ID列表
+     */
+    @Override
+    public void evictMenuCache(List<Long> userIds) {
+        if (CollUtil.isEmpty(userIds)) {
+            return;
+        }
+        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.MENU));
+        if (cache == null) {
+            return;
+        }
+        for (Long userId : userIds) {
+            cache.evict(userId);
+        }
     }
 
     /**

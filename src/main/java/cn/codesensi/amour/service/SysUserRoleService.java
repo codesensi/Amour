@@ -30,4 +30,11 @@ public interface SysUserRoleService extends IService<SysUserRole> {
      */
     List<String> listRoleCodeByUserId(Long userId);
 
+    /**
+     * 失效指定用户的角色编码缓存（role 缓存）
+     *
+     * @param userId 用户ID
+     */
+    void evictRoleCache(Long userId);
+
 }

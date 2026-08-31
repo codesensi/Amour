@@ -1,20 +1,25 @@
 package cn.codesensi.amour.service.impl;
 
 import cn.codesensi.amour.common.consts.AppConst;
+import cn.codesensi.amour.common.consts.CacheConst;
 import cn.codesensi.amour.common.enums.BuiltinEnum;
+import cn.codesensi.amour.common.enums.ConfigKeyEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
+import cn.codesensi.amour.common.util.CacheUtil;
 import cn.codesensi.amour.mapper.SysUserMapper;
 import cn.codesensi.amour.model.converter.SysUserConverter;
 import cn.codesensi.amour.model.dto.AssignRolesDTO;
+import cn.codesensi.amour.model.dto.ConfigDTO;
 import cn.codesensi.amour.model.dto.MenuDTO;
 import cn.codesensi.amour.model.dto.UserInfoDTO;
 import cn.codesensi.amour.model.dto.UserSaveDTO;
 import cn.codesensi.amour.model.entity.SysMenu;
 import cn.codesensi.amour.model.entity.SysUser;
 import cn.codesensi.amour.model.entity.SysUserRole;
+import cn.codesensi.amour.service.SysConfigService;
 import cn.codesensi.amour.service.SysMenuService;
-import cn.codesensi.amour.service.SysUserService;
 import cn.codesensi.amour.service.SysUserRoleService;
+import cn.codesensi.amour.service.SysUserService;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
@@ -23,6 +28,8 @@ import cn.hutool.crypto.digest.BCrypt;
 import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -43,14 +50,36 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private final SysUserMapper sysUserMapper;
     private final SysUserConverter sysUserConverter;
     private final SysUserRoleService sysUserRoleService;
+    private final SysConfigService sysConfigService;
+    private final CacheManager cacheManager;
 
     /**
-     * 获取当前用户信息
+     * 获取当前用户信息。
+     * <p>
+     * 结果经 userInfo 缓存加速（Key 为用户ID），写后 30 天兜底过期，写侧显式失效；
+     * 缓存未注册/未就绪时降级为直接查库。
      *
+     * @param userId 用户ID
      * @return 用户信息
      */
     @Override
     public UserInfoDTO getCurrentUser(Long userId) {
+        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.USER));
+        if (cache == null) {
+            // 缓存未注册/未就绪：降级为直接查库
+            return loadCurrentUser(userId);
+        }
+        // 原子回源：未命中时执行 loader 查库并写入，防止缓存击穿
+        return cache.get(userId, () -> loadCurrentUser(userId));
+    }
+
+    /**
+     * 从库中组装当前用户信息（资料 + 角色 + 权限 + 菜单）。
+     *
+     * @param userId 用户ID
+     * @return 用户信息
+     */
+    private UserInfoDTO loadCurrentUser(Long userId) {
         SysUser sysUser = QueryChain.of(sysUserMapper)
                 .select(SYS_USER.ALL_COLUMNS)
                 .where(SYS_USER.ID.eq(userId))
@@ -94,11 +123,16 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             sysUser.setNickname(username);
         }
 
-        // 默认随机头像
+        // 默认随机头像：未上传头像时读取系统配置的随机头像服务地址，以用户名作为随机种子生成
         if (StrUtil.isBlank(userSaveDTO.getAvatar())) {
-            // TODO 取系统配置
-            // String avatar = String.format(appProperties.getAvatar(), username);
-            // sysUser.setAvatar(avatar);
+            // 配置缺失/停用时保持头像为空，避免因缺配置导致保存失败
+            String avatarTemplate = sysConfigService.listByKeys(List.of(ConfigKeyEnum.AVATAR.getCode()))
+                    .stream().findFirst()
+                    .map(ConfigDTO::getConfigValue)
+                    .orElse(null);
+            if (StrUtil.isNotBlank(avatarTemplate)) {
+                sysUser.setAvatar(String.format(avatarTemplate, username));
+            }
         }
 
         // 默认密码
@@ -131,7 +165,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
         // 3. 删除旧关联
         sysUserRoleService.remove(SYS_USER_ROLE.USER_ID.eq(userId));
-        // TODO 同步清除用户的相关缓存（权限、菜单、用户信息）
+        // 4. 失效该用户的角色/权限/路由菜单/用户信息缓存（角色变更必然影响权限码与可访问菜单）
+        sysUserRoleService.evictRoleCache(userId);
+        sysMenuService.evictPermCache(List.of(userId));
+        sysMenuService.evictMenuCache(List.of(userId));
+        evictUserCache(userId);
 
         List<Long> roleIds = assignRolesDTO.getRoleIds();
         // 如果角色列表为空，则仅删除旧关联
@@ -150,4 +188,32 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             sysUserRoleService.saveBatch(entities);
         }
     }
+
+    /**
+     * 更新用户信息。
+     * <p>
+     * 昵称、头像等资料变更影响用户信息聚合体，失效该用户的 userInfo 缓存。
+     */
+    @Override
+    public boolean updateById(SysUser sysUser) {
+        boolean success = super.updateById(sysUser);
+        if (success) {
+            evictUserCache(sysUser.getId());
+        }
+        return success;
+    }
+
+    /**
+     * 失效指定用户的用户信息缓存。
+     *
+     * @param userId 用户ID
+     */
+    @Override
+    public void evictUserCache(Long userId) {
+        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.USER));
+        if (cache != null) {
+            cache.evict(userId);
+        }
+    }
+
 }

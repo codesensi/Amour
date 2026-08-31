@@ -34,4 +34,12 @@ public interface SysUserService extends IService<SysUser> {
      * @param assignRolesDTO 分配角色信息
      */
     void assignRoles(AssignRolesDTO assignRolesDTO);
+
+    /**
+     * 失效指定用户的用户信息缓存（userInfo 缓存）
+     *
+     * @param userId 用户ID
+     */
+    void evictUserCache(Long userId);
+
 }

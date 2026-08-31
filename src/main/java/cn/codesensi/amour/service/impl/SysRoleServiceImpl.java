@@ -8,10 +8,7 @@ import cn.codesensi.amour.model.dto.AssignMenusDTO;
 import cn.codesensi.amour.model.dto.RoleSaveDTO;
 import cn.codesensi.amour.model.entity.SysRole;
 import cn.codesensi.amour.model.entity.SysRoleMenu;
-import cn.codesensi.amour.service.SysMenuService;
-import cn.codesensi.amour.service.SysRoleMenuService;
-import cn.codesensi.amour.service.SysRoleService;
-import cn.codesensi.amour.service.SysUserRoleService;
+import cn.codesensi.amour.service.*;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import com.mybatisflex.core.query.QueryChain;
@@ -43,6 +40,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     private final SysUserRoleService sysUserRoleService;
     private final SysRoleMenuService sysRoleMenuService;
     private final SysMenuService sysMenuService;
+    private final SysUserService sysUserService;
 
     /**
      * 保存角色信息
@@ -88,12 +86,11 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
 
         // 2. 删除旧关联
         sysRoleMenuService.remove(SYS_ROLE_MENU.ROLE_ID.eq(roleId));
-        // 同步清除角色下属所有用户的相关缓存（权限、菜单、用户信息）
+        // 查询角色下属所有用户ID，用于在关联变更后失效其权限缓存
         List<Long> userIds = sysUserRoleService.queryChain()
                 .select(SYS_USER_ROLE.USER_ID)
                 .where(SYS_USER_ROLE.ROLE_ID.eq(roleId))
                 .listAs(Long.class);
-        // TODO 按照用户id清理缓存
 
         List<Long> menuIds = assignMenusDTO.getMenuIds();
         // 3. 补全所有父菜单
@@ -118,6 +115,11 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             // 批量插入
             sysRoleMenuService.saveBatch(entities);
         }
+
+        // 5. 失效角色下属所有用户的权限/路由菜单/用户信息缓存（菜单关联变更影响权限码与可访问菜单；角色码不变，role 缓存无需清理）
+        sysMenuService.evictPermCache(userIds);
+        sysMenuService.evictMenuCache(userIds);
+        userIds.forEach(sysUserService::evictUserCache);
     }
 
 }

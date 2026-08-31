@@ -45,4 +45,19 @@ public interface SysMenuService extends IService<SysMenu> {
      * @return 菜单的所有祖先ID（包含自身）
      */
     Set<Long> listAncestorIdsByIds(List<Long> menuIds);
+
+    /**
+     * 失效指定用户的权限编码缓存（perm 缓存）
+     *
+     * @param userIds 用户ID列表
+     */
+    void evictPermCache(List<Long> userIds);
+
+    /**
+     * 失效指定用户的路由菜单缓存（menu 缓存）
+     *
+     * @param userIds 用户ID列表
+     */
+    void evictMenuCache(List<Long> userIds);
+
 }
