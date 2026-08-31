@@ -70,7 +70,7 @@ app:
         expire-after-access: 0
       - name: config
         # 驻留不自动过期，热更新依赖写库侧调用 ConfigService.evictCache 失效
-        expire-after-write: 0
+        expire-after-write: 2592000
         expire-after-access: 0
       - name: role
         # 角色编码缓存：写后 30 天兜底过期，写侧显式失效（分配角色、角色变更/删除时清除）
