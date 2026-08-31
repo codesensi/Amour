@@ -4,6 +4,7 @@ import cn.codesensi.amour.service.SysMenuService;
 import cn.codesensi.amour.service.SysUserRoleService;
 import cn.dev33.satoken.stp.StpInterface;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.List;
 /**
  * 自定义权限验证接口扩展
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StpInterfaceImpl implements StpInterface {
@@ -29,7 +31,9 @@ public class StpInterfaceImpl implements StpInterface {
     public List<String> getPermissionList(Object loginId, String loginType) {
         String userIdStr = String.valueOf(loginId);
         Long userId = Long.valueOf(userIdStr);
-        return sysMenuService.listPermCodeByUserId(userId);
+        List<String> permCodes = sysMenuService.listPermCodeByUserId(userId);
+        log.debug("查询权限码：userId={}，permCodes={}", userId, permCodes);
+        return permCodes;
     }
 
     /**
@@ -43,7 +47,9 @@ public class StpInterfaceImpl implements StpInterface {
     public List<String> getRoleList(Object loginId, String loginType) {
         String userIdStr = String.valueOf(loginId);
         Long userId = Long.valueOf(userIdStr);
-        return sysUserRoleService.listRoleCodeByUserId(userId);
+        List<String> roleCodes = sysUserRoleService.listRoleCodeByUserId(userId);
+        log.debug("查询角色编码：userId={}，roleCodes={}", userId, roleCodes);
+        return roleCodes;
     }
 
 }

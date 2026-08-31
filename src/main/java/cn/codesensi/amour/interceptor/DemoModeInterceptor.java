@@ -6,6 +6,7 @@ import cn.codesensi.amour.service.SysConfigService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,6 +24,7 @@ import java.util.List;
  * @author codesensi
  * @since 1.0
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DemoModeInterceptor implements HandlerInterceptor {
@@ -49,6 +51,7 @@ public class DemoModeInterceptor implements HandlerInterceptor {
         if (demoMode) {
             String method = request.getMethod();
             if (!RequestMethod.GET.name().equals(method) && !RequestMethod.HEAD.name().equals(method)) {
+                log.warn("演示模式拦截写操作：method={}，uri={}", method, request.getRequestURI());
                 throw new AuthorizationException("演示模式不允许操作哦~");
             }
         }

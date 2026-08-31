@@ -14,6 +14,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.mybatisflex.core.paginate.Page;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import static cn.codesensi.amour.model.entity.table.SysUserTableDef.SYS_USER;
@@ -25,6 +26,7 @@ import static cn.codesensi.amour.model.entity.table.SysUserTableDef.SYS_USER;
  * @author codesensi
  * @since 2026-06-28
  */
+@Slf4j
 @ApiResponseBody
 @RequiredArgsConstructor
 @RestController
@@ -42,6 +44,7 @@ public class SysUserController {
      */
     @DeleteMapping("/delete/{id}")
     public boolean delete(@PathVariable Long id) {
+        log.info("删除用户：operator={}，userId={}", StpUtil.getLoginIdAsLong(), id);
         return sysUserService.removeById(id);
     }
 

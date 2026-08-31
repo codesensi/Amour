@@ -11,6 +11,7 @@ import cn.codesensi.amour.service.SysConfigService;
 import cn.hutool.core.collection.CollUtil;
 import com.mybatisflex.core.query.QueryChain;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ import static cn.codesensi.amour.model.entity.table.SysConfigTableDef.SYS_CONFIG
  * 查询结果以 {@link ConfigDTO} 返回；当配置键在库中不存在或处于停用状态时，
  * 结果中不包含对应条目，避免调用侧因缺配置而失败。
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SysConfigServiceImpl implements SysConfigService {
@@ -76,6 +78,7 @@ public class SysConfigServiceImpl implements SysConfigService {
      */
     @Override
     public void evictCache(List<String> keys) {
+        log.debug("失效配置缓存：keys={}", keys);
         Cache cache = configCache();
         if (cache == null) {
             return;
@@ -101,6 +104,7 @@ public class SysConfigServiceImpl implements SysConfigService {
         Cache cache = configCache();
         if (cache == null) {
             // 缓存未注册/未就绪：降级为直接查库
+            log.debug("config 缓存未注册，降级为直接查库：key={}", key);
             return oneConfigByKeyFromDb(key);
         }
         try {
@@ -121,6 +125,7 @@ public class SysConfigServiceImpl implements SysConfigService {
      */
     private Object loadFromDb(String key) {
         SysConfig config = oneConfigByKeyFromDb(key);
+        log.debug("config 缓存回源查库：key={}，result={}", key, config == null ? "不存在，以空值哨兵占位" : "已加载");
         return config == null ? CacheConst.NULL_MARKER : config;
     }
 

@@ -65,6 +65,7 @@ public class LoginServiceImpl implements LoginService {
         // 校验验证码（开关缺失/停用时视为关闭）
         boolean captchaEnabled = sysConfigService.listByKeys(List.of(ConfigKeyEnum.CAPTCHA_ENABLED.getCode())).stream()
                 .anyMatch(config -> Boolean.parseBoolean(config.getConfigValue()));
+        log.debug("验证码开关：captchaEnabled={}", captchaEnabled);
         if (captchaEnabled) {
             checkCaptcha(loginDTO);
         }
@@ -78,14 +79,17 @@ public class LoginServiceImpl implements LoginService {
                 .one();
         if (ObjUtil.isNull(sysUser) || StrUtil.isBlank(sysUser.getPassword())
                 || !BCrypt.checkpw(password, sysUser.getPassword())) {
+            log.debug("登录失败：username={}，账号不存在或密码不匹配", username);
             throw new BusinessException("账号或密码错误");
         }
+        log.debug("账号密码匹配成功：username={}", username);
 
         Long userId = sysUser.getId();
         // 校验账户是否封禁
         StpUtil.checkDisable(userId);
         // 登录
         StpUtil.login(userId);
+        log.debug("登录成功：userId={}", userId);
 
         // 构建登录响应
         LoginResultDTO loginResultDTO = new LoginResultDTO();
@@ -106,6 +110,7 @@ public class LoginServiceImpl implements LoginService {
      */
     @Override
     public void logout() {
+        log.info("用户登出：userId={}", StpUtil.getLoginIdAsLong());
         StpUtil.logout();
     }
 

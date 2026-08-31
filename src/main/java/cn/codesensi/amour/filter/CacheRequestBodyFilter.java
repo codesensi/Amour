@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -22,6 +23,7 @@ import java.io.IOException;
  * @author codesensi
  * @since 1.0
  */
+@Slf4j
 @RequiredArgsConstructor
 @Order(Ordered.HIGHEST_PRECEDENCE + 1)
 @Component
@@ -51,6 +53,7 @@ public class CacheRequestBodyFilter extends OncePerRequestFilter {
                                  @NonNull FilterChain filterChain) throws ServletException, IOException {
         // 文件上传请求跳过包装，避免大文件缓存导致内存溢出
         if (StrUtil.containsIgnoreCase(request.getContentType(), "multipart/form-data")) {
+            log.debug("multipart 请求跳过请求体缓存：uri={}", request.getRequestURI());
             filterChain.doFilter(request, response);
             return;
         }

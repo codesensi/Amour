@@ -27,6 +27,7 @@ import cn.hutool.crypto.digest.BCrypt;
 import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,7 @@ import static cn.codesensi.amour.model.entity.table.SysUserTableDef.SYS_USER;
  * <p>
  * CRUD 能力由 MyBatis-Flex 的 {@link ServiceImpl} 统一提供。
  */
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements SysUserService {
@@ -69,9 +71,14 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     public UserInfoDTO getCurrentUser(Long userId) {
         Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.USER));
         // 资料部分走 user 缓存（仅 DB 维度的用户资料，不含角色/权限/菜单）
-        UserInfoDTO userInfo = cache == null
-                ? loadUserProfile(userId)
-                : cache.get(userId, () -> loadUserProfile(userId));
+        UserInfoDTO userInfo;
+        if (cache == null) {
+            // 缓存未注册/未就绪：降级为直接查库
+            log.debug("userInfo 缓存未注册，降级为直接查库：userId={}", userId);
+            userInfo = loadUserProfile(userId);
+        } else {
+            userInfo = cache.get(userId, () -> loadUserProfile(userId));
+        }
         // 角色与权限：实时装配（各自有 role/perm 缓存加速；StpInterfaceImpl 即转发至这两个方法，行为与 StpUtil 等价）
         userInfo.setRoles(sysUserRoleService.listRoleCodeByUserId(userId));
         userInfo.setPerms(sysMenuService.listPermCodeByUserId(userId));
@@ -117,6 +124,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         SysUser sysUser = sysUserConverter.toEntity(userSaveDTO);
         // 若未输入昵称则保持昵称和用户名相同
         if (StrUtil.isBlank(userSaveDTO.getNickname())) {
+            log.debug("未输入昵称，默认与用户名一致：username={}", username);
             sysUser.setNickname(username);
         }
 
@@ -128,11 +136,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                     .map(ConfigDTO::getConfigValue)
                     .orElse(null);
             if (StrUtil.isNotBlank(avatarTemplate)) {
+                log.debug("命中随机头像服务地址配置，生成默认头像：username={}", username);
                 sysUser.setAvatar(String.format(avatarTemplate, username));
+            } else {
+                log.debug("未配置随机头像服务地址，跳过默认头像生成：username={}", username);
             }
         }
 
         // 默认密码
+        log.debug("使用系统默认密码初始化用户：username={}", username);
         String password = BCrypt.hashpw(AppConst.DEFAULT_PASSWORD, BCrypt.gensalt());
         sysUser.setPassword(password);
         sysUserMapper.insert(sysUser, true);
@@ -164,20 +176,21 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             throw new BusinessException("系统内置用户不允许修改角色");
         }
 
+        // 3. 角色ID去重并校验是否存在（避免产生悬空关联）
         List<Long> roleIds = assignRolesDTO.getRoleIds();
-        // 3. 校验待分配的角色是否存在（避免产生悬空关联）
-        if (CollUtil.isNotEmpty(roleIds)) {
-            // 角色ID去重
-            roleIds = roleIds.stream().distinct().toList();
-            checkRolesExist(roleIds);
+        List<Long> distinctRoleIds = CollUtil.isEmpty(roleIds)
+                ? List.of()
+                : roleIds.stream().distinct().toList();
+        if (CollUtil.isNotEmpty(distinctRoleIds)) {
+            checkRolesExist(distinctRoleIds);
         }
 
         // 4. 删除旧关联
         sysUserRoleService.remove(SYS_USER_ROLE.USER_ID.eq(userId));
 
         // 5. 插入新关联（如果角色列表为空，则仅删除）
-        if (CollUtil.isNotEmpty(roleIds)) {
-            List<SysUserRole> entities = roleIds.stream()
+        if (CollUtil.isNotEmpty(distinctRoleIds)) {
+            List<SysUserRole> entities = distinctRoleIds.stream()
                     .map(roleId -> {
                         SysUserRole sysUserRole = new SysUserRole();
                         sysUserRole.setUserId(userId);
@@ -191,6 +204,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         // 6. 失效该用户的角色/权限/路由菜单/用户信息缓存（角色变更必然影响权限码与可访问菜单）；
         //    注册到事务提交后执行，避免提交前其他请求回源查库把中间状态重新写入缓存
         CacheUtil.evictAfterCommit(() -> {
+            log.debug("角色分配完成，失效缓存：userId={}，roleIds={}", userId, distinctRoleIds);
             sysUserRoleService.evictRoleCache(List.of(userId));
             sysMenuService.evictPermCache(List.of(userId));
             sysMenuService.evictMenuCache(List.of(userId));
@@ -225,6 +239,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     public boolean updateById(SysUser sysUser) {
         boolean success = super.updateById(sysUser);
         if (success) {
+            log.debug("用户信息更新成功，失效 userInfo 缓存：userId={}", sysUser.getId());
             evictUserCache(List.of(sysUser.getId()));
         }
         return success;
@@ -240,6 +255,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         if (CollUtil.isEmpty(userIds)) {
             return;
         }
+        log.debug("失效 userInfo 缓存：userIds={}", userIds);
         Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.USER));
         if (cache == null) {
             return;

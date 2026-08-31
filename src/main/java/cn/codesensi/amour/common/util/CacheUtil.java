@@ -1,6 +1,7 @@
 package cn.codesensi.amour.common.util;
 
 import cn.codesensi.amour.common.context.AppEnvContext;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -17,6 +18,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * 本类为纯静态工具类（不标 {@code @Component}），依赖 {@link AppEnvContext} 在应用启动阶段完成
  * 装配；请在 {@link AppEnvContext} 就绪后调用 {@link #withAppEnv(String)}。
  */
+@Slf4j
 public class CacheUtil {
 
     /**
@@ -51,6 +53,7 @@ public class CacheUtil {
      */
     public static void evictAfterCommit(Runnable action) {
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            log.debug("存在活跃事务，缓存失效动作注册到事务提交后执行");
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
                 public void afterCommit() {
@@ -58,6 +61,7 @@ public class CacheUtil {
                 }
             });
         } else {
+            log.debug("无活跃事务同步，立即执行缓存失效动作");
             action.run();
         }
     }

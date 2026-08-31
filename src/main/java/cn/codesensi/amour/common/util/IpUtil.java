@@ -2,6 +2,7 @@ package cn.codesensi.amour.common.util;
 
 import cn.hutool.core.lang.Validator;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.net.*;
@@ -13,6 +14,7 @@ import java.util.Enumeration;
  * 解析时按优先级依次读取常见代理转发头（X-Forwarded-For 等），
  * 均未命中时回退到 {@code RemoteAddr}。
  */
+@Slf4j
 public class IpUtil {
 
     /**
@@ -136,7 +138,8 @@ public class IpUtil {
                     }
                 }
             }
-        } catch (SocketException ignored) {
+        } catch (SocketException e) {
+            log.warn("网络接口枚举失败，本机 IP 回退为默认值：ip={}", LOCALHOST_IP, e);
         }
         localIpCache = result;
         return result;

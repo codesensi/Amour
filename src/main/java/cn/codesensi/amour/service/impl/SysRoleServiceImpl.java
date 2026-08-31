@@ -16,6 +16,7 @@ import cn.hutool.core.util.ObjUtil;
 import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +36,7 @@ import static cn.codesensi.amour.model.entity.table.SysUserRoleTableDef.SYS_USER
  * @author codesensi
  * @since 2026-06-28
  */
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> implements SysRoleService {
@@ -131,6 +133,8 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         // 6. 失效角色下属所有用户的权限/路由菜单/用户信息缓存（菜单关联变更影响权限码与可访问菜单；角色码不变，role 缓存无需清理）；
         //    注册到事务提交后执行，避免提交前其他请求回源查库把中间状态重新写入缓存
         CacheUtil.evictAfterCommit(() -> {
+            log.debug("角色菜单关联变更完成：roleId={}，补全祖先菜单数={}，失效缓存，受影响用户数={}",
+                    roleId, allMenuIds.size(), userIds.size());
             sysMenuService.evictPermCache(userIds);
             sysMenuService.evictMenuCache(userIds);
             sysUserService.evictUserCache(userIds);

@@ -16,6 +16,7 @@ import cn.hutool.core.util.StrUtil;
 import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ import static cn.codesensi.amour.model.entity.table.SysMenuTableDef.SYS_MENU;
  * @author codesensi
  * @since 2026-06-28
  */
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> implements SysMenuService {
@@ -55,6 +57,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.PERM));
         if (cache == null) {
             // 缓存未注册/未就绪：降级为直接查库
+            log.debug("perm 缓存未注册，降级为直接查库：userId={}", userId);
             return loadPermCodes(userId);
         }
         // 原子回源：未命中时执行 loader 查库并写入，防止缓存击穿
@@ -121,6 +124,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.MENU));
         if (cache == null) {
             // 缓存未注册/未就绪：降级为直接查库
+            log.debug("menu 缓存未注册，降级为直接查库：userId={}", userId);
             return loadMenus(userId);
         }
         // 原子回源：未命中时执行 loader 查库并写入，防止缓存击穿

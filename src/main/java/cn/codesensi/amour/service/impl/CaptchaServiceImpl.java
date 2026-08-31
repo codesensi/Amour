@@ -83,12 +83,12 @@ public class CaptchaServiceImpl implements CaptchaService {
 
         // 算术验证码额外记录运算公式便于调试
         if (captcha instanceof ArithmeticCaptcha arithmeticCaptcha) {
-            log.debug("算术验证码运算公式：{}", arithmeticCaptcha.getArithmeticString());
+            log.debug("算术验证码生成：formula={}", arithmeticCaptcha.getArithmeticString());
         }
 
         String keyUuid = IdUtil.fastSimpleUUID();
         String text = captcha.text();
-        log.debug("图形验证码唯一标识：{}，验证码内容：{}", keyUuid, text);
+        log.debug("图形验证码生成：key={}，code={}", keyUuid, text);
 
         // 放入缓存：验证码答案以 captchaKey 为键存入，过期时间由 captcha 缓存定义决定
         Cache cache = captchaCache();

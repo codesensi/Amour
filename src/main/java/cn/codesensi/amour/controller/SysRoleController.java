@@ -8,9 +8,11 @@ import cn.codesensi.amour.model.entity.SysRole;
 import cn.codesensi.amour.model.request.AssignMenusRequest;
 import cn.codesensi.amour.model.request.RoleSaveRequest;
 import cn.codesensi.amour.service.SysRoleService;
+import cn.dev33.satoken.stp.StpUtil;
 import com.mybatisflex.core.paginate.Page;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import static cn.codesensi.amour.model.entity.table.SysRoleTableDef.SYS_ROLE;
@@ -22,6 +24,7 @@ import static cn.codesensi.amour.model.entity.table.SysRoleTableDef.SYS_ROLE;
  * @author codesensi
  * @since 2026-06-28
  */
+@Slf4j
 @ApiResponseBody
 @RequiredArgsConstructor
 @RestController
@@ -39,6 +42,7 @@ public class SysRoleController {
      */
     @DeleteMapping("/delete/{id}")
     public boolean delete(@PathVariable Long id) {
+        log.info("删除角色：operator={}，roleId={}", StpUtil.getLoginIdAsLong(), id);
         return sysRoleService.removeById(id);
     }
 

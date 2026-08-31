@@ -13,6 +13,7 @@ import cn.hutool.core.util.StrUtil;
 import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ import static cn.codesensi.amour.model.entity.table.SysUserRoleTableDef.SYS_USER
  * @author codesensi
  * @since 2026-06-28
  */
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUserRole> implements SysUserRoleService {
@@ -65,6 +67,7 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
         Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.ROLE));
         if (cache == null) {
             // 缓存未注册/未就绪：降级为直接查库
+            log.debug("role 缓存未注册，降级为直接查库：userId={}", userId);
             return loadRoleCodes(userId);
         }
         // 原子回源：未命中时执行 loader 查库并写入，防止缓存击穿

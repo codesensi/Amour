@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(AuthorizationException.class)
     public Result<Void> handleAuthorizationException(AuthorizationException e) {
-        log.error("授权异常：", e);
+        log.warn("AuthorizationException 授权异常：{}", e.getMsg());
         return Result.forbidden(e.getMsg());
     }
 
@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ValidationException.class)
     public Result<Void> handleValidationException(ValidationException e) {
-        log.error("参数异常：", e);
+        log.warn("ValidationException 参数异常：{}", e.getMsg());
         return Result.badRequest(e.getMsg());
     }
 
@@ -60,7 +60,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(BusinessException.class)
     public Result<Void> handleBusinessException(BusinessException e) {
-        log.error("业务异常：", e);
+        log.warn("BusinessException 业务异常：{}", e.getMsg());
         return Result.error(e.getCode(), e.getMsg());
     }
 
@@ -72,14 +72,14 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(SystemException.class)
     public Result<Void> handleSystemException(SystemException e) {
-        log.error("系统异常：", e);
+        log.error("SystemException 系统异常：", e);
         return Result.error(e.getCode(), e.getMsg());
     }
 
     // Sa-Token 异常细分处理
     @ExceptionHandler(SaTokenException.class)
     public Result<Void> handleSaTokenException(SaTokenException e) {
-        log.error("授权异常：", e);
+        log.warn("SaTokenException 授权异常：{}", e.getMessage());
         if (e instanceof NotLoginException notLoginException) {
             if (NotLoginException.TOKEN_FREEZE.equals(notLoginException.getType())) {
                 return Result.forbidden("账号已被冻结");
@@ -97,7 +97,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(BindException.class)
     public Result<Void> handleBindException(BindException e) {
-        log.error("参数异常：", e);
+        log.warn("BindException 参数异常：{}", e.getMessage());
         FieldError fieldError = e.getBindingResult().getFieldError();
         String message = "参数校验未通过";
         if (ObjUtil.isNotNull(fieldError)) {
@@ -115,7 +115,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoResourceFoundException.class)
     public Result<Void> handleNoResourceFoundException(NoResourceFoundException e) {
         String path = e.getResourcePath();
-        log.warn("资源异常：", e);
+        log.warn("NoResourceFoundException 资源异常：path={}", path);
         return Result.notFound("[" + path + "]不存在");
     }
 
@@ -127,7 +127,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public Result<Void> handleException(Exception e) {
-        log.error("未处理的异常：", e);
+        log.error("Exception 未处理异常：", e);
         return Result.systemError(e.getMessage());
     }
 }
