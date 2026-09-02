@@ -68,6 +68,11 @@ public class SysUser extends BaseEntity implements Serializable {
     private String gender;
 
     /**
+     * 用户QQ号码
+     */
+    private String qq;
+
+    /**
      * 用户头像地址
      */
     private String avatar;

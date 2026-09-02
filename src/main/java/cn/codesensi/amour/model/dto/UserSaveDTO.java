@@ -43,6 +43,11 @@ public class UserSaveDTO implements Serializable {
     private String phone;
 
     /**
+     * 用户QQ号码
+     */
+    private String qq;
+
+    /**
      * 用户性别:U-未知,M-男,F-女
      */
     private String gender;
