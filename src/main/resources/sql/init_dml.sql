@@ -22,9 +22,8 @@ FROM (
              (1004, 'qq-service', 'https://q1.qlogo.cn/g?b=qq&nk=%s&s=640', 'STRING', 'base', '用户QQ头像服务地址'),
              (1005, 'avatar-service', 'https://api.dicebear.com/7.x/bottts/svg?seed=%s', 'STRING', 'base', '用户随机头像服务地址'),
              -- site（2000 段）
-             (2001, 'site.title', '爱慕情侣小站', 'STRING', 'site', '门户站点标题'),
-             (2002, 'site.slogan', '爱晨雾漫过青瓦，爱暮色染透篱笆，更爱与君并肩立，看遍这人间烟火里的朝暮与年华。', 'STRING', 'site', '门户站点标语'),
-             (2003, 'site.love-start-date', '2018-07-15 00:00:00', 'STRING', 'site', '门户恋爱计时起点'),
+             (2001, 'site.slogan', '爱晨雾漫过青瓦，爱暮色染透篱笆，更爱与君并肩立，看遍这人间烟火里的朝暮与年华。', 'STRING', 'site', '门户标语'),
+             (2002, 'site.love-start-date', '2018-07-15 00:00:00', 'STRING', 'site', '门户恋爱计时起点'),
              -- captcha（3000 段）
              (3001, 'captcha.enabled', 'false', 'BOOLEAN', 'captcha', '验证码开关'),
              (3002, 'captcha.image-type', 'arithmetic', 'STRING', 'captcha', '图形验证码类型'),

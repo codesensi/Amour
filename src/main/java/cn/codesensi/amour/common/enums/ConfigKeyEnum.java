@@ -22,7 +22,6 @@ public enum ConfigKeyEnum implements BaseEnum<String> {
     AVATAR_SERVICE("avatar-service", "用户随机头像服务地址"),
 
     // ---------- 门户站点配置（site 分组：2000 段） ----------
-    SITE_TITLE("site.title", "门户站点标题"),
     SITE_SLOGAN("site.slogan", "门户站点标语"),
     SITE_LOVE_START_DATE("site.love-start-date", "门户恋爱计时起点"),
 
