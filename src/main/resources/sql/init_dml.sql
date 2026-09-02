@@ -15,21 +15,16 @@ SELECT
     t.remark
 FROM (
          VALUES
-             -- app（1000 段）
-             (1001, 'name', '爱慕情侣小站', 'STRING', 'app', '项目名称'),
-             (1002, 'version', '1.0.0', 'STRING', 'app', '版本号'),
-             (1003, 'author', 'codesensi', 'STRING', 'app', '负责人'),
-             (1004, 'copyright', '2026', 'STRING', 'app', '版权年份'),
-             (1005, 'avatar', 'https://api.dicebear.com/7.x/bottts/svg?seed=%s', 'STRING', 'app', '用户随机头像服务地址'),
-             (1006, 'demo-mode', 'false', 'BOOLEAN', 'app', '演示模式开关'),
+             -- base（1000 段）
+             (1001, 'name', '爱慕情侣小站', 'STRING', 'base', '项目/站点名称'),
+             (1002, 'icp-text', '赣ICP备2026010001号', 'STRING', 'base', 'ICP备案文案'),
+             (1003, 'copyright-year', '2026', 'STRING', 'base', '版权年份'),
+             (1004, 'qq-service', 'https://q1.qlogo.cn/g?b=qq&nk=%s&s=640', 'STRING', 'base', '用户QQ头像服务地址'),
+             (1005, 'avatar-service', 'https://api.dicebear.com/7.x/bottts/svg?seed=%s', 'STRING', 'base', '用户随机头像服务地址'),
              -- site（2000 段）
-             (2001, 'site.slogan', '爱晨雾漫过青瓦，爱暮色染透篱笆，更爱与君并肩立，看遍这人间烟火里的朝暮与年华。', 'STRING', 'site', '门户站点标语'),
-             (2002, 'site.female-name', 'Su', 'STRING', 'site', '门户女主昵称'),
-             (2003, 'site.male-name', 'Li', 'STRING', 'site', '门户男主昵称'),
-             (2004, 'site.female-qq', '673822943', 'STRING', 'site', '门户女主 QQ 号（头像由前端拼接）'),
-             (2005, 'site.male-qq', '2623669948', 'STRING', 'site', '门户男主 QQ 号（头像由前端拼接）'),
-             (2006, 'site.love-start-date', '2018-07-15T00:00:00', 'STRING', 'site', '门户恋爱计时起点'),
-             (2007, 'site.icp-text', '赣ICP备2026010001号', 'STRING', 'site', '门户 ICP 备案文案'),
+             (2001, 'site.title', '爱慕情侣小站', 'STRING', 'site', '门户站点标题'),
+             (2002, 'site.slogan', '爱晨雾漫过青瓦，爱暮色染透篱笆，更爱与君并肩立，看遍这人间烟火里的朝暮与年华。', 'STRING', 'site', '门户站点标语'),
+             (2003, 'site.love-start-date', '2018-07-15 00:00:00', 'STRING', 'site', '门户恋爱计时起点'),
              -- captcha（3000 段）
              (3001, 'captcha.enabled', 'false', 'BOOLEAN', 'captcha', '验证码开关'),
              (3002, 'captcha.image-type', 'arithmetic', 'STRING', 'captcha', '图形验证码类型'),
@@ -43,7 +38,7 @@ WHERE NOT EXISTS (
 -- 数据填充：sys_user（幂等插入）
 -- ----------------------------
 INSERT INTO `sys_user` (
-    `id`, `username`, `password`, `nickname`, `id_card`, `email`, `phone`, `avatar`, `builtin`, `remark`
+    `id`, `username`, `password`, `nickname`, `id_card`, `email`, `phone`, `qq`, `avatar`, `builtin`, `remark`
 )
 SELECT
     t.id,
@@ -53,6 +48,7 @@ SELECT
     t.id_card,
     t.email,
     t.phone,
+    t.qq,
     t.avatar,
     t.builtin,
     t.remark
@@ -65,11 +61,12 @@ FROM (
                     '110101200001010001',
                     'admin@amour.com',
                     '18900000000',
+                    '12345678',
                     'https://api.dicebear.com/7.x/bottts/svg?seed=admin',
                     1,
                     '超级管理员'
                 )
-     ) AS t(id, username, password, nickname, id_card, email, phone, avatar, builtin, remark)
+     ) AS t(id, username, password, nickname, id_card, email, phone, qq, avatar, builtin, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_user` WHERE `sys_user`.`id` = t.id
 );

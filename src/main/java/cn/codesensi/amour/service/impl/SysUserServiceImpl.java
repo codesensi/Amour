@@ -131,7 +131,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         // 默认随机头像：未上传头像时读取系统配置的随机头像服务地址，以用户名作为随机种子生成
         if (StrUtil.isBlank(userSaveDTO.getAvatar())) {
             // 配置缺失/停用时保持头像为空，避免因缺配置导致保存失败
-            String avatarTemplate = sysConfigService.listByKeys(List.of(ConfigKeyEnum.AVATAR.getCode()))
+            String avatarTemplate = sysConfigService.listByKeys(List.of(ConfigKeyEnum.AVATAR_SERVICE.getCode()))
                     .stream().findFirst()
                     .map(ConfigDTO::getConfigValue)
                     .orElse(null);

@@ -24,7 +24,7 @@ public interface SysConfigService {
      * {@code keys} 为空（{@code null} 或不含元素）时返回全部启用的配置；
      * 否则逐个按键查询，仅返回存在且启用的配置。
      *
-     * @param keys 配置键集合（app 之下的点分路径，如 {@code demo-mode}、{@code captcha.image-expire}）；
+     * @param keys 配置键集合（app 之下的点分路径，如 {@code captcha.enabled}、{@code captcha.image-expire}）；
      *             为空时查询全部
      * @return 配置 DTO 列表；无命中时返回空列表
      */
