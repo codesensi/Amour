@@ -16,13 +16,13 @@ public enum ConfigKeyEnum implements BaseEnum<String> {
 
     // ---------- 基础配置（base 分组：1000 段） ----------
     NAME("name", "项目/站点名称"),
-    ICP_TEXT("icp-text", "ICP备案文案"),
+    ICP("icp", "ICP备案文案"),
     COPYRIGHT_YEAR("copyright-year", "版权年份"),
     QQ_SERVICE("qq-service", "用户QQ头像服务地址"),
     AVATAR_SERVICE("avatar-service", "用户随机头像服务地址"),
 
     // ---------- 门户站点配置（site 分组：2000 段） ----------
-    SITE_SLOGAN("site.slogan", "门户站点标语"),
+    SITE_SLOGAN("site.slogan", "门户标语文案"),
     SITE_LOVE_START_DATE("site.love-start-date", "门户恋爱计时起点"),
 
     // ---------- 验证码配置（captcha 分组：3000 段） ----------

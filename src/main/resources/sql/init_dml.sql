@@ -17,15 +17,15 @@ FROM (
          VALUES
              -- base（1000 段）
              (1001, 'name', '爱慕情侣小站', 'STRING', 'base', '项目/站点名称'),
-             (1002, 'icp-text', '赣ICP备2026010001号', 'STRING', 'base', 'ICP备案文案'),
+             (1002, 'icp', '京ICP备2026010001号', 'STRING', 'base', 'ICP备案文案'),
              (1003, 'copyright-year', '2026', 'STRING', 'base', '版权年份'),
              (1004, 'qq-service', 'https://q1.qlogo.cn/g?b=qq&nk=%s&s=640', 'STRING', 'base', '用户QQ头像服务地址'),
              (1005, 'avatar-service', 'https://api.dicebear.com/7.x/bottts/svg?seed=%s', 'STRING', 'base', '用户随机头像服务地址'),
              -- site（2000 段）
-             (2001, 'site.slogan', '爱晨雾漫过青瓦，爱暮色染透篱笆，更爱与君并肩立，看遍这人间烟火里的朝暮与年华。', 'STRING', 'site', '门户标语'),
+             (2001, 'site.slogan', '爱晨雾漫过青瓦，爱暮色染透篱笆，更爱与君并肩立，看遍这人间烟火里的朝暮与年华。', 'STRING', 'site', '门户标语文案'),
              (2002, 'site.love-start-date', '2018-07-15 00:00:00', 'STRING', 'site', '门户恋爱计时起点'),
              -- captcha（3000 段）
-             (3001, 'captcha.enabled', 'false', 'BOOLEAN', 'captcha', '验证码开关'),
+             (3001, 'captcha.enabled', 'true', 'BOOLEAN', 'captcha', '验证码开关'),
              (3002, 'captcha.image-type', 'arithmetic', 'STRING', 'captcha', '图形验证码类型'),
              (3003, 'captcha.image-expire', '300', 'INTEGER', 'captcha', '图形验证码过期秒')
      ) AS t(id, config_key, config_value, value_type, config_group, remark)
