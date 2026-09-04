@@ -44,6 +44,30 @@ public class SysConfigServiceImpl implements SysConfigService {
     private final ConfigConverter configConverter;
 
     /**
+     * 从 config 缓存读取指定配置键当前启用（status=启用）的配置；未命中时回源查库并回填缓存。
+     *
+     * @param key 配置键
+     * @return 启用中的配置实体；不存在或停用返回 {@code null}
+     */
+    @Override
+    public SysConfig oneByKey(String key) {
+        Cache cache = configCache();
+        if (cache == null) {
+            // 缓存未注册/未就绪：降级为直接查库
+            log.debug("config 缓存未注册，降级为直接查库：key={}", key);
+            return oneConfigByKeyFromDb(key);
+        }
+        try {
+            // 原子回源：未命中时执行 loader 查库并写入，防止缓存击穿
+            Object cached = cache.get(key, () -> loadFromDb(key));
+            return cached == CacheConst.NULL_MARKER ? null : (SysConfig) cached;
+        } catch (Cache.ValueRetrievalException e) {
+            // 回源异常时降级为直接查库，避免缓存故障阻断配置读取
+            return oneConfigByKeyFromDb(key);
+        }
+    }
+
+    /**
      * 按配置键集合批量查询配置；入参为空（{@code null} 或不含元素）时返回全部启用的配置。
      * <p>
      * 指定 keys 时逐个按键读取（优先走缓存，未命中回源查库并回填），
@@ -62,7 +86,7 @@ public class SysConfigServiceImpl implements SysConfigService {
             if (key == null) {
                 continue;
             }
-            SysConfig config = oneConfigByKey(key);
+            SysConfig config = oneByKey(key);
             if (config != null) {
                 result.add(configConverter.toDTO(config));
             }
@@ -91,29 +115,6 @@ public class SysConfigServiceImpl implements SysConfigService {
             if (key != null) {
                 cache.evict(key);
             }
-        }
-    }
-
-    /**
-     * 从 config 缓存读取指定配置键当前启用（status=启用）的配置；未命中时回源查库并回填缓存。
-     *
-     * @param key 配置键
-     * @return 启用中的配置实体；不存在或停用返回 {@code null}
-     */
-    private SysConfig oneConfigByKey(String key) {
-        Cache cache = configCache();
-        if (cache == null) {
-            // 缓存未注册/未就绪：降级为直接查库
-            log.debug("config 缓存未注册，降级为直接查库：key={}", key);
-            return oneConfigByKeyFromDb(key);
-        }
-        try {
-            // 原子回源：未命中时执行 loader 查库并写入，防止缓存击穿
-            Object cached = cache.get(key, () -> loadFromDb(key));
-            return cached == CacheConst.NULL_MARKER ? null : (SysConfig) cached;
-        } catch (Cache.ValueRetrievalException e) {
-            // 回源异常时降级为直接查库，避免缓存故障阻断配置读取
-            return oneConfigByKeyFromDb(key);
         }
     }
 

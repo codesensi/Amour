@@ -1,6 +1,7 @@
 package cn.codesensi.amour.service;
 
 import cn.codesensi.amour.model.dto.ConfigDTO;
+import cn.codesensi.amour.model.entity.SysConfig;
 
 import java.util.List;
 
@@ -17,6 +18,14 @@ import java.util.List;
  * @since 1.0
  */
 public interface SysConfigService {
+
+    /**
+     * 从 config 缓存读取指定配置键当前启用（status=启用）的配置；未命中时回源查库并回填缓存。
+     *
+     * @param key 配置键
+     * @return 启用中的配置实体；不存在或停用返回 {@code null}
+     */
+    SysConfig oneByKey(String key);
 
     /**
      * 按配置键集合批量查询配置。
