@@ -13,6 +13,6 @@ public interface CaptchaService {
      *
      * @return 验证码
      */
-    CaptchaResultDTO captcha();
+    CaptchaResultDTO genCaptcha();
 
 }

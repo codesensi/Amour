@@ -30,7 +30,7 @@ public class CaptchaController {
     @SaIgnore
     @GetMapping("/captcha")
     public CaptchaResponse captcha() {
-        CaptchaResultDTO captchaResultDTO = captchaService.captcha();
+        CaptchaResultDTO captchaResultDTO = captchaService.genCaptcha();
         return captchaConverter.toResponse(captchaResultDTO);
     }
 }

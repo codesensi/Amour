@@ -67,7 +67,7 @@ public class CaptchaServiceImpl implements CaptchaService {
      * @throws SystemException 图形验证码类型配置错误或缓存未注册时抛出
      */
     @Override
-    public CaptchaResultDTO captcha() {
+    public CaptchaResultDTO genCaptcha() {
         // 读取图形验证码类型配置（实时读取支持热更新；未配置时默认算术验证码）
         String imageTypeCode = sysConfigService.listByKeys(List.of(ConfigKeyEnum.CAPTCHA_IMAGE_TYPE.getCode()))
                 .stream().findFirst()
