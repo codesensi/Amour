@@ -6,6 +6,7 @@ spring-boot = "4.1.1"
 # 顺序与下方 [libraries] 的「第三方库」板块及 build.gradle 的第三方分组保持一致
 sa-token = "1.46.0"
 sa-token-jwt = "1.46.0"
+hutool = "5.8.47"
 easy-captcha = "1.6.2"
 mybatis-flex = "1.11.8"
 ip2region = "3.3.7"
@@ -36,6 +37,7 @@ lombok = { module = "org.projectlombok:lombok" }
 # ===== 第三方库（自定版本）——对应 build.gradle 的 implementation「第三方框架/库」与 annotationProcessor 分组 =====
 sa-token-springboot4-starter = { module = "cn.dev33:sa-token-spring-boot4-starter", version.ref = "sa-token" }
 sa-token-jwt = { module = "cn.dev33:sa-token-jwt", version.ref = "sa-token-jwt" }
+hutool-all = { module = "cn.hutool:hutool-all", version.ref = "hutool" }
 easy-captcha = { module = "com.github.whvcse:easy-captcha", version.ref = "easy-captcha" }
 mybatis-flex-starter = { module = "com.mybatis-flex:mybatis-flex-spring-boot4-starter", version.ref = "mybatis-flex" }
 mybatis-flex-processor = { module = "com.mybatis-flex:mybatis-flex-processor", version.ref = "mybatis-flex" }

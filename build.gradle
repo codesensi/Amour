@@ -52,6 +52,7 @@ dependencies {
     // ---------- implementation：第三方框架 / 库（按依赖坐标字母序，对应 TOML「第三方库」板块） ----------
     implementation libs.sa.token.springboot4.starter // Sa-Token 鉴权框架（Spring Boot 4 Starter）
     implementation libs.sa.token.jwt                 // Sa-Token JWT 插件（Simple 简单模式）
+    implementation libs.hutool.all                       // Hutool 全模块：服务端转发调用头像服务
     implementation libs.caffeine                     // Caffeine 本地缓存实现
     implementation libs.easy.captcha                 // EasyCaptcha：图形/算术验证码生成
     implementation libs.mybatis.flex.starter         // MyBatis-Flex ORM
