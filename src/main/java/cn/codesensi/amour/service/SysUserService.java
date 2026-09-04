@@ -2,8 +2,10 @@ package cn.codesensi.amour.service;
 
 import cn.codesensi.amour.model.dto.AssignRolesDTO;
 import cn.codesensi.amour.model.dto.UserInfoDTO;
+import cn.codesensi.amour.model.dto.UserPageDTO;
 import cn.codesensi.amour.model.dto.UserSaveDTO;
 import cn.codesensi.amour.model.entity.SysUser;
+import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 
 import java.util.List;
@@ -15,6 +17,14 @@ import java.util.List;
  * 业务方法按需在后续迭代中补充。
  */
 public interface SysUserService extends IService<SysUser> {
+
+    /**
+     * 分页查询用户信息
+     *
+     * @param userPageDTO 分页查询参数
+     * @return 用户信息分页结果
+     */
+    Page<SysUser> page(UserPageDTO userPageDTO);
 
     /**
      * 获取当前用户信息

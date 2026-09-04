@@ -2,6 +2,7 @@ package cn.codesensi.amour.service.impl;
 
 import cn.codesensi.amour.common.consts.AppConst;
 import cn.codesensi.amour.common.consts.CacheConst;
+import cn.codesensi.amour.common.core.BasePage;
 import cn.codesensi.amour.common.enums.BuiltinEnum;
 import cn.codesensi.amour.common.enums.ConfigKeyEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
@@ -9,10 +10,7 @@ import cn.codesensi.amour.common.util.CacheUtil;
 import cn.codesensi.amour.mapper.SysRoleMapper;
 import cn.codesensi.amour.mapper.SysUserMapper;
 import cn.codesensi.amour.model.converter.SysUserConverter;
-import cn.codesensi.amour.model.dto.AssignRolesDTO;
-import cn.codesensi.amour.model.dto.ConfigDTO;
-import cn.codesensi.amour.model.dto.UserInfoDTO;
-import cn.codesensi.amour.model.dto.UserSaveDTO;
+import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.SysMenu;
 import cn.codesensi.amour.model.entity.SysUser;
 import cn.codesensi.amour.model.entity.SysUserRole;
@@ -24,6 +22,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.BCrypt;
+import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +55,30 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private final SysUserRoleService sysUserRoleService;
     private final SysConfigService sysConfigService;
     private final CacheManager cacheManager;
+
+    /**
+     * 分页查询用户信息。
+     * <p>
+     * 用户名称、手机号为模糊匹配,状态为精确匹配,条件缺省时自动忽略;
+     * 页码与每页条数的缺省值由 {@link BasePage} 提供(1 与 20),与前端默认值保持一致。
+     *
+     * @param userPageDTO 分页查询参数
+     * @return 用户信息分页结果
+     */
+    @Override
+    public Page<SysUser> page(UserPageDTO userPageDTO) {
+        return QueryChain.of(sysUserMapper)
+                .select(SYS_USER.ALL_COLUMNS)
+                .where(SYS_USER.USERNAME.like(userPageDTO.getUsername(), StrUtil::isNotBlank))
+                .and(SYS_USER.NICKNAME.like(userPageDTO.getNickname(), StrUtil::isNotBlank))
+                .and(SYS_USER.ID_CARD.like(userPageDTO.getIdCard(), StrUtil::isNotBlank))
+                .and(SYS_USER.PHONE.like(userPageDTO.getPhone(), StrUtil::isNotBlank))
+                .and(SYS_USER.QQ.like(userPageDTO.getQq(), StrUtil::isNotBlank))
+                .and(SYS_USER.EMAIL.like(userPageDTO.getEmail(), StrUtil::isNotBlank))
+                .and(SYS_USER.GENDER.eq(userPageDTO.getGender(), StrUtil::isNotBlank))
+                .and(SYS_USER.STATUS.eq(userPageDTO.getStatus(), ObjUtil::isNotNull))
+                .page(Page.of(userPageDTO.getPageNumber(), userPageDTO.getPageSize()));
+    }
 
     /**
      * 获取当前用户信息。
