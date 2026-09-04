@@ -45,6 +45,12 @@ public class CacheConst {
     public static final String USER = "user";
 
     /**
+     * QQ 信息缓存名（基础缓存名，实际使用时经 {@link CacheUtil#withAppEnv(String)} 拼接项目名_运行环境前缀），
+     * Key 为 QQ 号，存储上游服务解析出的头像地址与昵称
+     */
+    public static final String QQ_INFO = "qq-info";
+
+    /**
      * 缓存空值哨兵：Caffeine 不允许缓存 {@code null}，用该哨兵占位表示"数据不存在"，
      * 读取时再还原为 {@code null}，从而使"不存在"的结果也能被缓存，避免反复回源。
      */
