@@ -28,6 +28,11 @@ public class PortalHeroUserResponse implements Serializable {
     private String nickname;
 
     /**
+     * 用户名称
+     */
+    private String username;
+
+    /**
      * 用户头像地址（用户表上传头像，未维护时为 null）
      */
     private String avatar;
