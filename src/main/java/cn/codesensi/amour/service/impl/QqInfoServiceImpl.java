@@ -75,7 +75,11 @@ public class QqInfoServiceImpl implements QqInfoService {
             log.warn("QQ 信息查询服务响应为空");
             return new QqInfoResultDTO();
         }
-        return JSONUtil.toBean(qqServiceResponse, QqInfoResultDTO.class);
+        QqInfoResultDTO qqInfoResultDTO = JSONUtil.toBean(qqServiceResponse, QqInfoResultDTO.class);
+        if (qqInfoResultDTO.getAvatarUrl().startsWith("http://")) {
+            qqInfoResultDTO.setAvatarUrl(qqInfoResultDTO.getAvatarUrl().replace("http://", "https://"));
+        }
+        return qqInfoResultDTO;
     }
 
 }
