@@ -37,7 +37,7 @@ WHERE NOT EXISTS (
 -- 数据填充：sys_user（幂等插入）
 -- ----------------------------
 INSERT INTO `sys_user` (
-    `id`, `username`, `password`, `nickname`, `id_card`, `email`, `phone`, `qq`, `avatar`, `builtin`, `remark`
+    `id`, `username`, `password`, `nickname`, `id_card`, `email`, `phone`, `gender`, `qq`, `avatar`, `builtin`, `remark`
 )
 SELECT
     t.id,
@@ -47,25 +47,50 @@ SELECT
     t.id_card,
     t.email,
     t.phone,
+    t.gender,
     t.qq,
     t.avatar,
     t.builtin,
     t.remark
 FROM (
-         VALUES (
-                    1,
-                    'admin',
-                    '$2a$10$U.k0b43Pwg./Jg2QQl4bMOukItbYg4aYhKsciMamtHWvp3JEF2ism',
-                    '超级管理员',
-                    '110101200001010001',
-                    'admin@amour.com',
-                    '18900000000',
-                    '12345678',
-                    'https://api.dicebear.com/7.x/bottts/svg?seed=admin',
-                    1,
-                    '超级管理员'
-                )
-     ) AS t(id, username, password, nickname, id_card, email, phone, qq, avatar, builtin, remark)
+         VALUES
+             (1,
+              'admin',
+              '$2a$10$U.k0b43Pwg./Jg2QQl4bMOukItbYg4aYhKsciMamtHWvp3JEF2ism',
+              '超级管理员',
+              '110101200001010001',
+              'admin@amour.com',
+              '18900000000',
+              'U',
+              '12345678',
+              'https://api.dicebear.com/7.x/bottts/svg?seed=admin',
+              1,
+              '系统内置超级管理员'),
+             (2,
+              'li',
+              '$2a$10$U.k0b43Pwg./Jg2QQl4bMOukItbYg4aYhKsciMamtHWvp3JEF2ism',
+              'Li',
+              NULL,
+              NULL,
+              NULL,
+              'M',
+              '2623669948',
+              NULL,
+              1,
+              '系统内置门户男主'),
+             (3,
+              'su',
+              '$2a$10$U.k0b43Pwg./Jg2QQl4bMOukItbYg4aYhKsciMamtHWvp3JEF2ism',
+              'Su',
+              NULL,
+              NULL,
+              NULL,
+              'F',
+              '673822943',
+              NULL,
+              1,
+              '系统内置门户女主')
+     ) AS t(id, username, password, nickname, id_card, email, phone, gender, qq, avatar, builtin, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_user` WHERE `sys_user`.`id` = t.id
 );
@@ -74,27 +99,20 @@ WHERE NOT EXISTS (
 -- 数据填充：sys_role（幂等插入）
 -- ----------------------------
 INSERT INTO `sys_role` (
-    `id`, `name`, `code`, `sort`, `status`, `builtin`, `remark`
+    `id`, `name`, `code`, `sort`, `builtin`, `remark`
 )
 SELECT
     t.id,
     t.name,
     t.code,
     t.sort,
-    t.status,
     t.builtin,
     t.remark
 FROM (
-         VALUES (
-                     1,
-                     '超级管理员',
-                     'admin',
-                     1,
-                     0,
-                     1,
-                     '系统内置超级管理员角色'
-                 )
-     ) AS t(id, name, code, sort, status, builtin, remark)
+         VALUES
+             (1, '超级管理员', 'admin', 1, 1, '系统内置超级管理员角色'),
+             (2, '主角', 'hero', 2, 1, '系统内置门户主角角色')
+     ) AS t(id, name, code, sort, builtin, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_role` WHERE `sys_role`.`id` = t.id
 );
@@ -110,11 +128,10 @@ SELECT
     t.user_id,
     t.role_id
 FROM (
-         VALUES (
-                     1,
-                     1,
-                     1
-                 )
+         VALUES
+             (1, 1, 1),
+             (2, 2, 2),
+             (3, 3, 2)
      ) AS t(id, user_id, role_id)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_user_role` WHERE `sys_user_role`.`id` = t.id

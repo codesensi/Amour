@@ -24,6 +24,11 @@ public class RbacConst {
     public static final String ROLE_ADMIN_CODE = "admin";
 
     /**
+     * 门户主角角色标识
+     */
+    public static final String ROLE_HERO_CODE = "hero";
+
+    /**
      * 超级管理员权限码
      */
     public static final String PERM_ADMIN_CODE = "*:*:*";
