@@ -94,21 +94,23 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     public UserInfoDTO getCurrentUser(Long userId) {
         Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.USER));
         // 资料部分走 user 缓存（仅 DB 维度的用户资料，不含角色/权限/菜单）
-        UserInfoDTO userInfo;
+        UserInfoDTO userInfoDTO;
         if (cache == null) {
             // 缓存未注册/未就绪：降级为直接查库
             log.debug("userInfo 缓存未注册，降级为直接查库：userId={}", userId);
-            userInfo = loadUserProfile(userId);
+            userInfoDTO = loadUserProfile(userId);
         } else {
-            userInfo = cache.get(userId, () -> loadUserProfile(userId));
+            userInfoDTO = cache.get(userId, () -> loadUserProfile(userId));
         }
-        // 角色与权限：实时装配（各自有 role/perm 缓存加速；StpInterfaceImpl 即转发至这两个方法，行为与 StpUtil 等价）
-        userInfo.setRoles(sysUserRoleService.listRoleCodeByUserId(userId));
-        userInfo.setPerms(sysMenuService.listPermCodeByUserId(userId));
-        // 拥有的菜单（menu 缓存加速）
-        List<SysMenu> menus = sysMenuService.listMenuByUserId(userId);
-        userInfo.setMenus(sysUserConverter.toMenuDTOList(menus));
-        return userInfo;
+        if (ObjUtil.isNotNull(userInfoDTO)) {
+            // 角色与权限：实时装配（各自有 role/perm 缓存加速；StpInterfaceImpl 即转发至这两个方法，行为与 StpUtil 等价）
+            userInfoDTO.setRoles(sysUserRoleService.listRoleCodeByUserId(userId));
+            userInfoDTO.setPerms(sysMenuService.listPermCodeByUserId(userId));
+            // 拥有的菜单（menu 缓存加速）
+            List<SysMenu> menus = sysMenuService.listMenuByUserId(userId);
+            userInfoDTO.setMenus(sysUserConverter.toMenuDTOList(menus));
+        }
+        return userInfoDTO;
     }
 
     /**
