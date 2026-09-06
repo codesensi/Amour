@@ -4,12 +4,12 @@ import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.model.converter.UserConverter;
 import cn.codesensi.amour.model.dto.AssignRolesDTO;
 import cn.codesensi.amour.model.dto.UserInfoDTO;
+import cn.codesensi.amour.model.dto.UserInsertDTO;
 import cn.codesensi.amour.model.dto.UserPageDTO;
-import cn.codesensi.amour.model.dto.UserSaveDTO;
 import cn.codesensi.amour.model.entity.SysUser;
 import cn.codesensi.amour.model.request.AssignRolesRequest;
+import cn.codesensi.amour.model.request.UserInsertRequest;
 import cn.codesensi.amour.model.request.UserPageRequest;
-import cn.codesensi.amour.model.request.UserSaveRequest;
 import cn.codesensi.amour.model.response.UserInfoResponse;
 import cn.codesensi.amour.model.response.UserPageResponse;
 import cn.codesensi.amour.service.SysUserService;
@@ -63,14 +63,14 @@ public class SysUserController {
     }
 
     /**
-     * 保存用户信息
+     * 新增用户信息
      *
-     * @param request 保存用户请求参数
+     * @param request 新增用户请求参数
      */
     @PostMapping("/insert")
-    public void insert(@Valid @RequestBody UserSaveRequest request) {
-        UserSaveDTO userSaveDTO = userConverter.toSaveDTO(request);
-        sysUserService.insert(userSaveDTO);
+    public void insert(@Valid @RequestBody UserInsertRequest request) {
+        UserInsertDTO userInsertDTO = userConverter.toInsertDTO(request);
+        sysUserService.insert(userInsertDTO);
     }
 
     /**

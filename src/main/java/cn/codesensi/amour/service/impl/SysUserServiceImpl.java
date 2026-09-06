@@ -9,6 +9,7 @@ import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.util.CacheUtil;
 import cn.codesensi.amour.mapper.SysRoleMapper;
 import cn.codesensi.amour.mapper.SysUserMapper;
+import cn.codesensi.amour.model.converter.MenuConverter;
 import cn.codesensi.amour.model.converter.UserConverter;
 import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.SysMenu;
@@ -52,6 +53,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private final SysUserMapper sysUserMapper;
     private final SysRoleMapper sysRoleMapper;
     private final UserConverter userConverter;
+    private final MenuConverter menuConverter;
     private final SysUserRoleService sysUserRoleService;
     private final SysConfigService sysConfigService;
     private final CacheManager cacheManager;
@@ -108,7 +110,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             userInfoDTO.setPerms(sysMenuService.listPermCodeByUserId(userId));
             // 拥有的菜单（menu 缓存加速）
             List<SysMenu> menus = sysMenuService.listMenuByUserId(userId);
-            userInfoDTO.setMenus(userConverter.toMenuDTOList(menus));
+            userInfoDTO.setMenus(menuConverter.toDTOList(menus));
         }
         return userInfoDTO;
     }
@@ -131,13 +133,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     /**
-     * 保存用户信息
+     * 新增用户信息
      *
-     * @param userSaveDTO 用户信息
+     * @param userInsertDTO 用户信息
      */
     @Override
-    public void insert(UserSaveDTO userSaveDTO) {
-        String username = userSaveDTO.getUsername();
+    public void insert(UserInsertDTO userInsertDTO) {
+        String username = userInsertDTO.getUsername();
         // 校验用户名是否存在
         long count = QueryChain.of(sysUserMapper)
                 .where(SYS_USER.USERNAME.eq(username))
@@ -146,15 +148,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             throw new BusinessException("用户名已存在");
         }
 
-        SysUser sysUser = userConverter.toEntity(userSaveDTO);
+        SysUser sysUser = userConverter.toEntity(userInsertDTO);
         // 若未输入昵称则保持昵称和用户名相同
-        if (StrUtil.isBlank(userSaveDTO.getNickname())) {
+        if (StrUtil.isBlank(userInsertDTO.getNickname())) {
             log.debug("未输入昵称，默认与用户名一致：username={}", username);
             sysUser.setNickname(username);
         }
 
         // 默认随机头像：未上传头像时读取系统配置的随机头像服务地址，以用户名作为随机种子生成
-        if (StrUtil.isBlank(userSaveDTO.getAvatar())) {
+        if (StrUtil.isBlank(userInsertDTO.getAvatar())) {
             // 配置缺失/停用时保持头像为空，避免因缺配置导致保存失败
             String avatarTemplate = sysConfigService.listByKeys(List.of(ConfigKeyEnum.AVATAR_SERVICE.getCode()))
                     .stream().findFirst()

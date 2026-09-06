@@ -9,13 +9,13 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 保存用户请求参数
+ * 新增用户请求参数
  *
  * @author codesensi
  * @since 2026-06-28
  */
 @Data
-public class UserSaveRequest implements Serializable {
+public class UserInsertRequest implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

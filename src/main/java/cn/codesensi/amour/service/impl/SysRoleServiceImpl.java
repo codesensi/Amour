@@ -6,7 +6,7 @@ import cn.codesensi.amour.common.util.CacheUtil;
 import cn.codesensi.amour.mapper.SysRoleMapper;
 import cn.codesensi.amour.model.converter.RoleConverter;
 import cn.codesensi.amour.model.dto.AssignMenusDTO;
-import cn.codesensi.amour.model.dto.RoleSaveDTO;
+import cn.codesensi.amour.model.dto.RoleInsertDTO;
 import cn.codesensi.amour.model.entity.SysMenu;
 import cn.codesensi.amour.model.entity.SysRole;
 import cn.codesensi.amour.model.entity.SysRoleMenu;
@@ -49,13 +49,13 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     private final SysUserService sysUserService;
 
     /**
-     * 保存角色信息
+     * 新增角色信息
      *
-     * @param roleSaveDTO 角色信息
+     * @param roleInsertDTO 角色信息
      */
     @Override
-    public void insert(RoleSaveDTO roleSaveDTO) {
-        String code = roleSaveDTO.getCode();
+    public void insert(RoleInsertDTO roleInsertDTO) {
+        String code = roleInsertDTO.getCode();
         // 校验角色编码是否存在
         long count = QueryChain.of(sysRoleMapper)
                 .where(SYS_ROLE.CODE.eq(code))
@@ -64,7 +64,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             throw new BusinessException("角色编码已存在");
         }
 
-        SysRole sysRole = roleConverter.toEntity(roleSaveDTO);
+        SysRole sysRole = roleConverter.toEntity(roleInsertDTO);
         sysRoleMapper.insert(sysRole, true);
     }
 

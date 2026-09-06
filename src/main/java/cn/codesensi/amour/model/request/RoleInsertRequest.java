@@ -8,13 +8,13 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 保存角色请求参数
+ * 新增角色请求参数
  *
  * @author codesensi
  * @since 2026-06-28
  */
 @Data
-public class RoleSaveRequest implements Serializable {
+public class RoleInsertRequest implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

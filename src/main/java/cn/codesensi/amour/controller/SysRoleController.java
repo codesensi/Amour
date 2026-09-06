@@ -3,9 +3,9 @@ package cn.codesensi.amour.controller;
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.model.converter.RoleConverter;
 import cn.codesensi.amour.model.dto.AssignMenusDTO;
-import cn.codesensi.amour.model.dto.RoleSaveDTO;
+import cn.codesensi.amour.model.dto.RoleInsertDTO;
 import cn.codesensi.amour.model.request.AssignMenusRequest;
-import cn.codesensi.amour.model.request.RoleSaveRequest;
+import cn.codesensi.amour.model.request.RoleInsertRequest;
 import cn.codesensi.amour.service.SysRoleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,14 +28,14 @@ public class SysRoleController {
     private final RoleConverter roleConverter;
 
     /**
-     * 保存角色信息
+     * 新增角色信息
      *
-     * @param request 角色信息
+     * @param request 新增角色请求参数
      */
     @PostMapping("/insert")
-    public void insert(@Valid @RequestBody RoleSaveRequest request) {
-        RoleSaveDTO roleSaveDTO = roleConverter.toSaveDTO(request);
-        sysRoleService.insert(roleSaveDTO);
+    public void insert(@Valid @RequestBody RoleInsertRequest request) {
+        RoleInsertDTO roleInsertDTO = roleConverter.toInsertDTO(request);
+        sysRoleService.insert(roleInsertDTO);
     }
 
     /**
