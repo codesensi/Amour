@@ -46,11 +46,11 @@ public class RbacConst {
     /**
      * 登录接口路径
      */
-    public static final String LOGIN_PATH = "/auth/login";
+    public static final String LOGIN_PATH = "/login";
 
     /**
      * 退出登录接口路径
      */
-    public static final String LOGOUT_PATH = "/auth/logout";
+    public static final String LOGOUT_PATH = "/logout";
 
 }
