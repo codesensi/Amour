@@ -30,7 +30,7 @@ import static cn.codesensi.amour.model.entity.table.SysUserTableDef.SYS_USER;
 /**
  * 登录接口实现。
  * <p>
- * 账号（用户名/手机号/邮箱）+ 密码登录：按需校验图形验证码 → 校验账号密码 →
+ * 账号（用户名/QQ号）+ 密码登录：按需校验图形验证码 → 校验账号密码 →
  * 校验账号封禁状态 → 执行登录并返回令牌信息。
  * 验证码开关实时读取 sys_config 的 {@code captcha.enabled} 配置，支持热更新。
  */
@@ -70,12 +70,11 @@ public class LoginServiceImpl implements LoginService {
             checkCaptcha(loginDTO);
         }
 
-        // 校验用户及密码（用户名/手机号/邮箱任一匹配即可登录）
+        // 校验用户及密码（用户名/QQ号邮箱任一匹配即可登录）
         SysUser sysUser = sysUserService.queryChain()
-                .select(SYS_USER.ID, SYS_USER.USERNAME, SYS_USER.PHONE, SYS_USER.EMAIL, SYS_USER.NICKNAME, SYS_USER.PASSWORD)
+                .select(SYS_USER.ID, SYS_USER.PASSWORD)
                 .where(SYS_USER.USERNAME.eq(username))
-                .or(SYS_USER.PHONE.eq(username))
-                .or(SYS_USER.EMAIL.eq(username))
+                .or(SYS_USER.QQ.eq(username))
                 .one();
         if (ObjUtil.isNull(sysUser) || StrUtil.isBlank(sysUser.getPassword())
                 || !BCrypt.checkpw(password, sysUser.getPassword())) {
