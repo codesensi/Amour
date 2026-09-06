@@ -57,7 +57,7 @@ FROM (
               '超级管理员',
               'U',
               '12345678',
-              'https://api.dicebear.com/7.x/bottts/svg?seed=admin',
+              NULL
               1,
               '系统内置超级管理员'),
              (2,
