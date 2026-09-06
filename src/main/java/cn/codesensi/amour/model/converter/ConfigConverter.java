@@ -2,6 +2,7 @@ package cn.codesensi.amour.model.converter;
 
 import cn.codesensi.amour.model.dto.ConfigDTO;
 import cn.codesensi.amour.model.entity.SysConfig;
+import cn.codesensi.amour.model.response.ConfigResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 
@@ -35,5 +36,21 @@ public interface ConfigConverter {
      * @return 配置 DTO 列表
      */
     List<ConfigDTO> toDTOList(List<SysConfig> configs);
+
+    /**
+     * 将配置 DTO 转换为响应对象。
+     *
+     * @param configDTO 配置 DTO
+     * @return 配置响应对象
+     */
+    ConfigResponse toResponse(ConfigDTO configDTO);
+
+    /**
+     * 将配置 DTO 列表转换为响应对象列表（逐元素复用 {@link #toResponse(ConfigDTO)} 的映射规则）。
+     *
+     * @param configDTOs 配置 DTO 列表
+     * @return 配置响应对象列表
+     */
+    List<ConfigResponse> toResponseList(List<ConfigDTO> configDTOs);
 
 }

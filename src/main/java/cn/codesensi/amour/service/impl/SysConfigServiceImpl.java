@@ -55,31 +55,35 @@ public class SysConfigServiceImpl implements SysConfigService {
         if (cache == null) {
             // 缓存未注册/未就绪：降级为直接查库
             log.debug("config 缓存未注册，降级为直接查库：key={}", key);
-            return oneConfigByKeyFromDb(key);
+            return oneByKeyDb(key);
         }
         try {
             // 原子回源：未命中时执行 loader 查库并写入，防止缓存击穿
-            Object cached = cache.get(key, () -> loadFromDb(key));
+            Object cached = cache.get(key, () -> {
+                SysConfig config = oneByKeyDb(key);
+                log.debug("config 缓存回源查库：key={}，result={}", key, config == null ? "不存在，以空值哨兵占位" : "已加载");
+                return config == null ? CacheConst.NULL_MARKER : config;
+            });
             return cached == CacheConst.NULL_MARKER ? null : (SysConfig) cached;
         } catch (Cache.ValueRetrievalException e) {
             // 回源异常时降级为直接查库，避免缓存故障阻断配置读取
-            return oneConfigByKeyFromDb(key);
+            return oneByKeyDb(key);
         }
     }
 
     /**
-     * 按配置键集合批量查询配置；入参为空（{@code null} 或不含元素）时返回全部启用的配置。
+     * 按配置键集合批量查询配置；入参为空（{@code null} 或不含元素）时返回空列表。
      * <p>
      * 指定 keys 时逐个按键读取（优先走缓存，未命中回源查库并回填），
      * 不存在或停用的配置键不出现在结果中，集合中的 {@code null} 元素会被跳过。
      *
-     * @param keys 待查询的配置键集合（app 之下的点分路径）；为空时查询全部
+     * @param keys 待查询的配置键集合（app 之下的点分路径）；为空时返回空列表
      * @return 配置 DTO 列表；无命中时返回空列表
      */
     @Override
     public List<ConfigDTO> listByKeys(List<String> keys) {
         if (CollUtil.isEmpty(keys)) {
-            return listAllFromDb();
+            return List.of();
         }
         List<ConfigDTO> result = new ArrayList<>();
         for (String key : keys) {
@@ -119,18 +123,6 @@ public class SysConfigServiceImpl implements SysConfigService {
     }
 
     /**
-     * 配置缓存回源加载器：查库一次并回填；未命中（不存在/停用）以 {@link CacheConst#NULL_MARKER} 哨兵占位。
-     *
-     * @param key 配置键
-     * @return 配置实体或空值哨兵
-     */
-    private Object loadFromDb(String key) {
-        SysConfig config = oneConfigByKeyFromDb(key);
-        log.debug("config 缓存回源查库：key={}，result={}", key, config == null ? "不存在，以空值哨兵占位" : "已加载");
-        return config == null ? CacheConst.NULL_MARKER : config;
-    }
-
-    /**
      * 获取 config 缓存实例；未注册该缓存时返回 {@code null}。
      *
      * @return config 缓存，或 {@code null}
@@ -145,30 +137,10 @@ public class SysConfigServiceImpl implements SysConfigService {
      * @param key 配置键
      * @return 启用中的配置实体；不存在或停用返回 {@code null}
      */
-    private SysConfig oneConfigByKeyFromDb(String key) {
+    private SysConfig oneByKeyDb(String key) {
         return QueryChain.of(sysConfigMapper)
                 .where(SYS_CONFIG.CONFIG_KEY.eq(key))
                 .and(SYS_CONFIG.STATUS.eq(EnableEnum.ENABLE.getCode()))
                 .one();
-    }
-
-    /**
-     * 查询全部启用（status=启用）的配置。
-     * <p>缓存就绪时逐条回填缓存，顺带完成常用配置点的预热。
-     *
-     * @return 配置 DTO 列表；无数据时返回空列表
-     */
-    private List<ConfigDTO> listAllFromDb() {
-        List<SysConfig> configs = QueryChain.of(sysConfigMapper)
-                .where(SYS_CONFIG.STATUS.eq(EnableEnum.ENABLE.getCode()))
-                .list();
-        Cache cache = configCache();
-        // 缓存就绪时逐条回填缓存，顺带完成常用配置点的预热
-        if (cache != null) {
-            for (SysConfig config : configs) {
-                cache.put(config.getConfigKey(), config);
-            }
-        }
-        return configConverter.toDTOList(configs);
     }
 }
