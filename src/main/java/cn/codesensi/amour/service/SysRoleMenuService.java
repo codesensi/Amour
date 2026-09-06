@@ -30,4 +30,12 @@ public interface SysRoleMenuService extends IService<SysRoleMenu> {
      */
     List<SysMenu> listMenuByRoleCodeList(List<String> roleCodeList);
 
+    /**
+     * 查询角色已分配的菜单ID列表
+     *
+     * @param roleId 角色ID
+     * @return 菜单ID列表
+     */
+    List<Long> listMenuIdsByRoleId(Long roleId);
+
 }

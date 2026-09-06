@@ -165,6 +165,17 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     }
 
     /**
+     * 查询角色已分配的菜单ID列表。
+     *
+     * @param roleId 角色ID
+     * @return 菜单ID列表
+     */
+    @Override
+    public List<Long> listMenuIdsByRoleId(Long roleId) {
+        return sysRoleMenuService.listMenuIdsByRoleId(roleId);
+    }
+
+    /**
      * 校验待分配的菜单是否都存在（逻辑删除的菜单视为不存在），避免产生悬空关联。
      *
      * @param menuIds 去重后的菜单ID列表

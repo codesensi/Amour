@@ -7,6 +7,8 @@ import cn.codesensi.amour.model.entity.SysRole;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 
+import java.util.List;
+
 /**
  * 角色信息表 服务层。
  *
@@ -36,4 +38,12 @@ public interface SysRoleService extends IService<SysRole> {
      * @param assignMenusDTO 角色菜单权限信息
      */
     void assignMenus(AssignMenusDTO assignMenusDTO);
+
+    /**
+     * 查询角色已分配的菜单ID列表
+     *
+     * @param roleId 角色ID
+     * @return 菜单ID列表
+     */
+    List<Long> listMenuIdsByRoleId(Long roleId);
 }

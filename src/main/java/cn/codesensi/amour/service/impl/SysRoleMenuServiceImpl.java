@@ -74,4 +74,18 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
                 .orderBy(SYS_MENU.SORT, true)
                 .list();
     }
+
+    /**
+     * 查询角色已分配的菜单ID列表
+     *
+     * @param roleId 角色ID
+     * @return 菜单ID列表
+     */
+    @Override
+    public List<Long> listMenuIdsByRoleId(Long roleId) {
+        return queryChain()
+                .select(SYS_ROLE_MENU.MENU_ID)
+                .where(SYS_ROLE_MENU.ROLE_ID.eq(roleId))
+                .listAs(Long.class);
+    }
 }

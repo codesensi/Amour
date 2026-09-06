@@ -16,6 +16,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 /**
  * 角色信息表 控制层。
@@ -67,6 +69,18 @@ public class SysRoleController {
     public void assignMenus(@Valid @RequestBody AssignMenusRequest request) {
         AssignMenusDTO assignMenusDTO = roleConverter.toAssignMenusDTO(request);
         sysRoleService.assignMenus(assignMenusDTO);
+    }
+
+    /**
+     * 查询角色已分配的菜单ID列表（授权弹窗预勾选用）。
+     *
+     * @param id 角色ID
+     * @return 菜单ID列表
+     */
+    @GetMapping("/menu-ids/{id}")
+    public List<String> menuIds(@PathVariable Long id) {
+        return sysRoleService.listMenuIdsByRoleId(id)
+                .stream().map(String::valueOf).toList();
     }
 
 }
