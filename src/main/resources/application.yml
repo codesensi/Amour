@@ -11,9 +11,6 @@ spring:
     timeout-per-shutdown-phase: 60s
   profiles:
     active: dev
-  jackson:
-    # 日期格式
-    date-format: yyyy-MM-dd HH:mm:ss
 
 # 日志配置（含 logback 滚动策略）
 logging:
