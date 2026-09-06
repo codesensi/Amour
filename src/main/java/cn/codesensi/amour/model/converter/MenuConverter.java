@@ -31,4 +31,14 @@ public interface MenuConverter {
      */
     MenuResponse toResponse(MenuDTO menuDTO);
 
+    /**
+     * SysMenu → MenuResponse
+     */
+    MenuResponse toResponse(SysMenu sysMenu);
+
+    /**
+     * List<SysMenu> → List<MenuResponse>
+     */
+    List<MenuResponse> toResponseList(List<SysMenu> sysMenus);
+
 }

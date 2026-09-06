@@ -44,6 +44,22 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     private final CacheManager cacheManager;
 
     /**
+     * 查询全部菜单列表。
+     * <p>
+     * 覆写 {@link IService#list()}：按 sort 升序、id 升序排序,保证菜单树展示顺序稳定。
+     *
+     * @return 全量菜单列表
+     */
+    @Override
+    public List<SysMenu> list() {
+        return QueryChain.of(sysMenuMapper)
+                .select(SYS_MENU.ALL_COLUMNS)
+                .orderBy(SYS_MENU.SORT, true)
+                .orderBy(SYS_MENU.ID, true)
+                .list();
+    }
+
+    /**
      * 返回一个账号所拥有的权限编码列表。
      * <p>
      * 结果经 perm 缓存加速（Key 为用户ID），写后 30 天兜底过期，写侧显式失效；
