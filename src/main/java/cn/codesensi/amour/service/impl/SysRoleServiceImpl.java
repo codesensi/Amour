@@ -1,5 +1,6 @@
 package cn.codesensi.amour.service.impl;
 
+import cn.codesensi.amour.common.core.BasePage;
 import cn.codesensi.amour.common.enums.BuiltinEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.util.CacheUtil;
@@ -7,12 +8,15 @@ import cn.codesensi.amour.mapper.SysRoleMapper;
 import cn.codesensi.amour.model.converter.RoleConverter;
 import cn.codesensi.amour.model.dto.AssignMenusDTO;
 import cn.codesensi.amour.model.dto.RoleInsertDTO;
+import cn.codesensi.amour.model.dto.RolePageDTO;
 import cn.codesensi.amour.model.entity.SysMenu;
 import cn.codesensi.amour.model.entity.SysRole;
 import cn.codesensi.amour.model.entity.SysRoleMenu;
 import cn.codesensi.amour.service.*;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
+import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +51,25 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     private final SysRoleMenuService sysRoleMenuService;
     private final SysMenuService sysMenuService;
     private final SysUserService sysUserService;
+
+    /**
+     * 分页查询角色信息。
+     * <p>
+     * 角色名称、角色编码为模糊匹配,状态为精确匹配,条件缺省时自动忽略;
+     * 页码与每页条数的缺省值由 {@link BasePage} 提供(1 与 20),与前端默认值保持一致。
+     *
+     * @param rolePageDTO 分页查询参数
+     * @return 角色信息分页结果
+     */
+    @Override
+    public Page<SysRole> page(RolePageDTO rolePageDTO) {
+        return QueryChain.of(sysRoleMapper)
+                .select(SYS_ROLE.ALL_COLUMNS)
+                .where(SYS_ROLE.NAME.like(rolePageDTO.getName(), StrUtil::isNotBlank))
+                .and(SYS_ROLE.CODE.like(rolePageDTO.getCode(), StrUtil::isNotBlank))
+                .and(SYS_ROLE.STATUS.eq(rolePageDTO.getStatus(), ObjUtil::isNotNull))
+                .page(Page.of(rolePageDTO.getPageNumber(), rolePageDTO.getPageSize()));
+    }
 
     /**
      * 新增角色信息

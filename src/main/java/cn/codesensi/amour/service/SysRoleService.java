@@ -2,7 +2,9 @@ package cn.codesensi.amour.service;
 
 import cn.codesensi.amour.model.dto.AssignMenusDTO;
 import cn.codesensi.amour.model.dto.RoleInsertDTO;
+import cn.codesensi.amour.model.dto.RolePageDTO;
 import cn.codesensi.amour.model.entity.SysRole;
+import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
 
 /**
@@ -12,6 +14,14 @@ import com.mybatisflex.core.service.IService;
  * @since 2026-06-28
  */
 public interface SysRoleService extends IService<SysRole> {
+
+    /**
+     * 分页查询角色信息
+     *
+     * @param rolePageDTO 分页查询参数
+     * @return 角色信息分页结果
+     */
+    Page<SysRole> page(RolePageDTO rolePageDTO);
 
     /**
      * 新增角色信息

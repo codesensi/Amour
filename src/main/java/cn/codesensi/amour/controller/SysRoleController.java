@@ -4,9 +4,14 @@ import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.model.converter.RoleConverter;
 import cn.codesensi.amour.model.dto.AssignMenusDTO;
 import cn.codesensi.amour.model.dto.RoleInsertDTO;
+import cn.codesensi.amour.model.dto.RolePageDTO;
+import cn.codesensi.amour.model.entity.SysRole;
 import cn.codesensi.amour.model.request.AssignMenusRequest;
 import cn.codesensi.amour.model.request.RoleInsertRequest;
+import cn.codesensi.amour.model.request.RolePageRequest;
+import cn.codesensi.amour.model.response.RolePageResponse;
 import cn.codesensi.amour.service.SysRoleService;
+import com.mybatisflex.core.paginate.Page;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +31,21 @@ public class SysRoleController {
 
     private final SysRoleService sysRoleService;
     private final RoleConverter roleConverter;
+
+    /**
+     * 分页查询角色信息表。
+     * <p>
+     * 角色名称、角色编码为模糊匹配,状态为精确匹配,条件缺省时自动忽略。
+     *
+     * @param rolePageRequest 分页查询参数
+     * @return 分页对象
+     */
+    @GetMapping("/page")
+    public Page<RolePageResponse> page(@Valid RolePageRequest rolePageRequest) {
+        RolePageDTO rolePageDTO = roleConverter.toPageDTO(rolePageRequest);
+        Page<SysRole> sysRolePage = sysRoleService.page(rolePageDTO);
+        return roleConverter.toPageResponse(sysRolePage);
+    }
 
     /**
      * 新增角色信息
