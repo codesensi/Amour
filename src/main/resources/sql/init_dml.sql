@@ -37,16 +37,13 @@ WHERE NOT EXISTS (
 -- 数据填充：sys_user（幂等插入）
 -- ----------------------------
 INSERT INTO `sys_user` (
-    `id`, `username`, `password`, `nickname`, `id_card`, `email`, `phone`, `gender`, `qq`, `avatar`, `builtin`, `remark`
+    `id`, `username`, `password`, `nickname`, `gender`, `qq`, `avatar`, `builtin`, `remark`
 )
 SELECT
     t.id,
     t.username,
     t.password,
     t.nickname,
-    t.id_card,
-    t.email,
-    t.phone,
     t.gender,
     t.qq,
     t.avatar,
@@ -58,9 +55,6 @@ FROM (
               'admin',
               '$2a$10$U.k0b43Pwg./Jg2QQl4bMOukItbYg4aYhKsciMamtHWvp3JEF2ism',
               '超级管理员',
-              '110101200001010001',
-              'admin@amour.com',
-              '18900000000',
               'U',
               '12345678',
               'https://api.dicebear.com/7.x/bottts/svg?seed=admin',
@@ -70,9 +64,6 @@ FROM (
               'li',
               '$2a$10$U.k0b43Pwg./Jg2QQl4bMOukItbYg4aYhKsciMamtHWvp3JEF2ism',
               'Li',
-              NULL,
-              NULL,
-              NULL,
               'M',
               '2623669948',
               NULL,
@@ -82,15 +73,12 @@ FROM (
               'su',
               '$2a$10$U.k0b43Pwg./Jg2QQl4bMOukItbYg4aYhKsciMamtHWvp3JEF2ism',
               'Su',
-              NULL,
-              NULL,
-              NULL,
               'F',
               '673822943',
               NULL,
               1,
               '系统内置门户女主')
-     ) AS t(id, username, password, nickname, id_card, email, phone, gender, qq, avatar, builtin, remark)
+     ) AS t(id, username, password, nickname, gender, qq, avatar, builtin, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_user` WHERE `sys_user`.`id` = t.id
 );

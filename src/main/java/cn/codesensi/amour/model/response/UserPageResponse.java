@@ -34,6 +34,11 @@ public class UserPageResponse implements Serializable {
     private String nickname;
 
     /**
+     * 用户身份证号码
+     */
+    private String idCard;
+
+    /**
      * 用户手机号码
      */
     private String phone;
