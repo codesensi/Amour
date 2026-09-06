@@ -17,7 +17,6 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.mybatisflex.core.paginate.Page;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -27,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
  * @author codesensi
  * @since 2026-06-28
  */
-@Slf4j
 @ApiResponseBody
 @RequiredArgsConstructor
 @RestController
@@ -55,10 +53,10 @@ public class SysUserController {
     /**
      * 获取当前用户信息
      *
-     * @return SysUser 用户信息
+     * @return 用户信息
      */
-    @GetMapping("/getCurrentUser")
-    public UserInfoResponse getCurrentUser() {
+    @GetMapping("/current-user")
+    public UserInfoResponse currentUser() {
         long userId = StpUtil.getLoginIdAsLong();
         UserInfoDTO userInfoDTO = sysUserService.getCurrentUser(userId);
         return userConverter.toInfoResponse(userInfoDTO);
@@ -69,10 +67,10 @@ public class SysUserController {
      *
      * @param request 保存用户请求参数
      */
-    @PostMapping("/saveUser")
-    public void saveUser(@Valid @RequestBody UserSaveRequest request) {
+    @PostMapping("/insert")
+    public void insert(@Valid @RequestBody UserSaveRequest request) {
         UserSaveDTO userSaveDTO = userConverter.toSaveDTO(request);
-        sysUserService.saveUser(userSaveDTO);
+        sysUserService.insert(userSaveDTO);
     }
 
     /**
@@ -80,8 +78,8 @@ public class SysUserController {
      *
      * @param request 配置用户角色请求参数
      */
-    @PutMapping("/assignRoles")
-    public void assignRoles(@RequestBody @Valid AssignRolesRequest request) {
+    @PutMapping("/assign-roles")
+    public void assignRoles(@Valid @RequestBody AssignRolesRequest request) {
         AssignRolesDTO assignRolesDTO = userConverter.toAssignRolesDTO(request);
         sysUserService.assignRoles(assignRolesDTO);
     }

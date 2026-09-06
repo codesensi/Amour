@@ -54,7 +54,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
      * @param roleSaveDTO 角色信息
      */
     @Override
-    public void saveRole(RoleSaveDTO roleSaveDTO) {
+    public void insert(RoleSaveDTO roleSaveDTO) {
         String code = roleSaveDTO.getCode();
         // 校验角色编码是否存在
         long count = QueryChain.of(sysRoleMapper)

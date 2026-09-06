@@ -38,7 +38,7 @@ public interface SysUserService extends IService<SysUser> {
      *
      * @param userSaveDTO 用户信息
      */
-    void saveUser(UserSaveDTO userSaveDTO);
+    void insert(UserSaveDTO userSaveDTO);
 
     /**
      * 配置用户角色

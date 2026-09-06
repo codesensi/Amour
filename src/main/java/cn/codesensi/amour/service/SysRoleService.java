@@ -18,7 +18,7 @@ public interface SysRoleService extends IService<SysRole> {
      *
      * @param roleSaveDTO 角色信息
      */
-    void saveRole(RoleSaveDTO roleSaveDTO);
+    void insert(RoleSaveDTO roleSaveDTO);
 
     /**
      * 分配角色菜单权限

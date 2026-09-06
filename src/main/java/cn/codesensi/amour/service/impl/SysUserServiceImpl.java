@@ -136,7 +136,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      * @param userSaveDTO 用户信息
      */
     @Override
-    public void saveUser(UserSaveDTO userSaveDTO) {
+    public void insert(UserSaveDTO userSaveDTO) {
         String username = userSaveDTO.getUsername();
         // 校验用户名是否存在
         long count = QueryChain.of(sysUserMapper)

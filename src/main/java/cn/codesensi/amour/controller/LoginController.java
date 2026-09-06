@@ -8,8 +8,8 @@ import cn.codesensi.amour.model.request.LoginRequest;
 import cn.codesensi.amour.model.response.LoginResponse;
 import cn.codesensi.amour.service.LoginService;
 import cn.dev33.satoken.annotation.SaIgnore;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,7 +33,7 @@ public class LoginController {
      */
     @SaIgnore
     @PostMapping("/login")
-    public LoginResponse login(@Validated @RequestBody LoginRequest request) {
+    public LoginResponse login(@Valid @RequestBody LoginRequest request) {
         LoginDTO loginDTO = loginConverter.toDTO(request);
         LoginResultDTO loginResultDTO = loginService.login(loginDTO);
         return loginConverter.toResponse(loginResultDTO);

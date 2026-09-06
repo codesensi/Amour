@@ -27,7 +27,7 @@ public class CacheController {
     /**
      * 查询全部缓存内容
      */
-    @GetMapping("/listAll")
+    @GetMapping("/list-all")
     public List<CacheResponse> listAll() {
         return cacheService.listAll();
     }

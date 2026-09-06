@@ -9,7 +9,6 @@ import cn.codesensi.amour.model.request.RoleSaveRequest;
 import cn.codesensi.amour.service.SysRoleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
  * @author codesensi
  * @since 2026-06-28
  */
-@Slf4j
 @ApiResponseBody
 @RequiredArgsConstructor
 @RestController
@@ -34,10 +32,10 @@ public class SysRoleController {
      *
      * @param request 角色信息
      */
-    @PostMapping("/saveRole")
-    public void saveRole(@Valid @RequestBody RoleSaveRequest request) {
+    @PostMapping("/insert")
+    public void insert(@Valid @RequestBody RoleSaveRequest request) {
         RoleSaveDTO roleSaveDTO = roleConverter.toSaveDTO(request);
-        sysRoleService.saveRole(roleSaveDTO);
+        sysRoleService.insert(roleSaveDTO);
     }
 
     /**
@@ -45,7 +43,7 @@ public class SysRoleController {
      *
      * @param request 角色菜单权限信息
      */
-    @PutMapping("/assignMenus")
+    @PutMapping("/assign-menus")
     public void assignMenus(@Valid @RequestBody AssignMenusRequest request) {
         AssignMenusDTO assignMenusDTO = roleConverter.toAssignMenusDTO(request);
         sysRoleService.assignMenus(assignMenusDTO);
