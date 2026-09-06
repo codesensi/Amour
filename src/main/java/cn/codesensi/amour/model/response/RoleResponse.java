@@ -1,20 +1,22 @@
 package cn.codesensi.amour.model.response;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import tools.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.databind.ser.std.ToStringSerializer;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
- * 角色分页查询行数据响应结果
+ * 角色全量列表行数据响应结果
+ * <p>
+ * 用作分配角色等场景的选项数据源,仅保留选项所需字段。
  *
  * @author codesensi
  * @since 2026-09-06
  */
 @Data
-public class RolePageResponse implements Serializable {
+public class RoleResponse implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -22,6 +24,7 @@ public class RolePageResponse implements Serializable {
     /**
      * 角色ID
      */
+    @JsonSerialize(using = ToStringSerializer.class) // 序列化为字符串避免前端精度丢失
     private Long id;
 
     /**
@@ -35,11 +38,6 @@ public class RolePageResponse implements Serializable {
     private String code;
 
     /**
-     * 角色排序
-     */
-    private Integer sort;
-
-    /**
      * 角色状态:0-启用,1-禁用
      */
     private Integer status;
@@ -48,16 +46,5 @@ public class RolePageResponse implements Serializable {
      * 内置标识:0-非内置,1-内置
      */
     private Integer builtin;
-
-    /**
-     * 备注
-     */
-    private String remark;
-
-    /**
-     * 创建时间
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createTime;
 
 }

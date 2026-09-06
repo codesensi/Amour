@@ -110,7 +110,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             userInfoDTO.setPerms(sysMenuService.listPermCodeByUserId(userId));
             // 拥有的菜单（menu 缓存加速）
             List<SysMenu> menus = sysMenuService.listMenuByUserId(userId);
-            userInfoDTO.setMenus(menuConverter.toDTOList(menus));
+            userInfoDTO.setMenus(menuConverter.toListDTO(menus));
         }
         return userInfoDTO;
     }
@@ -237,6 +237,17 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             sysMenuService.evictMenuCache(List.of(userId));
             evictUserCache(List.of(userId));
         });
+    }
+
+    /**
+     * 查询用户已分配的角色ID列表。
+     *
+     * @param userId 用户ID
+     * @return 角色ID列表
+     */
+    @Override
+    public List<Long> listRoleIdsByUserId(Long userId) {
+        return sysUserRoleService.listRoleIdsByUserId(userId);
     }
 
     /**

@@ -9,6 +9,7 @@ import cn.codesensi.amour.model.entity.SysRole;
 import cn.codesensi.amour.model.request.AssignMenusRequest;
 import cn.codesensi.amour.model.request.RoleInsertRequest;
 import cn.codesensi.amour.model.request.RolePageRequest;
+import cn.codesensi.amour.model.response.RoleResponse;
 import cn.codesensi.amour.model.response.RolePageResponse;
 import cn.codesensi.amour.service.SysRoleService;
 import com.mybatisflex.core.paginate.Page;
@@ -47,6 +48,20 @@ public class SysRoleController {
         RolePageDTO rolePageDTO = roleConverter.toPageDTO(rolePageRequest);
         Page<SysRole> sysRolePage = sysRoleService.page(rolePageDTO);
         return roleConverter.toPageResponse(sysRolePage);
+    }
+
+    /**
+     * 查询全部角色列表。
+     * <p>
+     * 返回全量角色的一维数组,用作分配角色等场景的选项数据源;
+     * 数据量小,不做分页。
+     *
+     * @return 角色列表
+     */
+    @GetMapping("/list")
+    public List<RoleResponse> list() {
+        List<SysRole> sysRoles = sysRoleService.list();
+        return roleConverter.toListResponse(sysRoles);
     }
 
     /**

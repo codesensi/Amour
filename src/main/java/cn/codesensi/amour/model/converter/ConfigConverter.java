@@ -35,7 +35,7 @@ public interface ConfigConverter {
      * @param configs 配置实体列表
      * @return 配置 DTO 列表
      */
-    List<ConfigDTO> toDTOList(List<SysConfig> configs);
+    List<ConfigDTO> toListDTO(List<SysConfig> configs);
 
     /**
      * 将配置 DTO 转换为响应对象。
@@ -51,6 +51,6 @@ public interface ConfigConverter {
      * @param configDTOs 配置 DTO 列表
      * @return 配置响应对象列表
      */
-    List<ConfigResponse> toResponseList(List<ConfigDTO> configDTOs);
+    List<ConfigResponse> toListResponse(List<ConfigDTO> configDTOs);
 
 }

@@ -48,6 +48,14 @@ public interface SysUserService extends IService<SysUser> {
     void assignRoles(AssignRolesDTO assignRolesDTO);
 
     /**
+     * 查询用户已分配的角色ID列表
+     *
+     * @param userId 用户ID
+     * @return 角色ID列表
+     */
+    List<Long> listRoleIdsByUserId(Long userId);
+
+    /**
      * 失效指定用户的用户信息缓存（userInfo 缓存）
      *
      * @param userIds 用户ID列表

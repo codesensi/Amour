@@ -7,10 +7,13 @@ import cn.codesensi.amour.model.entity.SysRole;
 import cn.codesensi.amour.model.request.AssignMenusRequest;
 import cn.codesensi.amour.model.request.RoleInsertRequest;
 import cn.codesensi.amour.model.request.RolePageRequest;
+import cn.codesensi.amour.model.response.RoleResponse;
 import cn.codesensi.amour.model.response.RolePageResponse;
 import com.mybatisflex.core.paginate.Page;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+
+import java.util.List;
 
 /**
  * 角色相关对象转换
@@ -46,5 +49,10 @@ public interface RoleConverter {
      */
     @Mapping(target = "optimizeCountQuery", ignore = true)
     Page<RolePageResponse> toPageResponse(Page<SysRole> page);
+
+    /**
+     * List<SysRole> → List<RoleListResponse>
+     */
+    List<RoleResponse> toListResponse(List<SysRole> list);
 
 }

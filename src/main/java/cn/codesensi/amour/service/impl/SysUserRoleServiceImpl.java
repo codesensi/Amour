@@ -99,6 +99,20 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
     }
 
     /**
+     * 查询用户已分配的角色ID列表
+     *
+     * @param userId 用户ID
+     * @return 角色ID列表
+     */
+    @Override
+    public List<Long> listRoleIdsByUserId(Long userId) {
+        return queryChain()
+                .select(SYS_USER_ROLE.ROLE_ID)
+                .where(SYS_USER_ROLE.USER_ID.eq(userId))
+                .listAs(Long.class);
+    }
+
+    /**
      * 失效指定用户的角色编码缓存。
      *
      * @param userIds 用户ID列表

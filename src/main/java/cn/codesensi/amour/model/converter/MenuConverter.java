@@ -24,7 +24,7 @@ public interface MenuConverter {
     /**
      * List<SysMenu> → List<MenuDTO>
      */
-    List<MenuDTO> toDTOList(List<SysMenu> sysMenus);
+    List<MenuDTO> toListDTO(List<SysMenu> sysMenus);
 
     /**
      * MenuDTO → MenuResponse
@@ -39,6 +39,6 @@ public interface MenuConverter {
     /**
      * List<SysMenu> → List<MenuResponse>
      */
-    List<MenuResponse> toResponseList(List<SysMenu> sysMenus);
+    List<MenuResponse> toListResponse(List<SysMenu> sysMenus);
 
 }

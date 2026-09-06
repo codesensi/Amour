@@ -38,6 +38,6 @@ public class SysMenuController {
     @GetMapping("/list")
     public List<MenuResponse> list() {
         List<SysMenu> sysMenus = sysMenuService.list();
-        return menuConverter.toResponseList(sysMenus);
+        return menuConverter.toListResponse(sysMenus);
     }
 }

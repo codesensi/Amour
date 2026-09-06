@@ -31,6 +31,14 @@ public interface SysUserRoleService extends IService<SysUserRole> {
     List<String> listRoleCodeByUserId(Long userId);
 
     /**
+     * 查询用户已分配的角色ID列表
+     *
+     * @param userId 用户ID
+     * @return 角色ID列表
+     */
+    List<Long> listRoleIdsByUserId(Long userId);
+
+    /**
      * 失效指定用户的角色编码缓存（role 缓存）
      *
      * @param userIds 用户ID列表

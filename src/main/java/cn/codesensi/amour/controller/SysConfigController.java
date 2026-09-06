@@ -39,6 +39,6 @@ public class SysConfigController {
     @GetMapping("/list-by-keys")
     public List<ConfigResponse> listByKeys(@RequestParam(value = "keys", required = false) List<String> keys) {
         List<ConfigDTO> configDTOs = sysConfigService.listByKeys(keys);
-        return configConverter.toResponseList(configDTOs);
+        return configConverter.toListResponse(configDTOs);
     }
 }

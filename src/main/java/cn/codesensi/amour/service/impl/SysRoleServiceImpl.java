@@ -72,6 +72,22 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     }
 
     /**
+     * 查询全部角色列表。
+     * <p>
+     * 覆写 {@link IService#list()}：按 sort 升序、id 升序排序,保证选项顺序稳定。
+     *
+     * @return 全量角色列表
+     */
+    @Override
+    public List<SysRole> list() {
+        return QueryChain.of(sysRoleMapper)
+                .select(SYS_ROLE.ALL_COLUMNS)
+                .orderBy(SYS_ROLE.SORT, true)
+                .orderBy(SYS_ROLE.ID, true)
+                .list();
+    }
+
+    /**
      * 新增角色信息
      *
      * @param roleInsertDTO 角色信息

@@ -19,6 +19,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 /**
  * 用户信息表 控制层。
@@ -82,6 +84,17 @@ public class SysUserController {
     public void assignRoles(@Valid @RequestBody AssignRolesRequest request) {
         AssignRolesDTO assignRolesDTO = userConverter.toAssignRolesDTO(request);
         sysUserService.assignRoles(assignRolesDTO);
+    }
+
+    /**
+     * 查询用户已分配的角色ID列表（分配角色弹窗预勾选用）。
+     *
+     * @param id 用户ID
+     * @return 角色ID列表
+     */
+    @GetMapping("/role-ids/{id}")
+    public List<Long> roleIds(@PathVariable Long id) {
+        return sysUserService.listRoleIdsByUserId(id);
     }
 
 }
