@@ -9,7 +9,7 @@ import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.util.CacheUtil;
 import cn.codesensi.amour.mapper.SysRoleMapper;
 import cn.codesensi.amour.mapper.SysUserMapper;
-import cn.codesensi.amour.model.converter.SysUserConverter;
+import cn.codesensi.amour.model.converter.UserConverter;
 import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.SysMenu;
 import cn.codesensi.amour.model.entity.SysUser;
@@ -51,7 +51,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private final SysMenuService sysMenuService;
     private final SysUserMapper sysUserMapper;
     private final SysRoleMapper sysRoleMapper;
-    private final SysUserConverter sysUserConverter;
+    private final UserConverter userConverter;
     private final SysUserRoleService sysUserRoleService;
     private final SysConfigService sysConfigService;
     private final CacheManager cacheManager;
@@ -108,7 +108,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             userInfoDTO.setPerms(sysMenuService.listPermCodeByUserId(userId));
             // 拥有的菜单（menu 缓存加速）
             List<SysMenu> menus = sysMenuService.listMenuByUserId(userId);
-            userInfoDTO.setMenus(sysUserConverter.toMenuDTOList(menus));
+            userInfoDTO.setMenus(userConverter.toMenuDTOList(menus));
         }
         return userInfoDTO;
     }
@@ -127,7 +127,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         if (ObjUtil.isNull(sysUser)) {
             throw new BusinessException("用户不存在");
         }
-        return sysUserConverter.toUserInfoDTO(sysUser);
+        return userConverter.toInfoDTO(sysUser);
     }
 
     /**
@@ -146,7 +146,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             throw new BusinessException("用户名已存在");
         }
 
-        SysUser sysUser = sysUserConverter.toEntity(userSaveDTO);
+        SysUser sysUser = userConverter.toEntity(userSaveDTO);
         // 若未输入昵称则保持昵称和用户名相同
         if (StrUtil.isBlank(userSaveDTO.getNickname())) {
             log.debug("未输入昵称，默认与用户名一致：username={}", username);

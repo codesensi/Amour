@@ -2,6 +2,7 @@ package cn.codesensi.amour.model.converter;
 
 import cn.codesensi.amour.model.dto.AssignMenusDTO;
 import cn.codesensi.amour.model.dto.RoleSaveDTO;
+import cn.codesensi.amour.model.entity.SysRole;
 import cn.codesensi.amour.model.request.AssignMenusRequest;
 import cn.codesensi.amour.model.request.RoleSaveRequest;
 import org.mapstruct.Mapper;
@@ -24,5 +25,10 @@ public interface RoleConverter {
      * AssignMenusRequest → AssignMenusDTO
      */
     AssignMenusDTO toAssignMenusDTO(AssignMenusRequest request);
+
+    /**
+     * RoleSaveDTO → SysRole
+     */
+    SysRole toEntity(RoleSaveDTO roleSaveDTO);
 
 }

@@ -4,7 +4,7 @@ import cn.codesensi.amour.common.enums.BuiltinEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.util.CacheUtil;
 import cn.codesensi.amour.mapper.SysRoleMapper;
-import cn.codesensi.amour.model.converter.SysRoleConverter;
+import cn.codesensi.amour.model.converter.RoleConverter;
 import cn.codesensi.amour.model.dto.AssignMenusDTO;
 import cn.codesensi.amour.model.dto.RoleSaveDTO;
 import cn.codesensi.amour.model.entity.SysMenu;
@@ -42,7 +42,7 @@ import static cn.codesensi.amour.model.entity.table.SysUserRoleTableDef.SYS_USER
 public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> implements SysRoleService {
 
     private final SysRoleMapper sysRoleMapper;
-    private final SysRoleConverter sysRoleConverter;
+    private final RoleConverter roleConverter;
     private final SysUserRoleService sysUserRoleService;
     private final SysRoleMenuService sysRoleMenuService;
     private final SysMenuService sysMenuService;
@@ -64,7 +64,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             throw new BusinessException("角色编码已存在");
         }
 
-        SysRole sysRole = sysRoleConverter.toEntity(roleSaveDTO);
+        SysRole sysRole = roleConverter.toEntity(roleSaveDTO);
         sysRoleMapper.insert(sysRole, true);
     }
 
