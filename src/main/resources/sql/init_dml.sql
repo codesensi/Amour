@@ -37,13 +37,14 @@ WHERE NOT EXISTS (
 -- 数据填充：sys_user（幂等插入）
 -- ----------------------------
 INSERT INTO `sys_user` (
-    `id`, `username`, `password`, `nickname`, `gender`, `qq`, `avatar`, `builtin`, `remark`
+    `id`, `username`, `password`, `nickname`, `email`, `gender`, `qq`, `avatar`, `builtin`, `remark`
 )
 SELECT
     t.id,
     t.username,
     t.password,
     t.nickname,
+    t.email,
     t.gender,
     t.qq,
     t.avatar,
@@ -55,6 +56,7 @@ FROM (
               'admin',
               '$2a$10$U.k0b43Pwg./Jg2QQl4bMOukItbYg4aYhKsciMamtHWvp3JEF2ism',
               '超级管理员',
+              'admin@amour.com',
               'U',
               '12345678',
               NULL,
@@ -64,6 +66,7 @@ FROM (
               'li',
               '$2a$10$U.k0b43Pwg./Jg2QQl4bMOukItbYg4aYhKsciMamtHWvp3JEF2ism',
               'Li',
+              'li@amour.com',
               'M',
               '2623669948',
               NULL,
@@ -73,6 +76,7 @@ FROM (
               'su',
               '$2a$10$U.k0b43Pwg./Jg2QQl4bMOukItbYg4aYhKsciMamtHWvp3JEF2ism',
               'Su',
+              'su@amour.com',
               'F',
               '673822943',
               NULL,
@@ -82,12 +86,13 @@ FROM (
               'test',
               '$2a$10$U.k0b43Pwg./Jg2QQl4bMOukItbYg4aYhKsciMamtHWvp3JEF2ism',
               'Test',
+              'test@amour.com',
               'U',
               '1234567890',
               NULL,
               0,
               '测试用户')
-     ) AS t(id, username, password, nickname, gender, qq, avatar, builtin, remark)
+     ) AS t(id, username, password, nickname, email, gender, qq, avatar, builtin, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_user` WHERE `sys_user`.`id` = t.id
 );
