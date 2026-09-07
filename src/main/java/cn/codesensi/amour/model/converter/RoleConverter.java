@@ -51,7 +51,7 @@ public interface RoleConverter {
     Page<RolePageResponse> toPageResponse(Page<SysRole> page);
 
     /**
-     * List<SysRole> → List<RoleListResponse>
+     * List<SysRole> → List<RoleResponse>
      */
     List<RoleResponse> toListResponse(List<SysRole> list);
 

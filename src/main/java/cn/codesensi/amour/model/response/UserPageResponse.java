@@ -2,6 +2,8 @@ package cn.codesensi.amour.model.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import tools.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.databind.ser.std.ToStringSerializer;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -22,6 +24,7 @@ public class UserPageResponse implements Serializable {
     /**
      * 用户ID
      */
+    @JsonSerialize(using = ToStringSerializer.class) // 序列化为字符串避免前端精度丢失
     private Long id;
 
     /**

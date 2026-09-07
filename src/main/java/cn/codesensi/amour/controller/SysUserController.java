@@ -88,13 +88,16 @@ public class SysUserController {
 
     /**
      * 查询用户已分配的角色ID列表（分配角色弹窗预勾选用）。
+     * <p>
+     * id 以字符串形式下发,与 RoleResponse 及 el-select 的选项值类型对齐。
      *
      * @param id 用户ID
      * @return 角色ID列表
      */
     @GetMapping("/role-ids/{id}")
-    public List<Long> roleIds(@PathVariable Long id) {
-        return sysUserService.listRoleIdsByUserId(id);
+    public List<String> roleIds(@PathVariable Long id) {
+        return sysUserService.listRoleIdsByUserId(id)
+                .stream().map(String::valueOf).toList();
     }
 
 }
