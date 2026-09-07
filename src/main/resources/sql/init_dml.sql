@@ -221,33 +221,33 @@ FROM (
          VALUES
              -- gender（性别，对应 GenderEnum：U-未知,M-男,F-女；10000 段）
              (10001, 'gender', '性别', 'U', '未知', 1, 0, 1, '内置字典：与 GenderEnum(U/M/F) 对齐'),
-             (10002, 'gender', '性别', 'M', '男', 2, 0, 1, NULL),
-             (10003, 'gender', '性别', 'F', '女', 3, 0, 1, NULL),
+             (10002, 'gender', '性别', 'M', '男', 2, 0, 1, '内置字典：与 GenderEnum(U/M/F) 对齐'),
+             (10003, 'gender', '性别', 'F', '女', 3, 0, 1, '内置字典：与 GenderEnum(U/M/F) 对齐'),
              -- enable（通用启停状态，对应 EnableEnum：0-启用,1-禁用；10100 段）
              (10101, 'enable', '启用状态', '0', '启用', 1, 0, 1, '内置字典：与 EnableEnum(0/1) 对齐'),
-             (10102, 'enable', '启用状态', '1', '禁用', 2, 0, 1, NULL),
+             (10102, 'enable', '启用状态', '1', '禁用', 2, 0, 1, '内置字典：与 EnableEnum(0/1) 对齐'),
              -- yes（是否，对应 YesEnum：1-是,0-否；10200 段）
              (10201, 'yes', '是否', '1', '是', 1, 0, 1, '内置字典：与 YesEnum(1/0) 对齐'),
-             (10202, 'yes', '是否', '0', '否', 2, 0, 1, NULL),
+             (10202, 'yes', '是否', '0', '否', 2, 0, 1, '内置字典：与 YesEnum(1/0) 对齐'),
              -- builtin（内置标识，对应 BuiltinEnum：1-内置,0-非内置；10300 段）
              (10301, 'builtin', '内置标识', '1', '内置', 1, 0, 1, '内置字典：与 BuiltinEnum(1/0) 对齐'),
-             (10302, 'builtin', '内置标识', '0', '非内置', 2, 0, 1, NULL),
+             (10302, 'builtin', '内置标识', '0', '非内置', 2, 0, 1, '内置字典：与 BuiltinEnum(1/0) 对齐'),
              -- del-flag（删除标识，对应 DelFlagEnum：1-已删除,0-未删除；10400 段）
-             (10402, 'del-flag', '删除标识', '0', '未删除', 1, 0, 1, NULL),
+             (10402, 'del-flag', '删除标识', '0', '未删除', 1, 0, 1, '内置字典：与 DelFlagEnum(1/0) 对齐'),
              (10401, 'del-flag', '删除标识', '1', '已删除', 2, 0, 1, '内置字典：与 DelFlagEnum(1/0) 对齐'),
              -- menu-type（菜单类型，对应 MenuType：D-目录,M-菜单,B-按钮；10500 段）
              (10501, 'menu-type', '菜单类型', 'D', '目录', 1, 0, 1, '内置字典：与 MenuType(D/M/B) 对齐'),
-             (10502, 'menu-type', '菜单类型', 'M', '菜单', 2, 0, 1, NULL),
-             (10503, 'menu-type', '菜单类型', 'B', '按钮', 3, 0, 1, NULL),
+             (10502, 'menu-type', '菜单类型', 'M', '菜单', 2, 0, 1, '内置字典：与 MenuType(D/M/B) 对齐'),
+             (10503, 'menu-type', '菜单类型', 'B', '按钮', 3, 0, 1, '内置字典：与 MenuType(D/M/B) 对齐'),
              -- image-type（图形验证码类型，对应 ImageType；10600 段）
              (10601, 'image-type', '图形验证码类型', 'spec', 'PNG字符验证码', 1, 0, 1, '内置字典：与 ImageType(spec/gif/chinese/chinese-gif/arithmetic) 对齐'),
-             (10602, 'image-type', '图形验证码类型', 'gif', 'GIF字符验证码', 2, 0, 1, NULL),
-             (10603, 'image-type', '图形验证码类型', 'chinese', '中文字符验证码', 3, 0, 1, NULL),
-             (10604, 'image-type', '图形验证码类型', 'chinese-gif', '中文GIF字符验证码', 4, 0, 1, NULL),
-             (10605, 'image-type', '图形验证码类型', 'arithmetic', '算术验证码', 5, 0, 1, NULL),
+             (10602, 'image-type', '图形验证码类型', 'gif', 'GIF字符验证码', 2, 0, 1, '内置字典：与 ImageType(spec/gif/chinese/chinese-gif/arithmetic) 对齐'),
+             (10603, 'image-type', '图形验证码类型', 'chinese', '中文字符验证码', 3, 0, 1, '内置字典：与 ImageType(spec/gif/chinese/chinese-gif/arithmetic) 对齐'),
+             (10604, 'image-type', '图形验证码类型', 'chinese-gif', '中文GIF字符验证码', 4, 0, 1, '内置字典：与 ImageType(spec/gif/chinese/chinese-gif/arithmetic) 对齐'),
+             (10605, 'image-type', '图形验证码类型', 'arithmetic', '算术验证码', 5, 0, 1, '内置字典：与 ImageType(spec/gif/chinese/chinese-gif/arithmetic) 对齐'),
              -- success（成功状态，对应 SuccessEnum：1-成功,0-失败；10700 段）
              (10701, 'success', '成功状态', '1', '成功', 1, 0, 1, '内置字典：与 SuccessEnum(1/0) 对齐'),
-             (10702, 'success', '成功状态', '0', '失败', 2, 0, 1, NULL)
+             (10702, 'success', '成功状态', '0', '失败', 2, 0, 1, '内置字典：与 SuccessEnum(1/0) 对齐')
      ) AS t(id, dict_code, dict_name, dict_value, dict_label, sort, status, builtin, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_dict` WHERE `sys_dict`.`id` = t.id

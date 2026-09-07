@@ -2,10 +2,17 @@ package cn.codesensi.amour.model.converter;
 
 import cn.codesensi.amour.model.dto.DictDTO;
 import cn.codesensi.amour.model.dto.DictGroupDTO;
+import cn.codesensi.amour.model.dto.DictPageDTO;
+import cn.codesensi.amour.model.dto.DictTypeDTO;
 import cn.codesensi.amour.model.entity.SysDict;
+import cn.codesensi.amour.model.request.DictPageRequest;
 import cn.codesensi.amour.model.response.DictGroupResponse;
+import cn.codesensi.amour.model.response.DictPageResponse;
 import cn.codesensi.amour.model.response.DictResponse;
+import cn.codesensi.amour.model.response.DictTypeResponse;
+import com.mybatisflex.core.paginate.Page;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 
 import java.util.List;
@@ -70,5 +77,39 @@ public interface DictConverter {
      * @return 分组响应对象列表
      */
     List<DictGroupResponse> toListGroupResponse(List<DictGroupDTO> dictGroupDTOList);
+
+    /**
+     * 将字典类型 DTO 转换为类型响应对象。
+     *
+     * @param dictTypeDTO 字典类型 DTO
+     * @return 字典类型响应对象
+     */
+    DictTypeResponse toTypeResponse(DictTypeDTO dictTypeDTO);
+
+    /**
+     * 将字典类型 DTO 列表转换为类型响应对象列表（逐元素复用 {@link #toTypeResponse(DictTypeDTO)} 的映射规则）。
+     *
+     * @param dictTypeDTOList 字典类型 DTO 列表
+     * @return 字典类型响应对象列表
+     */
+    List<DictTypeResponse> toListTypeResponse(List<DictTypeDTO> dictTypeDTOList);
+
+    /**
+     * 字典分页查询请求 → 分页查询参数 DTO。
+     *
+     * @param request 分页查询请求
+     * @return 分页查询参数 DTO
+     */
+    DictPageDTO toPageDTO(DictPageRequest request);
+
+    /**
+     * Page&lt;SysDict&gt; → Page&lt;DictPageResponse&gt;
+     * （records 逐元素复用实体 → 行响应对象的映射规则）。
+     *
+     * @param page 字典实体分页
+     * @return 字典行响应对象分页
+     */
+    @Mapping(target = "optimizeCountQuery", ignore = true)
+    Page<DictPageResponse> toPageResponse(Page<SysDict> page);
 
 }

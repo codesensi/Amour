@@ -1,16 +1,21 @@
 package cn.codesensi.amour.service.impl;
 
 import cn.codesensi.amour.common.consts.CacheConst;
+import cn.codesensi.amour.common.core.BasePage;
 import cn.codesensi.amour.common.enums.EnableEnum;
 import cn.codesensi.amour.common.util.CacheUtil;
 import cn.codesensi.amour.mapper.SysDictMapper;
 import cn.codesensi.amour.model.converter.DictConverter;
 import cn.codesensi.amour.model.dto.DictDTO;
 import cn.codesensi.amour.model.dto.DictGroupDTO;
+import cn.codesensi.amour.model.dto.DictPageDTO;
+import cn.codesensi.amour.model.dto.DictTypeDTO;
 import cn.codesensi.amour.model.entity.SysDict;
 import cn.codesensi.amour.service.SysDictService;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
+import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +24,9 @@ import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static cn.codesensi.amour.model.entity.table.SysDictTableDef.SYS_DICT;
 
@@ -101,6 +108,52 @@ public class SysDictServiceImpl implements SysDictService {
             }
         }
         return groups;
+    }
+
+    /**
+     * 查询全部字典类型(按编码聚合,含条目数;管理端左侧类型列表的数据源)。
+     * <p>字典为单表扁平结构,"类型"是由 {@code dict_code} 聚合出的分组视角:
+     * 全表按 id 升序加载后内存聚合,名称取组内首行,计数包含禁用条目。
+     *
+     * @return 字典类型列表
+     */
+    @Override
+    public List<DictTypeDTO> listTypes() {
+        List<SysDict> dictList = QueryChain.of(sysDictMapper)
+                .orderBy(SYS_DICT.ID, true)
+                .list();
+        Map<String, DictTypeDTO> types = new LinkedHashMap<>();
+        for (SysDict dict : dictList) {
+            DictTypeDTO type = types.computeIfAbsent(dict.getDictCode(),
+                    code -> new DictTypeDTO().setDictCode(code).setCount(0));
+            type.setDictName(dict.getDictName());
+            type.setCount(type.getCount() + 1);
+        }
+        return new ArrayList<>(types.values());
+    }
+
+    /**
+     * 分页查询字典条目(管理端,含禁用条目与完整字段)。
+     * <p>
+     * 编码、名称、值为模糊匹配,状态为精确匹配,条件缺省时自动忽略;
+     * 排序为编码升序 → 组内 sort 升序 → id 升序;页码与每页条数的缺省值由 {@link BasePage} 提供(1 与 20)。
+     * <p>逻辑删除（del_flag）由 MyBatis-Flex 全局配置自动追加过滤。
+     *
+     * @param pageDTO 分页查询参数
+     * @return 字典条目分页结果
+     */
+    @Override
+    public Page<SysDict> page(DictPageDTO pageDTO) {
+        return QueryChain.of(sysDictMapper)
+                .select(SYS_DICT.ALL_COLUMNS)
+                .where(SYS_DICT.DICT_CODE.like(pageDTO.getDictCode(), StrUtil::isNotBlank))
+                .and(SYS_DICT.DICT_NAME.like(pageDTO.getDictName(), StrUtil::isNotBlank))
+                .and(SYS_DICT.DICT_VALUE.like(pageDTO.getDictValue(), StrUtil::isNotBlank))
+                .and(SYS_DICT.STATUS.eq(pageDTO.getStatus(), ObjUtil::isNotNull))
+                .orderBy(SYS_DICT.DICT_CODE, true)
+                .orderBy(SYS_DICT.SORT, true)
+                .orderBy(SYS_DICT.ID, true)
+                .page(Page.of(pageDTO.getPageNumber(), pageDTO.getPageSize()));
     }
 
     /**
