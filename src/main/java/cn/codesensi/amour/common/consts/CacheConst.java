@@ -51,6 +51,12 @@ public class CacheConst {
     public static final String QQ_INFO = "qq-info";
 
     /**
+     * 数据字典缓存名（基础缓存名，实际使用时经 {@link CacheUtil#withAppEnv(String)} 拼接项目名_运行环境前缀），
+     * Key 为字典编码（dict_code），存储该编码下启用中的字典项列表
+     */
+    public static final String DICT = "dict";
+
+    /**
      * 缓存空值哨兵：Caffeine 不允许缓存 {@code null}，用该哨兵占位表示"数据不存在"，
      * 读取时再还原为 {@code null}，从而使"不存在"的结果也能被缓存，避免反复回源。
      */

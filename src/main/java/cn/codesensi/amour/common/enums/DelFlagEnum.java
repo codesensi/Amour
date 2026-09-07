@@ -11,8 +11,8 @@ import lombok.Getter;
 @Getter
 public enum DelFlagEnum implements BaseEnum<Integer> {
 
-    DELETED(AppConst.ONE_INT, "已删除"),
     NOT_DELETED(AppConst.ZERO_INT, "未删除"),
+    DELETED(AppConst.ONE_INT, "已删除"),
     ;
 
     /**
