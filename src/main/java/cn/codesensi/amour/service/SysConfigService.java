@@ -1,7 +1,10 @@
 package cn.codesensi.amour.service;
 
 import cn.codesensi.amour.model.dto.ConfigDTO;
+import cn.codesensi.amour.model.dto.ConfigPageDTO;
+import cn.codesensi.amour.model.dto.ConfigUpdateDTO;
 import cn.codesensi.amour.model.entity.SysConfig;
+import com.mybatisflex.core.paginate.Page;
 
 import java.util.List;
 
@@ -38,6 +41,24 @@ public interface SysConfigService {
      * @return 配置 DTO 列表；无命中时返回空列表
      */
     List<ConfigDTO> listByKeys(List<String> keys);
+
+    /**
+     * 分页查询配置（管理端，含禁用条目与完整字段）。
+     *
+     * @param pageDTO 分页查询参数
+     * @return 配置实体分页结果
+     */
+    Page<SysConfig> page(ConfigPageDTO pageDTO);
+
+    /**
+     * 修改配置（管理端）。
+     * <p>
+     * 仅允许修改配置值、状态与备注；配置键、值类型与分组由代码侧约定，不可变更。
+     * 修改成功后失效该配置键的 config 缓存，实现"驻留不过期"策略下的热更新。
+     *
+     * @param updateDTO 修改参数
+     */
+    void update(ConfigUpdateDTO updateDTO);
 
     /**
      * 失效配置缓存。

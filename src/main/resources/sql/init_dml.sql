@@ -247,7 +247,11 @@ FROM (
              (10605, 'image-type', '图形验证码类型', 'arithmetic', '算术验证码', 5, 0, 1, '内置字典：与 ImageType(spec/gif/chinese/chinese-gif/arithmetic) 对齐'),
              -- success（成功状态，对应 SuccessEnum：1-成功,0-失败；10700 段）
              (10701, 'success', '成功状态', '1', '成功', 1, 0, 1, '内置字典：与 SuccessEnum(1/0) 对齐'),
-             (10702, 'success', '成功状态', '0', '失败', 2, 0, 1, '内置字典：与 SuccessEnum(1/0) 对齐')
+             (10702, 'success', '成功状态', '0', '失败', 2, 0, 1, '内置字典：与 SuccessEnum(1/0) 对齐'),
+             -- config-group（配置分组，与 sys_config.config_group 对齐：base-基础,site-门户,captcha-验证码；10800 段）
+             (10801, 'config-group', '配置分组', 'base', '基础配置', 1, 0, 1, '内置字典：与 sys_config.config_group(base/site/captcha) 对齐'),
+             (10802, 'config-group', '配置分组', 'site', '门户配置', 2, 0, 1, '内置字典：与 sys_config.config_group(base/site/captcha) 对齐'),
+             (10803, 'config-group', '配置分组', 'captcha', '验证码配置', 3, 0, 1, '内置字典：与 sys_config.config_group(base/site/captcha) 对齐')
      ) AS t(id, dict_code, dict_name, dict_value, dict_label, sort, status, builtin, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_dict` WHERE `sys_dict`.`id` = t.id

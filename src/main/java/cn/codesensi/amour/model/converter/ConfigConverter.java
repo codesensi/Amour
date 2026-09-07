@@ -1,9 +1,16 @@
 package cn.codesensi.amour.model.converter;
 
 import cn.codesensi.amour.model.dto.ConfigDTO;
+import cn.codesensi.amour.model.dto.ConfigPageDTO;
+import cn.codesensi.amour.model.dto.ConfigUpdateDTO;
 import cn.codesensi.amour.model.entity.SysConfig;
+import cn.codesensi.amour.model.request.ConfigPageRequest;
+import cn.codesensi.amour.model.request.ConfigUpdateRequest;
+import cn.codesensi.amour.model.response.ConfigPageResponse;
 import cn.codesensi.amour.model.response.ConfigResponse;
+import com.mybatisflex.core.paginate.Page;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 
 import java.util.List;
@@ -52,5 +59,31 @@ public interface ConfigConverter {
      * @return 配置响应对象列表
      */
     List<ConfigResponse> toListResponse(List<ConfigDTO> configDTOs);
+
+    /**
+     * 配置分页查询请求 → 分页查询参数 DTO。
+     *
+     * @param request 分页查询请求
+     * @return 分页查询参数 DTO
+     */
+    ConfigPageDTO toPageDTO(ConfigPageRequest request);
+
+    /**
+     * Page&lt;SysConfig&gt; → Page&lt;ConfigPageResponse&gt;
+     * （records 逐元素复用实体 → 行响应对象的映射规则）。
+     *
+     * @param page 配置实体分页
+     * @return 配置行响应对象分页
+     */
+    @Mapping(target = "optimizeCountQuery", ignore = true)
+    Page<ConfigPageResponse> toPageResponse(Page<SysConfig> page);
+
+    /**
+     * 配置修改请求 → 修改参数 DTO。
+     *
+     * @param request 修改请求
+     * @return 修改参数 DTO
+     */
+    ConfigUpdateDTO toUpdateDTO(ConfigUpdateRequest request);
 
 }
