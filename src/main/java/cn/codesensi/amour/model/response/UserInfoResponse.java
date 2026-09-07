@@ -2,7 +2,10 @@ package cn.codesensi.amour.model.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import tools.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.databind.ser.std.ToStringSerializer;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -16,6 +19,15 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class UserInfoResponse implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * 用户ID
+     */
+    @JsonSerialize(using = ToStringSerializer.class)  // 序列化为字符串避免前端精度丢失
+    private Long id;
 
     /**
      * 用户名

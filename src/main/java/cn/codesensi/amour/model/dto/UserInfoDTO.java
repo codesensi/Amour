@@ -19,6 +19,11 @@ public class UserInfoDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
+     * 用户ID
+     */
+    private Long id;
+
+    /**
      * 用户名
      */
     private String username;
