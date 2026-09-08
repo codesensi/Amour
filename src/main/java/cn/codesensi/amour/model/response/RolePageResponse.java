@@ -48,7 +48,7 @@ public class RolePageResponse implements Serializable {
     private Integer status;
 
     /**
-     * 内置标识:0-非内置,1-内置
+     * 是否内置:0-否,1-是
      */
     private Integer builtin;
 

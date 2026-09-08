@@ -4,15 +4,15 @@ import cn.codesensi.amour.common.consts.AppConst;
 import lombok.Getter;
 
 /**
- * 系统内置标识枚举
- * 1-内置
- * 0-非内置
+ * 是否内置枚举
+ * 1-是
+ * 0-否
  */
 @Getter
 public enum BuiltinEnum implements BaseEnum<Integer> {
 
-    YES(AppConst.ONE_INT, "内置"),
-    NO(AppConst.ZERO_INT, "非内置"),
+    YES(AppConst.ONE_INT, "是"),
+    NO(AppConst.ZERO_INT, "否"),
     ;
 
     /**
