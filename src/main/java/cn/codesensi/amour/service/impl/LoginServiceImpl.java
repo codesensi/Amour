@@ -123,8 +123,8 @@ public class LoginServiceImpl implements LoginService {
     /**
      * 校验图形验证码。
      * <p>
-     * 读取 captcha 缓存中 captchaKey 对应的答案并立即失效（保证一次性使用），再与提交内容比对；
-     * 缓存未注册属于配置错误，直接抛出业务异常。
+     * 读取 captcha 缓存中 captchaKey 对应的答案并立即失效（保证一次性使用），再与提交内容比对
+     * （忽略大小写，避免英文字母验证码因大小写误输导致校验失败）；缓存未注册属于配置错误，直接抛出业务异常。
      *
      * @param loginDTO 登录用户信息
      */
@@ -145,7 +145,7 @@ public class LoginServiceImpl implements LoginService {
         if (wrapper == null) {
             throw new BusinessException("验证码不存在");
         }
-        if (!loginDTO.getCaptchaValue().equals(wrapper.get())) {
+        if (!StrUtil.equalsIgnoreCase(loginDTO.getCaptchaValue(), (String) wrapper.get())) {
             throw new BusinessException("验证码错误");
         }
     }
