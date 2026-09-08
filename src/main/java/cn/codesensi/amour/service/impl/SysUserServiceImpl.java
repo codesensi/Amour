@@ -201,10 +201,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             throw new BusinessException("用户不存在");
         }
 
-        // 系统内置用户不允许停用(启用请求不受限)
+        // 系统内置用户不允许禁用(启用请求不受限)
         if (BuiltinEnum.YES.getCode().equals(sysUser.getBuiltin())
                 && EnableEnum.DISABLE.getCode().equals(userChangeStatusDTO.getStatus())) {
-            throw new BusinessException("系统内置用户不允许停用");
+            throw new BusinessException("系统内置用户不允许禁用");
         }
 
         // 状态一致时幂等返回
