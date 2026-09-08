@@ -8,6 +8,7 @@ import cn.codesensi.amour.model.request.*;
 import cn.codesensi.amour.model.response.RolePageResponse;
 import cn.codesensi.amour.model.response.RoleResponse;
 import cn.codesensi.amour.service.SysRoleService;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.mybatisflex.core.paginate.Page;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,7 @@ public class SysRoleController {
      * @param rolePageRequest 分页查询参数
      * @return 分页对象
      */
+    @SaCheckPermission("system:role:page")
     @GetMapping("/page")
     public Page<RolePageResponse> page(@Valid RolePageRequest rolePageRequest) {
         RolePageDTO rolePageDTO = roleConverter.toPageDTO(rolePageRequest);
@@ -54,6 +56,7 @@ public class SysRoleController {
      *
      * @return 角色列表
      */
+    @SaCheckPermission("system:role:page")
     @GetMapping("/list")
     public List<RoleResponse> list() {
         List<SysRole> sysRoles = sysRoleService.list();
@@ -65,6 +68,7 @@ public class SysRoleController {
      *
      * @param request 新增角色请求参数
      */
+    @SaCheckPermission("system:role:insert")
     @PostMapping("/insert")
     public void insert(@Valid @RequestBody RoleInsertRequest request) {
         RoleInsertDTO roleInsertDTO = roleConverter.toInsertDTO(request);
@@ -76,6 +80,7 @@ public class SysRoleController {
      *
      * @param request 修改角色请求参数
      */
+    @SaCheckPermission("system:role:update")
     @PutMapping("/update")
     public void update(@Valid @RequestBody RoleUpdateRequest request) {
         RoleUpdateDTO roleUpdateDTO = roleConverter.toUpdateDTO(request);
@@ -87,6 +92,7 @@ public class SysRoleController {
      *
      * @param request 角色状态请求参数
      */
+    @SaCheckPermission("system:role:update")
     @PutMapping("/change-status")
     public void changeStatus(@Valid @RequestBody RoleChangeStatusRequest request) {
         RoleChangeStatusDTO roleChangeStatusDTO = roleConverter.toChangeStatusDTO(request);
@@ -100,6 +106,7 @@ public class SysRoleController {
      *
      * @param ids 角色ID列表
      */
+    @SaCheckPermission("system:role:delete")
     @DeleteMapping("/delete/{ids}")
     public void delete(@PathVariable Long[] ids) {
         sysRoleService.delete(List.of(ids));
@@ -110,6 +117,7 @@ public class SysRoleController {
      *
      * @param request 角色菜单权限信息
      */
+    @SaCheckPermission("system:role:update")
     @PutMapping("/assign-menus")
     public void assignMenus(@Valid @RequestBody AssignMenusRequest request) {
         AssignMenusDTO assignMenusDTO = roleConverter.toAssignMenusDTO(request);
@@ -122,6 +130,7 @@ public class SysRoleController {
      * @param id 角色ID
      * @return 菜单ID列表
      */
+    @SaCheckPermission("system:role:update")
     @GetMapping("/menu-ids/{id}")
     public List<String> menuIds(@PathVariable Long id) {
         return sysRoleService.listMenuIdsByRoleId(id)

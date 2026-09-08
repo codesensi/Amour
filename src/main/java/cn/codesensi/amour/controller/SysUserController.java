@@ -8,6 +8,7 @@ import cn.codesensi.amour.model.request.*;
 import cn.codesensi.amour.model.response.UserInfoResponse;
 import cn.codesensi.amour.model.response.UserPageResponse;
 import cn.codesensi.amour.service.SysUserService;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.stp.StpUtil;
 import com.mybatisflex.core.paginate.Page;
 import jakarta.validation.Valid;
@@ -40,6 +41,7 @@ public class SysUserController {
      * @param userPageRequest 分页查询参数
      * @return 分页对象
      */
+    @SaCheckPermission("system:user:page")
     @GetMapping("/page")
     public Page<UserPageResponse> page(@Valid UserPageRequest userPageRequest) {
         UserPageDTO userPageDTO = userConverter.toPageDTO(userPageRequest);
@@ -64,6 +66,7 @@ public class SysUserController {
      *
      * @param request 新增用户请求参数
      */
+    @SaCheckPermission("system:user:insert")
     @PostMapping("/insert")
     public void insert(@Valid @RequestBody UserInsertRequest request) {
         UserInsertDTO userInsertDTO = userConverter.toInsertDTO(request);
@@ -75,6 +78,7 @@ public class SysUserController {
      *
      * @param request 修改用户请求参数
      */
+    @SaCheckPermission("system:user:update")
     @PutMapping("/update")
     public void update(@Valid @RequestBody UserUpdateRequest request) {
         UserUpdateDTO userUpdateDTO = userConverter.toUpdateDTO(request);
@@ -86,6 +90,7 @@ public class SysUserController {
      *
      * @param request 修改状态请求参数
      */
+    @SaCheckPermission("system:user:update")
     @PutMapping("/change-status")
     public void changeStatus(@Valid @RequestBody UserChangeStatusRequest request) {
         UserChangeStatusDTO userChangeStatusDTO = userConverter.toChangeStatusDTO(request);
@@ -97,6 +102,7 @@ public class SysUserController {
      *
      * @param ids 用户ID列表
      */
+    @SaCheckPermission("system:user:delete")
     @DeleteMapping("/delete/{ids}")
     public void delete(@PathVariable Long[] ids) {
         sysUserService.delete(List.of(ids));
@@ -107,6 +113,7 @@ public class SysUserController {
      *
      * @param id 用户ID
      */
+    @SaCheckPermission("system:user:update")
     @PutMapping("/reset-password/{id}")
     public void resetPassword(@PathVariable Long id) {
         sysUserService.resetPassword(id);
@@ -117,6 +124,7 @@ public class SysUserController {
      *
      * @param request 配置用户角色请求参数
      */
+    @SaCheckPermission("system:user:update")
     @PutMapping("/assign-roles")
     public void assignRoles(@Valid @RequestBody AssignRolesRequest request) {
         AssignRolesDTO assignRolesDTO = userConverter.toAssignRolesDTO(request);
@@ -131,6 +139,7 @@ public class SysUserController {
      * @param id 用户ID
      * @return 角色ID列表
      */
+    @SaCheckPermission("system:user:update")
     @GetMapping("/role-ids/{id}")
     public List<String> roleIds(@PathVariable Long id) {
         return sysUserService.listRoleIdsByUserId(id)

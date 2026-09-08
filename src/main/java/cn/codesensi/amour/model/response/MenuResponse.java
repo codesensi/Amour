@@ -1,5 +1,6 @@
 package cn.codesensi.amour.model.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import tools.jackson.databind.annotation.JsonSerialize;
@@ -7,6 +8,7 @@ import tools.jackson.databind.ser.std.ToStringSerializer;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * 菜单响应结果
@@ -88,5 +90,11 @@ public class MenuResponse implements Serializable {
      * 备注
      */
     private String remark;
+
+    /**
+     * 创建时间(yyyy-MM-dd HH:mm:ss)
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createTime;
 
 }
