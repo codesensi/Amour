@@ -1,8 +1,6 @@
 package cn.codesensi.amour.service;
 
-import cn.codesensi.amour.model.dto.AssignMenusDTO;
-import cn.codesensi.amour.model.dto.RoleInsertDTO;
-import cn.codesensi.amour.model.dto.RolePageDTO;
+import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.SysRole;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
@@ -31,6 +29,27 @@ public interface SysRoleService extends IService<SysRole> {
      * @param roleInsertDTO 角色信息
      */
     void insert(RoleInsertDTO roleInsertDTO);
+
+    /**
+     * 修改角色信息
+     *
+     * @param roleUpdateDTO 角色信息
+     */
+    void update(RoleUpdateDTO roleUpdateDTO);
+
+    /**
+     * 修改角色状态
+     *
+     * @param roleChangeStatusDTO 角色状态信息
+     */
+    void changeStatus(RoleChangeStatusDTO roleChangeStatusDTO);
+
+    /**
+     * 批量删除角色信息
+     *
+     * @param ids 角色ID列表
+     */
+    void delete(List<Long> ids);
 
     /**
      * 分配角色菜单权限

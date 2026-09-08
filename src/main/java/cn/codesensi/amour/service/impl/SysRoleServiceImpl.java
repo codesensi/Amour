@@ -2,17 +2,17 @@ package cn.codesensi.amour.service.impl;
 
 import cn.codesensi.amour.common.core.BasePage;
 import cn.codesensi.amour.common.enums.BuiltinEnum;
+import cn.codesensi.amour.common.enums.EnableEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.util.CacheUtil;
 import cn.codesensi.amour.mapper.SysRoleMapper;
 import cn.codesensi.amour.model.converter.RoleConverter;
-import cn.codesensi.amour.model.dto.AssignMenusDTO;
-import cn.codesensi.amour.model.dto.RoleInsertDTO;
-import cn.codesensi.amour.model.dto.RolePageDTO;
+import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.SysMenu;
 import cn.codesensi.amour.model.entity.SysRole;
 import cn.codesensi.amour.model.entity.SysRoleMenu;
 import cn.codesensi.amour.service.*;
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
@@ -105,6 +105,128 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
 
         SysRole sysRole = roleConverter.toEntity(roleInsertDTO);
         sysRoleMapper.insert(sysRole, true);
+    }
+
+    /**
+     * 修改角色信息。
+     * <p>
+     * 角色编码创建后不可修改,仅更新名称/排序/备注等资料字段。
+     *
+     * @param roleUpdateDTO 角色信息
+     */
+    @Override
+    public void update(RoleUpdateDTO roleUpdateDTO) {
+        SysRole sysRole = getById(roleUpdateDTO.getId());
+        if (ObjUtil.isNull(sysRole)) {
+            throw new BusinessException("角色不存在");
+        }
+
+        SysRole entity = roleConverter.toEntity(roleUpdateDTO);
+        updateById(entity);
+    }
+
+    /**
+     * 修改角色状态。
+     * <p>
+     * 系统内置角色不允许禁用(启用请求不受限);同状态幂等返回;
+     * 状态变化影响该角色下用户的权限,失效其权限/路由菜单/用户信息缓存。
+     *
+     * @param roleChangeStatusDTO 角色状态信息
+     */
+    @Override
+    public void changeStatus(RoleChangeStatusDTO roleChangeStatusDTO) {
+        SysRole sysRole = getById(roleChangeStatusDTO.getId());
+        if (ObjUtil.isNull(sysRole)) {
+            throw new BusinessException("角色不存在");
+        }
+
+        // 系统内置角色不允许禁用(启用请求不受限)
+        if (BuiltinEnum.YES.getCode().equals(sysRole.getBuiltin())
+                && EnableEnum.DISABLE.getCode().equals(roleChangeStatusDTO.getStatus())) {
+            throw new BusinessException("系统内置角色不允许禁用");
+        }
+
+        // 状态一致时幂等返回
+        if (roleChangeStatusDTO.getStatus().equals(sysRole.getStatus())) {
+            return;
+        }
+
+        SysRole entity = new SysRole();
+        entity.setId(roleChangeStatusDTO.getId());
+        entity.setStatus(roleChangeStatusDTO.getStatus());
+        updateById(entity);
+
+        List<Long> userIds = listUserIdsByRoleIds(List.of(roleChangeStatusDTO.getId()));
+        CacheUtil.evictAfterCommit(() -> {
+            log.debug("角色状态变更完成：roleId={}，status={}，失效缓存，受影响用户数={}",
+                    roleChangeStatusDTO.getId(), roleChangeStatusDTO.getStatus(), userIds.size());
+            sysMenuService.evictPermCache(userIds);
+            sysMenuService.evictMenuCache(userIds);
+            sysUserService.evictUserCache(userIds);
+        });
+    }
+
+    /**
+     * 批量删除角色信息。
+     * <p>
+     * 删除角色同时清理角色-菜单、用户-角色关联;缓存失效与踢会话注册到事务提交后执行,
+     * 避免提交前其他请求回源查库把中间状态重新写入缓存。
+     *
+     * @param ids 角色ID列表
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void delete(List<Long> ids) {
+        // 1. 校验角色是否存在
+        List<SysRole> sysRoles = listByIds(ids);
+        List<Long> existingIds = sysRoles.stream().map(SysRole::getId).toList();
+        List<Long> missingIds = ids.stream()
+                .filter(id -> !existingIds.contains(id))
+                .toList();
+        if (CollUtil.isNotEmpty(missingIds)) {
+            throw new BusinessException("角色不存在：" + missingIds);
+        }
+
+        // 2. 系统内置角色不允许删除(整批失败)
+        boolean containsBuiltin = sysRoles.stream()
+                .anyMatch(sysRole -> BuiltinEnum.YES.getCode().equals(sysRole.getBuiltin()));
+        if (containsBuiltin) {
+            throw new BusinessException("系统内置角色不允许删除");
+        }
+
+        // 3. 查询这些角色下关联的用户ID,用于删除后失效其缓存
+        List<Long> userIds = listUserIdsByRoleIds(ids);
+
+        // 4. 删除角色与角色-菜单、用户-角色关联
+        removeByIds(ids);
+        sysRoleMenuService.remove(SYS_ROLE_MENU.ROLE_ID.in(ids));
+        sysUserRoleService.remove(SYS_USER_ROLE.ROLE_ID.in(ids));
+
+        // 5. 失效受影响用户的权限/路由菜单/用户信息缓存,并踢出其会话(注册到事务提交后执行)
+        CacheUtil.evictAfterCommit(() -> {
+            log.debug("角色删除完成：roleIds={}，失效缓存，受影响用户数={}", ids, userIds.size());
+            sysMenuService.evictPermCache(userIds);
+            sysMenuService.evictMenuCache(userIds);
+            sysUserService.evictUserCache(userIds);
+            // 角色被删除后其关联用户的权限已变化,踢出使其重新登录
+            userIds.forEach(StpUtil::logout);
+        });
+    }
+
+    /**
+     * 查询角色列表下关联的所有用户ID。
+     *
+     * @param roleIds 角色ID列表
+     * @return 用户ID列表
+     */
+    private List<Long> listUserIdsByRoleIds(List<Long> roleIds) {
+        if (CollUtil.isEmpty(roleIds)) {
+            return List.of();
+        }
+        return sysUserRoleService.queryChain()
+                .select(SYS_USER_ROLE.USER_ID)
+                .where(SYS_USER_ROLE.ROLE_ID.in(roleIds))
+                .listAs(Long.class);
     }
 
     /**

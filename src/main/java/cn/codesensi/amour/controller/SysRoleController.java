@@ -2,15 +2,11 @@ package cn.codesensi.amour.controller;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.model.converter.RoleConverter;
-import cn.codesensi.amour.model.dto.AssignMenusDTO;
-import cn.codesensi.amour.model.dto.RoleInsertDTO;
-import cn.codesensi.amour.model.dto.RolePageDTO;
+import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.SysRole;
-import cn.codesensi.amour.model.request.AssignMenusRequest;
-import cn.codesensi.amour.model.request.RoleInsertRequest;
-import cn.codesensi.amour.model.request.RolePageRequest;
-import cn.codesensi.amour.model.response.RoleResponse;
+import cn.codesensi.amour.model.request.*;
 import cn.codesensi.amour.model.response.RolePageResponse;
+import cn.codesensi.amour.model.response.RoleResponse;
 import cn.codesensi.amour.service.SysRoleService;
 import com.mybatisflex.core.paginate.Page;
 import jakarta.validation.Valid;
@@ -73,6 +69,40 @@ public class SysRoleController {
     public void insert(@Valid @RequestBody RoleInsertRequest request) {
         RoleInsertDTO roleInsertDTO = roleConverter.toInsertDTO(request);
         sysRoleService.insert(roleInsertDTO);
+    }
+
+    /**
+     * 修改角色信息
+     *
+     * @param request 修改角色请求参数
+     */
+    @PutMapping("/update")
+    public void update(@Valid @RequestBody RoleUpdateRequest request) {
+        RoleUpdateDTO roleUpdateDTO = roleConverter.toUpdateDTO(request);
+        sysRoleService.update(roleUpdateDTO);
+    }
+
+    /**
+     * 修改角色状态
+     *
+     * @param request 角色状态请求参数
+     */
+    @PutMapping("/change-status")
+    public void changeStatus(@Valid @RequestBody RoleChangeStatusRequest request) {
+        RoleChangeStatusDTO roleChangeStatusDTO = roleConverter.toChangeStatusDTO(request);
+        sysRoleService.changeStatus(roleChangeStatusDTO);
+    }
+
+    /**
+     * 批量删除角色信息
+     * <p>
+     * 路径参数支持英文逗号分隔的多个ID,如 /sys/role/delete/1,2,3。
+     *
+     * @param ids 角色ID列表
+     */
+    @DeleteMapping("/delete/{ids}")
+    public void delete(@PathVariable Long[] ids) {
+        sysRoleService.delete(List.of(ids));
     }
 
     /**

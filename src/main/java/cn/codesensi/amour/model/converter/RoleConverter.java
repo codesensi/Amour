@@ -1,14 +1,10 @@
 package cn.codesensi.amour.model.converter;
 
-import cn.codesensi.amour.model.dto.AssignMenusDTO;
-import cn.codesensi.amour.model.dto.RoleInsertDTO;
-import cn.codesensi.amour.model.dto.RolePageDTO;
+import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.SysRole;
-import cn.codesensi.amour.model.request.AssignMenusRequest;
-import cn.codesensi.amour.model.request.RoleInsertRequest;
-import cn.codesensi.amour.model.request.RolePageRequest;
-import cn.codesensi.amour.model.response.RoleResponse;
+import cn.codesensi.amour.model.request.*;
 import cn.codesensi.amour.model.response.RolePageResponse;
+import cn.codesensi.amour.model.response.RoleResponse;
 import com.mybatisflex.core.paginate.Page;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -30,6 +26,16 @@ public interface RoleConverter {
     RoleInsertDTO toInsertDTO(RoleInsertRequest request);
 
     /**
+     * RoleUpdateRequest → RoleUpdateDTO
+     */
+    RoleUpdateDTO toUpdateDTO(RoleUpdateRequest request);
+
+    /**
+     * RoleChangeStatusRequest → RoleChangeStatusDTO
+     */
+    RoleChangeStatusDTO toChangeStatusDTO(RoleChangeStatusRequest request);
+
+    /**
      * AssignMenusRequest → AssignMenusDTO
      */
     AssignMenusDTO toAssignMenusDTO(AssignMenusRequest request);
@@ -38,6 +44,11 @@ public interface RoleConverter {
      * RoleInsertDTO → SysRole
      */
     SysRole toEntity(RoleInsertDTO roleInsertDTO);
+
+    /**
+     * RoleUpdateDTO → SysRole
+     */
+    SysRole toEntity(RoleUpdateDTO roleUpdateDTO);
 
     /**
      * RolePageRequest → RolePageDTO

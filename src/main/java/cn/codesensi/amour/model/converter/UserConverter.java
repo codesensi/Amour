@@ -2,11 +2,7 @@ package cn.codesensi.amour.model.converter;
 
 import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.SysUser;
-import cn.codesensi.amour.model.request.AssignRolesRequest;
-import cn.codesensi.amour.model.request.UserChangeStatusRequest;
-import cn.codesensi.amour.model.request.UserPageRequest;
-import cn.codesensi.amour.model.request.UserInsertRequest;
-import cn.codesensi.amour.model.request.UserUpdateRequest;
+import cn.codesensi.amour.model.request.*;
 import cn.codesensi.amour.model.response.UserInfoResponse;
 import cn.codesensi.amour.model.response.UserPageResponse;
 import com.mybatisflex.core.paginate.Page;

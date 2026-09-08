@@ -1,11 +1,6 @@
 package cn.codesensi.amour.service;
 
-import cn.codesensi.amour.model.dto.AssignRolesDTO;
-import cn.codesensi.amour.model.dto.UserChangeStatusDTO;
-import cn.codesensi.amour.model.dto.UserInfoDTO;
-import cn.codesensi.amour.model.dto.UserPageDTO;
-import cn.codesensi.amour.model.dto.UserInsertDTO;
-import cn.codesensi.amour.model.dto.UserUpdateDTO;
+import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.SysUser;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.service.IService;
