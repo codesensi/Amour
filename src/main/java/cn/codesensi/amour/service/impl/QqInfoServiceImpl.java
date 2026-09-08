@@ -3,6 +3,7 @@ package cn.codesensi.amour.service.impl;
 import cn.codesensi.amour.common.consts.CacheConst;
 import cn.codesensi.amour.common.enums.ConfigKeyEnum;
 import cn.codesensi.amour.common.exception.SystemException;
+import cn.codesensi.amour.common.properties.AppQqProperties;
 import cn.codesensi.amour.common.util.CacheUtil;
 import cn.codesensi.amour.model.dto.QqInfoResultDTO;
 import cn.codesensi.amour.model.entity.SysConfig;
@@ -38,15 +39,18 @@ public class QqInfoServiceImpl implements QqInfoService {
 
     private final CacheManager cacheManager;
 
+    private final AppQqProperties qqProperties;
+
     /**
      * {@inheritDoc}
      * <p>
      * 查询结果写入 qq-info 缓存（写后 15 分钟过期，见 application-dev.yml），
      * 同一 QQ 号在过期前直接复用缓存，避免失焦/翻页的高频调用穿透上游。
+     * 上游异常的降级空结果不写缓存，便于上游恢复后下次调用立即重试。
      */
     @Override
     public QqInfoResultDTO getQqInfo(String qq) {
-        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.QQ_INFO));
+        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.QQ));
         if (cache == null) {
             throw new SystemException("QQ信息缓存未注册，请检查缓存配置");
         }
@@ -55,12 +59,15 @@ public class QqInfoServiceImpl implements QqInfoService {
             return cached;
         }
         QqInfoResultDTO result = loadFromQqService(qq);
-        cache.put(qq, result);
+        // 降级空结果(上游异常/未配置)不写缓存:避免上游临时故障后 15 分钟内一直返回空信息
+        if (StrUtil.isNotBlank(result.getAvatarUrl())) {
+            cache.put(qq, result);
+        }
         return result;
     }
 
     /**
-     * 回源查询 QQ 信息：qq-service 未配置或响应为空时返回空 DTO，由前端判空兜底。
+     * 回源查询 QQ 信息：qq-service 未配置、响应为空、调用失败或响应缺少头像字段时返回空 DTO，由前端判空兜底。
      */
     private QqInfoResultDTO loadFromQqService(String qq) {
         SysConfig qqServiceConfig = sysConfigService.oneByKey(ConfigKeyEnum.QQ_SERVICE.getCode());
@@ -69,13 +76,31 @@ public class QqInfoServiceImpl implements QqInfoService {
             return new QqInfoResultDTO();
         }
         String qqServiceUrl = String.format(qqServiceConfig.getConfigValue(), URLEncoder.encode(qq, StandardCharsets.UTF_8));
-        String qqServiceResponse = HttpUtil.get(qqServiceUrl);
+        String qqServiceResponse;
+        try {
+            qqServiceResponse = HttpUtil.get(qqServiceUrl, qqProperties.getTimeout());
+        } catch (Exception e) {
+            // 上游网络异常(超时/连接失败)降级为空 DTO,不阻断登录页调用
+            log.warn("qq-service 调用失败：url={}", qqServiceUrl, e);
+            return new QqInfoResultDTO();
+        }
         log.debug("qq-service {} 响应：{}", qqServiceUrl, qqServiceResponse);
         if (StrUtil.isBlank(qqServiceResponse)) {
             log.warn("QQ 信息查询服务响应为空");
             return new QqInfoResultDTO();
         }
-        QqInfoResultDTO qqInfoResultDTO = JSONUtil.toBean(qqServiceResponse, QqInfoResultDTO.class);
+        QqInfoResultDTO qqInfoResultDTO;
+        try {
+            qqInfoResultDTO = JSONUtil.toBean(qqServiceResponse, QqInfoResultDTO.class);
+        } catch (Exception e) {
+            log.warn("qq-service 响应解析失败：{}", qqServiceResponse, e);
+            return new QqInfoResultDTO();
+        }
+        // 上游异常载荷(限流/配额耗尽/无效 QQ 等)可能缺少头像字段,判空兜底避免 NPE
+        if (StrUtil.isBlank(qqInfoResultDTO.getAvatarUrl())) {
+            log.warn("qq-service 响应缺少头像地址：{}", qqServiceResponse);
+            return new QqInfoResultDTO();
+        }
         if (qqInfoResultDTO.getAvatarUrl().startsWith("http://")) {
             qqInfoResultDTO.setAvatarUrl(qqInfoResultDTO.getAvatarUrl().replace("http://", "https://"));
         }
