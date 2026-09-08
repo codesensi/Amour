@@ -35,9 +35,4 @@ public class ConfigPageRequest extends BasePage implements Serializable {
     @Size(max = 64, message = "分组长度不能超过64")
     private String configGroup;
 
-    /**
-     * 配置状态:0-启用,1-禁用
-     */
-    private Integer status;
-
 }

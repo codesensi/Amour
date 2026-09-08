@@ -48,11 +48,6 @@ public class ConfigPageResponse implements Serializable {
     private String configGroup;
 
     /**
-     * 配置状态:0-启用,1-禁用
-     */
-    private Integer status;
-
-    /**
      * 备注
      */
     private String remark;

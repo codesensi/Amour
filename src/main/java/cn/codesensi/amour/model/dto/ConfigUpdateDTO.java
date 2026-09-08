@@ -9,7 +9,7 @@ import java.io.Serializable;
 /**
  * 系统配置修改 DTO —— 面向管理端修改配置的参数载体。
  * <p>
- * 仅允许修改配置值、状态与备注；配置键、值类型与分组由代码侧约定，不可变更。
+ * 仅允许修改配置值；配置键、值类型、分组与状态由代码侧约定，不可变更。
  *
  * @author codesensi
  * @since 1.0
@@ -30,15 +30,5 @@ public class ConfigUpdateDTO implements Serializable {
      * 配置值(统一字符串存储;格式由服务端按值类型校验)
      */
     private String configValue;
-
-    /**
-     * 配置状态:0-启用,1-禁用
-     */
-    private Integer status;
-
-    /**
-     * 备注
-     */
-    private String remark;
 
 }

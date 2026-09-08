@@ -11,6 +11,7 @@ import cn.codesensi.amour.model.request.ConfigUpdateRequest;
 import cn.codesensi.amour.model.response.ConfigPageResponse;
 import cn.codesensi.amour.model.response.ConfigResponse;
 import cn.codesensi.amour.service.SysConfigService;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaIgnore;
 import com.mybatisflex.core.paginate.Page;
 import jakarta.validation.Valid;
@@ -54,6 +55,7 @@ public class SysConfigController {
      * @param configPageRequest 分页查询参数
      * @return 配置分页结果
      */
+    @SaCheckPermission("system:config:page")
     @GetMapping("/page")
     public Page<ConfigPageResponse> page(@Valid ConfigPageRequest configPageRequest) {
         ConfigPageDTO pageDTO = configConverter.toPageDTO(configPageRequest);
@@ -62,13 +64,23 @@ public class SysConfigController {
     }
 
     /**
-     * 修改系统配置（仅允许修改配置值/状态/备注;更新后失效对应配置键缓存,热更新即时生效）。
+     * 修改系统配置（仅允许修改配置值;更新后失效对应配置键缓存,热更新即时生效）。
      *
      * @param updateRequest 修改请求参数
      */
+    @SaCheckPermission("system:config:update")
     @PutMapping("/update")
     public void update(@Valid @RequestBody ConfigUpdateRequest updateRequest) {
         ConfigUpdateDTO updateDTO = configConverter.toUpdateDTO(updateRequest);
         sysConfigService.update(updateDTO);
+    }
+
+    /**
+     * 刷新配置缓存（清空全部 config 缓存,下次读取时回源查库）。
+     */
+    @SaCheckPermission("system:config:update")
+    @PostMapping("/refresh-cache")
+    public void refreshCache() {
+        sysConfigService.evictCache(List.of());
     }
 }

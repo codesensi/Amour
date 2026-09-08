@@ -11,7 +11,7 @@ import java.io.Serializable;
 /**
  * 修改系统配置请求参数
  * <p>
- * 仅允许修改配置值、状态与备注；配置键、值类型与分组由代码侧（{@code ConfigKeyEnum}）
+ * 仅允许修改配置值；配置键、值类型、分组与状态由代码侧（{@code ConfigKeyEnum}）
  * 与初始化脚本约定，不接受修改。
  *
  * @author codesensi
@@ -35,17 +35,5 @@ public class ConfigUpdateRequest implements Serializable {
     @NotBlank(message = "配置值不能为空")
     @Size(max = 4000, message = "配置值长度不能超过4000")
     private String configValue;
-
-    /**
-     * 配置状态:0-启用,1-禁用
-     */
-    @NotNull(message = "配置状态不能为空")
-    private Integer status;
-
-    /**
-     * 备注
-     */
-    @Size(max = 512, message = "备注长度不能超过512")
-    private String remark;
 
 }
