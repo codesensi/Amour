@@ -3,8 +3,10 @@ package cn.codesensi.amour.model.converter;
 import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.SysUser;
 import cn.codesensi.amour.model.request.AssignRolesRequest;
+import cn.codesensi.amour.model.request.UserChangeStatusRequest;
 import cn.codesensi.amour.model.request.UserPageRequest;
 import cn.codesensi.amour.model.request.UserInsertRequest;
+import cn.codesensi.amour.model.request.UserUpdateRequest;
 import cn.codesensi.amour.model.response.UserInfoResponse;
 import cn.codesensi.amour.model.response.UserPageResponse;
 import com.mybatisflex.core.paginate.Page;
@@ -24,6 +26,16 @@ public interface UserConverter {
      * UserInsertRequest → UserInsertDTO
      */
     UserInsertDTO toInsertDTO(UserInsertRequest request);
+
+    /**
+     * UserUpdateRequest → UserUpdateDTO
+     */
+    UserUpdateDTO toUpdateDTO(UserUpdateRequest request);
+
+    /**
+     * UserChangeStatusRequest → UserChangeStatusDTO
+     */
+    UserChangeStatusDTO toChangeStatusDTO(UserChangeStatusRequest request);
 
     /**
      * UserInfoDTO → UserInfoResponse
@@ -50,6 +62,11 @@ public interface UserConverter {
      * UserInsertDTO → SysUser
      */
     SysUser toEntity(UserInsertDTO userInsertDTO);
+
+    /**
+     * UserUpdateDTO → SysUser(仅资料字段,id 用于定位更新;用户名/密码/状态不在映射范围)
+     */
+    SysUser toEntity(UserUpdateDTO userUpdateDTO);
 
     /**
      * SysUser → UserInfoDTO

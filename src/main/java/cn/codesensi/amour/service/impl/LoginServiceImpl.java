@@ -2,6 +2,7 @@ package cn.codesensi.amour.service.impl;
 
 import cn.codesensi.amour.common.consts.CacheConst;
 import cn.codesensi.amour.common.enums.ConfigKeyEnum;
+import cn.codesensi.amour.common.enums.EnableEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.exception.ValidationException;
 import cn.codesensi.amour.common.util.CacheUtil;
@@ -72,7 +73,7 @@ public class LoginServiceImpl implements LoginService {
 
         // 校验用户及密码（用户名/QQ号邮箱任一匹配即可登录）
         SysUser sysUser = sysUserService.queryChain()
-                .select(SYS_USER.ID, SYS_USER.PASSWORD)
+                .select(SYS_USER.ID, SYS_USER.PASSWORD, SYS_USER.STATUS)
                 .where(SYS_USER.USERNAME.eq(username))
                 .or(SYS_USER.QQ.eq(username))
                 .one();
@@ -82,6 +83,12 @@ public class LoginServiceImpl implements LoginService {
             throw new BusinessException("账号或密码错误");
         }
         log.debug("账号密码匹配成功：username={}", username);
+
+        // 校验用户状态（禁用用户不允许登录）
+        if (EnableEnum.DISABLE.getCode().equals(sysUser.getStatus())) {
+            log.debug("登录失败：username={}，账号已被禁用", username);
+            throw new BusinessException("该账号已被禁用");
+        }
 
         Long userId = sysUser.getId();
         // 校验账户是否封禁

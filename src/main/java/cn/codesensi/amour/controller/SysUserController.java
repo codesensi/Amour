@@ -2,14 +2,9 @@ package cn.codesensi.amour.controller;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.model.converter.UserConverter;
-import cn.codesensi.amour.model.dto.AssignRolesDTO;
-import cn.codesensi.amour.model.dto.UserInfoDTO;
-import cn.codesensi.amour.model.dto.UserInsertDTO;
-import cn.codesensi.amour.model.dto.UserPageDTO;
+import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.SysUser;
-import cn.codesensi.amour.model.request.AssignRolesRequest;
-import cn.codesensi.amour.model.request.UserInsertRequest;
-import cn.codesensi.amour.model.request.UserPageRequest;
+import cn.codesensi.amour.model.request.*;
 import cn.codesensi.amour.model.response.UserInfoResponse;
 import cn.codesensi.amour.model.response.UserPageResponse;
 import cn.codesensi.amour.service.SysUserService;
@@ -73,6 +68,48 @@ public class SysUserController {
     public void insert(@Valid @RequestBody UserInsertRequest request) {
         UserInsertDTO userInsertDTO = userConverter.toInsertDTO(request);
         sysUserService.insert(userInsertDTO);
+    }
+
+    /**
+     * 修改用户信息
+     *
+     * @param request 修改用户请求参数
+     */
+    @PutMapping("/update")
+    public void update(@Valid @RequestBody UserUpdateRequest request) {
+        UserUpdateDTO userUpdateDTO = userConverter.toUpdateDTO(request);
+        sysUserService.update(userUpdateDTO);
+    }
+
+    /**
+     * 修改用户状态
+     *
+     * @param request 修改状态请求参数
+     */
+    @PutMapping("/change-status")
+    public void changeStatus(@Valid @RequestBody UserChangeStatusRequest request) {
+        UserChangeStatusDTO userChangeStatusDTO = userConverter.toChangeStatusDTO(request);
+        sysUserService.changeStatus(userChangeStatusDTO);
+    }
+
+    /**
+     * 删除用户信息(支持单个或批量,ID 以英文逗号分隔)
+     *
+     * @param ids 用户ID列表
+     */
+    @DeleteMapping("/delete/{ids}")
+    public void delete(@PathVariable Long[] ids) {
+        sysUserService.delete(List.of(ids));
+    }
+
+    /**
+     * 重置用户密码为系统默认密码
+     *
+     * @param id 用户ID
+     */
+    @PutMapping("/reset-password/{id}")
+    public void resetPassword(@PathVariable Long id) {
+        sysUserService.resetPassword(id);
     }
 
     /**

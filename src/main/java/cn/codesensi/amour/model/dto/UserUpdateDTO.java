@@ -6,21 +6,21 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 新增用户请求参数
+ * 修改用户请求参数
  *
  * @author codesensi
- * @since 2026-06-28
+ * @since 2026-09-08
  */
 @Data
-public class UserInsertDTO implements Serializable {
+public class UserUpdateDTO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
-     * 用户名称
+     * 用户ID
      */
-    private String username;
+    private Long id;
 
     /**
      * 用户昵称
@@ -56,11 +56,6 @@ public class UserInsertDTO implements Serializable {
      * 用户头像地址
      */
     private String avatar;
-
-    /**
-     * 用户状态:0-启用,1-禁用(缺省视为启用)
-     */
-    private Integer status;
 
     /**
      * 备注

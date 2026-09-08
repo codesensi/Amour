@@ -4,7 +4,7 @@ import cn.codesensi.amour.common.consts.AppConst;
 import cn.codesensi.amour.common.consts.CacheConst;
 import cn.codesensi.amour.common.core.BasePage;
 import cn.codesensi.amour.common.enums.BuiltinEnum;
-import cn.codesensi.amour.common.enums.ConfigKeyEnum;
+import cn.codesensi.amour.common.enums.EnableEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.util.CacheUtil;
 import cn.codesensi.amour.mapper.SysRoleMapper;
@@ -15,10 +15,10 @@ import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.SysMenu;
 import cn.codesensi.amour.model.entity.SysUser;
 import cn.codesensi.amour.model.entity.SysUserRole;
-import cn.codesensi.amour.service.SysConfigService;
 import cn.codesensi.amour.service.SysMenuService;
 import cn.codesensi.amour.service.SysUserRoleService;
 import cn.codesensi.amour.service.SysUserService;
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
@@ -28,6 +28,7 @@ import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
@@ -55,7 +56,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private final UserConverter userConverter;
     private final MenuConverter menuConverter;
     private final SysUserRoleService sysUserRoleService;
-    private final SysConfigService sysConfigService;
     private final CacheManager cacheManager;
 
     /**
@@ -148,6 +148,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             throw new BusinessException("用户名已存在");
         }
 
+        // 状态缺省视为启用(0,与 EnableEnum 对齐)
+        if (ObjUtil.isNull(userInsertDTO.getStatus())) {
+            userInsertDTO.setStatus(EnableEnum.ENABLE.getCode());
+        }
+
         SysUser sysUser = userConverter.toEntity(userInsertDTO);
         // 若未输入昵称则保持昵称和用户名相同
         if (StrUtil.isBlank(userInsertDTO.getNickname())) {
@@ -160,6 +165,137 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         String password = BCrypt.hashpw(AppConst.DEFAULT_PASSWORD, BCrypt.gensalt());
         sysUser.setPassword(password);
         sysUserMapper.insert(sysUser, true);
+    }
+
+    /**
+     * 修改用户信息。
+     * <p>
+     * 仅更新请求中的资料字段（用户名、状态、密码不在可修改范围），
+     * MyBatis-Flex 按忽略 null 策略更新；更新成功后复用 {@link #updateById(SysUser)}
+     * 的缓存失效逻辑。
+     *
+     * @param userUpdateDTO 用户信息
+     */
+    @Override
+    public void update(UserUpdateDTO userUpdateDTO) {
+        SysUser sysUser = getById(userUpdateDTO.getId());
+        if (ObjUtil.isNull(sysUser)) {
+            throw new BusinessException("用户不存在");
+        }
+        SysUser entity = userConverter.toEntity(userUpdateDTO);
+        updateById(entity);
+    }
+
+    /**
+     * 修改用户状态。
+     * <p>
+     * 仅更新 status 字段；系统内置用户不允许停用；状态一致时幂等返回；
+     * 更新成功后复用 {@link #updateById(SysUser)} 的缓存失效逻辑。
+     *
+     * @param userChangeStatusDTO 状态信息
+     */
+    @Override
+    public void changeStatus(UserChangeStatusDTO userChangeStatusDTO) {
+        SysUser sysUser = getById(userChangeStatusDTO.getId());
+        if (ObjUtil.isNull(sysUser)) {
+            throw new BusinessException("用户不存在");
+        }
+
+        // 系统内置用户不允许停用(启用请求不受限)
+        if (BuiltinEnum.YES.getCode().equals(sysUser.getBuiltin())
+                && EnableEnum.DISABLE.getCode().equals(userChangeStatusDTO.getStatus())) {
+            throw new BusinessException("系统内置用户不允许停用");
+        }
+
+        // 状态一致时幂等返回
+        if (userChangeStatusDTO.getStatus().equals(sysUser.getStatus())) {
+            return;
+        }
+
+        SysUser entity = new SysUser();
+        entity.setId(userChangeStatusDTO.getId());
+        entity.setStatus(userChangeStatusDTO.getStatus());
+        updateById(entity);
+
+        // 禁用即踢出该用户当前会话,避免已签发令牌继续有效(启用无需处理)
+        if (EnableEnum.DISABLE.getCode().equals(userChangeStatusDTO.getStatus())) {
+            StpUtil.logout(userChangeStatusDTO.getId());
+        }
+    }
+
+    /**
+     * 删除用户信息。
+     * <p>
+     * 支持单个或批量删除,批量与单个共用同一校验链;逻辑删除由 MyBatis-Flex 全局
+     * del_flag 配置自动完成；删除用户与清理角色关联处于同一事务，原子提交，
+     * 任一校验不通过即整批回滚，不做部分成功；缓存失效注册在事务提交后执行，
+     * 避免提交前其他请求回源查库把中间状态重新写入缓存。
+     *
+     * @param ids 用户ID列表
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void delete(List<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return;
+        }
+
+        // 1. 校验用户是否存在（逻辑删除的用户视为不存在）
+        List<SysUser> sysUsers = listByIds(ids);
+        List<Long> existingIds = sysUsers.stream().map(SysUser::getId).toList();
+        List<Long> missingIds = ids.stream()
+                .filter(id -> !existingIds.contains(id))
+                .toList();
+        if (CollUtil.isNotEmpty(missingIds)) {
+            throw new BusinessException("用户不存在：" + missingIds);
+        }
+
+        // 2. 系统内置用户不允许删除（整批回滚）
+        boolean containsBuiltin = sysUsers.stream()
+                .anyMatch(user -> BuiltinEnum.YES.getCode().equals(user.getBuiltin()));
+        if (containsBuiltin) {
+            throw new BusinessException("系统内置用户不允许删除");
+        }
+
+        // 3. 不允许删除当前登录用户，避免误删自己导致无法管理（整批回滚）
+        if (ids.contains(StpUtil.getLoginIdAsLong())) {
+            throw new BusinessException("不允许删除当前登录用户");
+        }
+
+        // 4. 逻辑删除用户并清理角色关联
+        removeByIds(ids);
+        sysUserRoleService.remove(SYS_USER_ROLE.USER_ID.in(ids));
+
+        // 5. 失效这些用户的角色/权限/路由菜单/用户信息缓存（注册到事务提交后执行）
+        CacheUtil.evictAfterCommit(() -> {
+            log.debug("用户删除完成，失效缓存：userIds={}", ids);
+            sysUserRoleService.evictRoleCache(ids);
+            sysMenuService.evictPermCache(ids);
+            sysMenuService.evictMenuCache(ids);
+            evictUserCache(ids);
+            // 已删除用户立即下线,避免已签发会话继续有效
+            ids.forEach(StpUtil::logout);
+        });
+    }
+
+    /**
+     * 重置用户密码为系统默认密码({@link AppConst#DEFAULT_PASSWORD})。
+     * <p>
+     * BCrypt 加密后仅更新 password 字段，更新成功后复用
+     * {@link #updateById(SysUser)} 的缓存失效逻辑。
+     *
+     * @param id 用户ID
+     */
+    @Override
+    public void resetPassword(Long id) {
+        SysUser sysUser = getById(id);
+        if (ObjUtil.isNull(sysUser)) {
+            throw new BusinessException("用户不存在");
+        }
+        SysUser entity = new SysUser();
+        entity.setId(id);
+        entity.setPassword(BCrypt.hashpw(AppConst.DEFAULT_PASSWORD, BCrypt.gensalt()));
+        updateById(entity);
     }
 
     /**
@@ -259,7 +395,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      * 昵称、头像等资料变更影响用户信息聚合体，失效该用户的 userInfo 缓存。
      */
     @Override
-    public boolean updateById(SysUser sysUser) {
+    public boolean updateById(@NonNull SysUser sysUser) {
         boolean success = super.updateById(sysUser);
         if (success) {
             log.debug("用户信息更新成功，失效 userInfo 缓存：userId={}", sysUser.getId());

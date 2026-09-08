@@ -1,7 +1,7 @@
 package cn.codesensi.amour.model.request;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -9,23 +9,24 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 新增用户请求参数
+ * 修改用户请求参数
+ * <p>
+ * 用户名称、状态与密码不在可修改范围,分别由新增、状态管理与重置密码入口维护。
  *
  * @author codesensi
- * @since 2026-06-28
+ * @since 2026-09-08
  */
 @Data
-public class UserInsertRequest implements Serializable {
+public class UserUpdateRequest implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
-     * 用户名称
+     * 用户ID
      */
-    @NotBlank(message = "用户名称不能为空")
-    @Size(max = 20, message = "用户名称长度不能超过20")
-    private String username;
+    @NotNull(message = "用户ID不能为空")
+    private Long id;
 
     /**
      * 用户昵称
@@ -66,11 +67,6 @@ public class UserInsertRequest implements Serializable {
      * 用户头像地址
      */
     private String avatar;
-
-    /**
-     * 用户状态:0-启用,1-禁用(缺省视为启用)
-     */
-    private Integer status;
 
     /**
      * 备注
