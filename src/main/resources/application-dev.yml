@@ -90,7 +90,7 @@ app:
         # 用户信息缓存：写后 30 天兜底过期，写侧显式失效（资料/角色/权限/菜单任一变更时清除）
         expire-after-write: 2592000
         expire-after-access: 0
-      - name: qq-info
+      - name: qq
         # QQ 信息缓存：写后 15 分钟过期，同一 QQ 号短时复用，避免失焦/翻页的高频调用穿透上游
         expire-after-write: 900
         expire-after-access: 0
