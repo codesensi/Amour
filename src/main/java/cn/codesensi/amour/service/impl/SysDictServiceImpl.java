@@ -163,6 +163,7 @@ public class SysDictServiceImpl implements SysDictService {
     /**
      * 新增字典条目。
      * <p>
+     * 字典名称即类型名（组内共享），自动继承该编码组内首条条目的名称，不接受外部传入；
      * 校验同编码下字典值唯一；写库后失效该编码的字典缓存。
      *
      * @param insertDTO 字典条目信息
@@ -180,7 +181,8 @@ public class SysDictServiceImpl implements SysDictService {
     /**
      * 修改字典条目。
      * <p>
-     * 字典编码与内置标识不可修改；内置条目（builtin=1）锁定字典值（对齐前端 builtinLocked，
+     * 字典编码、字典名称与内置标识不可修改（字典名称即类型名，组内共享）；状态不经本接口维护
+     * （经启停接口单独操作）；内置条目（builtin=1）锁定字典值（对齐前端 builtinLocked，
      * 后端强校验防绕过）；非内置条目修改字典值时校验同编码下唯一；写库后失效该编码的字典缓存。
      *
      * @param updateDTO 字典条目信息
@@ -214,7 +216,8 @@ public class SysDictServiceImpl implements SysDictService {
     /**
      * 修改字典条目状态。
      * <p>
-     * 内置条目仅承载展示层，允许启停；同状态幂等返回；写库后失效该编码的字典缓存。
+     * 内置条目（builtin=1）为系统功能依赖，不允许更改状态（始终启用）；
+     * 同状态幂等返回；写库后失效该编码的字典缓存。
      *
      * @param changeStatusDTO 字典状态信息
      */
@@ -225,6 +228,11 @@ public class SysDictServiceImpl implements SysDictService {
                 .one();
         if (ObjUtil.isNull(sysDict)) {
             throw new BusinessException("字典条目不存在");
+        }
+
+        // 内置条目不允许更改状态
+        if (BuiltinEnum.YES.getCode().equals(sysDict.getBuiltin())) {
+            throw new BusinessException("内置字典条目不允许更改状态");
         }
 
         // 状态一致时幂等返回

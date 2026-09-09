@@ -11,7 +11,8 @@ import java.io.Serializable;
 /**
  * 修改字典条目请求参数
  * <p>
- * 字典编码与内置标识创建后不可修改，不在可提交字段之列。
+ * 字典编码、字典名称与内置标识均不可修改（字典名称即类型名，组内共享）；
+ * 状态经启停接口（change-status）单独维护，均不在可提交字段之列。
  *
  * @author codesensi
  * @since 1.0
@@ -27,13 +28,6 @@ public class DictUpdateRequest implements Serializable {
      */
     @NotNull(message = "字典条目ID不能为空")
     private Long id;
-
-    /**
-     * 字典名称
-     */
-    @NotBlank(message = "字典名称不能为空")
-    @Size(max = 64, message = "字典名称长度不能超过64")
-    private String dictName;
 
     /**
      * 字典值（统一字符串存储；内置条目不允许修改）
@@ -53,11 +47,6 @@ public class DictUpdateRequest implements Serializable {
      * 排序（数字越小越靠前）
      */
     private Integer sort;
-
-    /**
-     * 状态:0-启用，1-禁用
-     */
-    private Integer status;
 
     /**
      * 备注

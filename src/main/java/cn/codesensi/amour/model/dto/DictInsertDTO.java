@@ -23,11 +23,6 @@ public class DictInsertDTO implements Serializable {
     private String dictCode;
 
     /**
-     * 字典名称
-     */
-    private String dictName;
-
-    /**
      * 字典值
      */
     private String dictValue;

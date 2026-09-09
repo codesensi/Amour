@@ -23,11 +23,6 @@ public class DictUpdateDTO implements Serializable {
     private Long id;
 
     /**
-     * 字典名称
-     */
-    private String dictName;
-
-    /**
      * 字典值
      */
     private String dictValue;
@@ -41,11 +36,6 @@ public class DictUpdateDTO implements Serializable {
      * 排序（数字越小越靠前）
      */
     private Integer sort;
-
-    /**
-     * 状态:0-启用，1-禁用
-     */
-    private Integer status;
 
     /**
      * 备注

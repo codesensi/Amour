@@ -10,6 +10,8 @@ import java.io.Serializable;
 
 /**
  * 新增字典条目请求参数
+ * <p>
+ * 字典名称即类型名（组内共享），由后端自动继承该编码组内已有条目的名称，不在可提交字段之列。
  *
  * @author codesensi
  * @since 1.0
@@ -27,13 +29,6 @@ public class DictInsertRequest implements Serializable {
     @Size(max = 64, message = "字典编码长度不能超过64")
     @Pattern(regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$", message = "字典编码仅允许小写字母、数字与中划线")
     private String dictCode;
-
-    /**
-     * 字典名称
-     */
-    @NotBlank(message = "字典名称不能为空")
-    @Size(max = 64, message = "字典名称长度不能超过64")
-    private String dictName;
 
     /**
      * 字典值（统一字符串存储）
