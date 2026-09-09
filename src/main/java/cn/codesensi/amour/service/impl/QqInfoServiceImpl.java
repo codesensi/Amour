@@ -29,8 +29,8 @@ import java.nio.charset.StandardCharsets;
  * 通过 Hutool 以服务端身份调用上游接口（不携带浏览器特征请求头，规避上游对浏览器跨域调用的 403 拦截）：
  * 优先调用 qq-api（{@code app.uapi-qq}，sys_config 配置了 {@code uapi-key} 时携带
  * {@code X-API-KEY} 请求头）解析真实头像与昵称；任一环节失败（未配置/网络异常/响应空/解析失败/缺头像字段）
- * 降级为 avatar-api（{@code app.avatar-api}）按 QQ 号拼接；avatar-api 也未配置时返回空 DTO，
- * 由前端本地兜底图兜底。地址类配置取自 yml（改动需重启），密钥取自 sys_config（管理端修改热更新）。
+ * 降级为 qq-avatar（{@code app.qq-avatar}，QQ 官方头像）按 QQ 号拼接；qq-avatar 也未配置时返回
+ * 空 DTO，由前端本地兜底图兜底。地址类配置取自 yml（改动需重启），密钥取自 sys_config（管理端修改热更新）。
  *
  * @author codesensi
  * @since 1.0
@@ -65,7 +65,7 @@ public class QqInfoServiceImpl implements QqInfoService {
             return cached;
         }
         QqInfoResultDTO result = loadFromQqApi(qq);
-        // avatar-api 也未配置时的空结果不写缓存:避免配置补齐后 15 分钟内一直返回空信息
+        // 降级尽头仍无头像的空结果不写缓存:避免配置补齐后 15 分钟内一直返回空信息
         if (StrUtil.isNotBlank(result.getAvatarUrl())) {
             cache.put(qq, result);
         }
@@ -73,16 +73,16 @@ public class QqInfoServiceImpl implements QqInfoService {
     }
 
     /**
-     * 回源查询 QQ 信息：qq-api 优先，任一失败环节降级 avatar-api 拼接。
+     * 回源查询 QQ 信息：qq-api 优先，任一失败环节降级 qq-avatar 拼接。
      *
      * @param qq QQ 号（6~12 位数字，由控制器完成格式校验）
-     * @return 头像地址与昵称；降级时昵称为空，avatar-api 也未配置时为空 DTO
+     * @return 头像地址与昵称；qq-avatar 降级时昵称为空，qq-avatar 未配置时为空 DTO
      */
     private QqInfoResultDTO loadFromQqApi(String qq) {
         String qqApiUrl = appProperties.getUapiQq();
         if (StrUtil.isBlank(qqApiUrl)) {
-            log.debug("qq-api 未配置，直接降级 avatar-api：qq={}", qq);
-            return fallbackByAvatarApi(qq);
+            log.debug("qq-api 未配置，降级 qq-avatar：qq={}", qq);
+            return fallbackByQqAvatar(qq);
         }
         String qqApiResponse;
         try {
@@ -100,25 +100,25 @@ public class QqInfoServiceImpl implements QqInfoService {
             }
         } catch (Exception e) {
             // 上游网络异常(超时/连接失败)降级,不阻断门户调用
-            log.warn("qq-api 调用失败，降级 avatar-api：qq={}", qq, e);
-            return fallbackByAvatarApi(qq);
+            log.warn("qq-api 调用失败，降级 qq-avatar：qq={}", qq, e);
+            return fallbackByQqAvatar(qq);
         }
         log.debug("qq-api 响应：qq={}，body={}", qq, qqApiResponse);
         if (StrUtil.isBlank(qqApiResponse)) {
-            log.warn("qq-api 响应为空，降级 avatar-api：qq={}", qq);
-            return fallbackByAvatarApi(qq);
+            log.warn("qq-api 响应为空，降级 qq-avatar：qq={}", qq);
+            return fallbackByQqAvatar(qq);
         }
         QqInfoResultDTO qqInfoResultDTO;
         try {
             qqInfoResultDTO = JSONUtil.toBean(qqApiResponse, QqInfoResultDTO.class);
         } catch (Exception e) {
-            log.warn("qq-api 响应解析失败，降级 avatar-api：{}", qqApiResponse, e);
-            return fallbackByAvatarApi(qq);
+            log.warn("qq-api 响应解析失败，降级 qq-avatar：{}", qqApiResponse, e);
+            return fallbackByQqAvatar(qq);
         }
         // 上游异常载荷(限流/配额耗尽/无效 QQ 等)可能缺少头像字段,判空兜底避免 NPE
         if (StrUtil.isBlank(qqInfoResultDTO.getAvatarUrl())) {
-            log.warn("qq-api 响应缺少头像地址，降级 avatar-api：{}", qqApiResponse);
-            return fallbackByAvatarApi(qq);
+            log.warn("qq-api 响应缺少头像地址，降级 qq-avatar：{}", qqApiResponse);
+            return fallbackByQqAvatar(qq);
         }
         if (qqInfoResultDTO.getAvatarUrl().startsWith("http://")) {
             qqInfoResultDTO.setAvatarUrl(qqInfoResultDTO.getAvatarUrl().replace("http://", "https://"));
@@ -127,19 +127,19 @@ public class QqInfoServiceImpl implements QqInfoService {
     }
 
     /**
-     * 降级拼接头像地址：按 avatar-api 模板以 QQ 号为种子生成（同号恒定），昵称为空。
+     * 降级拼接头像地址：按 qq-avatar 模板以 QQ 号拼接（QQ 官方头像，同号恒定），昵称为空。
      *
      * @param qq QQ 号
-     * @return 降级结果；avatar-api 未配置时为空 DTO（响应数据全为空，由前端本地兜底图兜底）
+     * @return 降级结果；qq-avatar 未配置时为空 DTO（响应数据全为空，由前端本地兜底图兜底）
      */
-    private QqInfoResultDTO fallbackByAvatarApi(String qq) {
-        String avatarApiUrl = appProperties.getAvatarApi();
-        if (StrUtil.isBlank(avatarApiUrl)) {
-            log.warn("avatar-api 未配置，QQ 信息响应为空：qq={}", qq);
+    private QqInfoResultDTO fallbackByQqAvatar(String qq) {
+        String qqAvatarUrl = appProperties.getQqAvatar();
+        if (StrUtil.isBlank(qqAvatarUrl)) {
+            log.warn("qq-avatar 未配置，QQ 信息响应为空：qq={}", qq);
             return new QqInfoResultDTO();
         }
         return new QqInfoResultDTO()
-                .setAvatarUrl(String.format(avatarApiUrl, URLEncoder.encode(qq, StandardCharsets.UTF_8)));
+                .setAvatarUrl(String.format(qqAvatarUrl, URLEncoder.encode(qq, StandardCharsets.UTF_8)));
     }
 
 }

@@ -78,11 +78,12 @@ sa-token:
 app:
   # UApiPro(https://uapis.cn/)接口超时(毫秒)
   uapi-timeout: 5000
-  # UApiPro 获取 QQ 信息接口地址模板(%s = URL 编码后的 QQ 号);留空/未配置时 /qq-info 直接降级 avatar-api;配置文件改动需重启生效
+  # UApiPro 获取 QQ 信息接口地址模板(%s = URL 编码后的 QQ 号);留空/未配置时 /qq-info 直接降级 qq-avatar;配置文件改动需重启生效
   uapi-qq: https://uapis.cn/api/v1/social/qq/userinfo?qq=%s
+  # QQ 官方头像接口地址模板(%s = QQ 号);uapi-qq 失败时的第一级降级;留空/未配置时 /qq-info 响应数据全为空,由前端本地兜底图兜底
+  qq-avatar: https://q.qlogo.cn/headimg_dl?dst_uin=%s&spec=640&img_type=jpg
   # UApiPro 获取一言接口地址
   uapi-saying-random: https://uapis.cn/api/v1/saying/random?source=caoxingyu sentence,sentences bundle
-  # UApiPro 获取一言（随机/每日/场景/此刻）接口地址
+  # UApiPro 获取一言(普通版,降级来源)接口地址:响应仅含 text 字段
   uapi-saying: https://uapis.cn/api/v1/saying
-  # 随机头像服务地址模板(%s = 种子);留空/未配置时 /qq-info 响应数据全为空,由前端本地兜底图兜底
-  avatar-api: https://api.dicebear.com/7.x/bottts/svg?seed=%s
+

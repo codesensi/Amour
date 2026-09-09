@@ -32,8 +32,8 @@ public class QqInfoController {
     /**
      * 查询 QQ 信息（免登录）
      * <p>
-     * 服务端优先调用 qq-api 解析，失败降级 avatar-api 按 QQ 号拼接（头像恒非空，
-     * 除非 avatar-api 也未配置）
+     * 服务端优先调用 qq-api 解析，失败降级 qq-avatar 按 QQ 号拼接（头像恒非空，
+     * 除非 qq-avatar 未配置）
      *
      * @param request 查询入参（Jakarta Validation 校验，失败走全局 BindException 处理器返回 400）
      * @return 头像地址与昵称；昵称可能为空，由前端提示手动填写

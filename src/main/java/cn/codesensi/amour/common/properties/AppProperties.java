@@ -27,10 +27,18 @@ public class AppProperties {
     /**
      * UApiPro 获取 QQ 信息接口地址模板（{@code %s} 为 URL 编码后的 QQ 号）。
      * <p>
-     * 留空或未配置时 /qq-info 不调用上游，直接降级 avatar-api 拼接头像；
+     * 留空或未配置时 /qq-info 不调用上游，直接降级 qq-avatar 拼接头像；
      * 配置文件改动需重启应用生效。
      */
     private String uapiQq;
+
+    /**
+     * QQ 官方头像接口地址模板（{@code %s} 为 QQ 号）。
+     * <p>
+     * uapi-qq 失败时的降级拼接地址；留空或未配置时 /qq-info 响应数据全为空。
+     * 配置文件改动需重启应用生效。
+     */
+    private String qqAvatar;
 
     /**
      * UApiPro 接口调用超时时间（毫秒），适用于该上游全部接口。
@@ -44,15 +52,8 @@ public class AppProperties {
     private String uapiSayingRandom;
 
     /**
-     * UApiPro 获取一言（随机/每日/场景/此刻）接口地址。
+     * UApiPro 获取一言（普通版）接口地址：响应仅含 text 字段，作为随机一言的降级来源。
      */
     private String uapiSaying;
-
-    /**
-     * 随机头像服务地址模板（{@code %s} 为种子，QQ 号场景即 QQ 号）。
-     * <p>
-     * uapi-qq 未返回头像时的降级拼接地址；留空或未配置时 /qq-info 响应数据全为空。
-     */
-    private String avatarApi;
 
 }
