@@ -78,17 +78,7 @@ FROM (
               '673822943',
               NULL,
               1,
-              '系统内置门户女主'),
-             (4,
-              'test',
-              '$2a$10$U.k0b43Pwg./Jg2QQl4bMOukItbYg4aYhKsciMamtHWvp3JEF2ism',
-              'Test',
-              'test@amour.com',
-              'U',
-              '1234567890',
-              NULL,
-              0,
-              '测试用户')
+              '系统内置门户女主')
      ) AS t(id, username, password, nickname, email, gender, qq, avatar, builtin, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_user` WHERE `sys_user`.`id` = t.id
@@ -110,8 +100,7 @@ SELECT
 FROM (
          VALUES
              (1, '超级管理员', 'admin', 1, 1, '系统内置超级管理员角色'),
-             (2, '主角', 'hero', 2, 1, '系统内置门户主角角色'),
-             (3, '测试', 'test', 3, 0, '测试角色')
+             (2, '主角', 'hero', 2, 1, '系统内置门户主角角色')
      ) AS t(id, name, code, sort, builtin, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_role` WHERE `sys_role`.`id` = t.id
