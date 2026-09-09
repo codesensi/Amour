@@ -5,9 +5,9 @@ import cn.codesensi.amour.model.converter.SayingConverter;
 import cn.codesensi.amour.model.dto.SayingResultDTO;
 import cn.codesensi.amour.model.response.SayingResponse;
 import cn.codesensi.amour.service.SayingService;
-import cn.dev33.satoken.annotation.SaIgnore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @ApiResponseBody
 @RequiredArgsConstructor
+@RequestMapping("/portal")
 public class PortalSayingController {
 
     private final SayingService sayingService;
@@ -34,8 +35,7 @@ public class PortalSayingController {
      *
      * @return 一言文案与出处、作者；字段可能为空，由前端判空决定是否展示
      */
-    @SaIgnore
-    @GetMapping("/portal/saying")
+    @GetMapping("/saying")
     public SayingResponse portalSaying() {
         SayingResultDTO sayingResultDTO = sayingService.getSaying();
         return sayingConverter.toResponse(sayingResultDTO);

@@ -41,8 +41,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
                                 StpUtil.checkDisable(StpUtil.getLoginIdAsLong());
                             });
                 })).addPathPatterns(RbacConst.ROOT_PATH)
-                // 登录/登出/验证码为公开接口,不参与登录校验
-                .excludePathPatterns(RbacConst.CAPTCHA_PATH, RbacConst.LOGIN_PATH, RbacConst.LOGOUT_PATH)
+                // 登录/登出/验证码为公开接口,不参与登录校验;
+                // 门户端接口(/portal/**)面向访客免登录,统一放行,未实现的蓝图路径由 Spring 返回 404
+                .excludePathPatterns(RbacConst.CAPTCHA_PATH,
+                        RbacConst.LOGIN_PATH,
+                        RbacConst.LOGOUT_PATH,
+                        RbacConst.PORTAL_PATH)
                 .order(1);
 
         // 2. 演示模式拦截器：演示环境下仅允许查询和登录/登出，拒绝所有写操作

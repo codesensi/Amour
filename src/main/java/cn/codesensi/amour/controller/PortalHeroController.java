@@ -5,9 +5,9 @@ import cn.codesensi.amour.model.converter.PortalHeroConverter;
 import cn.codesensi.amour.model.dto.PortalHeroResultDTO;
 import cn.codesensi.amour.model.response.PortalHeroResponse;
 import cn.codesensi.amour.service.PortalHeroService;
-import cn.dev33.satoken.annotation.SaIgnore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @ApiResponseBody
 @RequiredArgsConstructor
+@RequestMapping("/portal")
 public class PortalHeroController {
 
     private final PortalHeroService portalHeroService;
@@ -35,8 +36,7 @@ public class PortalHeroController {
      *
      * @return 男主与女主信息；某性别暂无主角用户时对应字段为 null
      */
-    @SaIgnore
-    @GetMapping("/portal/hero")
+    @GetMapping("/hero")
     public PortalHeroResponse portalHero() {
         PortalHeroResultDTO portalHeroResultDTO = portalHeroService.getPortalHero();
         return portalHeroConverter.toResponse(portalHeroResultDTO);

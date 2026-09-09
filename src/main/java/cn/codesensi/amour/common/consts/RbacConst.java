@@ -53,4 +53,9 @@ public class RbacConst {
      */
     public static final String LOGOUT_PATH = "/logout";
 
+    /**
+     * 门户端接口路径前缀（门户端接口统一以 /portal 开头，面向访客免登录）
+     */
+    public static final String PORTAL_PATH = "/portal/**";
+
 }
