@@ -76,7 +76,13 @@ public class GlobalExceptionHandler {
         return Result.error(e.getCode(), e.getMsg());
     }
 
-    // Sa-Token 异常细分处理
+    /**
+     * 处理 Sa-Token 授权异常，按异常类型细分响应：
+     * 未登录返回 401，账号被冻结返回 403，其余透传原始描述。
+     *
+     * @param e Sa-Token 授权异常
+     * @return 携带错误码的统一响应
+     */
     @ExceptionHandler(SaTokenException.class)
     public Result<Void> handleSaTokenException(SaTokenException e) {
         log.warn("SaTokenException 授权异常：{}", e.getMessage());

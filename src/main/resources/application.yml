@@ -80,7 +80,7 @@ app:
   uapi-timeout: 5000
   # UApiPro 获取 QQ 信息接口地址模板(%s = URL 编码后的 QQ 号);留空/未配置时 /qq-info 直接降级 qq-avatar;配置文件改动需重启生效
   uapi-qq: https://uapis.cn/api/v1/social/qq/userinfo?qq=%s
-  # QQ 官方头像接口地址模板(%s = QQ 号);uapi-qq 失败时的第一级降级;留空/未配置时 /qq-info 响应数据全为空,由前端本地兜底图兜底
+  # QQ 官方头像接口地址模板(%s = QQ 号);uapi-qq 失败时的降级;留空/未配置时 /qq-info 响应数据全为空,由前端本地兜底图兜底
   qq-avatar: https://q.qlogo.cn/headimg_dl?dst_uin=%s&spec=640&img_type=jpg
   # UApiPro 获取一言接口地址
   uapi-saying-random: https://uapis.cn/api/v1/saying/random?source=caoxingyu sentence,sentences bundle
