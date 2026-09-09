@@ -81,7 +81,7 @@ app:
   # UApiPro 获取 QQ 信息接口地址模板(%s = URL 编码后的 QQ 号);留空/未配置时 /qq-info 直接降级 avatar-api;配置文件改动需重启生效
   uapi-qq: https://uapis.cn/api/v1/social/qq/userinfo?qq=%s
   # UApiPro 获取一言接口地址
-  uapi-saying-random: https://uapis.cn/api/v1/saying/random
+  uapi-saying-random: https://uapis.cn/api/v1/saying/random?source=caoxingyu sentence,sentences bundle
   # UApiPro 获取一言（随机/每日/场景/此刻）接口地址
   uapi-saying: https://uapis.cn/api/v1/saying
   # 随机头像服务地址模板(%s = 种子);留空/未配置时 /qq-info 响应数据全为空,由前端本地兜底图兜底

@@ -21,8 +21,7 @@ FROM (
              (1003, 'copyright-year', '2026', 'STRING', 'base', '版权年份'),
              (1004, 'uapi-key', NULL, 'STRING', 'base', 'UApiPro接口密钥(https://uapis.cn)'),
              -- site（2000 段）
-             (2001, 'site.slogan', '爱晨雾漫过青瓦，爱暮色染透篱笆，更爱与君并肩立，看遍这人间烟火里的朝暮与年华。', 'STRING', 'site', '门户标语文案'),
-             (2002, 'site.love-start-date', '2018-07-15 00:00:00', 'DATETIME', 'site', '门户恋爱计时起点'),
+             (2001, 'site.love-start-date', '2018-07-15 00:00:00', 'DATETIME', 'site', '门户恋爱计时起点'),
              -- captcha（3000 段）
              (3001, 'captcha.enabled', 'true', 'BOOLEAN', 'captcha', '验证码开关'),
              (3002, 'captcha.image-type', 'arithmetic', 'STRING', 'captcha', '图形验证码类型')

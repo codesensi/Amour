@@ -1,5 +1,6 @@
 package cn.codesensi.amour.service.impl;
 
+import cn.codesensi.amour.common.consts.AppConst;
 import cn.codesensi.amour.common.consts.CacheConst;
 import cn.codesensi.amour.common.enums.ConfigKeyEnum;
 import cn.codesensi.amour.common.exception.SystemException;
@@ -38,11 +39,6 @@ import java.nio.charset.StandardCharsets;
 @Service
 @RequiredArgsConstructor
 public class QqInfoServiceImpl implements QqInfoService {
-
-    /**
-     * UApiPro 密钥请求头名（sys_config {@code uapi-key} 的值非空时携带）
-     */
-    private static final String API_KEY_HEADER = "X-API-KEY";
 
     private final SysConfigService sysConfigService;
 
@@ -96,7 +92,7 @@ public class QqInfoServiceImpl implements QqInfoService {
             HttpRequest request = HttpRequest.get(
                     String.format(qqApiUrl, URLEncoder.encode(qq, StandardCharsets.UTF_8)));
             if (StrUtil.isNotBlank(apiKey)) {
-                request.header(API_KEY_HEADER, apiKey);
+                request.header(AppConst.UAPI_KEY_HEADER, apiKey);
             }
             // try-with-resources 及时释放 HttpResponse 底层连接,避免资源泄漏
             try (HttpResponse response = request.timeout(appProperties.getUapiTimeout()).execute()) {

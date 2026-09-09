@@ -21,7 +21,6 @@ public enum ConfigKeyEnum implements BaseEnum<String> {
     UAPI_KEY("uapi-key", "UApiPro接口密钥"),
 
     // ---------- 门户站点配置（site 分组：2000 段） ----------
-    SITE_SLOGAN("site.slogan", "门户标语文案"),
     SITE_LOVE_START_DATE("site.love-start-date", "门户恋爱计时起点"),
 
     // ---------- 验证码配置（captcha 分组：3000 段） ----------

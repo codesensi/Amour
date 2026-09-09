@@ -58,4 +58,9 @@ public class AppConst {
      */
     public static final String MDC_CONTEXT = "mdcContext";
 
+    /**
+     * UApiPro 密钥请求头名（sys_config {@code uapi-key} 的值非空时携带）
+     */
+    public static final String UAPI_KEY_HEADER = "X-API-KEY";
+
 }
