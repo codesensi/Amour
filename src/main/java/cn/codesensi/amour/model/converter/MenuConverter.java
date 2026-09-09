@@ -17,7 +17,7 @@ import java.util.List;
  * 菜单相关对象转换
  *
  * @author codesensi
- * @since 2026-09-06
+ * @since 1.0
  */
 @Mapper(componentModel = "spring")
 public interface MenuConverter {

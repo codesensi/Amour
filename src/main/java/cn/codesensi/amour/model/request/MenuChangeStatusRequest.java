@@ -10,7 +10,7 @@ import java.io.Serializable;
  * 修改菜单状态请求参数
  *
  * @author codesensi
- * @since 2026-09-06
+ * @since 1.0
  */
 @Data
 public class MenuChangeStatusRequest implements Serializable {
@@ -25,7 +25,7 @@ public class MenuChangeStatusRequest implements Serializable {
     private Long id;
 
     /**
-     * 菜单状态:0-启用,1-禁用
+     * 菜单状态:0-启用，1-禁用
      */
     @NotNull(message = "菜单状态不能为空")
     private Integer status;

@@ -38,7 +38,7 @@ import static cn.codesensi.amour.model.entity.table.SysUserRoleTableDef.SYS_USER
  * 角色信息表 服务层实现。
  *
  * @author codesensi
- * @since 2026-06-28
+ * @since 1.0
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -50,13 +50,13 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     private final SysUserRoleService sysUserRoleService;
     private final SysRoleMenuService sysRoleMenuService;
     private final SysMenuService sysMenuService;
-    private final SysUserService sysUserService;
+    private final CacheEvictService cacheEvictService;
 
     /**
      * 分页查询角色信息。
      * <p>
-     * 角色名称、角色编码为模糊匹配,状态为精确匹配,条件缺省时自动忽略;
-     * 页码与每页条数的缺省值由 {@link BasePage} 提供(1 与 20),与前端默认值保持一致。
+     * 角色名称、角色编码为模糊匹配，状态为精确匹配，条件缺省时自动忽略；
+     * 页码与每页条数的缺省值由 {@link BasePage} 提供(1 与 20)，与前端默认值保持一致。
      *
      * @param rolePageDTO 分页查询参数
      * @return 角色信息分页结果
@@ -74,7 +74,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     /**
      * 查询全部角色列表。
      * <p>
-     * 覆写 {@link IService#list()}：按 sort 升序、id 升序排序,保证选项顺序稳定。
+     * 按 sort 升序、id 升序排序，保证选项顺序稳定。
      *
      * @return 全量角色列表
      */
@@ -110,7 +110,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     /**
      * 修改角色信息。
      * <p>
-     * 角色编码创建后不可修改,仅更新名称/排序/备注等资料字段。
+     * 角色编码创建后不可修改，仅更新名称/排序/备注等资料字段。
      *
      * @param roleUpdateDTO 角色信息
      */
@@ -128,8 +128,8 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     /**
      * 修改角色状态。
      * <p>
-     * 系统内置角色不允许禁用(启用请求不受限);同状态幂等返回;
-     * 状态变化影响该角色下用户的权限,失效其权限/路由菜单/用户信息缓存。
+     * 系统内置角色不允许禁用(启用请求不受限)；同状态幂等返回；
+     * 状态变化影响该角色下用户的权限，失效其权限/路由菜单/用户信息缓存。
      *
      * @param roleChangeStatusDTO 角色状态信息
      */
@@ -160,16 +160,16 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         CacheUtil.evictAfterCommit(() -> {
             log.debug("角色状态变更完成：roleId={}，status={}，失效缓存，受影响用户数={}",
                     roleChangeStatusDTO.getId(), roleChangeStatusDTO.getStatus(), userIds.size());
-            sysMenuService.evictPermCache(userIds);
-            sysMenuService.evictMenuCache(userIds);
-            sysUserService.evictUserCache(userIds);
+            cacheEvictService.evictPermCache(userIds);
+            cacheEvictService.evictMenuCache(userIds);
+            cacheEvictService.evictUserCache(userIds);
         });
     }
 
     /**
      * 批量删除角色信息。
      * <p>
-     * 删除角色同时清理角色-菜单、用户-角色关联;缓存失效与踢会话注册到事务提交后执行,
+     * 删除角色同时清理角色-菜单、用户-角色关联；缓存失效与踢会话注册到事务提交后执行，
      * 避免提交前其他请求回源查库把中间状态重新写入缓存。
      *
      * @param ids 角色ID列表
@@ -205,9 +205,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         // 5. 失效受影响用户的权限/路由菜单/用户信息缓存,并踢出其会话(注册到事务提交后执行)
         CacheUtil.evictAfterCommit(() -> {
             log.debug("角色删除完成：roleIds={}，失效缓存，受影响用户数={}", ids, userIds.size());
-            sysMenuService.evictPermCache(userIds);
-            sysMenuService.evictMenuCache(userIds);
-            sysUserService.evictUserCache(userIds);
+            cacheEvictService.evictPermCache(userIds);
+            cacheEvictService.evictMenuCache(userIds);
+            cacheEvictService.evictUserCache(userIds);
             // 角色被删除后其关联用户的权限已变化,踢出使其重新登录
             userIds.forEach(StpUtil::logout);
         });
@@ -296,9 +296,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         CacheUtil.evictAfterCommit(() -> {
             log.debug("角色菜单关联变更完成：roleId={}，补全祖先菜单数={}，失效缓存，受影响用户数={}",
                     roleId, allMenuIds.size(), userIds.size());
-            sysMenuService.evictPermCache(userIds);
-            sysMenuService.evictMenuCache(userIds);
-            sysUserService.evictUserCache(userIds);
+            cacheEvictService.evictPermCache(userIds);
+            cacheEvictService.evictMenuCache(userIds);
+            cacheEvictService.evictUserCache(userIds);
         });
     }
 

@@ -34,6 +34,8 @@ import static cn.codesensi.amour.model.entity.table.SysUserTableDef.SYS_USER;
  * 账号（用户名/QQ号）+ 密码登录：按需校验图形验证码 → 校验账号密码 →
  * 校验账号封禁状态 → 执行登录并返回令牌信息。
  * 验证码开关实时读取 sys_config 的 {@code captcha.enabled} 配置，支持热更新。
+ *
+ * @since 1.0
  */
 @Slf4j
 @RequiredArgsConstructor

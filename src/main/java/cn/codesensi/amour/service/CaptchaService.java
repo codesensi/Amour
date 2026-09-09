@@ -5,6 +5,8 @@ import cn.codesensi.amour.model.dto.CaptchaResultDTO;
 
 /**
  * 验证码接口
+ *
+ * @since 1.0
  */
 public interface CaptchaService {
 

@@ -13,7 +13,7 @@ import java.io.Serializable;
  * 用户分页查询请求参数
  *
  * @author codesensi
- * @since 2026-09-04
+ * @since 1.0
  */
 @Data
 @ToString(callSuper = true)
@@ -60,12 +60,12 @@ public class UserPageRequest extends BasePage implements Serializable {
     private String email;
 
     /**
-     * 用户性别:U-未知,M-男,F-女
+     * 用户性别:U-未知，M-男，F-女
      */
     private String gender;
 
     /**
-     * 用户状态:0-启用,1-禁用
+     * 用户状态:0-启用，1-禁用
      */
     private Integer status;
 

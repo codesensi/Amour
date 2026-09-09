@@ -20,6 +20,8 @@ import java.util.concurrent.TimeUnit;
  * {@link CacheUtil#withAppEnv(String)} 拼接「项目名_运行环境」前缀，实现多环境隔离。
  * <p>
  * 各缓存的过期时间单位统一为秒，支持「写入后过期」与「访问后过期」两个维度（取先到者，0 表示不限）。
+ *
+ * @since 1.0
  */
 @Configuration
 public class CacheConfig {
@@ -54,13 +56,15 @@ public class CacheConfig {
 
     /**
      * 依据过期配置构建单个缓存的原生 Caffeine 缓存。
+     * <p>
+     * 开启 {@code recordStats()} 记录命中/未命中/驱逐等统计，供缓存监控读取。
      *
      * @param item    缓存配置项
      * @param maxSize 最大容量（条数）
      * @return 构建完成的原生缓存
      */
     private Cache<Object, Object> build(AppCacheProperties.CacheItem item, long maxSize) {
-        Caffeine<Object, Object> builder = Caffeine.newBuilder().maximumSize(maxSize);
+        Caffeine<Object, Object> builder = Caffeine.newBuilder().maximumSize(maxSize).recordStats();
         if (item.getExpireAfterWrite() > 0) {
             builder.expireAfterWrite(item.getExpireAfterWrite(), TimeUnit.SECONDS);
         }

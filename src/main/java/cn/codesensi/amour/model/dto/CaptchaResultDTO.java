@@ -7,6 +7,8 @@ import java.io.Serializable;
 
 /**
  * 生成验证码响应结果
+ *
+ * @since 1.0
  */
 @Data
 public class CaptchaResultDTO implements Serializable {

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 登录 前端控制器
  *
  * @author codesensi
- * @since 2024-07-21 11:09:56
+ * @since 1.0
  */
 @ApiResponseBody
 @RequiredArgsConstructor

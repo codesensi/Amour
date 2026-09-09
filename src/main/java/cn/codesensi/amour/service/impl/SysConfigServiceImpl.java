@@ -10,6 +10,7 @@ import cn.codesensi.amour.model.dto.ConfigDTO;
 import cn.codesensi.amour.model.dto.ConfigPageDTO;
 import cn.codesensi.amour.model.dto.ConfigUpdateDTO;
 import cn.codesensi.amour.model.entity.SysConfig;
+import cn.codesensi.amour.service.CacheEvictService;
 import cn.codesensi.amour.service.SysConfigService;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
@@ -39,26 +40,32 @@ import static cn.codesensi.amour.model.entity.table.SysConfigTableDef.SYS_CONFIG
  * （如 {@code name}、{@code captcha.enabled}）作为 {@code config_key} 存储的配置，未命中时回源查库并回填，
  * 减少高频配置点的数据库压力。
  * <p>
- * 缓存采用"驻留不自动过期"策略，热更新依赖写库侧显式调用 {@link #evictCache(List)}
- * 失效对应配置键；在缓存未就绪或回源异常时降级为直接查库，保证配置读取不受缓存故障影响。
+ * 缓存采用"驻留不自动过期"策略，热更新依赖写库侧显式失效对应配置键
+ * （经 {@link CacheEvictService#evictConfigCache(List)}）；在缓存未就绪或回源异常时
+ * 降级为直接查库，保证配置读取不受缓存故障影响。
  * <p>
  * 查询结果以 {@link ConfigDTO} 返回；当配置键在库中不存在时，
  * 结果中不包含对应条目，避免调用侧因缺配置而失败。
  * <p>
  * 同时承载管理端能力：分页查询（直查库）与修改配置
  * （仅配置值，修改后失效对应配置键的缓存，实现热更新）。
+ *
+ * @since 1.0
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class SysConfigServiceImpl implements SysConfigService {
 
-    /** DATETIME 值类型的合法形态（yyyy-MM-dd HH:mm:ss），与门户展示契约一致 */
+    /**
+     * DATETIME 值类型的合法形态（yyyy-MM-dd HH:mm:ss），与门户展示契约一致
+     */
     private static final Pattern DATETIME_PATTERN = Pattern.compile("^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$");
 
     private final SysConfigMapper sysConfigMapper;
     private final CacheManager cacheManager;
     private final ConfigConverter configConverter;
+    private final CacheEvictService cacheEvictService;
 
     /**
      * 从 config 缓存读取指定配置键的配置；未命中时回源查库并回填缓存。
@@ -68,7 +75,7 @@ public class SysConfigServiceImpl implements SysConfigService {
      */
     @Override
     public SysConfig oneByKey(String key) {
-        Cache cache = configCache();
+        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.CONFIG));
         if (cache == null) {
             // 缓存未注册/未就绪：降级为直接查库
             log.debug("config 缓存未注册，降级为直接查库：key={}", key);
@@ -170,7 +177,7 @@ public class SysConfigServiceImpl implements SysConfigService {
 
         CacheUtil.evictAfterCommit(() -> {
             log.debug("配置修改完成，失效缓存：configKey={}", config.getConfigKey());
-            evictCache(List.of(config.getConfigKey()));
+            cacheEvictService.evictConfigCache(List.of(config.getConfigKey()));
         });
     }
 
@@ -215,39 +222,6 @@ public class SysConfigServiceImpl implements SysConfigService {
                 // STRING 及未知类型不做格式校验
             }
         }
-    }
-
-    /**
-     * 失效配置缓存：入参为空（{@code null} 或不含元素）时清空整个缓存，否则逐个失效对应配置键。
-     * <p>集合中的 {@code null} 元素会被跳过，避免缓存层对空键抛出异常。
-     *
-     * @param keys 待失效的配置键集合；为空时清除全部
-     */
-    @Override
-    public void evictCache(List<String> keys) {
-        log.debug("失效配置缓存：keys={}", keys);
-        Cache cache = configCache();
-        if (cache == null) {
-            return;
-        }
-        if (CollUtil.isEmpty(keys)) {
-            cache.clear();
-            return;
-        }
-        for (String key : keys) {
-            if (key != null) {
-                cache.evict(key);
-            }
-        }
-    }
-
-    /**
-     * 获取 config 缓存实例；未注册该缓存时返回 {@code null}。
-     *
-     * @return config 缓存，或 {@code null}
-     */
-    private Cache configCache() {
-        return cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.CONFIG));
     }
 
     /**

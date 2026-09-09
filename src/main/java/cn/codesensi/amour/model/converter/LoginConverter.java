@@ -10,7 +10,7 @@ import org.mapstruct.Mapper;
  * 登录相关对象转换
  *
  * @author codesensi
- * @since 2026-07-15
+ * @since 1.0
  */
 @Mapper(componentModel = "spring")
 public interface LoginConverter {

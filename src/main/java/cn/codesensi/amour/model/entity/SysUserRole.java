@@ -15,6 +15,8 @@ import java.io.Serializable;
  * 用户角色关联实体。
  * <p>
  * 对应 {@code sys_user_role} 表，维护用户与角色的绑定关系。
+ *
+ * @since 1.0
  */
 @Data
 @Accessors(chain = true)

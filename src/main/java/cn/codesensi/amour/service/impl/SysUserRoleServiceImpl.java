@@ -28,7 +28,7 @@ import static cn.codesensi.amour.model.entity.table.SysUserRoleTableDef.SYS_USER
  * 用户角色关联表 服务层实现。
  *
  * @author codesensi
- * @since 2026-06-28
+ * @since 1.0
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -110,25 +110,6 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
                 .select(SYS_USER_ROLE.ROLE_ID)
                 .where(SYS_USER_ROLE.USER_ID.eq(userId))
                 .listAs(Long.class);
-    }
-
-    /**
-     * 失效指定用户的角色编码缓存。
-     *
-     * @param userIds 用户ID列表
-     */
-    @Override
-    public void evictRoleCache(List<Long> userIds) {
-        if (CollUtil.isEmpty(userIds)) {
-            return;
-        }
-        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.ROLE));
-        if (cache == null) {
-            return;
-        }
-        for (Long userId : userIds) {
-            cache.evict(userId);
-        }
     }
 
 }

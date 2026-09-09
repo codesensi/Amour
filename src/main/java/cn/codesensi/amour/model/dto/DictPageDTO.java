@@ -38,7 +38,7 @@ public class DictPageDTO extends BasePage implements Serializable {
     private String dictValue;
 
     /**
-     * 状态:0-启用,1-禁用
+     * 状态:0-启用，1-禁用
      */
     private Integer status;
 

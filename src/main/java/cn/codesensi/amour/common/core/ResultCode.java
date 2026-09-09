@@ -5,6 +5,8 @@ import lombok.Getter;
 /**
  * 统一响应状态码（基于 HTTP 语义）
  * 优点：前端无需维护额外的映射表，code 值直观反映接口状态
+ *
+ * @since 1.0
  */
 @Getter
 public enum ResultCode {

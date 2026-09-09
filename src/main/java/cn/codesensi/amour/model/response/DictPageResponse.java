@@ -53,12 +53,12 @@ public class DictPageResponse implements Serializable {
     private Integer sort;
 
     /**
-     * 状态:0-启用,1-禁用
+     * 状态:0-启用，1-禁用
      */
     private Integer status;
 
     /**
-     * 是否内置:0-否,1-是
+     * 是否内置:0-否，1-是
      */
     private Integer builtin;
 

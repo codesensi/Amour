@@ -13,7 +13,7 @@ import org.mapstruct.Mapping;
  * 用户相关对象转换
  *
  * @author codesensi
- * @since 2026-07-15
+ * @since 1.0
  */
 @Mapper(componentModel = "spring", uses = MenuConverter.class)
 public interface UserConverter {
@@ -60,7 +60,7 @@ public interface UserConverter {
     SysUser toEntity(UserInsertDTO userInsertDTO);
 
     /**
-     * UserUpdateDTO → SysUser(仅资料字段,id 用于定位更新;用户名/密码/状态不在映射范围)
+     * UserUpdateDTO → SysUser(仅资料字段，id 用于定位更新；用户名/密码/状态不在映射范围)
      */
     SysUser toEntity(UserUpdateDTO userUpdateDTO);
 

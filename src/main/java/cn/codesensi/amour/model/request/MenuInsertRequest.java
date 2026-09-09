@@ -13,7 +13,7 @@ import java.io.Serializable;
  * 新增菜单请求参数
  *
  * @author codesensi
- * @since 2026-09-06
+ * @since 1.0
  */
 @Data
 public class MenuInsertRequest implements Serializable {
@@ -35,14 +35,14 @@ public class MenuInsertRequest implements Serializable {
     private String title;
 
     /**
-     * 菜单类型:D-目录,M-菜单,B-按钮
+     * 菜单类型:D-目录，M-菜单，B-按钮
      */
     @NotBlank(message = "菜单类型不能为空")
     @Pattern(regexp = "^[DMB]$", message = "菜单类型不合法")
     private String type;
 
     /**
-     * 路由路径(目录/菜单必填,按钮无需填写)
+     * 路由路径(目录/菜单必填，按钮无需填写)
      */
     @Size(max = 512, message = "路由路径长度不能超过512")
     private String path;
@@ -71,12 +71,12 @@ public class MenuInsertRequest implements Serializable {
     private String perms;
 
     /**
-     * 菜单状态:0-启用,1-禁用
+     * 菜单状态:0-启用，1-禁用
      */
     private Integer status;
 
     /**
-     * 显隐标识:0-显示,1-隐藏
+     * 显隐标识:0-显示，1-隐藏
      */
     private Integer hidden;
 

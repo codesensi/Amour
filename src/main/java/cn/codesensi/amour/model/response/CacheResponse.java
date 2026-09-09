@@ -44,4 +44,9 @@ public class CacheResponse implements Serializable {
      * 缓存条目列表（含每条目的键、值与剩余过期时间）
      */
     private List<CacheEntryResponse> entries;
+
+    /**
+     * 缓存命中统计（自缓存实例创建/应用启动起累计）
+     */
+    private CacheStatsResponse stats;
 }

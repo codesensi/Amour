@@ -10,7 +10,7 @@ import java.util.List;
  * 获取当前用户信息响应结果
  *
  * @author codesensi
- * @since 2024/1/21 15:39
+ * @since 1.0
  */
 @Data
 public class UserInfoDTO implements Serializable {
@@ -59,7 +59,7 @@ public class UserInfoDTO implements Serializable {
     private String qq;
 
     /**
-     * 用户性别:U-未知,M-男,F-女
+     * 用户性别:U-未知，M-男，F-女
      */
     private String gender;
 
@@ -69,7 +69,7 @@ public class UserInfoDTO implements Serializable {
     private String remark;
 
     /**
-     * 是否内置:0-否,1-是
+     * 是否内置:0-否，1-是
      */
     private Integer builtin;
 

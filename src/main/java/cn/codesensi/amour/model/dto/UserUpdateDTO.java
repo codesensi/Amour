@@ -9,7 +9,7 @@ import java.io.Serializable;
  * 修改用户请求参数
  *
  * @author codesensi
- * @since 2026-09-08
+ * @since 1.0
  */
 @Data
 public class UserUpdateDTO implements Serializable {
@@ -48,7 +48,7 @@ public class UserUpdateDTO implements Serializable {
     private String qq;
 
     /**
-     * 用户性别:U-未知,M-男,F-女
+     * 用户性别:U-未知，M-男，F-女
      */
     private String gender;
 

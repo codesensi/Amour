@@ -15,6 +15,8 @@ import java.io.InputStream;
  * <p>
  * 以纯静态方式在类加载时把 {@code xdb/ip2region_v4.xdb}、{@code xdb/ip2region_v6.xdb}
  * 加载进内存，无 Spring 容器依赖、天然线程安全；加载失败时降级处理（查询返回「未知」）。
+ *
+ * @since 1.0
  */
 @Slf4j
 public class Ip2regionUtil {

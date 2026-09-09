@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  * 用户分页查询行数据响应结果
  *
  * @author codesensi
- * @since 2026-09-04
+ * @since 1.0
  */
 @Data
 public class UserPageResponse implements Serializable {
@@ -58,7 +58,7 @@ public class UserPageResponse implements Serializable {
     private String qq;
 
     /**
-     * 用户性别:U-未知,M-男,F-女
+     * 用户性别:U-未知，M-男，F-女
      */
     private String gender;
 
@@ -68,12 +68,12 @@ public class UserPageResponse implements Serializable {
     private String avatar;
 
     /**
-     * 用户状态:0-启用,1-禁用
+     * 用户状态:0-启用，1-禁用
      */
     private Integer status;
 
     /**
-     * 是否内置:0-否,1-是
+     * 是否内置:0-否，1-是
      */
     private Integer builtin;
 

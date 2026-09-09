@@ -10,6 +10,8 @@ import java.time.Instant;
  * 统一接口响应对象
  *
  * @param <T> 响应数据的类型
+ *
+ * @since 1.0
  */
 @Data
 public class Result<T> implements Serializable {

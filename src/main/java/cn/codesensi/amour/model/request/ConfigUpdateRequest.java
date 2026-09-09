@@ -30,7 +30,7 @@ public class ConfigUpdateRequest implements Serializable {
     private Long id;
 
     /**
-     * 配置值(统一字符串存储;格式由服务端按值类型校验)
+     * 配置值(统一字符串存储；格式由服务端按值类型校验)
      */
     @NotBlank(message = "配置值不能为空")
     @Size(max = 4000, message = "配置值长度不能超过4000")

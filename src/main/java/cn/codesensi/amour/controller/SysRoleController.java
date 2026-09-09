@@ -21,7 +21,7 @@ import java.util.List;
  * 角色信息表 控制层。
  *
  * @author codesensi
- * @since 2026-06-28
+ * @since 1.0
  */
 @ApiResponseBody
 @RequiredArgsConstructor
@@ -35,7 +35,7 @@ public class SysRoleController {
     /**
      * 分页查询角色信息表。
      * <p>
-     * 角色名称、角色编码为模糊匹配,状态为精确匹配,条件缺省时自动忽略。
+     * 角色名称、角色编码为模糊匹配，状态为精确匹配，条件缺省时自动忽略。
      *
      * @param rolePageRequest 分页查询参数
      * @return 分页对象
@@ -51,8 +51,8 @@ public class SysRoleController {
     /**
      * 查询全部角色列表。
      * <p>
-     * 返回全量角色的一维数组,用作分配角色等场景的选项数据源;
-     * 数据量小,不做分页。
+     * 返回全量角色的一维数组，用作分配角色等场景的选项数据源；
+     * 数据量小，不做分页。
      *
      * @return 角色列表
      */
@@ -102,7 +102,7 @@ public class SysRoleController {
     /**
      * 批量删除角色信息
      * <p>
-     * 路径参数支持英文逗号分隔的多个ID,如 /sys/role/delete/1,2,3。
+     * 路径参数支持英文逗号分隔的多个ID，如 /sys/role/delete/1,2,3。
      *
      * @param ids 角色ID列表
      */

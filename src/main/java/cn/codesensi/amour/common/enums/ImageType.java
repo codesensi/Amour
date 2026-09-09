@@ -9,6 +9,8 @@ import lombok.Getter;
  * chinese-中文字符验证码
  * chinese-gif-中文GIF字符验证码
  * arithmetic-算术验证码
+ *
+ * @since 1.0
  */
 @Getter
 public enum ImageType implements BaseEnum<String> {

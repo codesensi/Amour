@@ -12,7 +12,7 @@ import java.io.Serializable;
  * 修改角色请求参数
  *
  * @author codesensi
- * @since 2026-09-08
+ * @since 1.0
  */
 @Data
 public class RoleUpdateRequest implements Serializable {

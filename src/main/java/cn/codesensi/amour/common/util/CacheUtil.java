@@ -17,6 +17,8 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * <p>
  * 本类为纯静态工具类（不标 {@code @Component}），依赖 {@link AppEnvContext} 在应用启动阶段完成
  * 装配；请在 {@link AppEnvContext} 就绪后调用 {@link #withAppEnv(String)}。
+ *
+ * @since 1.0
  */
 @Slf4j
 public class CacheUtil {

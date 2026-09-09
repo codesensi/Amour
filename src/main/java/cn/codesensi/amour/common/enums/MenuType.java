@@ -7,6 +7,8 @@ import lombok.Getter;
  * D-目录
  * M-菜单
  * B-按钮
+ *
+ * @since 1.0
  */
 @Getter
 public enum MenuType implements BaseEnum<String> {

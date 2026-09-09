@@ -18,6 +18,8 @@ import java.io.Serializable;
  * 命名与 {@code common/enums} 下现有枚举类对齐），{@code dict_value}/{@code dict_label}
  * 为字典项的值与展示标签。内置字典（builtin=1）仅承载展示层（标签、排序、启停），
  * 对应编码的业务校验仍由枚举类负责。
+ *
+ * @since 1.0
  */
 @Data
 @Accessors(chain = true)
@@ -61,12 +63,12 @@ public class SysDict extends BaseEntity implements Serializable {
     private Integer sort;
 
     /**
-     * 状态:0-启用,1-禁用
+     * 状态:0-启用，1-禁用
      */
     private Integer status;
 
     /**
-     * 是否内置:0-否,1-是
+     * 是否内置:0-否，1-是
      */
     private Integer builtin;
 

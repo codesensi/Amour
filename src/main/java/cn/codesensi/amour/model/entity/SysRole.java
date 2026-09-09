@@ -15,6 +15,8 @@ import java.io.Serializable;
  * 角色信息实体。
  * <p>
  * 对应 {@code sys_role} 表，存储后台角色定义及其启停状态。
+ *
+ * @since 1.0
  */
 @Data
 @Accessors(chain = true)
@@ -48,12 +50,12 @@ public class SysRole extends BaseEntity implements Serializable {
     private Integer sort;
 
     /**
-     * 角色状态:0-启用,1-禁用
+     * 角色状态:0-启用，1-禁用
      */
     private Integer status;
 
     /**
-     * 是否内置:0-否,1-是
+     * 是否内置:0-否，1-是
      */
     private Integer builtin;
 

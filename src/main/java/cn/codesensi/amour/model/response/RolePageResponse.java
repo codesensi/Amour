@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  * 角色分页查询行数据响应结果
  *
  * @author codesensi
- * @since 2026-09-06
+ * @since 1.0
  */
 @Data
 public class RolePageResponse implements Serializable {
@@ -43,12 +43,12 @@ public class RolePageResponse implements Serializable {
     private Integer sort;
 
     /**
-     * 角色状态:0-启用,1-禁用
+     * 角色状态:0-启用，1-禁用
      */
     private Integer status;
 
     /**
-     * 是否内置:0-否,1-是
+     * 是否内置:0-否，1-是
      */
     private Integer builtin;
 

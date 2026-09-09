@@ -9,7 +9,7 @@ import java.io.Serializable;
  * 登录响应结果
  *
  * @author codesensi
- * @since 2024/1/21 15:39
+ * @since 1.0
  */
 @Data
 public class LoginResultDTO implements Serializable {

@@ -11,7 +11,9 @@ import java.util.List;
  * 用户信息 Service。
  * <p>
  * 继承 MyBatis-Flex 的 {@link IService}，开箱即得 {@code sys_user} 表的增删改查能力；
- * 业务方法覆盖分页查询、资料维护、状态与角色管理、密码重置及用户缓存失效。
+ * 业务方法覆盖分页查询、资料维护、状态与角色管理及密码重置。
+ *
+ * @since 1.0
  */
 public interface SysUserService extends IService<SysUser> {
 
@@ -38,7 +40,7 @@ public interface SysUserService extends IService<SysUser> {
     void insert(UserInsertDTO userInsertDTO);
 
     /**
-     * 修改用户信息(仅资料字段,用户名、状态与密码不在可修改范围)
+     * 修改用户信息(仅资料字段，用户名、状态与密码不在可修改范围)
      *
      * @param userUpdateDTO 用户信息
      */
@@ -52,7 +54,7 @@ public interface SysUserService extends IService<SysUser> {
     void changeStatus(UserChangeStatusDTO userChangeStatusDTO);
 
     /**
-     * 删除用户信息(逻辑删除,并清理角色关联与缓存)
+     * 删除用户信息(逻辑删除，并清理角色关联与缓存)
      *
      * @param ids 用户ID列表
      */
@@ -79,12 +81,5 @@ public interface SysUserService extends IService<SysUser> {
      * @return 角色ID列表
      */
     List<Long> listRoleIdsByUserId(Long userId);
-
-    /**
-     * 失效指定用户的用户信息缓存（userInfo 缓存）
-     *
-     * @param userIds 用户ID列表
-     */
-    void evictUserCache(List<Long> userIds);
 
 }

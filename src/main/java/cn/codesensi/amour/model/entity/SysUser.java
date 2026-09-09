@@ -15,6 +15,8 @@ import java.io.Serializable;
  * 用户信息实体。
  * <p>
  * 对应 {@code sys_user} 表，存储系统用户的账号凭据与基本资料。
+ *
+ * @since 1.0
  */
 @Data
 @Accessors(chain = true)
@@ -63,7 +65,7 @@ public class SysUser extends BaseEntity implements Serializable {
     private String phone;
 
     /**
-     * 用户性别:U-未知,M-男,F-女
+     * 用户性别:U-未知，M-男，F-女
      */
     private String gender;
 
@@ -78,12 +80,12 @@ public class SysUser extends BaseEntity implements Serializable {
     private String avatar;
 
     /**
-     * 用户状态:0-启用,1-禁用
+     * 用户状态:0-启用，1-禁用
      */
     private Integer status;
 
     /**
-     * 是否内置:0-否,1-是
+     * 是否内置:0-否，1-是
      */
     private Integer builtin;
 

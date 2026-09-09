@@ -7,6 +7,8 @@ import lombok.Getter;
  * 启用/禁用状态枚举
  * 0-启用
  * 1-禁用
+ *
+ * @since 1.0
  */
 @Getter
 public enum EnableEnum implements BaseEnum<Integer> {

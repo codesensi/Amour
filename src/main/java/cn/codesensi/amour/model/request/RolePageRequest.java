@@ -13,7 +13,7 @@ import java.io.Serializable;
  * 角色分页查询请求参数
  *
  * @author codesensi
- * @since 2026-09-06
+ * @since 1.0
  */
 @Data
 @ToString(callSuper = true)
@@ -36,7 +36,7 @@ public class RolePageRequest extends BasePage implements Serializable {
     private String code;
 
     /**
-     * 角色状态:0-启用,1-禁用
+     * 角色状态:0-启用，1-禁用
      */
     private Integer status;
 

@@ -12,7 +12,7 @@ import java.io.Serializable;
  * 新增用户请求参数
  *
  * @author codesensi
- * @since 2026-06-28
+ * @since 1.0
  */
 @Data
 public class UserInsertRequest implements Serializable {
@@ -57,7 +57,7 @@ public class UserInsertRequest implements Serializable {
     private String qq;
 
     /**
-     * 用户性别:U-未知,M-男,F-女
+     * 用户性别:U-未知，M-男，F-女
      */
     // @InEnum(enumClass = GenderEnum.class, message = "用户性别不在指定范围内")
     private String gender;
@@ -68,7 +68,7 @@ public class UserInsertRequest implements Serializable {
     private String avatar;
 
     /**
-     * 用户状态:0-启用,1-禁用(缺省视为启用)
+     * 用户状态:0-启用，1-禁用(缺省视为启用)
      */
     private Integer status;
 

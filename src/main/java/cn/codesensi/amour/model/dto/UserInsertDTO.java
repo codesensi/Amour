@@ -9,7 +9,7 @@ import java.io.Serializable;
  * 新增用户请求参数
  *
  * @author codesensi
- * @since 2026-06-28
+ * @since 1.0
  */
 @Data
 public class UserInsertDTO implements Serializable {
@@ -48,7 +48,7 @@ public class UserInsertDTO implements Serializable {
     private String qq;
 
     /**
-     * 用户性别:U-未知,M-男,F-女
+     * 用户性别:U-未知，M-男，F-女
      */
     private String gender;
 
@@ -58,7 +58,7 @@ public class UserInsertDTO implements Serializable {
     private String avatar;
 
     /**
-     * 用户状态:0-启用,1-禁用(缺省视为启用)
+     * 用户状态:0-启用，1-禁用(缺省视为启用)
      */
     private Integer status;
 

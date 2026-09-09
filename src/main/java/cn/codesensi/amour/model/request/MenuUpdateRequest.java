@@ -11,10 +11,10 @@ import java.io.Serializable;
 /**
  * 修改菜单请求参数
  * <p>
- * 不接收 builtin/type 字段:二者均为结构性标识,创建后不允许通过修改接口变更。
+ * 不接收 builtin/type 字段:二者均为结构性标识，创建后不允许通过修改接口变更。
  *
  * @author codesensi
- * @since 2026-09-06
+ * @since 1.0
  */
 @Data
 public class MenuUpdateRequest implements Serializable {
@@ -42,7 +42,7 @@ public class MenuUpdateRequest implements Serializable {
     private String title;
 
     /**
-     * 路由路径(目录/菜单必填,按钮无需填写)
+     * 路由路径(目录/菜单必填，按钮无需填写)
      */
     @Size(max = 512, message = "路由路径长度不能超过512")
     private String path;
@@ -71,12 +71,12 @@ public class MenuUpdateRequest implements Serializable {
     private String perms;
 
     /**
-     * 菜单状态:0-启用,1-禁用
+     * 菜单状态:0-启用，1-禁用
      */
     private Integer status;
 
     /**
-     * 显隐标识:0-显示,1-隐藏
+     * 显隐标识:0-显示，1-隐藏
      */
     private Integer hidden;
 

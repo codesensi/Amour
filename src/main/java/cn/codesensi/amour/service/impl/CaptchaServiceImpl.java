@@ -31,6 +31,8 @@ import java.util.function.Supplier;
  * 依据 sys_config 表中 {@code captcha.image-type} 配置生成对应类型的图形验证码，
  * 验证码答案以 captchaKey 为键存入 captcha 缓存（过期时间由缓存定义决定，见
  * {@link CacheConst#CAPTCHA}），接口仅返回 captchaKey 与验证码图片的 Base64 编码。
+ *
+ * @since 1.0
  */
 @Slf4j
 @RequiredArgsConstructor

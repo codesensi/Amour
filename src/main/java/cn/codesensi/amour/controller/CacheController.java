@@ -3,6 +3,7 @@ package cn.codesensi.amour.controller;
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.model.response.CacheResponse;
 import cn.codesensi.amour.service.CacheService;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,7 @@ public class CacheController {
     /**
      * 查询全部缓存内容
      */
+    @SaCheckPermission("system:cache:list")
     @GetMapping("/list-all")
     public List<CacheResponse> listAll() {
         return cacheService.listAll();

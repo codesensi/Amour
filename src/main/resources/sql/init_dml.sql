@@ -176,6 +176,8 @@ FROM (
              (1503, 1500, '修改', 'B', NULL, NULL, 3, NULL, 'system:dict:update', 1),
              (1504, 1500, '增加', 'B', NULL, NULL, 4, NULL, 'system:dict:insert', 1),
              (1505, 1500, '删除', 'B', NULL, NULL, 5, NULL, 'system:dict:delete', 1),
+             (1600, 1000, '缓存监控', 'M', '/admin/system/cache', 'system/cache/index', 6, 'ep:monitor', NULL, 1),
+             (1601, 1600, '查询', 'B', NULL, NULL, 1, NULL, 'system:cache:list', 1),
              (2000, 0, '日志管理', 'D', '/admin/log', NULL, 2, 'ep:document', NULL, 1),
              (2100, 2000, '登录日志', 'M', '/admin/log/login', 'log/login/index', 1, 'ep:key', NULL, 1),
              (2101, 2100, '分页查询', 'B', NULL, NULL, 1, NULL, 'log:login:page', 1),

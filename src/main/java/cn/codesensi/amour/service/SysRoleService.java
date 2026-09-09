@@ -11,7 +11,7 @@ import java.util.List;
  * 角色信息表 服务层。
  *
  * @author codesensi
- * @since 2026-06-28
+ * @since 1.0
  */
 public interface SysRoleService extends IService<SysRole> {
 

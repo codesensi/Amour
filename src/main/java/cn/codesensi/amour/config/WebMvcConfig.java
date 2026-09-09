@@ -65,8 +65,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     /**
      * Sa-Token 整合 JWT(Simple 简单模式)。
      * <p>
-     * 保留 sa-token 原生会话与注解鉴权能力,仅将令牌替换为 JWT 风格签名串,
-     * 使会话信息可被无状态校验,便于后续水平扩展。
+     * 保留 sa-token 原生会话与注解鉴权能力，仅将令牌替换为 JWT 风格签名串，
+     * 使会话信息可被无状态校验，便于后续水平扩展。
      */
     @Bean
     public StpLogic getStpLogicJwt() {

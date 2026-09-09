@@ -14,6 +14,8 @@ import java.time.LocalDateTime;
  * <p>
  * 对应数据库各表的 {@code creator}、{@code create_time}、{@code updater}、
  * {@code update_time}、{@code del_flag} 公共列。
+ *
+ * @since 1.0
  */
 @Data
 @Accessors(chain = true)
@@ -47,7 +49,7 @@ public class BaseEntity implements Serializable {
     private LocalDateTime updateTime;
 
     /**
-     * 逻辑删除标识:0-未删除,1-已删除
+     * 逻辑删除标识:0-未删除，1-已删除
      */
     private Integer delFlag;
 

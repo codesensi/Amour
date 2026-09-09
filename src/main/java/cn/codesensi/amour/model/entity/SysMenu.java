@@ -16,6 +16,8 @@ import java.io.Serializable;
  * <p>
  * 对应 {@code sys_menu} 表，存储后台导航菜单、路由信息与按钮权限点，
  * 通过 {@code pid} 构建树形结构。
+ *
+ * @since 1.0
  */
 @Data
 @Accessors(chain = true)
@@ -44,7 +46,7 @@ public class SysMenu extends BaseEntity implements Serializable {
     private String title;
 
     /**
-     * 菜单类型:D-目录,M-菜单,B-按钮
+     * 菜单类型:D-目录，M-菜单，B-按钮
      */
     private String type;
 
@@ -74,17 +76,17 @@ public class SysMenu extends BaseEntity implements Serializable {
     private String perms;
 
     /**
-     * 菜单状态:0-启用,1-禁用
+     * 菜单状态:0-启用，1-禁用
      */
     private Integer status;
 
     /**
-     * 显隐标识:0-显示,1-隐藏
+     * 显隐标识:0-显示，1-隐藏
      */
     private Integer hidden;
 
     /**
-     * 是否内置:0-否,1-是
+     * 是否内置:0-否，1-是
      */
     private Integer builtin;
 

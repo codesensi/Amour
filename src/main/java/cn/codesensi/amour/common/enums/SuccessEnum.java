@@ -7,6 +7,8 @@ import lombok.Getter;
  * 成功/失败状态枚举
  * 1-成功
  * 0-失败
+ *
+ * @since 1.0
  */
 @Getter
 public enum SuccessEnum implements BaseEnum<Integer> {

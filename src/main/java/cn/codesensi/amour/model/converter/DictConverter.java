@@ -1,11 +1,11 @@
 package cn.codesensi.amour.model.converter;
 
-import cn.codesensi.amour.model.dto.DictDTO;
-import cn.codesensi.amour.model.dto.DictGroupDTO;
-import cn.codesensi.amour.model.dto.DictPageDTO;
-import cn.codesensi.amour.model.dto.DictTypeDTO;
+import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.SysDict;
+import cn.codesensi.amour.model.request.DictChangeStatusRequest;
+import cn.codesensi.amour.model.request.DictInsertRequest;
 import cn.codesensi.amour.model.request.DictPageRequest;
+import cn.codesensi.amour.model.request.DictUpdateRequest;
 import cn.codesensi.amour.model.response.DictGroupResponse;
 import cn.codesensi.amour.model.response.DictPageResponse;
 import cn.codesensi.amour.model.response.DictResponse;
@@ -101,6 +101,46 @@ public interface DictConverter {
      * @return 分页查询参数 DTO
      */
     DictPageDTO toPageDTO(DictPageRequest request);
+
+    /**
+     * DictInsertRequest → DictInsertDTO。
+     *
+     * @param request 新增字典条目请求
+     * @return 新增字典条目 DTO
+     */
+    DictInsertDTO toInsertDTO(DictInsertRequest request);
+
+    /**
+     * DictUpdateRequest → DictUpdateDTO。
+     *
+     * @param request 修改字典条目请求
+     * @return 修改字典条目 DTO
+     */
+    DictUpdateDTO toUpdateDTO(DictUpdateRequest request);
+
+    /**
+     * DictChangeStatusRequest → DictChangeStatusDTO。
+     *
+     * @param request 修改字典状态请求
+     * @return 修改字典状态 DTO
+     */
+    DictChangeStatusDTO toChangeStatusDTO(DictChangeStatusRequest request);
+
+    /**
+     * DictInsertDTO → SysDict。
+     *
+     * @param insertDTO 新增字典条目 DTO
+     * @return 字典实体
+     */
+    SysDict toEntity(DictInsertDTO insertDTO);
+
+    /**
+     * DictUpdateDTO → SysDict。
+     *
+     * @param updateDTO 修改字典条目 DTO
+     * @return 字典实体
+     */
+    SysDict toEntity(DictUpdateDTO updateDTO);
 
     /**
      * Page&lt;SysDict&gt; → Page&lt;DictPageResponse&gt;

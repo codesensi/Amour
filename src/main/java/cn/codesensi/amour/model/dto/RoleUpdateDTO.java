@@ -12,7 +12,7 @@ import java.io.Serializable;
  * 修改角色业务数据
  *
  * @author codesensi
- * @since 2026-09-08
+ * @since 1.0
  */
 @Data
 public class RoleUpdateDTO implements Serializable {

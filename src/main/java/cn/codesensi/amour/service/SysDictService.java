@@ -1,16 +1,19 @@
 package cn.codesensi.amour.service;
 
 import cn.codesensi.amour.model.dto.DictDTO;
+import cn.codesensi.amour.model.dto.DictChangeStatusDTO;
 import cn.codesensi.amour.model.dto.DictGroupDTO;
+import cn.codesensi.amour.model.dto.DictInsertDTO;
 import cn.codesensi.amour.model.dto.DictPageDTO;
 import cn.codesensi.amour.model.dto.DictTypeDTO;
+import cn.codesensi.amour.model.dto.DictUpdateDTO;
 import cn.codesensi.amour.model.entity.SysDict;
 import com.mybatisflex.core.paginate.Page;
 
 import java.util.List;
 
 /**
- * 数据字典查询服务。
+ * 数据字典服务。
  *
  * @author codesensi
  * @since 1.0
@@ -18,9 +21,46 @@ import java.util.List;
 public interface SysDictService {
 
     /**
-     * 分页查询字典条目(管理端右侧数据表格的数据源,含禁用条目与完整字段)。
+     * 新增字典条目。
      * <p>
-     * 编码、名称、值为模糊匹配,状态为精确匹配,条件缺省时自动忽略。
+     * 校验同编码下字典值唯一；写库后失效该编码的字典缓存。
+     *
+     * @param insertDTO 字典条目信息
+     */
+    void insert(DictInsertDTO insertDTO);
+
+    /**
+     * 修改字典条目。
+     * <p>
+     * 字典编码与内置标识不可修改；内置条目（builtin=1）仅允许修改名称/标签/排序/备注/状态；
+     * 非内置条目修改字典值时校验同编码下唯一；写库后失效该编码的字典缓存。
+     *
+     * @param updateDTO 字典条目信息
+     */
+    void update(DictUpdateDTO updateDTO);
+
+    /**
+     * 修改字典条目状态。
+     * <p>
+     * 内置条目仅承载展示层，允许启停；状态变化后失效该编码的字典缓存。
+     *
+     * @param changeStatusDTO 字典状态信息
+     */
+    void changeStatus(DictChangeStatusDTO changeStatusDTO);
+
+    /**
+     * 批量删除字典条目。
+     * <p>
+     * 内置条目不允许删除（整批失败）；删除后失效所涉编码的字典缓存。
+     *
+     * @param ids 字典条目ID列表
+     */
+    void delete(List<Long> ids);
+
+    /**
+     * 分页查询字典条目(管理端右侧数据表格的数据源，含禁用条目与完整字段)。
+     * <p>
+     * 编码、名称、值为模糊匹配，状态为精确匹配，条件缺省时自动忽略。
      *
      * @param pageDTO 分页查询参数
      * @return 字典条目分页结果
@@ -28,7 +68,7 @@ public interface SysDictService {
     Page<SysDict> page(DictPageDTO pageDTO);
 
     /**
-     * 查询全部字典类型（按编码聚合,含条目数;管理端左侧类型列表的数据源）。
+     * 查询全部字典类型（按编码聚合，含条目数；管理端左侧类型列表的数据源）。
      *
      * @return 字典类型列表
      */

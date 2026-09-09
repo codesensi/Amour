@@ -11,6 +11,8 @@ import java.util.List;
 
 /**
  * 自定义权限验证接口扩展
+ *
+ * @since 1.0
  */
 @Slf4j
 @Service

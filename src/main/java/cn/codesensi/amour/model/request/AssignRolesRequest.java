@@ -9,6 +9,8 @@ import java.util.List;
 
 /**
  * 用户配置角色请求参数
+ *
+ * @since 1.0
  */
 
 @Data

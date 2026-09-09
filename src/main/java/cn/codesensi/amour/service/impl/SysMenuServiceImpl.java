@@ -15,6 +15,7 @@ import cn.codesensi.amour.model.dto.MenuInsertDTO;
 import cn.codesensi.amour.model.dto.MenuUpdateDTO;
 import cn.codesensi.amour.model.entity.SysMenu;
 import cn.codesensi.amour.model.entity.SysRole;
+import cn.codesensi.amour.service.CacheEvictService;
 import cn.codesensi.amour.service.SysMenuService;
 import cn.codesensi.amour.service.SysRoleMenuService;
 import cn.codesensi.amour.service.SysUserRoleService;
@@ -41,7 +42,7 @@ import static cn.codesensi.amour.model.entity.table.SysRoleMenuTableDef.SYS_ROLE
  * 路由菜单表 服务层实现。
  *
  * @author codesensi
- * @since 2026-06-28
+ * @since 1.0
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -53,11 +54,12 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     private final SysUserRoleService sysUserRoleService;
     private final CacheManager cacheManager;
     private final MenuConverter menuConverter;
+    private final CacheEvictService cacheEvictService;
 
     /**
      * 查询全部菜单列表。
      * <p>
-     * 覆写 {@link IService#list()}：按 sort 升序、id 升序排序,保证菜单树展示顺序稳定。
+     * 按 sort 升序、id 升序排序，保证菜单树展示顺序稳定。
      *
      * @return 全量菜单列表
      */
@@ -73,7 +75,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     /**
      * 新增菜单。
      * <p>
-     * 校验上级菜单合法性与类型必填项;新增菜单尚未关联角色,无需失效用户缓存。
+     * 校验上级菜单合法性与类型必填项；新增菜单尚未关联角色，无需失效用户缓存。
      *
      * @param menuInsertDTO 菜单信息
      */
@@ -103,9 +105,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     /**
      * 修改菜单。
      * <p>
-     * 菜单类型不在修改入参中(结构性标识,创建后不可变);系统内置菜单的结构字段(上级/路由路径/组件路径/权限编码)
-     * 不允许修改;上级菜单不允许选择自身或其下级(否则树成环);
-     * 变更影响权限码与路由装配,失效全部用户的 perm/menu 缓存。
+     * 菜单类型不在修改入参中(结构性标识，创建后不可变)；系统内置菜单的结构字段(上级/路由路径/组件路径/权限编码)
+     * 不允许修改；上级菜单不允许选择自身或其下级(否则树成环)；
+     * 变更影响权限码与路由装配，失效全部用户的 perm/menu 缓存。
      *
      * @param menuUpdateDTO 菜单信息
      */
@@ -145,8 +147,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     /**
      * 修改菜单状态。
      * <p>
-     * 系统内置菜单不允许禁用(启用请求不受限);同状态幂等返回;
-     * 菜单状态影响权限码与路由装配,失效全部用户的 perm/menu 缓存。
+     * 系统内置菜单不允许禁用(启用请求不受限)；同状态幂等返回；
+     * 菜单状态影响权限码与路由装配，失效全部用户的 perm/menu 缓存。
      *
      * @param menuChangeStatusDTO 菜单状态信息
      */
@@ -178,8 +180,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     /**
      * 删除菜单。
      * <p>
-     * 系统内置菜单不允许删除;级联删除其全部下级菜单并清理角色-菜单关联;
-     * 缓存失效注册到事务提交后执行,避免提交前其他请求回源把中间状态重新写回缓存。
+     * 系统内置菜单不允许删除；级联删除其全部下级菜单并清理角色-菜单关联；
+     * 缓存失效注册到事务提交后执行，避免提交前其他请求回源把中间状态重新写回缓存。
      *
      * @param id 菜单ID
      */
@@ -209,7 +211,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     }
 
     /**
-     * 校验上级菜单合法性:pid 为 0 表示根节点;否则父级必须存在且不能为按钮类型。
+     * 校验上级菜单合法性:pid 为 0 表示根节点；否则父级必须存在且不能为按钮类型。
      *
      * @param pid 上级菜单ID
      */
@@ -227,7 +229,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     }
 
     /**
-     * 校验按菜单类型的必填项:目录/菜单必须填写路由路径,按钮必须填写权限编码。
+     * 校验按菜单类型的必填项:目录/菜单必须填写路由路径，按钮必须填写权限编码。
      *
      * @param type  菜单类型
      * @param path  路由路径
@@ -247,7 +249,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      *
      * @param pid       父级菜单ID
      * @param title     菜单名称
-     * @param excludeId 修改时排除自身,新增时传 null
+     * @param excludeId 修改时排除自身，新增时传 null
      */
     private void validateSiblingTitleUnique(Long pid, String title, Long excludeId) {
         QueryChain<SysMenu> query = QueryChain.of(sysMenuMapper)
@@ -262,10 +264,10 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     }
 
     /**
-     * 校验权限标识全局唯一(空标识跳过,仅按钮类型填写)。
+     * 校验权限标识全局唯一(空标识跳过，仅按钮类型填写)。
      *
      * @param perms     权限编码
-     * @param excludeId 修改时排除自身,新增时传 null
+     * @param excludeId 修改时排除自身，新增时传 null
      */
     private void validatePermsUnique(String perms, Long excludeId) {
         if (StrUtil.isBlank(perms)) {
@@ -284,8 +286,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     /**
      * 校验系统内置菜单的结构字段未被修改。
      * <p>
-     * 内置菜单的上级、路由路径、组件路径与权限编码和源码路由、前后端权限契约硬编码绑定,
-     * 修改会直接导致功能入口失效或权限判定错位;空串与 null 视为一致,
+     * 内置菜单的上级、路由路径、组件路径与权限编码和源码路由、前后端权限契约硬编码绑定，
+     * 修改会直接导致功能入口失效或权限判定错位；空串与 null 视为一致，
      * 避免表单提交空串被误判为修改。
      *
      * @param sysMenu       数据库中的内置菜单
@@ -309,7 +311,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     /**
      * 收集指定菜单的全部下级菜单ID(不含自身)。
      * <p>
-     * 菜单表数据量小,一次性加载后沿 pid 向下遍历;visited 兼作防环终止条件,
+     * 菜单表数据量小，一次性加载后沿 pid 向下遍历；visited 兼作防环终止条件，
      * 规避 pid 环脏数据导致的死循环。
      *
      * @param menuId 菜单ID
@@ -345,19 +347,13 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     /**
      * 失效全部用户的 perm/menu 缓存。
      * <p>
-     * 菜单数据被所有用户共享,无法按用户 Key 精准失效,直接清空两个缓存;
-     * 注册到事务提交后执行,避免提交前其他请求回源把中间状态重新写回缓存。
+     * 菜单数据被所有用户共享，无法按用户 Key 精准失效，直接清空两个缓存；
+     * 注册到事务提交后执行，避免提交前其他请求回源把中间状态重新写回缓存。
      */
     private void evictAllCaches() {
         CacheUtil.evictAfterCommit(() -> {
-            Cache permCache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.PERM));
-            if (permCache != null) {
-                permCache.clear();
-            }
-            Cache menuCache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.MENU));
-            if (menuCache != null) {
-                menuCache.clear();
-            }
+            cacheEvictService.clearCache(CacheConst.PERM);
+            cacheEvictService.clearCache(CacheConst.MENU);
         });
     }
 
@@ -410,25 +406,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     }
 
     /**
-     * 失效指定用户的权限编码缓存。
-     *
-     * @param userIds 用户ID列表
-     */
-    @Override
-    public void evictPermCache(List<Long> userIds) {
-        if (CollUtil.isEmpty(userIds)) {
-            return;
-        }
-        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.PERM));
-        if (cache == null) {
-            return;
-        }
-        for (Long userId : userIds) {
-            cache.evict(userId);
-        }
-    }
-
-    /**
      * 查询用户路由菜单列表。
      * <p>
      * 结果经 menu 缓存加速（Key 为用户ID），写后 30 天兜底过期，写侧显式失效；
@@ -474,25 +451,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
 
         // 获取角色拥有的路由菜单列表（不包含按钮级别）
         return sysRoleMenuService.listMenuByRoleCodeList(roleCodeList);
-    }
-
-    /**
-     * 失效指定用户的路由菜单缓存。
-     *
-     * @param userIds 用户ID列表
-     */
-    @Override
-    public void evictMenuCache(List<Long> userIds) {
-        if (CollUtil.isEmpty(userIds)) {
-            return;
-        }
-        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.MENU));
-        if (cache == null) {
-            return;
-        }
-        for (Long userId : userIds) {
-            cache.evict(userId);
-        }
     }
 
     /**

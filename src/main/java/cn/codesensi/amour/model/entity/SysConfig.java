@@ -15,6 +15,8 @@ import java.io.Serializable;
  * 系统配置实体。
  * <p>
  * 存储 {@code app.*} 业务可调配置，运行期由 {@code SysConfigService} 实时查库读取（热更新）。
+ *
+ * @since 1.0
  */
 @Data
 @Accessors(chain = true)

@@ -20,6 +20,8 @@ import java.util.Map;
  * <p>
  * 注意：除 {@link #getParameterMap(ServletRequest)} 外，其余方法均依赖当前线程
  * 绑定的请求上下文，只能在 Web 请求线程内调用。
+ *
+ * @since 1.0
  */
 public class ServletUtil {
 

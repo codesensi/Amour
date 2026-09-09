@@ -11,10 +11,10 @@ import java.io.Serializable;
 /**
  * 修改用户请求参数
  * <p>
- * 用户名称、状态与密码不在可修改范围,分别由新增、状态管理与重置密码入口维护。
+ * 用户名称、状态与密码不在可修改范围，分别由新增、状态管理与重置密码入口维护。
  *
  * @author codesensi
- * @since 2026-09-08
+ * @since 1.0
  */
 @Data
 public class UserUpdateRequest implements Serializable {
@@ -58,7 +58,7 @@ public class UserUpdateRequest implements Serializable {
     private String qq;
 
     /**
-     * 用户性别:U-未知,M-男,F-女
+     * 用户性别:U-未知，M-男，F-女
      */
     // @InEnum(enumClass = GenderEnum.class, message = "用户性别不在指定范围内")
     private String gender;

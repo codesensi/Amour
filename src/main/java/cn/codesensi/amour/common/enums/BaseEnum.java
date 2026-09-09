@@ -5,6 +5,8 @@ package cn.codesensi.amour.common.enums;
  * 供业务枚举统一实现，便于以统一的 code 语义在前后端之间传递与反查。
  *
  * @param <T> code 的类型（如 {@link Integer}、{@link String}）
+ *
+ * @since 1.0
  */
 public interface BaseEnum<T> {
 

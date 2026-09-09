@@ -17,6 +17,8 @@ import java.util.List;
  *   <li>{@code expireAfterAccess} 为访问后过期时间；</li>
  *   <li>{@code 0} 表示该维度不限制。</li>
  * </ul>
+ *
+ * @since 1.0
  */
 @Data
 @ConfigurationProperties(prefix = "app.cache")

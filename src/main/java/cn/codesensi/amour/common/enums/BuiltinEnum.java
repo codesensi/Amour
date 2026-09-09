@@ -7,6 +7,8 @@ import lombok.Getter;
  * 是否内置枚举
  * 1-是
  * 0-否
+ *
+ * @since 1.0
  */
 @Getter
 public enum BuiltinEnum implements BaseEnum<Integer> {

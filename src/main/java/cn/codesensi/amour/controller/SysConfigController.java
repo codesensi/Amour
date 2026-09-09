@@ -49,8 +49,8 @@ public class SysConfigController {
     }
 
     /**
-     * 分页查询系统配置（登录态;管理端列表数据源,含禁用条目与完整字段,直查库不走缓存）。
-     * <p>配置键为模糊匹配,分组与状态为精确匹配,条件缺省时自动忽略。
+     * 分页查询系统配置（登录态；管理端列表数据源，含禁用条目与完整字段，直查库不走缓存）。
+     * <p>配置键为模糊匹配，分组与状态为精确匹配，条件缺省时自动忽略。
      *
      * @param configPageRequest 分页查询参数
      * @return 配置分页结果
@@ -64,7 +64,7 @@ public class SysConfigController {
     }
 
     /**
-     * 修改系统配置（仅允许修改配置值;更新后失效对应配置键缓存,热更新即时生效）。
+     * 修改系统配置（仅允许修改配置值；更新后失效对应配置键缓存，热更新即时生效）。
      *
      * @param updateRequest 修改请求参数
      */
@@ -73,14 +73,5 @@ public class SysConfigController {
     public void update(@Valid @RequestBody ConfigUpdateRequest updateRequest) {
         ConfigUpdateDTO updateDTO = configConverter.toUpdateDTO(updateRequest);
         sysConfigService.update(updateDTO);
-    }
-
-    /**
-     * 刷新配置缓存（清空全部 config 缓存,下次读取时回源查库）。
-     */
-    @SaCheckPermission("system:config:update")
-    @PostMapping("/refresh-cache")
-    public void refreshCache() {
-        sysConfigService.evictCache(List.of());
     }
 }

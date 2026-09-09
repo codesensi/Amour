@@ -10,7 +10,7 @@ import java.util.List;
  * 用户角色关联表 服务层。
  *
  * @author codesensi
- * @since 2026-06-28
+ * @since 1.0
  */
 public interface SysUserRoleService extends IService<SysUserRole> {
 
@@ -37,12 +37,5 @@ public interface SysUserRoleService extends IService<SysUserRole> {
      * @return 角色ID列表
      */
     List<Long> listRoleIdsByUserId(Long userId);
-
-    /**
-     * 失效指定用户的角色编码缓存（role 缓存）
-     *
-     * @param userIds 用户ID列表
-     */
-    void evictRoleCache(List<Long> userIds);
 
 }

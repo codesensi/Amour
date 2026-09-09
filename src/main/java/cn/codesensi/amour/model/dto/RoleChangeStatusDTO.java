@@ -9,7 +9,7 @@ import java.io.Serializable;
  * 修改角色状态业务数据
  *
  * @author codesensi
- * @since 2026-09-08
+ * @since 1.0
  */
 @Data
 public class RoleChangeStatusDTO implements Serializable {
@@ -23,7 +23,7 @@ public class RoleChangeStatusDTO implements Serializable {
     private Long id;
 
     /**
-     * 角色状态:0-启用,1-禁用
+     * 角色状态:0-启用，1-禁用
      */
     private Integer status;
 

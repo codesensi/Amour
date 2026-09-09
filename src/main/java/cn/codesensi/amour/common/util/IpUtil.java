@@ -13,6 +13,8 @@ import java.util.Enumeration;
  * <p>
  * 解析时按优先级依次读取常见代理转发头（X-Forwarded-For 等），
  * 均未命中时回退到 {@code RemoteAddr}。
+ *
+ * @since 1.0
  */
 @Slf4j
 public class IpUtil {

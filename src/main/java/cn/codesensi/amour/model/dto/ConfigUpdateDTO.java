@@ -27,7 +27,7 @@ public class ConfigUpdateDTO implements Serializable {
     private Long id;
 
     /**
-     * 配置值(统一字符串存储;格式由服务端按值类型校验)
+     * 配置值(统一字符串存储；格式由服务端按值类型校验)
      */
     private String configValue;
 

@@ -22,7 +22,7 @@ import java.util.List;
  * 路由菜单表 控制层。
  *
  * @author codesensi
- * @since 2026-06-28
+ * @since 1.0
  */
 @ApiResponseBody
 @RequiredArgsConstructor
@@ -37,7 +37,7 @@ public class SysMenuController {
      * 查询全部菜单列表。
      * <p>
      * 返回全量菜单的一维扁平数组（id + pid），由前端自行组树；
-     * 树形列表数据量小,不做分页。
+     * 树形列表数据量小，不做分页。
      *
      * @return 菜单列表
      */

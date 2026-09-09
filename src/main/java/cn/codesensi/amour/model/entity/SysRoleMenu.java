@@ -15,6 +15,8 @@ import java.io.Serializable;
  * 角色菜单关联实体。
  * <p>
  * 对应 {@code sys_role_menu} 表，维护角色与菜单的授权关系。
+ *
+ * @since 1.0
  */
 @Data
 @Accessors(chain = true)

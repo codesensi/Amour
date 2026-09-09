@@ -15,7 +15,7 @@ import java.util.List;
  * 角色相关对象转换
  *
  * @author codesensi
- * @since 2026-07-15
+ * @since 1.0
  */
 @Mapper(componentModel = "spring")
 public interface RoleConverter {

@@ -15,6 +15,7 @@ import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.SysMenu;
 import cn.codesensi.amour.model.entity.SysUser;
 import cn.codesensi.amour.model.entity.SysUserRole;
+import cn.codesensi.amour.service.CacheEvictService;
 import cn.codesensi.amour.service.SysMenuService;
 import cn.codesensi.amour.service.SysUserRoleService;
 import cn.codesensi.amour.service.SysUserService;
@@ -44,6 +45,8 @@ import static cn.codesensi.amour.model.entity.table.SysUserTableDef.SYS_USER;
  * 用户信息 Service 实现。
  * <p>
  * CRUD 能力由 MyBatis-Flex 的 {@link ServiceImpl} 统一提供。
+ *
+ * @since 1.0
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -57,12 +60,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private final MenuConverter menuConverter;
     private final SysUserRoleService sysUserRoleService;
     private final CacheManager cacheManager;
+    private final CacheEvictService cacheEvictService;
 
     /**
      * 分页查询用户信息。
      * <p>
-     * 用户名称、手机号为模糊匹配,状态为精确匹配,条件缺省时自动忽略;
-     * 页码与每页条数的缺省值由 {@link BasePage} 提供(1 与 20),与前端默认值保持一致。
+     * 用户名称、手机号为模糊匹配，状态为精确匹配，条件缺省时自动忽略；
+     * 页码与每页条数的缺省值由 {@link BasePage} 提供(1 与 20)，与前端默认值保持一致。
      *
      * @param userPageDTO 分页查询参数
      * @return 用户信息分页结果
@@ -226,7 +230,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     /**
      * 删除用户信息。
      * <p>
-     * 支持单个或批量删除,批量与单个共用同一校验链;逻辑删除由 MyBatis-Flex 全局
+     * 支持单个或批量删除，批量与单个共用同一校验链；逻辑删除由 MyBatis-Flex 全局
      * del_flag 配置自动完成；删除用户与清理角色关联处于同一事务，原子提交，
      * 任一校验不通过即整批回滚，不做部分成功；缓存失效注册在事务提交后执行，
      * 避免提交前其他请求回源查库把中间状态重新写入缓存。
@@ -269,10 +273,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         // 5. 失效这些用户的角色/权限/路由菜单/用户信息缓存（注册到事务提交后执行）
         CacheUtil.evictAfterCommit(() -> {
             log.debug("用户删除完成，失效缓存：userIds={}", ids);
-            sysUserRoleService.evictRoleCache(ids);
-            sysMenuService.evictPermCache(ids);
-            sysMenuService.evictMenuCache(ids);
-            evictUserCache(ids);
+            cacheEvictService.evictRoleCache(ids);
+            cacheEvictService.evictPermCache(ids);
+            cacheEvictService.evictMenuCache(ids);
+            cacheEvictService.evictUserCache(ids);
             // 已删除用户立即下线,避免已签发会话继续有效
             ids.forEach(StpUtil::logout);
         });
@@ -353,10 +357,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         //    注册到事务提交后执行，避免提交前其他请求回源查库把中间状态重新写入缓存
         CacheUtil.evictAfterCommit(() -> {
             log.debug("角色分配完成，失效缓存：userId={}，roleIds={}", userId, distinctRoleIds);
-            sysUserRoleService.evictRoleCache(List.of(userId));
-            sysMenuService.evictPermCache(List.of(userId));
-            sysMenuService.evictMenuCache(List.of(userId));
-            evictUserCache(List.of(userId));
+            cacheEvictService.evictRoleCache(List.of(userId));
+            cacheEvictService.evictPermCache(List.of(userId));
+            cacheEvictService.evictMenuCache(List.of(userId));
+            cacheEvictService.evictUserCache(List.of(userId));
         });
     }
 
@@ -399,29 +403,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         boolean success = super.updateById(sysUser);
         if (success) {
             log.debug("用户信息更新成功，失效 userInfo 缓存：userId={}", sysUser.getId());
-            evictUserCache(List.of(sysUser.getId()));
+            cacheEvictService.evictUserCache(List.of(sysUser.getId()));
         }
         return success;
-    }
-
-    /**
-     * 失效指定用户的用户信息缓存。
-     *
-     * @param userIds 用户ID列表
-     */
-    @Override
-    public void evictUserCache(List<Long> userIds) {
-        if (CollUtil.isEmpty(userIds)) {
-            return;
-        }
-        log.debug("失效 userInfo 缓存：userIds={}", userIds);
-        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.USER));
-        if (cache == null) {
-            return;
-        }
-        for (Long userId : userIds) {
-            cache.evict(userId);
-        }
     }
 
 }

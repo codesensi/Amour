@@ -3,8 +3,10 @@ package cn.codesensi.amour.service.impl;
 import cn.codesensi.amour.common.consts.CacheConst;
 import cn.codesensi.amour.model.response.CacheEntryResponse;
 import cn.codesensi.amour.model.response.CacheResponse;
+import cn.codesensi.amour.model.response.CacheStatsResponse;
 import cn.codesensi.amour.service.CacheService;
 import com.github.benmanes.caffeine.cache.Policy;
+import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
@@ -23,7 +25,9 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * 遍历 {@link CacheManager} 中注册的全部缓存，经 {@link CaffeineCache#getNativeCache()}
  * 获取原生 Caffeine 缓存后，通过 {@code asMap()} 视图读取全部条目，通过 {@code policy()}
- * 读取过期策略与每条目的剩余过期时间，用于运行期查看缓存内容。
+ * 读取过期策略与每条目的剩余过期时间，通过 {@code stats()} 读取命中统计，用于运行期查看缓存内容。
+ *
+ * @since 1.0
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -35,8 +39,8 @@ public class CacheServiceImpl implements CacheService {
     /**
      * 查询全部 Caffeine 缓存内容。
      * <p>
-     * 处理流程：遍历缓存管理器中注册的全部缓存 → 读取过期策略 → 读取各缓存条目及剩余过期时间 →
-     * 空值哨兵还原为 {@code null} → 按缓存名排序返回。
+     * 处理流程：遍历缓存管理器中注册的全部缓存 → 读取过期策略 → 读取命中统计 →
+     * 读取各缓存条目及剩余过期时间 → 空值哨兵还原为 {@code null} → 按缓存名排序返回。
      *
      * @return 各缓存的名称、过期策略与条目列表；无缓存时返回空列表
      */
@@ -53,6 +57,7 @@ public class CacheServiceImpl implements CacheService {
             CacheResponse response = new CacheResponse();
             response.setCacheName(cacheName);
             fillPolicy(response, caffeineCache);
+            fillStats(response, caffeineCache);
             response.setEntries(listEntries(caffeineCache));
             result.add(response);
         }
@@ -75,6 +80,29 @@ public class CacheServiceImpl implements CacheService {
         policy.expireAfterWrite().ifPresent(fixed -> response.setExpireAfterWrite(fixed.getExpiresAfter(TimeUnit.SECONDS)));
         policy.expireAfterAccess().ifPresent(fixed -> response.setExpireAfterAccess(fixed.getExpiresAfter(TimeUnit.SECONDS)));
         policy.eviction().ifPresent(eviction -> response.setMaximumSize(eviction.getMaximum()));
+    }
+
+    /**
+     * 读取缓存命中统计并填充到响应对象。
+     * <p>
+     * 数据来源于 Caffeine 原生 {@code CacheStats}（缓存构建时经 {@code recordStats()} 开启），
+     * 为自缓存实例创建（应用启动）起的累计值，重启后归零。
+     *
+     * @param response      响应对象
+     * @param caffeineCache Spring 缓存的 Caffeine 实现
+     */
+    private void fillStats(CacheResponse response, CaffeineCache caffeineCache) {
+        CacheStats stats = caffeineCache.getNativeCache().stats();
+        CacheStatsResponse statsResponse = new CacheStatsResponse()
+                .setHitCount(stats.hitCount())
+                .setMissCount(stats.missCount())
+                .setHitRate(stats.hitRate())
+                .setEvictionCount(stats.evictionCount())
+                .setLoadSuccessCount(stats.loadSuccessCount())
+                .setLoadFailureCount(stats.loadFailureCount())
+                // Caffeine 以纳秒计平均加载耗时，换算为毫秒展示
+                .setAverageLoadPenaltyMillis(stats.averageLoadPenalty() / 1_000_000.0);
+        response.setStats(statsResponse);
     }
 
     /**

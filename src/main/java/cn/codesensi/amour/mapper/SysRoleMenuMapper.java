@@ -5,6 +5,8 @@ import com.mybatisflex.core.BaseMapper;
 
 /**
  * 角色菜单关联 Mapper。
+ *
+ * @since 1.0
  */
 public interface SysRoleMenuMapper extends BaseMapper<SysRoleMenu> {
 }

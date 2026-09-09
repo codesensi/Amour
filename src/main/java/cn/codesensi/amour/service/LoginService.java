@@ -5,6 +5,8 @@ import cn.codesensi.amour.model.dto.LoginResultDTO;
 
 /**
  * 登录接口
+ *
+ * @since 1.0
  */
 public interface LoginService {
 

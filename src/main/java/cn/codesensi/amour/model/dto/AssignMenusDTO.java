@@ -10,7 +10,7 @@ import java.util.List;
  * 角色分配菜单请求参数
  *
  * @author codesensi
- * @since 2026-06-28
+ * @since 1.0
  */
 @Data
 public class AssignMenusDTO implements Serializable {

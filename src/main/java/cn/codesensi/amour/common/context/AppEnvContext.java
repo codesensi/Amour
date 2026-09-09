@@ -15,6 +15,8 @@ import org.springframework.util.StringUtils;
  * <p>
  * 该组件由 Spring 容器管理，构造时完成属性绑定；属性缺失时会回退到默认值
  * （项目名缺省为 {@code app}，Profile 缺省为 {@code default}）。
+ *
+ * @since 1.0
  */
 @Data
 @Component

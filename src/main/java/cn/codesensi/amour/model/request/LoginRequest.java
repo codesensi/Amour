@@ -10,7 +10,7 @@ import java.io.Serializable;
  * 登录请求参数
  *
  * @author codesensi
- * @since 2024-07-21 11:09:56
+ * @since 1.0
  */
 @Data
 public class LoginRequest implements Serializable {

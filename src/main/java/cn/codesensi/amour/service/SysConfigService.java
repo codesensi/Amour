@@ -60,16 +60,4 @@ public interface SysConfigService {
      */
     void update(ConfigUpdateDTO updateDTO);
 
-    /**
-     * 失效配置缓存。
-     * <p>
-     * 供写库侧（如管理端新增/修改/停用 sys_config）在数据变更后调用，实现"驻留不过期"缓存策略下的热更新：
-     * <ul>
-     *   <li>{@code keys} 为空（{@code null} 或不含元素）时清空整个 config 缓存，适用于批量变更（如初始化、导入）后的全量失效；</li>
-     *   <li>{@code keys} 非空时逐个失效对应配置键的缓存。</li>
-     * </ul>
-     *
-     * @param keys 待失效的配置键集合（app 之下的点分路径）；为空时清除全部
-     */
-    void evictCache(List<String> keys);
 }

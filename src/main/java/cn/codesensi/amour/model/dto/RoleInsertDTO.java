@@ -9,7 +9,7 @@ import java.io.Serializable;
  * 新增角色请求参数
  *
  * @author codesensi
- * @since 2026-06-28
+ * @since 1.0
  */
 @Data
 public class RoleInsertDTO implements Serializable {

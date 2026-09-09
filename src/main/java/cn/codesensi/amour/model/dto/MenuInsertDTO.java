@@ -9,7 +9,7 @@ import java.io.Serializable;
  * 新增菜单请求参数
  *
  * @author codesensi
- * @since 2026-09-06
+ * @since 1.0
  */
 @Data
 public class MenuInsertDTO implements Serializable {
@@ -28,7 +28,7 @@ public class MenuInsertDTO implements Serializable {
     private String title;
 
     /**
-     * 菜单类型:D-目录,M-菜单,B-按钮
+     * 菜单类型:D-目录，M-菜单，B-按钮
      */
     private String type;
 
@@ -58,12 +58,12 @@ public class MenuInsertDTO implements Serializable {
     private String perms;
 
     /**
-     * 菜单状态:0-启用,1-禁用
+     * 菜单状态:0-启用，1-禁用
      */
     private Integer status;
 
     /**
-     * 显隐标识:0-显示,1-隐藏
+     * 显隐标识:0-显示，1-隐藏
      */
     private Integer hidden;
 

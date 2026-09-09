@@ -7,6 +7,8 @@ import lombok.Getter;
  * U-未知
  * M-男
  * F-女
+ *
+ * @since 1.0
  */
 @Getter
 public enum GenderEnum implements BaseEnum<String> {

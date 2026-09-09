@@ -22,7 +22,7 @@ import java.util.List;
  * 用户信息表 控制层。
  *
  * @author codesensi
- * @since 2026-06-28
+ * @since 1.0
  */
 @ApiResponseBody
 @RequiredArgsConstructor
@@ -36,7 +36,7 @@ public class SysUserController {
     /**
      * 分页查询用户信息表。
      * <p>
-     * 用户名称、手机号为模糊匹配,状态为精确匹配,条件缺省时自动忽略。
+     * 用户名称、手机号为模糊匹配，状态为精确匹配，条件缺省时自动忽略。
      *
      * @param userPageRequest 分页查询参数
      * @return 分页对象
@@ -98,7 +98,7 @@ public class SysUserController {
     }
 
     /**
-     * 删除用户信息(支持单个或批量,ID 以英文逗号分隔)
+     * 删除用户信息(支持单个或批量，ID 以英文逗号分隔)
      *
      * @param ids 用户ID列表
      */
@@ -134,7 +134,7 @@ public class SysUserController {
     /**
      * 查询用户已分配的角色ID列表（分配角色弹窗预勾选用）。
      * <p>
-     * id 以字符串形式下发,与 RoleResponse 及 el-select 的选项值类型对齐。
+     * id 以字符串形式下发，与 RoleResponse 及 el-select 的选项值类型对齐。
      *
      * @param id 用户ID
      * @return 角色ID列表

@@ -10,7 +10,7 @@ import java.io.Serializable;
  * 修改角色状态请求参数
  *
  * @author codesensi
- * @since 2026-09-08
+ * @since 1.0
  */
 @Data
 public class RoleChangeStatusRequest implements Serializable {
@@ -25,7 +25,7 @@ public class RoleChangeStatusRequest implements Serializable {
     private Long id;
 
     /**
-     * 角色状态:0-启用,1-禁用
+     * 角色状态:0-启用，1-禁用
      */
     @NotNull(message = "角色状态不能为空")
     private Integer status;
