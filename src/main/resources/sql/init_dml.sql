@@ -19,10 +19,10 @@ FROM (
              (1001, 'name', '爱慕情侣小站', 'STRING', 'base', '项目/站点名称'),
              (1002, 'icp', '京ICP备2026010001号', 'STRING', 'base', 'ICP备案文案'),
              (1003, 'copyright-year', '2026', 'STRING', 'base', '版权年份'),
-             (1004, 'qq-api-key', NULL, 'STRING', 'base', 'QQ信息接口密钥(qq-api 请求头 X-API-KEY,空=不携带)'),
+             (1004, 'qq-api-key', NULL, 'STRING', 'base', 'QQ信息接口密钥(https://uapis.cn/docs/api-reference/get-social-qq-userinfo)'),
              -- site（2000 段）
              (2001, 'site.slogan', '爱晨雾漫过青瓦，爱暮色染透篱笆，更爱与君并肩立，看遍这人间烟火里的朝暮与年华。', 'STRING', 'site', '门户标语文案'),
-             (2002, 'site.love-start-date', '2018-07-15 00:00:00', 'STRING', 'site', '门户恋爱计时起点'),
+             (2002, 'site.love-start-date', '2018-07-15 00:00:00', 'DATETIME', 'site', '门户恋爱计时起点'),
              -- captcha（3000 段）
              (3001, 'captcha.enabled', 'true', 'BOOLEAN', 'captcha', '验证码开关'),
              (3002, 'captcha.image-type', 'arithmetic', 'STRING', 'captcha', '图形验证码类型')
@@ -253,11 +253,12 @@ FROM (
              (10701, 'config-group', '配置分组', 'base', '基础配置', 1, 0, 1, '与 sys_config.config_group(base/site/captcha) 对齐'),
              (10702, 'config-group', '配置分组', 'site', '门户配置', 2, 0, 1, '与 sys_config.config_group(base/site/captcha) 对齐'),
              (10703, 'config-group', '配置分组', 'captcha', '验证码配置', 3, 0, 1, '与 sys_config.config_group(base/site/captcha) 对齐'),
-             -- config-value-type（配置值类型，与 sys_config.value_type 对齐：STRING/INTEGER/LONG/BOOLEAN；10800 段）
+             -- config-value-type（配置值类型，与 sys_config.value_type 对齐：STRING/INTEGER/LONG/BOOLEAN/DATETIME；10800 段）
              (10801, 'config-value-type', '配置值类型', 'STRING', '字符串', 1, 0, 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN) 对齐'),
              (10802, 'config-value-type', '配置值类型', 'INTEGER', '整数', 2, 0, 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN) 对齐'),
              (10803, 'config-value-type', '配置值类型', 'LONG', '长整数', 3, 0, 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN) 对齐'),
-             (10804, 'config-value-type', '配置值类型', 'BOOLEAN', '布尔', 4, 0, 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN) 对齐')
+             (10804, 'config-value-type', '配置值类型', 'BOOLEAN', '布尔', 4, 0, 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN) 对齐'),
+             (10805, 'config-value-type', '配置值类型', 'DATETIME', '日期时间', 5, 0, 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN/DATETIME) 对齐')
      ) AS t(id, dict_code, dict_name, dict_value, dict_label, sort, status, builtin, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_dict` WHERE `sys_dict`.`id` = t.id

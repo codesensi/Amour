@@ -12,6 +12,7 @@ import cn.codesensi.amour.model.dto.ConfigUpdateDTO;
 import cn.codesensi.amour.model.entity.SysConfig;
 import cn.codesensi.amour.service.SysConfigService;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
@@ -23,8 +24,11 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static cn.codesensi.amour.model.entity.table.SysConfigTableDef.SYS_CONFIG;
 
@@ -48,6 +52,9 @@ import static cn.codesensi.amour.model.entity.table.SysConfigTableDef.SYS_CONFIG
 @Service
 @RequiredArgsConstructor
 public class SysConfigServiceImpl implements SysConfigService {
+
+    /** DATETIME 值类型的合法形态（yyyy-MM-dd HH:mm:ss），与门户展示契约一致 */
+    private static final Pattern DATETIME_PATTERN = Pattern.compile("^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$");
 
     private final SysConfigMapper sysConfigMapper;
     private final CacheManager cacheManager;
@@ -191,6 +198,17 @@ public class SysConfigServiceImpl implements SysConfigService {
             case "LONG" -> {
                 if (!NumberUtil.isLong(value)) {
                     throw new ValidationException("长整型配置值必须为整数");
+                }
+            }
+            case "DATETIME" -> {
+                // 先核对 yyyy-MM-dd HH:mm:ss 形态，再严格解析拦截不存在的日期（如 2 月 30 日）
+                if (value == null || !DATETIME_PATTERN.matcher(value).matches()) {
+                    throw new ValidationException("日期时间格式必须为 yyyy-MM-dd HH:mm:ss");
+                }
+                try {
+                    LocalDateTime.parse(value, DatePattern.NORM_DATETIME_FORMATTER);
+                } catch (DateTimeParseException e) {
+                    throw new ValidationException("日期时间值不存在，请重新选择");
                 }
             }
             default -> {
