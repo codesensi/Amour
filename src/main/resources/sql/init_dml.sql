@@ -26,8 +26,7 @@ FROM (
              (2002, 'site.love-start-date', '2018-07-15 00:00:00', 'STRING', 'site', '门户恋爱计时起点'),
              -- captcha（3000 段）
              (3001, 'captcha.enabled', 'true', 'BOOLEAN', 'captcha', '验证码开关'),
-             (3002, 'captcha.image-type', 'arithmetic', 'STRING', 'captcha', '图形验证码类型'),
-             (3003, 'captcha.image-expire', '300', 'INTEGER', 'captcha', '图形验证码过期秒')
+             (3002, 'captcha.image-type', 'arithmetic', 'STRING', 'captcha', '图形验证码类型')
      ) AS t(id, config_key, config_value, value_type, config_group, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_config` WHERE `sys_config`.`id` = t.id

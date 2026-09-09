@@ -27,8 +27,7 @@ public enum ConfigKeyEnum implements BaseEnum<String> {
 
     // ---------- 验证码配置（captcha 分组：3000 段） ----------
     CAPTCHA_ENABLED("captcha.enabled", "验证码开关"),
-    CAPTCHA_IMAGE_TYPE("captcha.image-type", "图形验证码类型"),
-    CAPTCHA_IMAGE_EXPIRE("captcha.image-expire", "图形验证码过期秒"),
+    CAPTCHA_IMAGE_TYPE("captcha.image-type", "图形验证码类型")
     ;
 
     /**
