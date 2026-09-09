@@ -19,7 +19,7 @@ FROM (
              (1001, 'name', '爱慕情侣小站', 'STRING', 'base', '项目/站点名称'),
              (1002, 'icp', '京ICP备2026010001号', 'STRING', 'base', 'ICP备案文案'),
              (1003, 'copyright-year', '2026', 'STRING', 'base', '版权年份'),
-             (1004, 'qq-api-key', NULL, 'STRING', 'base', 'QQ信息接口密钥(https://uapis.cn/docs/api-reference/get-social-qq-userinfo)'),
+             (1004, 'uapi-key', NULL, 'STRING', 'base', 'UApiPro接口密钥(https://uapis.cn)'),
              -- site（2000 段）
              (2001, 'site.slogan', '爱晨雾漫过青瓦，爱暮色染透篱笆，更爱与君并肩立，看遍这人间烟火里的朝暮与年华。', 'STRING', 'site', '门户标语文案'),
              (2002, 'site.love-start-date', '2018-07-15 00:00:00', 'DATETIME', 'site', '门户恋爱计时起点'),

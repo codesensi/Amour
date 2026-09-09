@@ -18,7 +18,7 @@ public enum ConfigKeyEnum implements BaseEnum<String> {
     NAME("name", "项目/站点名称"),
     ICP("icp", "ICP备案文案"),
     COPYRIGHT_YEAR("copyright-year", "版权年份"),
-    QQ_API_KEY("qq-api-key", "QQ信息接口密钥"),
+    UAPI_KEY("uapi-key", "UApiPro接口密钥"),
 
     // ---------- 门户站点配置（site 分组：2000 段） ----------
     SITE_SLOGAN("site.slogan", "门户标语文案"),

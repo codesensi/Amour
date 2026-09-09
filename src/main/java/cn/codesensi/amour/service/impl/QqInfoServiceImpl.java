@@ -26,7 +26,7 @@ import java.nio.charset.StandardCharsets;
  * QQ 信息查询服务实现。
  * <p>
  * 通过 Hutool 以服务端身份调用上游接口（不携带浏览器特征请求头，规避上游对浏览器跨域调用的 403 拦截）：
- * 优先调用 qq-api（{@code app.qq-api}，sys_config 配置了 {@code qq-api-key} 时携带
+ * 优先调用 qq-api（{@code app.uapi-qq}，sys_config 配置了 {@code uapi-key} 时携带
  * {@code X-API-KEY} 请求头）解析真实头像与昵称；任一环节失败（未配置/网络异常/响应空/解析失败/缺头像字段）
  * 降级为 avatar-api（{@code app.avatar-api}）按 QQ 号拼接；avatar-api 也未配置时返回空 DTO，
  * 由前端本地兜底图兜底。地址类配置取自 yml（改动需重启），密钥取自 sys_config（管理端修改热更新）。
@@ -40,7 +40,7 @@ import java.nio.charset.StandardCharsets;
 public class QqInfoServiceImpl implements QqInfoService {
 
     /**
-     * qq-api 密钥请求头名（sys_config {@code qq-api-key} 的值非空时携带）
+     * UApiPro 密钥请求头名（sys_config {@code uapi-key} 的值非空时携带）
      */
     private static final String API_KEY_HEADER = "X-API-KEY";
 
@@ -83,7 +83,7 @@ public class QqInfoServiceImpl implements QqInfoService {
      * @return 头像地址与昵称；降级时昵称为空，avatar-api 也未配置时为空 DTO
      */
     private QqInfoResultDTO loadFromQqApi(String qq) {
-        String qqApiUrl = appProperties.getQqApi();
+        String qqApiUrl = appProperties.getUapiQq();
         if (StrUtil.isBlank(qqApiUrl)) {
             log.debug("qq-api 未配置，直接降级 avatar-api：qq={}", qq);
             return fallbackByAvatarApi(qq);
@@ -91,7 +91,7 @@ public class QqInfoServiceImpl implements QqInfoService {
         String qqApiResponse;
         try {
             // 密钥实时读取 sys_config（管理端修改后事务提交即失效缓存，下次请求即生效），空时不携带请求头
-            SysConfig apiKeyConfig = sysConfigService.oneByKey(ConfigKeyEnum.QQ_API_KEY.getCode());
+            SysConfig apiKeyConfig = sysConfigService.oneByKey(ConfigKeyEnum.UAPI_KEY.getCode());
             String apiKey = apiKeyConfig == null ? null : apiKeyConfig.getConfigValue();
             HttpRequest request = HttpRequest.get(
                     String.format(qqApiUrl, URLEncoder.encode(qq, StandardCharsets.UTF_8)));
@@ -99,7 +99,7 @@ public class QqInfoServiceImpl implements QqInfoService {
                 request.header(API_KEY_HEADER, apiKey);
             }
             // try-with-resources 及时释放 HttpResponse 底层连接,避免资源泄漏
-            try (HttpResponse response = request.timeout(appProperties.getQqApiTimeout()).execute()) {
+            try (HttpResponse response = request.timeout(appProperties.getUapiTimeout()).execute()) {
                 qqApiResponse = response.body();
             }
         } catch (Exception e) {

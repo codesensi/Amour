@@ -76,9 +76,13 @@ sa-token:
 
 # 应用配置（app 段为全局基座,环境专属覆盖写在 application-{profile}.yml）
 app:
-  # QQ 信息上游接口地址模板(%s = URL 编码后的 QQ 号);留空/未配置时 /qq-info 直接降级 avatar-api;配置文件改动需重启生效
-  qq-api: https://uapis.cn/api/v1/social/qq/userinfo?qq=%s
-  # QQ 信息上游接口超时(毫秒)
-  qq-api-timeout: 5000
+  # UApiPro(https://uapis.cn/)接口超时(毫秒)
+  uapi-timeout: 5000
+  # UApiPro 获取 QQ 信息接口地址模板(%s = URL 编码后的 QQ 号);留空/未配置时 /qq-info 直接降级 avatar-api;配置文件改动需重启生效
+  uapi-qq: https://uapis.cn/api/v1/social/qq/userinfo?qq=%s
+  # UApiPro 获取一言接口地址
+  uapi-saying-random: https://uapis.cn/api/v1/saying/random
+  # UApiPro 获取一言（随机/每日/场景/此刻）接口地址
+  uapi-saying: https://uapis.cn/api/v1/saying
   # 随机头像服务地址模板(%s = 种子);留空/未配置时 /qq-info 响应数据全为空,由前端本地兜底图兜底
   avatar-api: https://api.dicebear.com/7.x/bottts/svg?seed=%s
