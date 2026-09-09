@@ -9,8 +9,9 @@ import java.io.Serializable;
 /**
  * QQ 信息响应 —— 门户留言等场景的 QQ 头像与昵称查询结果。
  * <p>
- * 字段允许为 {@code null}：上游服务部分失败时以空值表达缺失，
- * 由调用方（前端）执行本地兜底（本地生成头像、手动填写昵称）。
+ * 服务端已完成降级：头像优先取 qq-api 解析的真实地址（强制 https），
+ * 失败时降级为 avatar-api 按 QQ 号拼接的地址，仅在 avatar-api 也未配置时为 {@code null}；
+ * 昵称仅 qq-api 解析成功时返回，否则为 {@code null}（由调用方提示手动填写）。
  *
  * @author codesensi
  * @since 1.0
@@ -23,12 +24,12 @@ public class QqInfoResponse implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * QQ 头像地址（qq-service 解析的真实图片地址，强制 https；降级时为随机头像地址）
+     * QQ 头像地址（qq-api 解析的真实图片地址，强制 https；降级时为 avatar-api 按 QQ 号拼接地址）
      */
     private String avatarUrl;
 
     /**
-     * QQ 昵称（仅 qq-service 解析成功时返回，降级随机头像时为 null）
+     * QQ 昵称（仅 qq-api 解析成功时返回，降级时为 null）
      */
     private String nickname;
 

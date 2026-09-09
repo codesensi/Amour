@@ -73,3 +73,12 @@ sa-token:
   is-share: false
   # token 风格（默认可取值：uuid、simple-uuid、random-32、random-64、random-128、tik）
   token-style: random-128
+
+# 应用配置（app 段为全局基座,环境专属覆盖写在 application-{profile}.yml）
+app:
+  # QQ 信息上游接口地址模板(%s = URL 编码后的 QQ 号);留空/未配置时 /qq-info 直接降级 avatar-api;配置文件改动需重启生效
+  qq-api: https://uapis.cn/api/v1/social/qq/userinfo?qq=%s
+  # QQ 信息上游接口超时(毫秒)
+  qq-api-timeout: 3000
+  # 随机头像服务地址模板(%s = 种子);留空/未配置时 /qq-info 响应数据全为空,由前端本地兜底图兜底
+  avatar-api: https://api.dicebear.com/7.x/bottts/svg?seed=%s

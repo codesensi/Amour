@@ -102,10 +102,6 @@ app:
   security:
     # 请求缓存限制 5M
     request-cache-limit: 5242880
-  # qq-service 上游调用配置
-  qq:
-    # 上游接口调用超时时间(毫秒)
-    timeout: 3000
 
 # sa-token配置
 sa-token:

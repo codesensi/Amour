@@ -13,11 +13,11 @@ public interface QqInfoService {
     /**
      * 按 QQ 号查询头像地址与昵称。
      * <p>
-     * 查询结果携带 10 分钟缓存；上游失败时的降级策略见接口说明。
+     * 查询结果携带 15 分钟缓存；优先调用 qq-api 解析，失败时降级 avatar-api 按 QQ 号拼接。
      *
      * @param qq QQ 号（6~12 位数字，由控制器完成格式校验）
-     * @return 头像地址与昵称；昵称仅 qq-service 解析成功时非空
-     * @throws cn.codesensi.amour.common.exception.SystemException 两层服务均不可用时抛出
+     * @return 头像地址与昵称；昵称仅 qq-api 解析成功时非空，avatar-api 也未配置时头像亦为空
+     * @throws cn.codesensi.amour.common.exception.SystemException QQ 信息缓存未注册时抛出
      */
     QqInfoResultDTO getQqInfo(String qq);
 
