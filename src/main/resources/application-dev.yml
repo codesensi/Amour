@@ -45,6 +45,13 @@ spring:
   # Thymeleaf 模板：开发环境关闭缓存，修改模板后刷新即生效，无需重启
   thymeleaf:
     cache: false
+  # 文件上传全局限制(单文件业务上限另由 FileBizTypeEnum 按业务类型控制)
+  servlet:
+    multipart:
+      # 单个文件允许的最大大小
+      max-file-size: 50MB
+      # 整个 multipart 请求允许的最大大小
+      max-request-size: 500MB
 
 # 日志级别配置
 logging:
@@ -107,6 +114,18 @@ app:
   security:
     # 请求缓存限制 5M
     request-cache-limit: 5242880
+  # 文件存储配置(存储方式运行时以 sys_config 的 file.storage 为准,此处为配置缺失时的兜底值)
+  file:
+    storage: local
+    local:
+      # 本地存储根目录,实际文件按 {bizType}/{yyyyMM}/{fileId}.{ext} 落盘
+      base-path: ./data/files
+    # 对象存储参数(OSS 接入时启用)
+    oss:
+      endpoint:
+      bucket:
+      access-key:
+      secret-key:
 
 # sa-token配置
 sa-token:

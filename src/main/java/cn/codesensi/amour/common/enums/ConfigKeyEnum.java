@@ -25,8 +25,10 @@ public enum ConfigKeyEnum implements BaseEnum<String> {
 
     // ---------- 验证码配置（captcha 分组：3000 段） ----------
     CAPTCHA_ENABLED("captcha.enabled", "验证码开关"),
-    CAPTCHA_IMAGE_TYPE("captcha.image-type", "图形验证码类型")
-    ;
+    CAPTCHA_IMAGE_TYPE("captcha.image-type", "图形验证码类型"),
+
+    // ---------- 文件配置（file 分组：4000 段） ----------
+    FILE_STORAGE("file.storage", "文件存储方式");
 
     /**
      * 编码

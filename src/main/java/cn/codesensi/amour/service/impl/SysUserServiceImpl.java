@@ -5,6 +5,7 @@ import cn.codesensi.amour.common.consts.CacheConst;
 import cn.codesensi.amour.common.core.BasePage;
 import cn.codesensi.amour.common.enums.BuiltinEnum;
 import cn.codesensi.amour.common.enums.EnableEnum;
+import cn.codesensi.amour.common.enums.FileBizTypeEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.util.CacheUtil;
 import cn.codesensi.amour.mapper.SysRoleMapper;
@@ -15,10 +16,7 @@ import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.SysMenu;
 import cn.codesensi.amour.model.entity.SysUser;
 import cn.codesensi.amour.model.entity.SysUserRole;
-import cn.codesensi.amour.service.CacheEvictService;
-import cn.codesensi.amour.service.SysMenuService;
-import cn.codesensi.amour.service.SysUserRoleService;
-import cn.codesensi.amour.service.SysUserService;
+import cn.codesensi.amour.service.*;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
@@ -61,6 +59,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private final SysUserRoleService sysUserRoleService;
     private final CacheManager cacheManager;
     private final CacheEvictService cacheEvictService;
+    private final FileService fileService;
 
     /**
      * 分页查询用户信息。
@@ -169,6 +168,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         String password = BCrypt.hashpw(AppConst.DEFAULT_PASSWORD, BCrypt.gensalt());
         sysUser.setPassword(password);
         sysUserMapper.insert(sysUser, true);
+
+        // 头像采纳:回填文件业务归属并标记被替换的旧头像失效(外链等非本系统地址自动跳过)
+        if (StrUtil.isNotBlank(sysUser.getAvatar())) {
+            fileService.bindBizFiles(FileBizTypeEnum.AVATAR, sysUser.getId(), List.of(sysUser.getAvatar()));
+        }
     }
 
     /**
@@ -188,6 +192,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
         SysUser entity = userConverter.toEntity(userUpdateDTO);
         updateById(entity);
+
+        // 头像采纳:回填文件业务归属并标记被替换的旧头像失效(外链等非本系统地址自动跳过)
+        if (StrUtil.isNotBlank(entity.getAvatar())) {
+            fileService.bindBizFiles(FileBizTypeEnum.AVATAR, entity.getId(), List.of(entity.getAvatar()));
+        }
     }
 
     /**

@@ -2,7 +2,6 @@ package cn.codesensi.amour.common.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 /**
  * 项目应用配置属性 —— 映射 {@code app.*} 顶层配置项。
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Component;
  * @since 1.0
  */
 @Data
-@Component
 @ConfigurationProperties(prefix = "app")
 public class AppProperties {
 

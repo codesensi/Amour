@@ -58,4 +58,9 @@ public class RbacConst {
      */
     public static final String PORTAL_PATH = "/portal/**";
 
+    /**
+     * 文件预览接口路径前缀（img 等标签发起的资源请求不携带凭证，需免登录放行；仅覆盖读取，上传/下载不豁免）
+     */
+    public static final String FILE_VIEW_PATH = "/file/view/**";
+
 }

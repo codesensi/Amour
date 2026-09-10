@@ -44,11 +44,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 })).addPathPatterns(RbacConst.ROOT_PATH)
                 // 公开路径:验证码、登录、登出为幂等公开接口;
                 // 门户端接口(/portal/**)面向访客免登录,统一放行——新增门户接口时无需再加 @SaIgnore,
-                // 未实现的蓝图路径由此穿透到 Spring 层返回 404(前端门户空态承接)
+                // 未实现的蓝图路径由此穿透到 Spring 层返回 404(前端门户空态承接);
+                // 文件预览为免登录读取(img 等标签请求不携带凭证),上传/下载不豁免
                 .excludePathPatterns(RbacConst.CAPTCHA_PATH,
                         RbacConst.LOGIN_PATH,
                         RbacConst.LOGOUT_PATH,
-                        RbacConst.PORTAL_PATH)
+                        RbacConst.PORTAL_PATH,
+                        RbacConst.FILE_VIEW_PATH)
                 .order(1);
 
         // 2. 演示模式拦截器：演示开关(app.demo-mode)开启时仅放行 GET/HEAD 等只读请求,
@@ -58,7 +60,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns(RbacConst.CAPTCHA_PATH,
                         RbacConst.LOGIN_PATH,
                         RbacConst.LOGOUT_PATH,
-                        RbacConst.PORTAL_PATH)
+                        RbacConst.PORTAL_PATH,
+                        RbacConst.FILE_VIEW_PATH)
                 .order(2);
     }
 
