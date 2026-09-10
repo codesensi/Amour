@@ -17,6 +17,9 @@ import java.util.List;
  *   <li>{@code expireAfterAccess} 为访问后过期时间；</li>
  *   <li>{@code 0} 表示该维度不限制。</li>
  * </ul>
+ * <p>
+ * 过期时间作为基准值，实际生效时按 {@code expireJitterPercent} 幅度随机抖动，
+ * 避免多个缓存（如同批预热的条目）在同一时点集中过期导致回源洪峰。
  *
  * @since 1.0
  */
@@ -28,6 +31,17 @@ public class AppCacheProperties {
      * 全局兜底最大容量（条数）。
      */
     private long maxSize = 1000L;
+
+    /**
+     * 过期时间随机抖动幅度（百分比，如 {@code 10} 表示在基准值上下 ±10% 内随机）；0 表示关闭抖动。
+     */
+    private int expireJitterPercent = 10;
+
+    /**
+     * 参与随机抖动的最小过期时间（秒）：基准值达到该阈值的缓存才参与抖动，
+     * 短 TTL 缓存（如验证码、QQ 信息）保持精确语义；0 表示全部参与。
+     */
+    private long expireJitterMinSeconds = 0;
 
     /**
      * 各缓存个性化配置列表。

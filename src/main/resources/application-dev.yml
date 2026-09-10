@@ -66,28 +66,33 @@ app:
   # caches 中 name 为基础缓存名，实际注册时会自动拼接「项目名_运行环境」前缀（见 CacheUtil）
   cache:
     max-size: 1000
+    # 过期时间随机抖动幅度（百分比，10 = 基准值上下 ±10% 内随机），0 表示关闭；
+    # 用于避免多个缓存（如同批预热的条目）在同一时点集中过期
+    expire-jitter-percent: 10
+    # 参与抖动的最小过期时间（秒），短 TTL 缓存（验证码、QQ 信息）保持精确语义
+    expire-jitter-min-seconds: 86400
     caches:
       - name: captcha
         expire-after-write: 300
         expire-after-access: 0
       - name: config
-        # 驻留不自动过期，热更新依赖写库侧调用 ConfigService.evictCache 失效
+        # 配置缓存：写后 30 天左右兜底过期，热更新依赖写库侧调用 ConfigService.evictCache 失效
         expire-after-write: 2592000
         expire-after-access: 0
       - name: role
-        # 角色编码缓存：写后 30 天兜底过期，写侧显式失效（分配角色、角色变更/删除时清除）
+        # 角色编码缓存：写后 30 天左右兜底过期，写侧显式失效（分配角色、角色变更/删除时清除）
         expire-after-write: 2592000
         expire-after-access: 0
       - name: perm
-        # 权限编码缓存：写后 30 天兜底过期，写侧显式失效（分配角色、分配菜单、角色变更/删除时清除）
+        # 权限编码缓存：写后 30 天左右兜底过期，写侧显式失效（分配角色、分配菜单、角色变更/删除时清除）
         expire-after-write: 2592000
         expire-after-access: 0
       - name: menu
-        # 路由菜单缓存：写后 30 天兜底过期，写侧显式失效（分配角色/菜单、菜单与角色变更时清除）
+        # 路由菜单缓存：写后 30 天左右兜底过期，写侧显式失效（分配角色/菜单、菜单与角色变更时清除）
         expire-after-write: 2592000
         expire-after-access: 0
       - name: user
-        # 用户信息缓存：写后 30 天兜底过期，写侧显式失效（资料/角色/权限/菜单任一变更时清除）
+        # 用户信息缓存：写后 30 天左右兜底过期，写侧显式失效（资料/角色/权限/菜单任一变更时清除）
         expire-after-write: 2592000
         expire-after-access: 0
       - name: qq
@@ -95,7 +100,7 @@ app:
         expire-after-write: 900
         expire-after-access: 0
       - name: dict
-        # 数据字典缓存：Key 为字典编码（dict_code），写后 30 天兜底过期，写侧显式失效（字典增删改时清除对应编码）
+        # 数据字典缓存：Key 为字典编码（dict_code），写后 30 天左右兜底过期，写侧显式失效（字典增删改时清除对应编码）
         expire-after-write: 2592000
         expire-after-access: 0
   # 安全配置
