@@ -49,6 +49,16 @@ public interface UserConverter {
     UserPageDTO toPageDTO(UserPageRequest request);
 
     /**
+     * UserProfileUpdateRequest → UserProfileUpdateDTO
+     */
+    UserProfileUpdateDTO toProfileUpdateDTO(UserProfileUpdateRequest request);
+
+    /**
+     * UserPasswordUpdateRequest → UserPasswordUpdateDTO
+     */
+    UserPasswordUpdateDTO toPasswordUpdateDTO(UserPasswordUpdateRequest request);
+
+    /**
      * Page<SysUser> → Page<UserPageResponse>
      */
     @Mapping(target = "optimizeCountQuery", ignore = true)
@@ -63,6 +73,11 @@ public interface UserConverter {
      * UserUpdateDTO → SysUser(仅资料字段，id 用于定位更新；用户名/密码/状态不在映射范围)
      */
     SysUser toEntity(UserUpdateDTO userUpdateDTO);
+
+    /**
+     * UserProfileUpdateDTO → SysUser(仅资料字段，id 由调用方回填；用户名/密码/状态不在映射范围)
+     */
+    SysUser toEntity(UserProfileUpdateDTO userProfileUpdateDTO);
 
     /**
      * SysUser → UserInfoDTO

@@ -92,11 +92,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      * 缓存未注册/未就绪时降级为直接查库；角色/权限/菜单不进该缓存，每次实时装配——
      * 它们各自拥有独立缓存与失效路径，避免会话维度数据被烤进资料快照后因漏失效而不一致。
      *
-     * @param userId 用户ID
      * @return 用户信息
      */
     @Override
-    public UserInfoDTO getCurrentUser(Long userId) {
+    public UserInfoDTO getCurrentUser() {
+        Long userId = StpUtil.getLoginIdAsLong();
         Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.USER));
         // 资料部分走 user 缓存（仅 DB 维度的用户资料，不含角色/权限/菜单）
         UserInfoDTO userInfoDTO;
@@ -196,6 +196,31 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         // 头像采纳:回填文件业务归属并标记被替换的旧头像失效(外链等非本系统地址自动跳过)
         if (StrUtil.isNotBlank(entity.getAvatar())) {
             fileService.bindBizFiles(FileBizTypeEnum.AVATAR, entity.getId(), List.of(entity.getAvatar()));
+        }
+    }
+
+    /**
+     * 更新当前登录用户资料。
+     * <p>
+     * 仅更新白名单内的资料字段（MyBatis-Flex 按忽略 null 策略更新），用户名、密码、
+     * 状态不在可修改范围；更新成功后复用 {@link #updateById(SysUser)} 的缓存失效逻辑。
+     *
+     * @param userProfileUpdateDTO 资料信息
+     */
+    @Override
+    public void updateProfile(UserProfileUpdateDTO userProfileUpdateDTO) {
+        Long userId = StpUtil.getLoginIdAsLong();
+        SysUser sysUser = getById(userId);
+        if (ObjUtil.isNull(sysUser)) {
+            throw new BusinessException("用户不存在");
+        }
+        SysUser entity = userConverter.toEntity(userProfileUpdateDTO);
+        entity.setId(userId);
+        updateById(entity);
+
+        // 头像采纳:回填文件业务归属并标记被替换的旧头像失效(外链等非本系统地址自动跳过)
+        if (StrUtil.isNotBlank(entity.getAvatar())) {
+            fileService.bindBizFiles(FileBizTypeEnum.AVATAR, userId, List.of(entity.getAvatar()));
         }
     }
 
@@ -309,6 +334,76 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         entity.setId(id);
         entity.setPassword(BCrypt.hashpw(AppConst.DEFAULT_PASSWORD, BCrypt.gensalt()));
         updateById(entity);
+    }
+
+    /**
+     * 修改当前登录用户名。
+     * <p>
+     * 用户名为登录凭证，校验新用户名未被其他用户占用后仅更新 username 字段，
+     * 更新成功后复用 {@link #updateById(SysUser)} 的缓存失效逻辑，并踢出该用户
+     * 当前会话，要求使用新用户名重新登录。
+     *
+     * @param username 新用户名
+     */
+    @Override
+    public void rename(String username) {
+        Long userId = StpUtil.getLoginIdAsLong();
+        SysUser sysUser = getById(userId);
+        if (ObjUtil.isNull(sysUser)) {
+            throw new BusinessException("用户不存在");
+        }
+
+        // 用户名未变化时幂等返回，避免无意义的会话踢出
+        if (username.equals(sysUser.getUsername())) {
+            return;
+        }
+
+        // 校验新用户名是否已被其他用户占用
+        long count = QueryChain.of(sysUserMapper)
+                .where(SYS_USER.USERNAME.eq(username))
+                .and(SYS_USER.ID.ne(userId))
+                .count();
+        if (count > 0) {
+            throw new BusinessException("用户名已存在");
+        }
+
+        SysUser entity = new SysUser();
+        entity.setId(userId);
+        entity.setUsername(username);
+        updateById(entity);
+
+        // 用户名是登录凭证,修改后踢出当前会话,要求使用新用户名重新登录
+        StpUtil.logout(userId);
+    }
+
+    /**
+     * 修改当前登录用户密码。
+     * <p>
+     * 校验原密码匹配后以 BCrypt 加密仅更新 password 字段，更新成功后复用
+     * {@link #updateById(SysUser)} 的缓存失效逻辑，并踢出该用户当前会话，
+     * 要求使用新密码重新登录。
+     *
+     * @param userPasswordUpdateDTO 密码信息
+     */
+    @Override
+    public void updatePassword(UserPasswordUpdateDTO userPasswordUpdateDTO) {
+        Long userId = StpUtil.getLoginIdAsLong();
+        SysUser sysUser = getById(userId);
+        if (ObjUtil.isNull(sysUser)) {
+            throw new BusinessException("用户不存在");
+        }
+        if (StrUtil.isBlank(sysUser.getPassword())
+                || !BCrypt.checkpw(userPasswordUpdateDTO.getOldPassword(), sysUser.getPassword())) {
+            throw new BusinessException("原密码不正确");
+        }
+
+        SysUser entity = new SysUser();
+        entity.setId(userId);
+        entity.setPassword(BCrypt.hashpw(userPasswordUpdateDTO.getNewPassword(), BCrypt.gensalt()));
+        updateById(entity);
+
+        // 密码变更后踢出当前会话,要求使用新密码重新登录
+        StpUtil.logout(userId);
     }
 
     /**

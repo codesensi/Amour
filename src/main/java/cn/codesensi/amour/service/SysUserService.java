@@ -30,7 +30,7 @@ public interface SysUserService extends IService<SysUser> {
      *
      * @return 用户信息
      */
-    UserInfoDTO getCurrentUser(Long userId);
+    UserInfoDTO getCurrentUser();
 
     /**
      * 新增用户信息
@@ -45,6 +45,27 @@ public interface SysUserService extends IService<SysUser> {
      * @param userUpdateDTO 用户信息
      */
     void update(UserUpdateDTO userUpdateDTO);
+
+    /**
+     * 更新当前登录用户资料(仅白名单资料字段，变更后失效 userInfo 缓存)
+     *
+     * @param userProfileUpdateDTO 资料信息
+     */
+    void updateProfile(UserProfileUpdateDTO userProfileUpdateDTO);
+
+    /**
+     * 修改当前登录用户名(用户名为登录凭证，修改成功后踢出会话要求重新登录)
+     *
+     * @param username 新用户名
+     */
+    void rename(String username);
+
+    /**
+     * 修改当前登录用户密码(校验原密码，修改成功后踢出会话要求重新登录)
+     *
+     * @param userPasswordUpdateDTO 密码信息
+     */
+    void updatePassword(UserPasswordUpdateDTO userPasswordUpdateDTO);
 
     /**
      * 修改用户状态(系统内置用户不允许停用)

@@ -9,7 +9,6 @@ import cn.codesensi.amour.model.response.UserInfoResponse;
 import cn.codesensi.amour.model.response.UserPageResponse;
 import cn.codesensi.amour.service.SysUserService;
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import cn.dev33.satoken.stp.StpUtil;
 import com.mybatisflex.core.paginate.Page;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -56,9 +55,46 @@ public class SysUserController {
      */
     @GetMapping("/current-user")
     public UserInfoResponse currentUser() {
-        long userId = StpUtil.getLoginIdAsLong();
-        UserInfoDTO userInfoDTO = sysUserService.getCurrentUser(userId);
+        UserInfoDTO userInfoDTO = sysUserService.getCurrentUser();
         return userConverter.toInfoResponse(userInfoDTO);
+    }
+
+    /**
+     * 更新当前登录用户资料
+     * <p>
+     * 登录即可操作，仅允许修改自己的白名单资料字段。
+     *
+     * @param request 资料更新请求参数
+     */
+    @PutMapping("/update-profile")
+    public void updateProfile(@Valid @RequestBody UserProfileUpdateRequest request) {
+        UserProfileUpdateDTO userProfileUpdateDTO = userConverter.toProfileUpdateDTO(request);
+        sysUserService.updateProfile(userProfileUpdateDTO);
+    }
+
+    /**
+     * 修改当前登录用户名
+     * <p>
+     * 用户名为登录凭证，修改成功后服务端踢出会话，需使用新用户名重新登录。
+     *
+     * @param request 改名请求参数
+     */
+    @PutMapping("/rename")
+    public void rename(@Valid @RequestBody UserRenameRequest request) {
+        sysUserService.rename(request.getUsername());
+    }
+
+    /**
+     * 修改当前登录用户密码
+     * <p>
+     * 校验原密码匹配，修改成功后服务端踢出会话，需使用新密码重新登录。
+     *
+     * @param request 密码修改请求参数
+     */
+    @PutMapping("/update-password")
+    public void updatePassword(@Valid @RequestBody UserPasswordUpdateRequest request) {
+        UserPasswordUpdateDTO userPasswordUpdateDTO = userConverter.toPasswordUpdateDTO(request);
+        sysUserService.updatePassword(userPasswordUpdateDTO);
     }
 
     /**
