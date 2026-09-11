@@ -38,6 +38,18 @@ mybatis-flex:
 
 # Logbook配置
 logbook:
+  # 白名单:仅记录业务接口的请求/响应日志,未命中(h2-console、静态资源、未实现路径等)完全不记录;
+  # path 为 Glob 通配,新增接口前缀时需同步维护此清单
+  predicate:
+    include:
+      - path: /sys/**
+      - path: /portal/**
+      - path: /file/**
+      - path: /cache/**
+      - path: /captcha
+      - path: /login
+      - path: /logout
+      - path: /qq-info
   write:
     # body 最大记录长度，超出部分用 ... 截断
     max-body-size: 2000
