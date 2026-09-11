@@ -63,4 +63,9 @@ public class RbacConst {
      */
     public static final String FILE_VIEW_PATH = "/file/view/**";
 
+    /**
+     * H2 控制台路径前缀（仅 dev 启用 spring.h2.console.enabled，控制台自带 JDBC 账密页，免登录放行）
+     */
+    public static final String H2_CONSOLE_PATH = "/h2-console/**";
+
 }

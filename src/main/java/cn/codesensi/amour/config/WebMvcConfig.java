@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -17,8 +18,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * Web MVC 拦截器链配置 —— 统一注册应用的拦截器。
  * <p>
  * 拦截链按 order 从小到大执行：鉴权（order 1）→ 演示模式（order 2）。
- * 两个拦截器共享同一份公开路径清单（验证码、登录、登出、门户 /portal/**），
- * 调整公开口径时需同步维护两处排除项。
+ * 两个拦截器共享同一份公开路径清单（验证码、登录、登出、门户 /portal/**、文件预览），
+ * 调整公开口径时需同步维护两处排除项；
+ * 例外：H2 控制台（/h2-console/**，仅 dev 启用）仅从鉴权拦截器豁免——
+ * 演示模式拦截器不豁免它，保留演示开关对控制台写操作的拦截能力；
+ * 鉴权拦截器还对非 Controller 处理器（静态资源、404 兜底）不做登录校验。
  *
  * @author codesensi
  * @since 1.0
@@ -38,19 +42,26 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         // 1. SaToken 鉴权拦截器:初始化 SaTokenContext + 登录校验 + 封禁校验 + 注解鉴权(@SaCheckPermission)
         registry.addInterceptor(new SaInterceptor(handler -> {
-                    // 所有请求需登录 + 账号未封禁(路径筛选由 addPathPatterns/excludePathPatterns 完成)
+                    // 仅对 Controller 方法做登录/封禁校验;
+                    // 静态资源(favicon 等)与未命中路径的 404 兜底由 ResourceHttpRequestHandler 接管,
+                    // 属于浏览器自动发起的附带请求,不校验登录,避免产生授权异常日志噪音
+                    if (!(handler instanceof HandlerMethod)) {
+                        return;
+                    }
                     StpUtil.checkLogin();
                     StpUtil.checkDisable(StpUtil.getLoginIdAsLong());
                 })).addPathPatterns(RbacConst.ROOT_PATH)
                 // 公开路径:验证码、登录、登出为幂等公开接口;
                 // 门户端接口(/portal/**)面向访客免登录,统一放行——新增门户接口时无需再加 @SaIgnore,
                 // 未实现的蓝图路径由此穿透到 Spring 层返回 404(前端门户空态承接);
-                // 文件预览为免登录读取(img 等标签请求不携带凭证),上传/下载不豁免
+                // 文件预览为免登录读取(img 等标签请求不携带凭证),上传/下载不豁免;
+                // H2 控制台仅 dev 启用且自带 JDBC 账密页,免登录放行(演示模式拦截器不豁免,其写操作仍受限)
                 .excludePathPatterns(RbacConst.CAPTCHA_PATH,
                         RbacConst.LOGIN_PATH,
                         RbacConst.LOGOUT_PATH,
                         RbacConst.PORTAL_PATH,
-                        RbacConst.FILE_VIEW_PATH)
+                        RbacConst.FILE_VIEW_PATH,
+                        RbacConst.H2_CONSOLE_PATH)
                 .order(1);
 
         // 2. 演示模式拦截器：演示开关(app.demo-mode)开启时仅放行 GET/HEAD 等只读请求,
