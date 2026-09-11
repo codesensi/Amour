@@ -101,7 +101,7 @@ public class SysLog extends BaseEntity implements Serializable {
     private Long elapsed;
 
     /**
-     * 操作状态: 0-成功, 1-失败
+     * 操作状态: 0-失败, 1-成功
      */
     private Integer status;
 
