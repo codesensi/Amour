@@ -1,6 +1,8 @@
 package cn.codesensi.amour.controller;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
+import cn.codesensi.amour.common.annotation.Log;
+import cn.codesensi.amour.common.enums.LogTypeEnum;
 import cn.codesensi.amour.model.converter.MenuConverter;
 import cn.codesensi.amour.model.dto.MenuChangeStatusDTO;
 import cn.codesensi.amour.model.dto.MenuInsertDTO;
@@ -54,6 +56,7 @@ public class SysMenuController {
      * @param request 新增菜单请求参数
      */
     @SaCheckPermission("system:menu:insert")
+    @Log(module = "菜单管理", operation = "新增菜单", type = LogTypeEnum.INSERT)
     @PostMapping("/insert")
     public void insert(@Valid @RequestBody MenuInsertRequest request) {
         MenuInsertDTO menuInsertDTO = menuConverter.toInsertDTO(request);
@@ -66,6 +69,7 @@ public class SysMenuController {
      * @param request 修改菜单请求参数
      */
     @SaCheckPermission("system:menu:update")
+    @Log(module = "菜单管理", operation = "修改菜单", type = LogTypeEnum.UPDATE)
     @PutMapping("/update")
     public void update(@Valid @RequestBody MenuUpdateRequest request) {
         MenuUpdateDTO menuUpdateDTO = menuConverter.toUpdateDTO(request);
@@ -78,6 +82,7 @@ public class SysMenuController {
      * @param request 修改菜单状态请求参数
      */
     @SaCheckPermission("system:menu:update")
+    @Log(module = "菜单管理", operation = "修改菜单状态", type = LogTypeEnum.UPDATE)
     @PutMapping("/change-status")
     public void changeStatus(@Valid @RequestBody MenuChangeStatusRequest request) {
         MenuChangeStatusDTO menuChangeStatusDTO = menuConverter.toChangeStatusDTO(request);
@@ -90,6 +95,7 @@ public class SysMenuController {
      * @param id 菜单ID
      */
     @SaCheckPermission("system:menu:delete")
+    @Log(module = "菜单管理", operation = "删除菜单", type = LogTypeEnum.DELETE)
     @DeleteMapping("/delete/{id}")
     public void delete(@PathVariable Long id) {
         sysMenuService.delete(id);

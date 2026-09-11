@@ -39,6 +39,11 @@ public class AppConst {
     public static final String ONE_STR = "1";
 
     /**
+     * 消息字段（msg）统一最大长度 —— 项目内所有表的 msg 列与代码截断均对齐此值
+     */
+    public static final int MSG_MAX_LENGTH = 512;
+
+    /**
      * 链路追踪 ID 在 MDC 中的键名
      */
     public static final String TRACE_ID = "traceId";

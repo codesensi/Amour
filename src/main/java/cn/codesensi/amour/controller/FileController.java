@@ -1,6 +1,8 @@
 package cn.codesensi.amour.controller;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
+import cn.codesensi.amour.common.annotation.Log;
+import cn.codesensi.amour.common.enums.LogTypeEnum;
 import cn.codesensi.amour.model.entity.SysFile;
 import cn.codesensi.amour.model.response.FileUploadResponse;
 import cn.codesensi.amour.service.FileService;
@@ -46,6 +48,7 @@ public class FileController {
      * @return 文件ID、访问地址与原始文件名
      */
     @ApiResponseBody
+    @Log(module = "文件管理", operation = "上传文件", type = LogTypeEnum.UPLOAD)
     @PostMapping("/upload/{bizType}")
     public FileUploadResponse upload(@PathVariable("bizType") String bizType,
                                      @RequestParam("file") MultipartFile file) {
@@ -86,6 +89,7 @@ public class FileController {
      * @param id 文件ID
      * @return 文件流
      */
+    @Log(module = "文件管理", operation = "下载文件", type = LogTypeEnum.DOWNLOAD, saveResult = false)
     @GetMapping("/download/{id}")
     public ResponseEntity<Resource> download(@PathVariable("id") Long id) {
         FileViewResult result = fileService.load(id);

@@ -21,6 +21,7 @@ spring-boot-dependencies = { module = "org.springframework.boot:spring-boot-depe
 
 # ===== Spring 系依赖（版本交给 BOM）——对应 build.gradle 的 implementation「Spring Boot 相关」与 test 分组 =====
 spring-boot-h2console = { module = "org.springframework.boot:spring-boot-h2console" }
+spring-boot-starter-aspectj = { module = "org.springframework.boot:spring-boot-starter-aspectj" }
 spring-boot-starter-cache = { module = "org.springframework.boot:spring-boot-starter-cache" }
 spring-boot-starter-jdbc = { module = "org.springframework.boot:spring-boot-starter-jdbc" }
 spring-boot-starter-thymeleaf = { module = "org.springframework.boot:spring-boot-starter-thymeleaf" }

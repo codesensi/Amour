@@ -5,6 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * Amour 应用启动类。
@@ -20,6 +21,7 @@ import org.springframework.cache.annotation.EnableCaching;
  * @author codesensi
  * @since 1.0
  */
+@EnableAsync
 @ConfigurationPropertiesScan
 @EnableCaching
 @MapperScan("cn.codesensi.amour.**.mapper")

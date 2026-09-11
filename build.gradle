@@ -43,6 +43,7 @@ dependencies {
 
     // ---------- implementation：Spring Boot 相关（对应 TOML「Spring 系依赖」板块） ----------
     implementation libs.spring.boot.h2console           // H2 Web 控制台自动配置
+    implementation libs.spring.boot.starter.aspectj    // AspectJ/AOP:操作日志切面(sys_log 入库)
     implementation libs.spring.boot.starter.cache       // Spring Cache 抽象
     implementation libs.spring.boot.starter.jdbc        // JDBC + HikariCP 数据源（Spring Boot 4 需显式引入才具备自动配置）
     implementation libs.spring.boot.starter.thymeleaf   // Thymeleaf 模板引擎：门户页公共外壳（头部/首屏/侧栏/页脚）服务端片段化

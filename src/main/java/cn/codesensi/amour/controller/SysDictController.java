@@ -1,6 +1,8 @@
 package cn.codesensi.amour.controller;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
+import cn.codesensi.amour.common.annotation.Log;
+import cn.codesensi.amour.common.enums.LogTypeEnum;
 import cn.codesensi.amour.model.converter.DictConverter;
 import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.SysDict;
@@ -84,6 +86,7 @@ public class SysDictController {
      * @param request 新增字典条目请求参数
      */
     @SaCheckPermission("system:dict:insert")
+    @Log(module = "字典管理", operation = "新增字典条目", type = LogTypeEnum.INSERT)
     @PostMapping("/insert")
     public void insert(@Valid @RequestBody DictInsertRequest request) {
         DictInsertDTO insertDTO = dictConverter.toInsertDTO(request);
@@ -98,6 +101,7 @@ public class SysDictController {
      * @param request 修改字典条目请求参数
      */
     @SaCheckPermission("system:dict:update")
+    @Log(module = "字典管理", operation = "修改字典条目", type = LogTypeEnum.UPDATE)
     @PutMapping("/update")
     public void update(@Valid @RequestBody DictUpdateRequest request) {
         DictUpdateDTO updateDTO = dictConverter.toUpdateDTO(request);
@@ -111,6 +115,7 @@ public class SysDictController {
      * @param request 修改字典状态请求参数
      */
     @SaCheckPermission("system:dict:update")
+    @Log(module = "字典管理", operation = "修改字典状态", type = LogTypeEnum.UPDATE)
     @PutMapping("/change-status")
     public void changeStatus(@Valid @RequestBody DictChangeStatusRequest request) {
         DictChangeStatusDTO changeStatusDTO = dictConverter.toChangeStatusDTO(request);
@@ -124,6 +129,7 @@ public class SysDictController {
      * @param ids 字典条目ID列表
      */
     @SaCheckPermission("system:dict:delete")
+    @Log(module = "字典管理", operation = "删除字典条目", type = LogTypeEnum.DELETE)
     @DeleteMapping("/delete/{ids}")
     public void delete(@PathVariable Long[] ids) {
         sysDictService.delete(List.of(ids));

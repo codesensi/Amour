@@ -1,6 +1,8 @@
 package cn.codesensi.amour.controller;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
+import cn.codesensi.amour.common.annotation.Log;
+import cn.codesensi.amour.common.enums.LogTypeEnum;
 import cn.codesensi.amour.model.converter.ConfigConverter;
 import cn.codesensi.amour.model.dto.ConfigDTO;
 import cn.codesensi.amour.model.dto.ConfigPageDTO;
@@ -69,6 +71,7 @@ public class SysConfigController {
      * @param updateRequest 修改请求参数
      */
     @SaCheckPermission("system:config:update")
+    @Log(module = "系统配置", operation = "修改系统配置", type = LogTypeEnum.UPDATE)
     @PutMapping("/update")
     public void update(@Valid @RequestBody ConfigUpdateRequest updateRequest) {
         ConfigUpdateDTO updateDTO = configConverter.toUpdateDTO(updateRequest);

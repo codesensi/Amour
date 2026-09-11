@@ -169,6 +169,8 @@ CREATE TABLE IF NOT EXISTS `sys_log` (
     `operation`   VARCHAR(128)  NULL DEFAULT NULL       COMMENT '操作描述',
     `method`      VARCHAR(256)  NULL DEFAULT NULL       COMMENT '请求类方法',
     `url`         VARCHAR(512)  NULL DEFAULT NULL       COMMENT '请求接口地址',
+    `param`       TEXT          NULL                    COMMENT '请求参数(JSON,脱敏后截断存储)',
+    `result`      TEXT          NULL                    COMMENT '响应结果(JSON,脱敏后截断存储)',
     `ip`          VARCHAR(64)   NULL DEFAULT NULL       COMMENT '操作IP',
     `region`      VARCHAR(64)   NULL DEFAULT NULL       COMMENT 'IP归属地',
     `elapsed`     BIGINT        NULL DEFAULT NULL       COMMENT '耗时（毫秒）',

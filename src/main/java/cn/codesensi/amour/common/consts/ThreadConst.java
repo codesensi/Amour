@@ -14,6 +14,11 @@ public class ThreadConst {
     public static final String ASYNC_EXECUTOR_NAME = "asyncExecutor";
 
     /**
+     * 操作日志专用执行器名称
+     */
+    public static final String LOG_EXECUTOR_NAME = "logExecutor";
+
+    /**
      * 定时任务执行器名称
      */
     public static final String SCHEDULED_EXECUTOR_SERVICE = "scheduledExecutorService";

@@ -1,6 +1,8 @@
 package cn.codesensi.amour.controller;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
+import cn.codesensi.amour.common.annotation.Log;
+import cn.codesensi.amour.common.enums.LogTypeEnum;
 import cn.codesensi.amour.model.converter.RoleConverter;
 import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.SysRole;
@@ -69,6 +71,7 @@ public class SysRoleController {
      * @param request 新增角色请求参数
      */
     @SaCheckPermission("system:role:insert")
+    @Log(module = "角色管理", operation = "新增角色", type = LogTypeEnum.INSERT)
     @PostMapping("/insert")
     public void insert(@Valid @RequestBody RoleInsertRequest request) {
         RoleInsertDTO roleInsertDTO = roleConverter.toInsertDTO(request);
@@ -81,6 +84,7 @@ public class SysRoleController {
      * @param request 修改角色请求参数
      */
     @SaCheckPermission("system:role:update")
+    @Log(module = "角色管理", operation = "修改角色", type = LogTypeEnum.UPDATE)
     @PutMapping("/update")
     public void update(@Valid @RequestBody RoleUpdateRequest request) {
         RoleUpdateDTO roleUpdateDTO = roleConverter.toUpdateDTO(request);
@@ -93,6 +97,7 @@ public class SysRoleController {
      * @param request 角色状态请求参数
      */
     @SaCheckPermission("system:role:update")
+    @Log(module = "角色管理", operation = "修改角色状态", type = LogTypeEnum.UPDATE)
     @PutMapping("/change-status")
     public void changeStatus(@Valid @RequestBody RoleChangeStatusRequest request) {
         RoleChangeStatusDTO roleChangeStatusDTO = roleConverter.toChangeStatusDTO(request);
@@ -107,6 +112,7 @@ public class SysRoleController {
      * @param ids 角色ID列表
      */
     @SaCheckPermission("system:role:delete")
+    @Log(module = "角色管理", operation = "删除角色", type = LogTypeEnum.DELETE)
     @DeleteMapping("/delete/{ids}")
     public void delete(@PathVariable Long[] ids) {
         sysRoleService.delete(List.of(ids));
@@ -118,6 +124,7 @@ public class SysRoleController {
      * @param request 角色菜单权限信息
      */
     @SaCheckPermission("system:role:update")
+    @Log(module = "角色管理", operation = "分配角色菜单权限", type = LogTypeEnum.GRANT)
     @PutMapping("/assign-menus")
     public void assignMenus(@Valid @RequestBody AssignMenusRequest request) {
         AssignMenusDTO assignMenusDTO = roleConverter.toAssignMenusDTO(request);

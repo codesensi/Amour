@@ -1,6 +1,8 @@
 package cn.codesensi.amour.controller;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
+import cn.codesensi.amour.common.annotation.Log;
+import cn.codesensi.amour.common.enums.LogTypeEnum;
 import cn.codesensi.amour.model.converter.UserConverter;
 import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.SysUser;
@@ -66,6 +68,7 @@ public class SysUserController {
      *
      * @param request 资料更新请求参数
      */
+    @Log(module = "用户管理", operation = "更新个人资料", type = LogTypeEnum.UPDATE)
     @PutMapping("/update-profile")
     public void updateProfile(@Valid @RequestBody UserProfileUpdateRequest request) {
         UserProfileUpdateDTO userProfileUpdateDTO = userConverter.toProfileUpdateDTO(request);
@@ -79,6 +82,7 @@ public class SysUserController {
      *
      * @param request 改名请求参数
      */
+    @Log(module = "用户管理", operation = "修改用户名", type = LogTypeEnum.UPDATE)
     @PutMapping("/rename")
     public void rename(@Valid @RequestBody UserRenameRequest request) {
         sysUserService.rename(request.getUsername());
@@ -91,6 +95,7 @@ public class SysUserController {
      *
      * @param request 密码修改请求参数
      */
+    @Log(module = "用户管理", operation = "修改密码", type = LogTypeEnum.UPDATE)
     @PutMapping("/update-password")
     public void updatePassword(@Valid @RequestBody UserPasswordUpdateRequest request) {
         UserPasswordUpdateDTO userPasswordUpdateDTO = userConverter.toPasswordUpdateDTO(request);
@@ -103,6 +108,7 @@ public class SysUserController {
      * @param request 新增用户请求参数
      */
     @SaCheckPermission("system:user:insert")
+    @Log(module = "用户管理", operation = "新增用户", type = LogTypeEnum.INSERT)
     @PostMapping("/insert")
     public void insert(@Valid @RequestBody UserInsertRequest request) {
         UserInsertDTO userInsertDTO = userConverter.toInsertDTO(request);
@@ -115,6 +121,7 @@ public class SysUserController {
      * @param request 修改用户请求参数
      */
     @SaCheckPermission("system:user:update")
+    @Log(module = "用户管理", operation = "修改用户", type = LogTypeEnum.UPDATE)
     @PutMapping("/update")
     public void update(@Valid @RequestBody UserUpdateRequest request) {
         UserUpdateDTO userUpdateDTO = userConverter.toUpdateDTO(request);
@@ -127,6 +134,7 @@ public class SysUserController {
      * @param request 修改状态请求参数
      */
     @SaCheckPermission("system:user:update")
+    @Log(module = "用户管理", operation = "修改用户状态", type = LogTypeEnum.UPDATE)
     @PutMapping("/change-status")
     public void changeStatus(@Valid @RequestBody UserChangeStatusRequest request) {
         UserChangeStatusDTO userChangeStatusDTO = userConverter.toChangeStatusDTO(request);
@@ -139,6 +147,7 @@ public class SysUserController {
      * @param ids 用户ID列表
      */
     @SaCheckPermission("system:user:delete")
+    @Log(module = "用户管理", operation = "删除用户", type = LogTypeEnum.DELETE)
     @DeleteMapping("/delete/{ids}")
     public void delete(@PathVariable Long[] ids) {
         sysUserService.delete(List.of(ids));
@@ -150,6 +159,7 @@ public class SysUserController {
      * @param id 用户ID
      */
     @SaCheckPermission("system:user:update")
+    @Log(module = "用户管理", operation = "重置用户密码", type = LogTypeEnum.UPDATE)
     @PutMapping("/reset-password/{id}")
     public void resetPassword(@PathVariable Long id) {
         sysUserService.resetPassword(id);
@@ -161,6 +171,7 @@ public class SysUserController {
      * @param request 配置用户角色请求参数
      */
     @SaCheckPermission("system:user:update")
+    @Log(module = "用户管理", operation = "配置用户角色", type = LogTypeEnum.GRANT)
     @PutMapping("/assign-roles")
     public void assignRoles(@Valid @RequestBody AssignRolesRequest request) {
         AssignRolesDTO assignRolesDTO = userConverter.toAssignRolesDTO(request);
