@@ -174,7 +174,7 @@ CREATE TABLE IF NOT EXISTS `sys_log` (
     `ip`          VARCHAR(64)   NULL DEFAULT NULL       COMMENT '操作IP',
     `region`      VARCHAR(64)   NULL DEFAULT NULL       COMMENT 'IP归属地',
     `elapsed`     BIGINT        NULL DEFAULT NULL       COMMENT '耗时（毫秒）',
-    `status`      TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '操作状态: 0-成功, 1-失败',
+    `status`      TINYINT(1)    NULL DEFAULT NULL       COMMENT '操作状态: 0-失败, 1-成功',
     `msg`         VARCHAR(512)  NULL DEFAULT NULL       COMMENT '描述/失败原因',
     `creator`     BIGINT        NULL DEFAULT NULL       COMMENT '创建人',
     `create_time` DATETIME      NULL DEFAULT CURRENT_TIMESTAMP       COMMENT '创建时间',
