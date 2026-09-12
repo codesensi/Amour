@@ -1,5 +1,6 @@
 package cn.codesensi.amour.model.request;
 
+import cn.codesensi.amour.common.consts.RegexConst;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -38,7 +39,7 @@ public class MenuInsertRequest implements Serializable {
      * 菜单类型:D-目录，M-菜单，B-按钮
      */
     @NotBlank(message = "菜单类型不能为空")
-    @Pattern(regexp = "^[DMB]$", message = "菜单类型不合法")
+    @Pattern(regexp = RegexConst.MENU_TYPE, message = RegexConst.MENU_TYPE_MESSAGE)
     private String type;
 
     /**

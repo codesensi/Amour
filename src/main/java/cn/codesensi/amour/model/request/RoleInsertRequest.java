@@ -41,6 +41,7 @@ public class RoleInsertRequest implements Serializable {
     /**
      * 备注
      */
+    @Size(max = 512, message = "备注长度不能超过512")
     private String remark;
 
 }

@@ -1,5 +1,6 @@
 package cn.codesensi.amour.model.request;
 
+import cn.codesensi.amour.common.consts.RegexConst;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
@@ -25,7 +26,7 @@ public class QqInfoRequest implements Serializable {
      * QQ 号（6~12 位数字）
      */
     @NotBlank(message = "QQ号码不能为空")
-    @Pattern(regexp = "^[0-9]{6,12}$", message = "QQ号码格式错误，请输入6-12位数字")
+    @Pattern(regexp = RegexConst.QQ, message = RegexConst.QQ_MESSAGE)
     private String qq;
 
 }

@@ -1,6 +1,7 @@
 package cn.codesensi.amour.service.impl;
 
 import cn.codesensi.amour.common.consts.CacheConst;
+import cn.codesensi.amour.common.consts.RegexConst;
 import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.exception.ValidationException;
 import cn.codesensi.amour.common.util.CacheUtil;
@@ -60,7 +61,7 @@ public class SysConfigServiceImpl implements SysConfigService {
     /**
      * DATETIME 值类型的合法形态（yyyy-MM-dd HH:mm:ss），与门户展示契约一致
      */
-    private static final Pattern DATETIME_PATTERN = Pattern.compile("^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$");
+    private static final Pattern DATETIME_PATTERN = Pattern.compile(RegexConst.DATETIME_FORMAT);
 
     private final SysConfigMapper sysConfigMapper;
     private final CacheManager cacheManager;

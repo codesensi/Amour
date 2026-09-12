@@ -1,5 +1,6 @@
 package cn.codesensi.amour.service.impl;
 
+import cn.codesensi.amour.common.consts.RegexConst;
 import cn.codesensi.amour.common.enums.*;
 import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.exception.SystemException;
@@ -59,7 +60,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
     /**
      * 文件分发 URL 解析器：仅识别本系统 /file/view/{id} 形态
      */
-    private static final Pattern VIEW_URL_PATTERN = Pattern.compile("^/file/view/(\\d+)$");
+    private static final Pattern VIEW_URL_PATTERN = Pattern.compile(RegexConst.FILE_VIEW_URL);
 
     private final SysFileMapper sysFileMapper;
     private final AppFileProperties props;

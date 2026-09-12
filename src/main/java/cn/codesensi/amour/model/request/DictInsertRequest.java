@@ -1,5 +1,6 @@
 package cn.codesensi.amour.model.request;
 
+import cn.codesensi.amour.common.consts.RegexConst;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -27,7 +28,7 @@ public class DictInsertRequest implements Serializable {
      */
     @NotBlank(message = "字典编码不能为空")
     @Size(max = 64, message = "字典编码长度不能超过64")
-    @Pattern(regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$", message = "字典编码仅允许小写字母、数字与中划线")
+    @Pattern(regexp = RegexConst.DICT_CODE, message = RegexConst.DICT_CODE_MESSAGE)
     private String dictCode;
 
     /**

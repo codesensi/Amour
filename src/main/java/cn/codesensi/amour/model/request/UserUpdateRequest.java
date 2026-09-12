@@ -1,7 +1,9 @@
 package cn.codesensi.amour.model.request;
 
+import cn.codesensi.amour.common.consts.RegexConst;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -37,7 +39,7 @@ public class UserUpdateRequest implements Serializable {
     /**
      * 用户身份证号码
      */
-    // @IdCard(message = "身份证号码格式不正确")
+    @Pattern(regexp = RegexConst.ID_CARD, message = RegexConst.ID_CARD_MESSAGE)
     private String idCard;
 
     /**
@@ -50,19 +52,19 @@ public class UserUpdateRequest implements Serializable {
     /**
      * 用户手机号码
      */
-    // @Phone(message = "手机号格式不正确")
+    @Pattern(regexp = RegexConst.PHONE, message = RegexConst.PHONE_MESSAGE)
     private String phone;
 
     /**
      * 用户QQ号码
      */
-    @Size(max = 12, message = "用户QQ号码长度不能超过12")
+    @Pattern(regexp = RegexConst.QQ, message = RegexConst.QQ_MESSAGE)
     private String qq;
 
     /**
      * 用户性别:U-未知，M-男，F-女
      */
-    // @InEnum(enumClass = GenderEnum.class, message = "用户性别不在指定范围内")
+    @Pattern(regexp = RegexConst.GENDER, message = RegexConst.GENDER_MESSAGE)
     private String gender;
 
     /**
