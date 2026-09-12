@@ -9,7 +9,6 @@ import cn.codesensi.amour.model.dto.LoginResultDTO;
 import cn.codesensi.amour.model.request.LoginRequest;
 import cn.codesensi.amour.model.response.LoginResponse;
 import cn.codesensi.amour.service.LoginService;
-import cn.dev33.satoken.annotation.SaIgnore;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,7 +32,6 @@ public class LoginController {
     /**
      * 登录
      */
-    @SaIgnore
     @Log(module = "系统管理", operation = "登录", type = LogTypeEnum.LOGIN)
     @PostMapping("/login")
     public LoginResponse login(@Valid @RequestBody LoginRequest request) {

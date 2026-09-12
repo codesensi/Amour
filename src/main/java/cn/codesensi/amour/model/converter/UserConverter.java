@@ -66,22 +66,66 @@ public interface UserConverter {
 
     /**
      * UserInsertDTO → SysUser
+     * <p>
+     * id 由雪花生成器填充，审计字段由实体监听器填充，builtin 走数据库默认值；
+     * password 由服务层 BCrypt 加密后设置，均不参与映射。
      */
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "creator", ignore = true)
+    @Mapping(target = "createTime", ignore = true)
+    @Mapping(target = "updater", ignore = true)
+    @Mapping(target = "updateTime", ignore = true)
+    @Mapping(target = "delFlag", ignore = true)
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "builtin", ignore = true)
     SysUser toEntity(UserInsertDTO userInsertDTO);
 
     /**
-     * UserUpdateDTO → SysUser(仅资料字段，id 用于定位更新；用户名/密码/状态不在映射范围)
+     * UserUpdateDTO → SysUser(仅资料字段，id 用于定位更新；
+     * 用户名/密码/状态/身份证/手机号不在映射范围，审计字段由实体监听器维护)
      */
+    @Mapping(target = "creator", ignore = true)
+    @Mapping(target = "createTime", ignore = true)
+    @Mapping(target = "updater", ignore = true)
+    @Mapping(target = "updateTime", ignore = true)
+    @Mapping(target = "delFlag", ignore = true)
+    @Mapping(target = "username", ignore = true)
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "builtin", ignore = true)
     SysUser toEntity(UserUpdateDTO userUpdateDTO);
 
     /**
-     * UserProfileUpdateDTO → SysUser(仅资料字段，id 由调用方回填；用户名/密码/状态不在映射范围)
+     * UserProfileUpdateDTO → SysUser(仅资料字段，id 由调用方回填；
+     * 用户名/密码/状态/身份证/手机号不在映射范围，审计字段由实体监听器维护)
      */
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "creator", ignore = true)
+    @Mapping(target = "createTime", ignore = true)
+    @Mapping(target = "updater", ignore = true)
+    @Mapping(target = "updateTime", ignore = true)
+    @Mapping(target = "delFlag", ignore = true)
+    @Mapping(target = "username", ignore = true)
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "idCard", ignore = true)
+    @Mapping(target = "phone", ignore = true)
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "builtin", ignore = true)
     SysUser toEntity(UserProfileUpdateDTO userProfileUpdateDTO);
 
     /**
      * SysUser → UserInfoDTO
+     * <p>
+     * roles/perms/menus 为聚合字段，由调用方在转换后装配，不参与映射。
      */
+    @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "perms", ignore = true)
+    @Mapping(target = "menus", ignore = true)
     UserInfoDTO toInfoDTO(SysUser sysUser);
+
+    /**
+     * UserInfoDTO 浅拷贝（缓存命中后的防御性复制，避免写后突变缓存中的共享实例）
+     */
+    UserInfoDTO copy(UserInfoDTO source);
 
 }

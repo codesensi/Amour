@@ -40,7 +40,7 @@ public class CacheConst {
 
     /**
      * 用户信息缓存名（基础缓存名，实际使用时经 {@link CacheUtil#withAppEnv(String)} 拼接项目名_运行环境前缀），
-     * Key 为用户ID，存储当前用户信息聚合体（资料+角色+权限+菜单）
+     * Key 为用户ID，存储用户资料快照（不含角色/权限/菜单，聚合字段每次实时装配）
      */
     public static final String USER = "user";
 

@@ -22,6 +22,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.BCrypt;
+import com.mybatisflex.core.logicdelete.LogicDeleteManager;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
@@ -105,7 +106,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             log.debug("userInfo 缓存未注册，降级为直接查库：userId={}", userId);
             userInfoDTO = loadUserProfile(userId);
         } else {
-            userInfoDTO = cache.get(userId, () -> loadUserProfile(userId));
+            UserInfoDTO cached = cache.get(userId, () -> loadUserProfile(userId));
+            // 缓存返回的是共享实例，拷贝一份再装配聚合字段，避免写后突变缓存中的对象
+            userInfoDTO = cached == null ? null : userConverter.copy(cached);
         }
         if (ObjUtil.isNotNull(userInfoDTO)) {
             // 角色与权限：实时装配（各自有 role/perm 缓存加速；StpInterfaceImpl 即转发至这两个方法，行为与 StpUtil 等价）
@@ -144,13 +147,17 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Override
     public void insert(UserInsertDTO userInsertDTO) {
         String username = userInsertDTO.getUsername();
-        // 校验用户名是否存在
-        long count = QueryChain.of(sysUserMapper)
-                .where(SYS_USER.USERNAME.eq(username))
-                .count();
+        // 校验用户名未被占用（含已删除记录，全生命周期唯一）
+        long count = LogicDeleteManager.execWithoutLogicDelete(() ->
+                QueryChain.of(sysUserMapper)
+                        .where(SYS_USER.USERNAME.eq(username))
+                        .count());
         if (count > 0) {
             throw new BusinessException("用户名已存在");
         }
+
+        // 校验QQ号未被其他用户占用
+        checkQqAvailable(userInsertDTO.getQq(), null);
 
         // 状态缺省视为启用(0,与 EnableEnum 对齐)
         if (ObjUtil.isNull(userInsertDTO.getStatus())) {
@@ -193,6 +200,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             throw new BusinessException("用户不存在");
         }
         SysUser entity = userConverter.toEntity(userUpdateDTO);
+        // 校验QQ号未被其他用户占用
+        checkQqAvailable(userUpdateDTO.getQq(), userUpdateDTO.getId());
         updateById(entity);
 
         // 头像采纳:回填文件业务归属并标记被替换的旧头像失效(外链等非本系统地址自动跳过)
@@ -219,6 +228,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
         SysUser entity = userConverter.toEntity(userProfileUpdateDTO);
         entity.setId(userId);
+        // 校验QQ号未被其他用户占用
+        checkQqAvailable(userProfileUpdateDTO.getQq(), userId);
         updateById(entity);
 
         // 头像采纳:回填文件业务归属并标记被替换的旧头像失效(外链等非本系统地址自动跳过)
@@ -361,11 +372,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             return;
         }
 
-        // 校验新用户名是否已被其他用户占用
-        long count = QueryChain.of(sysUserMapper)
-                .where(SYS_USER.USERNAME.eq(username))
-                .and(SYS_USER.ID.ne(userId))
-                .count();
+        // 校验新用户名是否已被其他用户占用（含已删除记录，全生命周期唯一）
+        long count = LogicDeleteManager.execWithoutLogicDelete(() ->
+                QueryChain.of(sysUserMapper)
+                        .where(SYS_USER.USERNAME.eq(username))
+                        .and(SYS_USER.ID.ne(userId))
+                        .count());
         if (count > 0) {
             throw new BusinessException("用户名已存在");
         }
@@ -501,16 +513,38 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     /**
+     * 校验 QQ 号未被其他用户占用（含已删除记录，全生命周期唯一；QQ 为可选字段，空值跳过校验）。
+     *
+     * @param qq            QQ号
+     * @param excludeUserId 需排除的用户ID（修改场景排除本人），可为 null
+     */
+    private void checkQqAvailable(String qq, Long excludeUserId) {
+        if (StrUtil.isBlank(qq)) {
+            return;
+        }
+        long count = LogicDeleteManager.execWithoutLogicDelete(() ->
+                QueryChain.of(sysUserMapper)
+                        .where(SYS_USER.QQ.eq(qq))
+                        .and(SYS_USER.ID.ne(excludeUserId, ObjUtil::isNotNull))
+                        .count());
+        if (count > 0) {
+            throw new BusinessException("QQ号已被其他用户使用");
+        }
+    }
+
+    /**
      * 更新用户信息。
      * <p>
-     * 昵称、头像等资料变更影响用户信息聚合体，失效该用户的 userInfo 缓存。
+     * 昵称、头像等资料变更影响用户信息聚合体，失效该用户的 userInfo 缓存；
+     * 事务内调用时失效动作注册到提交后执行，避免提交前其他请求回源把旧数据写回缓存
+     * （无事务时立即执行）。
      */
     @Override
     public boolean updateById(@NonNull SysUser sysUser) {
         boolean success = super.updateById(sysUser);
         if (success) {
             log.debug("用户信息更新成功，失效 userInfo 缓存：userId={}", sysUser.getId());
-            cacheEvictService.evictUserCache(List.of(sysUser.getId()));
+            CacheUtil.evictAfterCommit(() -> cacheEvictService.evictUserCache(List.of(sysUser.getId())));
         }
         return success;
     }

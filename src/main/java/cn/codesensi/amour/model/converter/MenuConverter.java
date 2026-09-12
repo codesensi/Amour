@@ -10,6 +10,7 @@ import cn.codesensi.amour.model.request.MenuInsertRequest;
 import cn.codesensi.amour.model.request.MenuUpdateRequest;
 import cn.codesensi.amour.model.response.MenuResponse;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 
@@ -34,7 +35,11 @@ public interface MenuConverter {
 
     /**
      * MenuDTO → MenuResponse
+     * <p>
+     * 同时作为 toInfoResponse 中 menus 集合的元素级映射被 MapStruct 复用；
+     * MenuDTO 无创建时间，路由渲染载荷不携带该字段，显式忽略。
      */
+    @Mapping(target = "createTime", ignore = true)
     MenuResponse toResponse(MenuDTO menuDTO);
 
     /**
@@ -64,12 +69,30 @@ public interface MenuConverter {
 
     /**
      * MenuInsertDTO → SysMenu
+     * <p>
+     * id 由雪花生成器填充，审计字段由实体监听器填充，builtin 走数据库默认值，均不参与映射。
      */
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "creator", ignore = true)
+    @Mapping(target = "createTime", ignore = true)
+    @Mapping(target = "updater", ignore = true)
+    @Mapping(target = "updateTime", ignore = true)
+    @Mapping(target = "delFlag", ignore = true)
+    @Mapping(target = "builtin", ignore = true)
     SysMenu toEntity(MenuInsertDTO menuInsertDTO);
 
     /**
      * MenuUpdateDTO → SysMenu
+     * <p>
+     * 审计字段由实体监听器维护；type 属分组级属性，创建后不可修改，均不参与映射。
      */
+    @Mapping(target = "creator", ignore = true)
+    @Mapping(target = "createTime", ignore = true)
+    @Mapping(target = "updater", ignore = true)
+    @Mapping(target = "updateTime", ignore = true)
+    @Mapping(target = "delFlag", ignore = true)
+    @Mapping(target = "type", ignore = true)
+    @Mapping(target = "builtin", ignore = true)
     SysMenu toEntity(MenuUpdateDTO menuUpdateDTO);
 
 }

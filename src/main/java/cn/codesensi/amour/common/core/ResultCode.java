@@ -3,8 +3,10 @@ package cn.codesensi.amour.common.core;
 import lombok.Getter;
 
 /**
- * 统一响应状态码（基于 HTTP 语义）
- * 优点：前端无需维护额外的映射表，code 值直观反映接口状态
+ * 统一响应状态码（码值借用 HTTP 语义）
+ * <p>
+ * HTTP 传输层状态码统一保持 200，错误语义由本枚举的 code 在响应体内表达；
+ * 前端无需维护额外的映射表，code 值直观反映接口状态。
  *
  * @since 1.0
  */

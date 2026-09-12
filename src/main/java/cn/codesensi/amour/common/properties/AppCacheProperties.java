@@ -1,15 +1,17 @@
 package cn.codesensi.amour.common.properties;
 
 import cn.codesensi.amour.common.util.CacheUtil;
-import cn.codesensi.amour.config.CacheConfig;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 缓存配置属性，可从 yml（前缀 {@code app.cache.*}）绑定，由 {@link CacheConfig} 消费。
+ * 缓存配置属性，可从 yml（前缀 {@code app.cache.*}）绑定，由 config 包的 CacheConfig 消费。
  * <p>
  * 过期时间单位统一为「秒」，支持写入后与访问后两个维度，取先到者生效：
  * <ul>
@@ -24,6 +26,7 @@ import java.util.List;
  * @since 1.0
  */
 @Data
+@Validated
 @ConfigurationProperties(prefix = "app.cache")
 public class AppCacheProperties {
 
@@ -46,6 +49,7 @@ public class AppCacheProperties {
     /**
      * 各缓存个性化配置列表。
      */
+    @Valid
     private List<CacheItem> caches = new ArrayList<>();
 
     /**
@@ -57,6 +61,7 @@ public class AppCacheProperties {
         /**
          * 基础缓存名（不含「项目名_运行环境」前缀，实际注册时由 {@link CacheUtil#withAppEnv(String)} 拼接）。
          */
+        @NotBlank(message = "缓存配置项 name 不能为空")
         private String name;
 
         /**

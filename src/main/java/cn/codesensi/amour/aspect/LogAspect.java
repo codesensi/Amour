@@ -6,11 +6,10 @@ import cn.codesensi.amour.common.core.Result;
 import cn.codesensi.amour.common.enums.SuccessEnum;
 import cn.codesensi.amour.common.util.Ip2regionUtil;
 import cn.codesensi.amour.common.util.IpUtil;
+import cn.codesensi.amour.common.util.LoginUserUtil;
 import cn.codesensi.amour.common.util.ServletUtil;
 import cn.codesensi.amour.model.entity.SysLog;
 import cn.codesensi.amour.service.SysLogService;
-import cn.dev33.satoken.exception.SaTokenException;
-import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -99,12 +98,12 @@ public class LogAspect {
     @Around("@annotation(log)")
     public Object around(ProceedingJoinPoint joinPoint, Log log) throws Throwable {
         long start = System.currentTimeMillis();
-        Long userId = getCurrentUserId();
+        Long userId = LoginUserUtil.getLoginIdOrNull();
         try {
             Object result = joinPoint.proceed();
             if (userId == null) {
                 // 登录场景：执行前未登录，执行后新会话已建立，补采一次
-                userId = getCurrentUserId();
+                userId = LoginUserUtil.getLoginIdOrNull();
             }
             save(joinPoint, log, start, result, null, userId);
             return result;
@@ -136,6 +135,8 @@ public class LogAspect {
             sysLog.setMethod(buildMethod(joinPoint));
 
             sysLog.setUserId(userId);
+            // 本条日志在异步线程入库，BaseEntity 监听器在日志线程内取不到登录用户（无会话上下文），
+            // creator 必须趁请求线程上下文仍在时手动填充，不可删除
             sysLog.setCreator(userId);
             if (userId == null) {
                 // 未登录（如登录接口）：用户名从请求参数中提取
@@ -243,20 +244,6 @@ public class LogAspect {
             } catch (Exception ignored) {
                 // 非对象类型参数无法解析出用户名，跳过
             }
-        }
-    }
-
-    /**
-     * 获取当前登录用户ID。
-     *
-     * @return 用户ID；未登录时返回 {@code null}
-     */
-    private Long getCurrentUserId() {
-        try {
-            return StpUtil.getLoginIdAsLong();
-        } catch (SaTokenException ignored) {
-            // 公开接口（如登录、验证码）本身未登录，不视为异常
-            return null;
         }
     }
 

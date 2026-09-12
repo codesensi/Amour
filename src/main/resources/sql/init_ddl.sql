@@ -1,6 +1,7 @@
 -- ----------------------------
 -- 表结构：sys_config（系统配置表）
 -- 幂等建表：仅当表不存在时创建
+-- 唯一性：config_key 全生命周期唯一（含逻辑删除记录），服务层全量查重先行拦截并给出友好提示
 -- ----------------------------
 CREATE TABLE IF NOT EXISTS `sys_config` (
     `id`           BIGINT        NOT NULL                COMMENT '主键ID',
@@ -15,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `sys_config` (
     `update_time`  DATETIME      NULL DEFAULT CURRENT_TIMESTAMP       COMMENT '更新时间',
     `del_flag`     TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
     PRIMARY KEY (`id`),
-    INDEX `idx_c_config_key` (`config_key` ASC)
+    UNIQUE INDEX `uk_c_config_key` (`config_key`)
     ) ENGINE = InnoDB
     CHARACTER SET = utf8mb4
     COLLATE = utf8mb4_general_ci
@@ -25,6 +26,7 @@ CREATE TABLE IF NOT EXISTS `sys_config` (
 -- ----------------------------
 -- 表结构：sys_user（用户信息表）
 -- 幂等建表：仅当表不存在时创建
+-- 唯一性：username 全生命周期唯一（含逻辑删除记录），服务层全量查重先行拦截并给出友好提示
 -- ----------------------------
 CREATE TABLE IF NOT EXISTS `sys_user` (
     `id`          BIGINT        NOT NULL                COMMENT '用户ID',
@@ -46,7 +48,7 @@ CREATE TABLE IF NOT EXISTS `sys_user` (
     `update_time` DATETIME      NULL DEFAULT CURRENT_TIMESTAMP       COMMENT '更新时间',
     `del_flag`    TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
     PRIMARY KEY (`id`),
-    INDEX `idx_u_username` (`username` ASC),
+    UNIQUE INDEX `uk_u_username` (`username`),
     INDEX `idx_u_status`   (`status` ASC)
     ) ENGINE = InnoDB
     CHARACTER SET = utf8mb4
@@ -57,6 +59,7 @@ CREATE TABLE IF NOT EXISTS `sys_user` (
 -- ----------------------------
 -- 表结构：sys_role（角色信息表）
 -- 幂等建表：仅当表不存在时创建
+-- 唯一性：code 全生命周期唯一（含逻辑删除记录），服务层全量查重先行拦截并给出友好提示
 -- ----------------------------
 CREATE TABLE IF NOT EXISTS `sys_role` (
     `id`          BIGINT        NOT NULL                COMMENT '角色ID',
@@ -72,7 +75,7 @@ CREATE TABLE IF NOT EXISTS `sys_role` (
     `update_time` DATETIME      NULL DEFAULT CURRENT_TIMESTAMP       COMMENT '更新时间',
     `del_flag`    TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
     PRIMARY KEY (`id`),
-    INDEX `idx_r_code`   (`code` ASC),
+    UNIQUE INDEX `uk_r_code` (`code`),
     INDEX `idx_r_status` (`status` ASC)
     ) ENGINE = InnoDB
     CHARACTER SET = utf8mb4

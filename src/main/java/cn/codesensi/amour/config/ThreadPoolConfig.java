@@ -1,7 +1,7 @@
 package cn.codesensi.amour.config;
 
 import cn.codesensi.amour.common.consts.ThreadConst;
-import cn.codesensi.amour.common.context.MdcTaskDecorator;
+import cn.codesensi.amour.common.context.ContextTaskDecorator;
 import cn.codesensi.amour.common.properties.ThreadPoolProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  *       （{@code SysLogService#record}），队列饱和即丢弃并告警，
  *       绝不允许阻塞或反压业务线程。</li>
  * </ul>
- * 两池均通过 {@link MdcTaskDecorator} 沿用提交线程的 MDC 上下文（链路追踪 ID）。
+ * 两池均通过 {@link ContextTaskDecorator} 沿用提交线程的 MDC 上下文（链路追踪 ID）与登录用户ID。
  *
  * @since 1.0
  */
@@ -150,7 +150,7 @@ public class ThreadPoolConfig implements AsyncConfigurer {
         executor.setAwaitTerminationSeconds(spec.getAwaitTerminationSeconds());
         executor.setThreadNamePrefix(namePrefix);
         executor.setRejectedExecutionHandler(handler);
-        executor.setTaskDecorator(new MdcTaskDecorator());
+        executor.setTaskDecorator(new ContextTaskDecorator());
         executor.initialize();
         return executor;
     }
@@ -165,7 +165,7 @@ public class ThreadPoolConfig implements AsyncConfigurer {
         SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor("async-vt-");
         executor.setVirtualThreads(true);
         executor.setConcurrencyLimit(threadPoolProperties.getGeneral().getMaxPoolSize());
-        executor.setTaskDecorator(new MdcTaskDecorator());
+        executor.setTaskDecorator(new ContextTaskDecorator());
         return executor;
     }
 

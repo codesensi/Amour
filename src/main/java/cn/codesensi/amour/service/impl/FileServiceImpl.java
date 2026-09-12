@@ -155,8 +155,9 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
                 public void afterCompletion(int status) {
-                    if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
-                        log.warn("上传事务回滚，清理已写盘的物理文件：key={}", key);
+                    // 提交成功才保留物理文件；回滚或提交阶段失败均清理，避免残留孤儿文件
+                    if (status != TransactionSynchronization.STATUS_COMMITTED) {
+                        log.warn("上传事务未成功提交(status={})，清理已写盘的物理文件：key={}", status, key);
                         storage.delete(key);
                     }
                 }

@@ -15,7 +15,6 @@ import cn.codesensi.amour.model.response.DictPageResponse;
 import cn.codesensi.amour.model.response.DictTypeResponse;
 import cn.codesensi.amour.service.SysDictService;
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import cn.dev33.satoken.annotation.SaIgnore;
 import com.mybatisflex.core.paginate.Page;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +56,6 @@ public class SysDictController {
      * @param codes 字典编码集合（如 gender、enable）；为空时返回空分组
      * @return 字典分组列表（每组含 dictCode 与组内条目，条目按 sort 升序）；无命中时返回空列表
      */
-    @SaIgnore
     @GetMapping("/list-by-codes")
     public List<DictGroupResponse> listByCodes(@RequestParam(value = "codes", required = false) List<String> codes) {
         List<DictGroupDTO> dictGroups = sysDictService.listByCodes(codes);

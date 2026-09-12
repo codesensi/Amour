@@ -128,18 +128,41 @@ public interface DictConverter {
 
     /**
      * DictInsertDTO → SysDict。
+     * <p>
+     * id 由雪花生成器填充，审计字段由实体监听器填充，builtin 走数据库默认值；
+     * dictName 为组内共享属性，由服务层按分组继承回填，均不参与映射。
      *
      * @param insertDTO 新增字典条目 DTO
      * @return 字典实体
      */
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "creator", ignore = true)
+    @Mapping(target = "createTime", ignore = true)
+    @Mapping(target = "updater", ignore = true)
+    @Mapping(target = "updateTime", ignore = true)
+    @Mapping(target = "delFlag", ignore = true)
+    @Mapping(target = "builtin", ignore = true)
+    @Mapping(target = "dictName", ignore = true)
     SysDict toEntity(DictInsertDTO insertDTO);
 
     /**
      * DictUpdateDTO → SysDict。
+     * <p>
+     * 审计字段由实体监听器维护；dictCode 创建后不可修改，status 由独立的状态接口维护；
+     * dictName 为组内共享属性，不在单条修改范围，均不参与映射。
      *
      * @param updateDTO 修改字典条目 DTO
      * @return 字典实体
      */
+    @Mapping(target = "creator", ignore = true)
+    @Mapping(target = "createTime", ignore = true)
+    @Mapping(target = "updater", ignore = true)
+    @Mapping(target = "updateTime", ignore = true)
+    @Mapping(target = "delFlag", ignore = true)
+    @Mapping(target = "dictCode", ignore = true)
+    @Mapping(target = "dictName", ignore = true)
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "builtin", ignore = true)
     SysDict toEntity(DictUpdateDTO updateDTO);
 
     /**

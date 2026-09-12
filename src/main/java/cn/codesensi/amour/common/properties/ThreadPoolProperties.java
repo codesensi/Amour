@@ -2,13 +2,11 @@ package cn.codesensi.amour.common.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 /**
  * 线程池配置：通用池与日志池共用同一套规格结构，两池均在代码内带缺省值，yml 可覆盖。
  */
 @Data
-@Component
 @ConfigurationProperties(prefix = "thread.pool")
 public class ThreadPoolProperties {
 

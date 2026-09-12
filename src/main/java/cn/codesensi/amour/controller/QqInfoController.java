@@ -6,7 +6,6 @@ import cn.codesensi.amour.model.dto.QqInfoResultDTO;
 import cn.codesensi.amour.model.request.QqInfoRequest;
 import cn.codesensi.amour.model.response.QqInfoResponse;
 import cn.codesensi.amour.service.QqInfoService;
-import cn.dev33.satoken.annotation.SaIgnore;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,7 +37,6 @@ public class QqInfoController {
      * @param request 查询入参（Jakarta Validation 校验，失败走全局 BindException 处理器返回 400）
      * @return 头像地址与昵称；昵称可能为空，由前端提示手动填写
      */
-    @SaIgnore
     @GetMapping("/qq-info")
     public QqInfoResponse qqInfo(@Valid QqInfoRequest request) {
         QqInfoResultDTO qqInfoResultDTO = qqInfoService.getQqInfo(request.getQq());

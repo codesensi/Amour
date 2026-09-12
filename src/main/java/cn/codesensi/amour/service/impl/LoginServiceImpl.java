@@ -73,12 +73,17 @@ public class LoginServiceImpl implements LoginService {
             checkCaptcha(loginDTO);
         }
 
-        // 校验用户及密码（用户名/QQ号邮箱任一匹配即可登录）
-        SysUser sysUser = sysUserService.queryChain()
-                .select(SYS_USER.ID, SYS_USER.PASSWORD, SYS_USER.STATUS)
+        // 校验用户及密码（用户名/QQ号任一匹配即可登录）
+        List<SysUser> candidates = sysUserService.queryChain()
+                .select(SYS_USER.ID, SYS_USER.USERNAME, SYS_USER.PASSWORD, SYS_USER.STATUS)
                 .where(SYS_USER.USERNAME.eq(username))
                 .or(SYS_USER.QQ.eq(username))
-                .one();
+                .list();
+        // 用户名匹配优先（他人 QQ 号可能恰好与本用户名相同），未命中再取 QQ 匹配的记录
+        SysUser sysUser = candidates.stream()
+                .filter(user -> username.equals(user.getUsername()))
+                .findFirst()
+                .orElse(candidates.stream().findFirst().orElse(null));
         if (ObjUtil.isNull(sysUser) || StrUtil.isBlank(sysUser.getPassword())
                 || !BCrypt.checkpw(password, sysUser.getPassword())) {
             log.debug("登录失败：username={}，账号不存在或密码不匹配", username);

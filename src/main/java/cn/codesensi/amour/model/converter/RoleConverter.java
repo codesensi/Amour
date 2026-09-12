@@ -42,12 +42,32 @@ public interface RoleConverter {
 
     /**
      * RoleInsertDTO → SysRole
+     * <p>
+     * id 由雪花生成器填充，审计字段由实体监听器填充，status/builtin 走数据库默认值，均不参与映射。
      */
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "creator", ignore = true)
+    @Mapping(target = "createTime", ignore = true)
+    @Mapping(target = "updater", ignore = true)
+    @Mapping(target = "updateTime", ignore = true)
+    @Mapping(target = "delFlag", ignore = true)
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "builtin", ignore = true)
     SysRole toEntity(RoleInsertDTO roleInsertDTO);
 
     /**
      * RoleUpdateDTO → SysRole
+     * <p>
+     * 审计字段由实体监听器维护；code 创建后不可修改，status 由独立的状态接口维护，均不参与映射。
      */
+    @Mapping(target = "creator", ignore = true)
+    @Mapping(target = "createTime", ignore = true)
+    @Mapping(target = "updater", ignore = true)
+    @Mapping(target = "updateTime", ignore = true)
+    @Mapping(target = "delFlag", ignore = true)
+    @Mapping(target = "code", ignore = true)
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "builtin", ignore = true)
     SysRole toEntity(RoleUpdateDTO roleUpdateDTO);
 
     /**

@@ -13,7 +13,9 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static cn.codesensi.amour.model.entity.table.SysMenuTableDef.SYS_MENU;
 import static cn.codesensi.amour.model.entity.table.SysRoleMenuTableDef.SYS_ROLE_MENU;
@@ -52,6 +54,7 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
                 .stream()
                 .map(SysMenu::getPerms)
                 .filter(StrUtil::isNotBlank)
+                .distinct()
                 .toList();
     }
 
@@ -72,7 +75,13 @@ public class SysRoleMenuServiceImpl extends ServiceImpl<SysRoleMenuMapper, SysRo
                 .and(SYS_MENU.STATUS.eq(EnableEnum.ENABLE.getCode()))
                 .and(SYS_MENU.TYPE.ne(MenuType.B.getCode()))
                 .orderBy(SYS_MENU.SORT, true)
-                .list();
+                .list()
+                .stream()
+                // 多角色用户经 join 会命中重复菜单行，按 id 去重（LinkedHashMap 保持 sort 排序顺序）
+                .collect(Collectors.toMap(SysMenu::getId, menu -> menu, (first, second) -> first, LinkedHashMap::new))
+                .values()
+                .stream()
+                .toList();
     }
 
     /**

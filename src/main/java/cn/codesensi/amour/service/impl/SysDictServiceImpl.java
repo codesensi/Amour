@@ -173,6 +173,15 @@ public class SysDictServiceImpl implements SysDictService {
         checkValueUnique(insertDTO.getDictCode(), insertDTO.getDictValue());
 
         SysDict sysDict = dictConverter.toEntity(insertDTO);
+        // 组名继承:字典名称为组内共享属性(见 DictInsertRequest 类注释)，沿用同组已有条目的组名；
+        // 全新分组无既有条目时以字典编码占位，避免组名空缺
+        SysDict existDict = QueryChain.of(sysDictMapper)
+                .select(SYS_DICT.DICT_NAME)
+                .where(SYS_DICT.DICT_CODE.eq(insertDTO.getDictCode()))
+                .limit(1)
+                .one();
+        String groupName = existDict == null ? null : existDict.getDictName();
+        sysDict.setDictName(StrUtil.blankToDefault(groupName, insertDTO.getDictCode()));
         sysDictMapper.insert(sysDict, true);
 
         CacheUtil.evictAfterCommit(() -> cacheEvictService.evictDictCache(List.of(insertDTO.getDictCode())));

@@ -17,6 +17,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.logicdelete.LogicDeleteManager;
 import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -95,10 +96,11 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     @Override
     public void insert(RoleInsertDTO roleInsertDTO) {
         String code = roleInsertDTO.getCode();
-        // 校验角色编码是否存在
-        long count = QueryChain.of(sysRoleMapper)
-                .where(SYS_ROLE.CODE.eq(code))
-                .count();
+        // 校验角色编码未被占用（含已删除记录，全生命周期唯一）
+        long count = LogicDeleteManager.execWithoutLogicDelete(() ->
+                QueryChain.of(sysRoleMapper)
+                        .where(SYS_ROLE.CODE.eq(code))
+                        .count());
         if (count > 0) {
             throw new BusinessException("角色编码已存在");
         }
@@ -151,12 +153,13 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             return;
         }
 
+        // 先查询受影响用户再写库，确保写库成功后缓存失效动作必然可执行
+        List<Long> userIds = listUserIdsByRoleIds(List.of(roleChangeStatusDTO.getId()));
+
         SysRole entity = new SysRole();
         entity.setId(roleChangeStatusDTO.getId());
         entity.setStatus(roleChangeStatusDTO.getStatus());
         updateById(entity);
-
-        List<Long> userIds = listUserIdsByRoleIds(List.of(roleChangeStatusDTO.getId()));
         CacheUtil.evictAfterCommit(() -> {
             log.debug("角色状态变更完成：roleId={}，status={}，失效缓存，受影响用户数={}",
                     roleChangeStatusDTO.getId(), roleChangeStatusDTO.getStatus(), userIds.size());
