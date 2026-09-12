@@ -44,6 +44,7 @@ public class UserUpdateRequest implements Serializable {
      * 用户邮箱
      */
     @Email(message = "邮箱格式不正确")
+    @Size(max = 64, message = "用户邮箱长度不能超过64")
     private String email;
 
     /**
@@ -55,6 +56,7 @@ public class UserUpdateRequest implements Serializable {
     /**
      * 用户QQ号码
      */
+    @Size(max = 12, message = "用户QQ号码长度不能超过12")
     private String qq;
 
     /**
@@ -66,11 +68,13 @@ public class UserUpdateRequest implements Serializable {
     /**
      * 用户头像地址
      */
+    @Size(max = 512, message = "用户头像地址长度不能超过512")
     private String avatar;
 
     /**
      * 备注
      */
+    @Size(max = 512, message = "备注长度不能超过512")
     private String remark;
 
 }
