@@ -1,6 +1,7 @@
 package cn.codesensi.amour.common.enums;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
  * @since 1.0
  */
 @Getter
+@RequiredArgsConstructor
 public enum FileBizTypeEnum implements BaseEnum<String> {
 
     AVATAR("avatar", "用户头像", List.of("jpg", "jpeg", "png", "gif", "webp"), 2),
@@ -40,29 +42,4 @@ public enum FileBizTypeEnum implements BaseEnum<String> {
      * 单文件大小上限（MB）
      */
     private final int maxMb;
-
-    /**
-     * 枚举构造函数
-     *
-     * @param code       编码
-     * @param desc       说明
-     * @param extensions 扩展名白名单（全小写）
-     * @param maxMb      单文件大小上限（MB）
-     */
-    FileBizTypeEnum(String code, String desc, List<String> extensions, int maxMb) {
-        this.code = code;
-        this.desc = desc;
-        this.extensions = extensions;
-        this.maxMb = maxMb;
-    }
-
-    @Override
-    public String getCode() {
-        return code;
-    }
-
-    @Override
-    public String getDesc() {
-        return desc;
-    }
 }

@@ -1,6 +1,7 @@
 package cn.codesensi.amour.common.enums;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 日志类型枚举
@@ -11,6 +12,7 @@ import lombok.Getter;
  * @since 1.0
  */
 @Getter
+@RequiredArgsConstructor
 public enum LogTypeEnum implements BaseEnum<Integer> {
 
     UNKNOWN(0, "未知"),
@@ -34,25 +36,4 @@ public enum LogTypeEnum implements BaseEnum<Integer> {
      * 说明
      */
     private final String desc;
-
-    /**
-     * 枚举构造函数
-     *
-     * @param code 编码
-     * @param desc 说明
-     */
-    LogTypeEnum(Integer code, String desc) {
-        this.code = code;
-        this.desc = desc;
-    }
-
-    @Override
-    public Integer getCode() {
-        return code;
-    }
-
-    @Override
-    public String getDesc() {
-        return desc;
-    }
 }

@@ -1,6 +1,7 @@
 package cn.codesensi.amour.common.enums;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 性别枚举
@@ -11,6 +12,7 @@ import lombok.Getter;
  * @since 1.0
  */
 @Getter
+@RequiredArgsConstructor
 public enum GenderEnum implements BaseEnum<String> {
 
     UNKNOWN("U", "未知"),
@@ -27,25 +29,4 @@ public enum GenderEnum implements BaseEnum<String> {
      * 说明
      */
     private final String desc;
-
-    /**
-     * 枚举构造函数
-     *
-     * @param code 编码
-     * @param desc 说明
-     */
-    GenderEnum(String code, String desc) {
-        this.code = code;
-        this.desc = desc;
-    }
-
-    @Override
-    public String getCode() {
-        return code;
-    }
-
-    @Override
-    public String getDesc() {
-        return desc;
-    }
 }

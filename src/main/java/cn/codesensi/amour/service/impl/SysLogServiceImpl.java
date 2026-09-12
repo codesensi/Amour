@@ -49,7 +49,7 @@ public class SysLogServiceImpl implements SysLogService {
             }
             sysLogMapper.insert(sysLog);
         } catch (Exception e) {
-            log.warn("操作日志入库失败：{}", e.getMessage());
+            log.warn("操作日志入库失败：{}", e.getMessage(), e);
         }
     }
 }

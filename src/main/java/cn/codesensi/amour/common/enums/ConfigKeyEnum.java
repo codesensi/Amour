@@ -1,6 +1,7 @@
 package cn.codesensi.amour.common.enums;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 系统配置键枚举 —— 与 sys_config 表初始化数据（sql/init_dml.sql）中的配置键一一对应。
@@ -12,6 +13,7 @@ import lombok.Getter;
  * @since 1.0
  */
 @Getter
+@RequiredArgsConstructor
 public enum ConfigKeyEnum implements BaseEnum<String> {
 
     // ---------- 基础配置（base 分组：1000 段） ----------
@@ -39,25 +41,4 @@ public enum ConfigKeyEnum implements BaseEnum<String> {
      * 说明
      */
     private final String desc;
-
-    /**
-     * 枚举构造函数
-     *
-     * @param code 编码
-     * @param desc 说明
-     */
-    ConfigKeyEnum(String code, String desc) {
-        this.code = code;
-        this.desc = desc;
-    }
-
-    @Override
-    public String getCode() {
-        return code;
-    }
-
-    @Override
-    public String getDesc() {
-        return desc;
-    }
 }

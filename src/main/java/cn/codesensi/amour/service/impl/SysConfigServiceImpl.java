@@ -91,6 +91,7 @@ public class SysConfigServiceImpl implements SysConfigService {
             return cached == CacheConst.NULL_MARKER ? null : (SysConfig) cached;
         } catch (Cache.ValueRetrievalException e) {
             // 回源异常时降级为直接查库，避免缓存故障阻断配置读取
+            log.debug("config 缓存回源异常，降级为直接查库：key={}", key, e);
             return oneByKeyDb(key);
         }
     }
