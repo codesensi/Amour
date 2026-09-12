@@ -50,4 +50,14 @@ public class OssFileStorage implements FileStorage {
     public Resource load(SysFile sysFile) {
         throw new SystemException("OSS 对象存储尚未接入,无法读取文件：" + sysFile.getId());
     }
+
+    /**
+     * 删除对象存储文件（预留,未接入）。
+     *
+     * @param key 相对存储 key（object key）
+     */
+    @Override
+    public void delete(String key) {
+        throw new SystemException("OSS 对象存储尚未接入,无法删除文件：" + key);
+    }
 }

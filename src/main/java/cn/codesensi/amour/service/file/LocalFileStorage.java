@@ -79,6 +79,25 @@ public class LocalFileStorage implements FileStorage {
     }
 
     /**
+     * 删除本地磁盘文件。
+     * <p>
+     * 文件不存在时静默成功；删除失败仅告警不抛出——清理动作不允许反向影响调用方。
+     *
+     * @param key 相对存储 key
+     */
+    @Override
+    public void delete(String key) {
+        Path target = resolve(key);
+        try {
+            if (Files.deleteIfExists(target)) {
+                log.debug("本地文件删除成功：key={}", key);
+            }
+        } catch (IOException e) {
+            log.warn("本地文件删除失败：key={}", key, e);
+        }
+    }
+
+    /**
      * 存储类型标识。
      *
      * @return 本地存储

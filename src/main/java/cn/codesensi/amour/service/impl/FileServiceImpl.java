@@ -22,6 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -147,6 +149,18 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
 
         // 4. 写盘(物理文件名使用主键ID)
         String key = storage.upload(sysFile, bytes);
+        // 注册回滚清理:本事务回滚时删除已写盘的物理文件,避免残留孤儿文件
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCompletion(int status) {
+                    if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
+                        log.warn("上传事务回滚，清理已写盘的物理文件：key={}", key);
+                        storage.delete(key);
+                    }
+                }
+            });
+        }
 
         // 5. 回填存储 key
         SysFile pathUpdate = new SysFile().setId(sysFile.getId()).setPath(key);

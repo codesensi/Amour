@@ -39,4 +39,13 @@ public interface FileStorage {
      * @return 文件资源
      */
     Resource load(SysFile sysFile);
+
+    /**
+     * 删除已存储的物理文件。
+     * <p>
+     * 用于上传事务回滚等场景的物理文件清理；文件不存在时静默成功。
+     *
+     * @param key 相对存储 key（与 sys_file.path 同语义）
+     */
+    void delete(String key);
 }
