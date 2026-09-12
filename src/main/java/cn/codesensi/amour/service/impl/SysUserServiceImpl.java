@@ -140,6 +140,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      *
      * @param userInsertDTO 用户信息
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void insert(UserInsertDTO userInsertDTO) {
         String username = userInsertDTO.getUsername();
@@ -184,6 +185,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      *
      * @param userUpdateDTO 用户信息
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void update(UserUpdateDTO userUpdateDTO) {
         SysUser sysUser = getById(userUpdateDTO.getId());
@@ -207,6 +209,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      *
      * @param userProfileUpdateDTO 资料信息
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateProfile(UserProfileUpdateDTO userProfileUpdateDTO) {
         Long userId = StpUtil.getLoginIdAsLong();

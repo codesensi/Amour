@@ -142,13 +142,16 @@ public class LogAspect {
                 fillUsernameFromArgs(joinPoint, sysLog);
             }
 
+            // 非 Web 线程触发时无请求上下文,请求维度字段(url/ip/region/param)整体跳过
             HttpServletRequest request = ServletUtil.getRequest();
-            sysLog.setUrl(request.getRequestURI());
-            String ip = IpUtil.getIpAddr(request);
-            sysLog.setIp(ip);
-            sysLog.setRegion(Ip2regionUtil.search(ip));
-            if (log.saveParam()) {
-                sysLog.setParam(fitJson(buildParam(request, joinPoint), maxTextLength));
+            if (request != null) {
+                sysLog.setUrl(request.getRequestURI());
+                String ip = IpUtil.getIpAddr(request);
+                sysLog.setIp(ip);
+                sysLog.setRegion(Ip2regionUtil.search(ip));
+                if (log.saveParam()) {
+                    sysLog.setParam(fitJson(buildParam(request, joinPoint), maxTextLength));
+                }
             }
 
             if (e != null) {

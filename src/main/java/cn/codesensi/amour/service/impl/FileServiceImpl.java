@@ -201,6 +201,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
      * @param bizId   业务对象ID（新增场景由调用方在业务落库后传入）
      * @param urls    业务对象当前引用的全部文件 URL
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void bindBizFiles(FileBizTypeEnum bizType, Long bizId, Collection<String> urls) {
         if (bizType == null || bizId == null || CollUtil.isEmpty(urls)) {

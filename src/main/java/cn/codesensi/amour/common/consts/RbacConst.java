@@ -68,4 +68,18 @@ public class RbacConst {
      */
     public static final String H2_CONSOLE_PATH = "/h2-console/**";
 
+    /**
+     * 公开路径清单 —— 验证码、登录、登出、门户 /portal/**、文件预览。
+     * <p>
+     * 鉴权与演示模式两个拦截器共用本清单统一放行，新增公开接口时仅需在此追加；
+     * H2 控制台不在此列——仅鉴权拦截器额外豁免，演示模式拦截器保留对其写操作的拦截。
+     */
+    public static final String[] PUBLIC_PATHS = {
+            CAPTCHA_PATH,
+            LOGIN_PATH,
+            LOGOUT_PATH,
+            PORTAL_PATH,
+            FILE_VIEW_PATH
+    };
+
 }

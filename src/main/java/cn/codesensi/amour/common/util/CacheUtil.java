@@ -36,9 +36,14 @@ public class CacheUtil {
      *
      * @param cacheName 基础缓存名，不可为 null
      * @return 拼接后的缓存名
+     * @throws IllegalStateException 应用上下文尚未由 Spring 装配完成时抛出
      */
     public static String withAppEnv(String cacheName) {
         AppEnvContext ctx = AppEnvContext.getInstance();
+        if (ctx == null) {
+            // 实例就绪前调用属于编程错误，给出明确报错而非 NPE
+            throw new IllegalStateException("AppEnvContext 尚未由 Spring 装配完成，无法拼接带环境前缀的缓存名");
+        }
         return ctx.getAppName() + SEPARATOR + ctx.getFirstActiveProfile() + SEPARATOR + cacheName;
     }
 

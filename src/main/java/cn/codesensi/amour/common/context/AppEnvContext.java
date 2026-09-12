@@ -25,9 +25,9 @@ public class AppEnvContext {
     /**
      * 由 Spring 装配后自持的静态实例，供 {@link CacheUtil} 等
      * 非 Spring 管理（未加 {@code @Component}）的静态工具类读取当前环境信息。
-     * 构造器执行完成后即被赋值，此后不再变化。
+     * 构造器执行完成后即被赋值，此后不再变化；volatile 保证跨线程的写入可见性。
      */
-    private static AppEnvContext INSTANCE;
+    private static volatile AppEnvContext INSTANCE;
 
     /**
      * Spring 配置项 {@code spring.application.name} 的键名，用于读取项目名。

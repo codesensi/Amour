@@ -110,10 +110,6 @@ app:
         # 数据字典缓存：Key 为字典编码（dict_code），写后 30 天左右兜底过期，写侧显式失效（字典增删改时清除对应编码）
         expire-after-write: 2592000
         expire-after-access: 0
-  # 安全配置
-  security:
-    # 请求缓存限制 5M
-    request-cache-limit: 5242880
   # 文件存储配置(存储方式运行时以 sys_config 的 file.storage 为准,此处为配置缺失时的兜底值)
   file:
     storage: local
