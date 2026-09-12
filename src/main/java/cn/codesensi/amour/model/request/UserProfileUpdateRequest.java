@@ -1,6 +1,8 @@
 package cn.codesensi.amour.model.request;
 
+import cn.codesensi.amour.common.constraint.InEnum;
 import cn.codesensi.amour.common.consts.RegexConst;
+import cn.codesensi.amour.common.enums.GenderEnum;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -34,7 +36,7 @@ public class UserProfileUpdateRequest implements Serializable {
     /**
      * 用户性别:U-未知，M-男，F-女
      */
-    @Pattern(regexp = RegexConst.GENDER, message = RegexConst.GENDER_MESSAGE)
+    @InEnum(enumClass = GenderEnum.class, message = "用户性别不在指定范围内")
     private String gender;
 
     /**

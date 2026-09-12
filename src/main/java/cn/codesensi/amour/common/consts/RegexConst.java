@@ -28,18 +28,6 @@ public class RegexConst {
     public static final String QQ_MESSAGE = "QQ号码格式错误，请输入6-12位数字";
 
     /**
-     * 性别:U-未知, M-男, F-女(与 GenderEnum 同步维护)
-     */
-    public static final String GENDER = "^[UMF]$";
-    public static final String GENDER_MESSAGE = "用户性别不在指定范围内";
-
-    /**
-     * 菜单类型:D-目录, M-菜单, B-按钮
-     */
-    public static final String MENU_TYPE = "^[DMB]$";
-    public static final String MENU_TYPE_MESSAGE = "菜单类型不合法";
-
-    /**
      * 字典编码:kebab-case(小写字母、数字、中划线)
      */
     public static final String DICT_CODE = "^[a-z0-9]+(?:-[a-z0-9]+)*$";
