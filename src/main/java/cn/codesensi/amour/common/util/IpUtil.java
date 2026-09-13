@@ -37,6 +37,16 @@ public class IpUtil {
     private static final String SEPARATOR = ",";
 
     /**
+     * 优先解析的多级代理请求头名称（从右向左取第一个非内网 IP）。
+     */
+    private static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
+
+    /**
+     * 次优先检查的常见代理头名称（HTTP_X_FORWARDED_FOR 等为 PHP 风格命名，Servlet 环境下取不到值，已排除）。
+     */
+    private static final String[] OTHER_PROXY_IP_HEADERS = {"X-Real-IP", "Proxy-Client-IP", "WL-Proxy-Client-IP"};
+
+    /**
      * 获取真实客户端 IP。
      * <p>
      * 解析优先级：
@@ -59,7 +69,7 @@ public class IpUtil {
         // 1. 优先检查 X-Forwarded-For（处理多级代理）。
         //    从右向左遍历并跳过内网 IP：最右侧的条目由最靠近应用的可信代理追加，不可被客户端伪造，
         //    从左向右取"第一个非内网 IP"会被客户端伪造的头部内容欺骗。
-        String ip = request.getHeader("X-Forwarded-For");
+        String ip = request.getHeader(HEADER_X_FORWARDED_FOR);
         if (isValidIp(ip)) {
             String[] ips = ip.split(SEPARATOR);
             for (int i = ips.length - 1; i >= 0; i--) {
@@ -76,8 +86,7 @@ public class IpUtil {
         }
 
         // 2. 检查其他常见的代理头（HTTP_X_FORWARDED_FOR 等为 PHP 风格命名，Servlet 环境下取不到值，已移除）
-        String[] headers = {"X-Real-IP", "Proxy-Client-IP", "WL-Proxy-Client-IP"};
-        for (String header : headers) {
+        for (String header : OTHER_PROXY_IP_HEADERS) {
             ip = request.getHeader(header);
             if (isValidIp(ip)) {
                 return ip;

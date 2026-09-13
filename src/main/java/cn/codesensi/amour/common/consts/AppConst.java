@@ -44,6 +44,31 @@ public class AppConst {
     public static final int MSG_MAX_LENGTH = 512;
 
     /**
+     * 备注列宽 —— 各表 remark 列均为 VARCHAR(512)，校验注解对齐此值
+     */
+    public static final int REMARK_MAX_LENGTH = 512;
+
+    /**
+     * 用户头像地址列宽 —— avatar 列为 VARCHAR(512)，校验注解对齐此值
+     */
+    public static final int AVATAR_MAX_LENGTH = 512;
+
+    /**
+     * 路由路径列宽 —— sys_menu 的 path 列为 VARCHAR(512)，校验注解对齐此值
+     */
+    public static final int PATH_MAX_LENGTH = 512;
+
+    /**
+     * 用户账号列宽 —— sys_user 的 username 列为 VARCHAR(128)，登录与改名等校验注解对齐此值
+     */
+    public static final int USERNAME_MAX_LENGTH = 128;
+
+    /**
+     * 明文密码长度上限 —— 入库为加密值（sys_user.password VARCHAR(512)），登录与修改密码校验口径一致
+     */
+    public static final int PASSWORD_MAX_LENGTH = 64;
+
+    /**
      * 链路追踪 ID 在 MDC 中的键名
      */
     public static final String TRACE_ID = "traceId";

@@ -12,12 +12,15 @@ import cn.codesensi.amour.common.core.ResultCode;
 public class BusinessException extends BaseException {
 
     /**
-     * 构造业务异常，默认错误码为 {@link ResultCode#INTERNAL_SERVER_ERROR}（500）。
+     * 构造业务异常，默认错误码为 {@link ResultCode#BAD_REQUEST}（400）。
+     * <p>
+     * 业务失败属于请求方可感知、可自行纠正的错误，HTTP 语义上应为 4xx 而非 5xx；
+     * 需表达系统级故障时请使用 {@link SystemException} 或显式指定错误码。
      *
      * @param msg 错误描述信息
      */
     public BusinessException(String msg) {
-        super(ResultCode.INTERNAL_SERVER_ERROR.getCode(), msg);
+        super(ResultCode.BAD_REQUEST.getCode(), msg);
     }
 
     /**

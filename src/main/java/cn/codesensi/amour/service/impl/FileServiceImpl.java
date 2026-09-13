@@ -31,6 +31,7 @@ import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -157,7 +158,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
                 .setSize(file.getSize())
                 .setStorageType(storage.getStorageType().getCode())
                 .setExtension(extension)
-                .setContentType(StrUtil.blankToDefault(file.getContentType(), "application/octet-stream"))
+                .setContentType(StrUtil.blankToDefault(file.getContentType(), MediaType.APPLICATION_OCTET_STREAM_VALUE))
                 .setBizType(bizTypeEnum.getCode());
 
         // 5. 流式写盘:不将文件整包读入内存,避免并发上传大文件时的内存尖峰
@@ -381,9 +382,9 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
     /**
      * 彻底删除回收站文件。
      * <p>
-     * 仅允许对已逻辑删除（回收站内）的记录执行；先兜底清理可能残留的物理文件
-     * ——文件管理页删除的记录物理文件已清理，此处主要覆盖业务替换语义
-     * （{@code bindBizFiles}）产生的孤儿文件——再物理删除记录。
+     * 仅允许对已逻辑删除（回收站内）的记录执行；先物理删除记录，成功后再兜底清理
+     * 可能残留的物理文件——文件管理页删除的记录物理文件已清理，此处主要覆盖业务
+     * 替换语义（{@code bindBizFiles}）产生的孤儿文件。
      * 存储清理失败仅告警不抛出，不阻塞删行。
      *
      * @param id 文件ID
@@ -404,9 +405,11 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         if (storageType == null) {
             throw new SystemException("不支持的存储类型：" + sysFile.getStorageType());
         }
-        requireStorage(storageType).delete(sysFile.getPath());
-
+        // 先物理删除记录（保持绕过全局逻辑删除的真正 DELETE）,成功后再清理物理文件,
+        // 避免先删文件而删行失败时留下"记录仍在、文件已丢"的悬空记录
         LogicDeleteManager.execWithoutLogicDelete(() -> sysFileMapper.deleteById(id));
+
+        requireStorage(storageType).delete(sysFile.getPath());
         log.debug("文件彻底删除完成：id={}, storageType={}, path={}", id, storageType.getCode(), sysFile.getPath());
     }
 

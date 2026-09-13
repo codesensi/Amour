@@ -1,5 +1,6 @@
 package cn.codesensi.amour.model.request;
 
+import cn.codesensi.amour.common.consts.AppConst;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -29,7 +30,7 @@ public class UserPasswordUpdateRequest implements Serializable {
      * 新密码
      */
     @NotBlank(message = "新密码不能为空")
-    @Size(min = 6, max = 64, message = "密码长度需在6-64位之间")
+    @Size(min = 6, max = AppConst.PASSWORD_MAX_LENGTH, message = "密码长度需在6-" + AppConst.PASSWORD_MAX_LENGTH + "位之间")
     private String newPassword;
 
 }

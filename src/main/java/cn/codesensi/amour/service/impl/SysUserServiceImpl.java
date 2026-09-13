@@ -29,7 +29,6 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -101,19 +100,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Override
     public UserInfoDTO getCurrentUser() {
         Long userId = StpUtil.getLoginIdAsLong();
-        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.USER));
-        // 资料部分走 user 缓存（仅 DB 维度的用户资料，不含角色/权限/菜单）
-        UserInfoDTO userInfoDTO;
-        if (cache == null) {
-            // 缓存未注册/未就绪：降级为直接查库
-            log.debug("userInfo 缓存未注册，降级为直接查库：userId={}", userId);
-            userInfoDTO = loadUserProfile(userId);
-        } else {
-            UserInfoDTO cached = cache.get(userId, () -> loadUserProfile(userId));
-            // 缓存返回的是共享实例，拷贝一份再装配聚合字段，避免写后突变缓存中的对象
-            userInfoDTO = cached == null ? null : userConverter.copy(cached);
-        }
+        // 资料部分走 user 缓存（仅 DB 维度的用户资料，不含角色/权限/菜单）；
+        // 统一缓存读取：原子回源 + 空值哨兵 + 缓存故障降级（见 CacheUtil#load）
+        UserInfoDTO userInfoDTO = CacheUtil.load(cacheManager, CacheConst.USER, userId, this::loadUserProfile);
         if (ObjUtil.isNotNull(userInfoDTO)) {
+            // 缓存返回的是共享实例，拷贝一份再装配聚合字段，避免写后突变缓存中的对象
+            userInfoDTO = userConverter.copy(userInfoDTO);
             // 角色与权限：实时装配（各自有 role/perm 缓存加速；StpInterfaceImpl 即转发至这两个方法，行为与 StpUtil 等价）
             userInfoDTO.setRoles(sysUserRoleService.listRoleCodeByUserId(userId));
             userInfoDTO.setPerms(sysMenuService.listPermCodeByUserId(userId));
@@ -337,7 +329,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      * 重置用户密码为系统默认密码({@link AppConst#DEFAULT_PASSWORD})。
      * <p>
      * BCrypt 加密后仅更新 password 字段，更新成功后复用
-     * {@link #updateById(SysUser)} 的缓存失效逻辑。
+     * {@link #updateById(SysUser)} 的缓存失效逻辑；同时踢出该用户当前会话，
+     * 避免旧会话在密码已重置后继续有效（与禁用/删除用户的会话处置保持一致）。
      *
      * @param id 用户ID
      */
@@ -351,6 +344,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         entity.setId(id);
         entity.setPassword(BCrypt.hashpw(AppConst.DEFAULT_PASSWORD, BCrypt.gensalt()));
         updateById(entity);
+        // 重置密码即踢出该用户当前会话，迫使其以默认密码重新登录
+        StpUtil.logout(id);
     }
 
     /**
@@ -495,6 +490,17 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Override
     public List<Long> listRoleIdsByUserId(Long userId) {
         return sysUserRoleService.listRoleIdsByUserId(userId);
+    }
+
+    /**
+     * 查询用户已分配的角色ID列表（字符串形式下发，与前端选项值类型对齐）。
+     *
+     * @param userId 用户ID
+     * @return 角色ID字符串列表
+     */
+    @Override
+    public List<String> listRoleIdStrings(Long userId) {
+        return listRoleIdsByUserId(userId).stream().map(String::valueOf).toList();
     }
 
     /**

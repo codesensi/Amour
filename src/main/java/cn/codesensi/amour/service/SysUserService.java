@@ -103,4 +103,12 @@ public interface SysUserService extends IService<SysUser> {
      */
     List<Long> listRoleIdsByUserId(Long userId);
 
+    /**
+     * 查询用户已分配的角色ID列表（字符串形式下发，与前端选项值类型对齐）
+     *
+     * @param userId 用户ID
+     * @return 角色ID字符串列表
+     */
+    List<String> listRoleIdStrings(Long userId);
+
 }

@@ -65,4 +65,12 @@ public interface SysRoleService extends IService<SysRole> {
      * @return 菜单ID列表
      */
     List<Long> listMenuIdsByRoleId(Long roleId);
+
+    /**
+     * 查询角色已分配的菜单ID列表（字符串形式下发，与前端选项值类型对齐）
+     *
+     * @param roleId 角色ID
+     * @return 菜单ID字符串列表
+     */
+    List<String> listMenuIdStrings(Long roleId);
 }

@@ -14,7 +14,6 @@ import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
@@ -64,14 +63,8 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
      */
     @Override
     public List<String> listRoleCodeByUserId(Long userId) {
-        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.ROLE));
-        if (cache == null) {
-            // 缓存未注册/未就绪：降级为直接查库
-            log.debug("role 缓存未注册，降级为直接查库：userId={}", userId);
-            return loadRoleCodes(userId);
-        }
-        // 原子回源：未命中时执行 loader 查库并写入，防止缓存击穿
-        return cache.get(userId, () -> loadRoleCodes(userId));
+        // 统一缓存读取：原子回源 + 缓存故障降级（见 CacheUtil#load）
+        return CacheUtil.load(cacheManager, CacheConst.ROLE, userId, this::loadRoleCodes);
     }
 
     /**

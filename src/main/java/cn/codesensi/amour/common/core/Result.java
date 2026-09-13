@@ -1,6 +1,9 @@
 package cn.codesensi.amour.common.core;
 
+import cn.codesensi.amour.common.consts.AppConst;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import org.slf4j.MDC;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -45,6 +48,13 @@ public class Result<T> implements Serializable {
     private long timestamp;
 
     /**
+     * 链路追踪 ID（与响应头 X-Trace-Id 同源，取自 MDC；非 Web 线程或未经过滤器时为 null 不输出）。
+     * 前端报障时提供此值可精确定位服务端全链路日志。
+     */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String traceId;
+
+    /**
      * 私有构造器：仅允许通过下方静态工厂方法创建实例。
      *
      * @param code 业务状态码
@@ -57,6 +67,7 @@ public class Result<T> implements Serializable {
         this.msg = msg;
         this.data = data;
         this.timestamp = Instant.now().toEpochMilli();
+        this.traceId = MDC.get(AppConst.TRACE_ID);
     }
 
     /**

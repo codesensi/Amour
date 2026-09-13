@@ -12,6 +12,8 @@ import cn.hutool.core.util.ObjUtil;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -29,8 +31,10 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
  * 将各类异常统一转换为 {@link Result} 响应，避免异常堆栈直接暴露给前端；
  * 处理顺序为「具体异常优先，兜底 Exception 收尾」。
  * <p>
- * HTTP 传输层状态码统一保持 200，错误语义由 {@link Result#getCode()} 在响应体内表达
- * （码值借用 HTTP 状态码语义，见 {@link ResultCode}）。
+ * 错误语义同时通过两层表达：HTTP 传输层状态码按异常类别映射真实语义
+ * （4xx/5xx，见各 handler 与 {@link #toHttpStatus(int)}），便于网关、监控与通用
+ * HTTP 客户端感知；响应体内 {@link Result#getCode()} 仍保留业务码（借用 HTTP 语义），
+ * 响应体结构与既有契约保持一致，前端按统一契约解析即可。
  *
  * @author codesensi
  * @since 1.0
@@ -46,9 +50,9 @@ public class GlobalExceptionHandler {
      * @return 无权限（403 语义）统一响应
      */
     @ExceptionHandler(AuthorizationException.class)
-    public Result<Void> handleAuthorizationException(AuthorizationException e) {
+    public ResponseEntity<Result<Void>> handleAuthorizationException(AuthorizationException e) {
         log.warn("AuthorizationException 授权异常：{}", e.getMsg());
-        return Result.forbidden(e.getMsg());
+        return wrap(HttpStatus.FORBIDDEN, Result.forbidden(e.getMsg()));
     }
 
     /**
@@ -58,33 +62,35 @@ public class GlobalExceptionHandler {
      * @return 请求参数错误（400 语义）统一响应
      */
     @ExceptionHandler(ValidationException.class)
-    public Result<Void> handleValidationException(ValidationException e) {
+    public ResponseEntity<Result<Void>> handleValidationException(ValidationException e) {
         log.warn("ValidationException 参数异常：{}", e.getMsg());
-        return Result.badRequest(e.getMsg());
+        return wrap(HttpStatus.BAD_REQUEST, Result.badRequest(e.getMsg()));
     }
 
     /**
-     * 处理业务异常，透传其业务错误码与描述。
+     * 处理业务异常，透传其业务错误码与描述；
+     * HTTP 状态码按业务码语义映射（见 {@link #toHttpStatus(int)}）。
      *
      * @param e 业务异常
      * @return 携带业务错误码的统一响应
      */
     @ExceptionHandler(BusinessException.class)
-    public Result<Void> handleBusinessException(BusinessException e) {
+    public ResponseEntity<Result<Void>> handleBusinessException(BusinessException e) {
         log.warn("BusinessException 业务异常：{}", e.getMsg());
-        return Result.error(e.getCode(), e.getMsg());
+        HttpStatus status = toHttpStatus(e.getCode());
+        return wrap(status, Result.error(e.getCode(), e.getMsg()));
     }
 
     /**
-     * 处理系统异常，透传其错误码与描述。
+     * 处理系统异常，透传其错误码与描述；HTTP 状态码统一以 500 表达。
      *
      * @param e 系统异常
      * @return 携带错误码的统一响应
      */
     @ExceptionHandler(SystemException.class)
-    public Result<Void> handleSystemException(SystemException e) {
+    public ResponseEntity<Result<Void>> handleSystemException(SystemException e) {
         log.error("SystemException 系统异常：", e);
-        return Result.error(e.getCode(), e.getMsg());
+        return wrap(HttpStatus.INTERNAL_SERVER_ERROR, Result.error(e.getCode(), e.getMsg()));
     }
 
     /**
@@ -95,15 +101,15 @@ public class GlobalExceptionHandler {
      * @return 携带错误码的统一响应
      */
     @ExceptionHandler(SaTokenException.class)
-    public Result<Void> handleSaTokenException(SaTokenException e) {
+    public ResponseEntity<Result<Void>> handleSaTokenException(SaTokenException e) {
         log.warn("SaTokenException 授权异常：{}", e.getMessage());
         if (e instanceof NotLoginException notLoginException) {
             if (NotLoginException.TOKEN_FREEZE.equals(notLoginException.getType())) {
-                return Result.forbidden("账号已被冻结");
+                return wrap(HttpStatus.FORBIDDEN, Result.forbidden("账号已被冻结"));
             }
-            return Result.unauthorized("未登录或登录已过期");
+            return wrap(HttpStatus.UNAUTHORIZED, Result.unauthorized("未登录或登录已过期"));
         }
-        return Result.forbidden(e.getMessage());
+        return wrap(HttpStatus.FORBIDDEN, Result.forbidden(e.getMessage()));
     }
 
     /**
@@ -113,14 +119,14 @@ public class GlobalExceptionHandler {
      * @return 请求参数错误（400）统一响应
      */
     @ExceptionHandler(BindException.class)
-    public Result<Void> handleBindException(BindException e) {
+    public ResponseEntity<Result<Void>> handleBindException(BindException e) {
         log.warn("BindException 参数异常：{}", e.getMessage());
         FieldError fieldError = e.getBindingResult().getFieldError();
         String message = "参数校验未通过";
         if (ObjUtil.isNotNull(fieldError)) {
             message = fieldError.getDefaultMessage();
         }
-        return Result.badRequest(message);
+        return wrap(HttpStatus.BAD_REQUEST, Result.badRequest(message));
     }
 
     /**
@@ -130,9 +136,9 @@ public class GlobalExceptionHandler {
      * @return 请求参数错误（400 语义）统一响应
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public Result<Void> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+    public ResponseEntity<Result<Void>> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         log.warn("HttpMessageNotReadableException 请求体解析异常：{}", e.getMessage());
-        return Result.badRequest("请求体格式错误");
+        return wrap(HttpStatus.BAD_REQUEST, Result.badRequest("请求体格式错误"));
     }
 
     /**
@@ -142,9 +148,9 @@ public class GlobalExceptionHandler {
      * @return 请求参数错误（400 语义）统一响应
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public Result<Void> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
+    public ResponseEntity<Result<Void>> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
         log.warn("MethodArgumentTypeMismatchException 参数类型异常：{}", e.getMessage());
-        return Result.badRequest("请求参数类型不正确");
+        return wrap(HttpStatus.BAD_REQUEST, Result.badRequest("请求参数类型不正确"));
     }
 
     /**
@@ -154,9 +160,9 @@ public class GlobalExceptionHandler {
      * @return 请求参数错误（400 语义）统一响应
      */
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public Result<Void> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
+    public ResponseEntity<Result<Void>> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
         log.warn("MissingServletRequestParameterException 缺少参数：{}", e.getParameterName());
-        return Result.badRequest("缺少必要的请求参数：" + e.getParameterName());
+        return wrap(HttpStatus.BAD_REQUEST, Result.badRequest("缺少必要的请求参数：" + e.getParameterName()));
     }
 
     /**
@@ -166,9 +172,9 @@ public class GlobalExceptionHandler {
      * @return 方法不支持（405 语义）统一响应
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public Result<Void> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+    public ResponseEntity<Result<Void>> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
         log.warn("HttpRequestMethodNotSupportedException 请求方法异常：{}", e.getMessage());
-        return Result.error(ResultCode.METHOD_NOT_ALLOWED.getCode(), "请求方法不支持");
+        return wrap(HttpStatus.METHOD_NOT_ALLOWED, Result.error(ResultCode.METHOD_NOT_ALLOWED.getCode(), "请求方法不支持"));
     }
 
     /**
@@ -178,9 +184,9 @@ public class GlobalExceptionHandler {
      * @return 请求参数错误（400 语义）统一响应
      */
     @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public Result<Void> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
+    public ResponseEntity<Result<Void>> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
         log.warn("MaxUploadSizeExceededException 上传大小超限：{}", e.getMessage());
-        return Result.badRequest("上传文件大小超出限制");
+        return wrap(HttpStatus.BAD_REQUEST, Result.badRequest("上传文件大小超出限制"));
     }
 
     /**
@@ -190,13 +196,13 @@ public class GlobalExceptionHandler {
      * @return 请求参数错误（400 语义）统一响应
      */
     @ExceptionHandler(ConstraintViolationException.class)
-    public Result<Void> handleConstraintViolationException(ConstraintViolationException e) {
+    public ResponseEntity<Result<Void>> handleConstraintViolationException(ConstraintViolationException e) {
         log.warn("ConstraintViolationException 参数异常：{}", e.getMessage());
         String message = e.getConstraintViolations().stream()
                 .map(ConstraintViolation::getMessage)
                 .findFirst()
                 .orElse("参数校验未通过");
-        return Result.badRequest(message);
+        return wrap(HttpStatus.BAD_REQUEST, Result.badRequest(message));
     }
 
     /**
@@ -206,10 +212,10 @@ public class GlobalExceptionHandler {
      * @return 资源不存在（404）统一响应
      */
     @ExceptionHandler(NoResourceFoundException.class)
-    public Result<Void> handleNoResourceFoundException(NoResourceFoundException e) {
+    public ResponseEntity<Result<Void>> handleNoResourceFoundException(NoResourceFoundException e) {
         String path = e.getResourcePath();
         log.warn("NoResourceFoundException 资源异常：path={}", path);
-        return Result.notFound("[" + path + "]不存在");
+        return wrap(HttpStatus.NOT_FOUND, Result.notFound("[" + path + "]不存在"));
     }
 
     /**
@@ -221,8 +227,37 @@ public class GlobalExceptionHandler {
      * @return 系统内部错误（500 语义）统一响应
      */
     @ExceptionHandler(Exception.class)
-    public Result<Void> handleException(Exception e) {
+    public ResponseEntity<Result<Void>> handleException(Exception e) {
         log.error("Exception 未处理异常：", e);
-        return Result.systemError("系统繁忙，请稍后重试");
+        return wrap(HttpStatus.INTERNAL_SERVER_ERROR, Result.systemError("系统繁忙，请稍后重试"));
+    }
+
+    /**
+     * 将业务错误码映射为 HTTP 传输层状态码。
+     * <p>
+     * 映射规则：code 落在 4xx 区间时直接采用（语义与业务码一致）；
+     * 5xx 区间统一以 500 表达（含借用 504 语义的数据库异常，避免被网关按超时干预）；
+     * 其余非 HTTP 语义的业务码按请求参数错误（400）处理。
+     *
+     * @param code 业务错误码
+     * @return 对应的 HTTP 状态码
+     */
+    private HttpStatus toHttpStatus(int code) {
+        if (code >= 500 && code != ResultCode.SERVICE_UNAVAILABLE.getCode()) {
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+        HttpStatus status = HttpStatus.resolve(code);
+        return status != null && status.isError() ? status : HttpStatus.BAD_REQUEST;
+    }
+
+    /**
+     * 组装带传输层状态码的统一响应。
+     *
+     * @param status HTTP 状态码
+     * @param body   统一响应体
+     * @return 携带状态码的响应实体
+     */
+    private ResponseEntity<Result<Void>> wrap(HttpStatus status, Result<Void> body) {
+        return ResponseEntity.status(status).body(body);
     }
 }

@@ -1,6 +1,7 @@
 package cn.codesensi.amour.model.request;
 
 import cn.codesensi.amour.common.constraint.InEnum;
+import cn.codesensi.amour.common.consts.AppConst;
 import cn.codesensi.amour.common.consts.RegexConst;
 import cn.codesensi.amour.common.enums.GenderEnum;
 import jakarta.validation.constraints.Email;
@@ -71,7 +72,7 @@ public class UserInsertRequest implements Serializable {
     /**
      * 用户头像地址
      */
-    @Size(max = 512, message = "用户头像地址长度不能超过512")
+    @Size(max = AppConst.AVATAR_MAX_LENGTH, message = "用户头像地址长度不能超过" + AppConst.AVATAR_MAX_LENGTH)
     private String avatar;
 
     /**
@@ -82,7 +83,7 @@ public class UserInsertRequest implements Serializable {
     /**
      * 备注
      */
-    @Size(max = 512, message = "备注长度不能超过512")
+    @Size(max = AppConst.REMARK_MAX_LENGTH, message = "备注长度不能超过" + AppConst.REMARK_MAX_LENGTH)
     private String remark;
 
 }

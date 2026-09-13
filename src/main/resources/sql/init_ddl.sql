@@ -100,7 +100,8 @@ CREATE TABLE IF NOT EXISTS `sys_user_role` (
     `del_flag`    TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
     PRIMARY KEY (`id`),
     INDEX `idx_ur_user_id` (`user_id` ASC),
-    INDEX `idx_ur_role_id` (`role_id` ASC)
+    INDEX `idx_ur_role_id` (`role_id` ASC),
+    UNIQUE INDEX `uk_ur_user_role` (`user_id`, `role_id`)
     ) ENGINE = InnoDB
     CHARACTER SET = utf8mb4
     COLLATE = utf8mb4_general_ci
@@ -153,7 +154,8 @@ CREATE TABLE IF NOT EXISTS `sys_role_menu` (
     `del_flag`    TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
     PRIMARY KEY (`id`),
     INDEX `idx_rm_role_id` (`role_id` ASC),
-    INDEX `idx_rm_menu_id` (`menu_id` ASC)
+    INDEX `idx_rm_menu_id` (`menu_id` ASC),
+    UNIQUE INDEX `uk_rm_role_menu` (`role_id`, `menu_id`)
     ) ENGINE = InnoDB
     CHARACTER SET = utf8mb4
     COLLATE = utf8mb4_general_ci
@@ -189,7 +191,9 @@ CREATE TABLE IF NOT EXISTS `sys_log` (
     PRIMARY KEY (`id`),
     INDEX `idx_l_trace_id` (`trace_id` ASC),
     INDEX `idx_l_log_type` (`log_type` ASC),
-    INDEX `idx_l_username`  (`username` ASC)
+    INDEX `idx_l_username`  (`username` ASC),
+    INDEX `idx_l_user_id`   (`user_id` ASC),
+    INDEX `idx_l_create_time` (`create_time` ASC)
     ) ENGINE = InnoDB
     CHARACTER SET = utf8mb4
     COLLATE = utf8mb4_general_ci

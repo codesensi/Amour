@@ -29,7 +29,7 @@ public class BasePage implements Serializable {
     private Integer pageNumber = 1;
 
     /**
-     * 每页条数(最大 100，缺省为 20)
+     * �页条数(最大 500，缺省为 20)
      */
     @Min(value = 1, message = "每页条数最小值为1")
     @Max(value = 500, message = "每页条数最大值为500")

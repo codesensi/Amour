@@ -2,6 +2,8 @@ package cn.codesensi.amour.service.impl;
 
 import cn.codesensi.amour.common.consts.CacheConst;
 import cn.codesensi.amour.common.consts.RegexConst;
+import cn.codesensi.amour.common.enums.BaseEnum;
+import cn.codesensi.amour.common.enums.ValueType;
 import cn.codesensi.amour.common.enums.YesEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.exception.ValidationException;
@@ -23,7 +25,6 @@ import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
@@ -77,25 +78,12 @@ public class SysConfigServiceImpl implements SysConfigService {
      */
     @Override
     public SysConfig oneByKey(String key) {
-        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.CONFIG));
-        if (cache == null) {
-            // 缓存未注册/未就绪：降级为直接查库
-            log.debug("config 缓存未注册，降级为直接查库：key={}", key);
-            return oneByKeyDb(key);
-        }
-        try {
-            // 原子回源：未命中时执行 loader 查库并写入，防止缓存击穿
-            Object cached = cache.get(key, () -> {
-                SysConfig config = oneByKeyDb(key);
-                log.debug("config 缓存回源查库：key={}，result={}", key, config == null ? "不存在，以空值哨兵占位" : "已加载");
-                return config == null ? CacheConst.NULL_MARKER : config;
-            });
-            return cached == CacheConst.NULL_MARKER ? null : (SysConfig) cached;
-        } catch (Cache.ValueRetrievalException e) {
-            // 回源异常时降级为直接查库，避免缓存故障阻断配置读取
-            log.debug("config 缓存回源异常，降级为直接查库：key={}", key, e);
-            return oneByKeyDb(key);
-        }
+        // 统一缓存读取：原子回源 + 空值哨兵 + 缓存故障降级（见 CacheUtil#load）
+        return CacheUtil.load(cacheManager, CacheConst.CONFIG, key, k -> {
+            SysConfig config = oneByKeyDb(k);
+            log.debug("config 缓存回源查库：key={}，result={}", k, config == null ? "不存在，以空值哨兵占位" : "已加载");
+            return config;
+        });
     }
 
     /**
@@ -211,23 +199,25 @@ public class SysConfigServiceImpl implements SysConfigService {
      * @param value     配置值
      */
     private void validateValueByType(String valueType, String value) {
-        switch (StrUtil.nullToEmpty(valueType)) {
-            case "BOOLEAN" -> {
+        // 未知/空类型按 STRING 口径处理（不做格式限制），与既有行为一致
+        ValueType type = BaseEnum.fromCode(ValueType.class, valueType);
+        switch (type == null ? ValueType.STRING : type) {
+            case BOOLEAN -> {
                 if (!"true".equals(value) && !"false".equals(value)) {
                     throw new ValidationException("布尔型配置值只能为 true 或 false");
                 }
             }
-            case "INTEGER" -> {
+            case INTEGER -> {
                 if (!NumberUtil.isInteger(value)) {
                     throw new ValidationException("整型配置值必须为整数");
                 }
             }
-            case "LONG" -> {
+            case LONG -> {
                 if (!NumberUtil.isLong(value)) {
                     throw new ValidationException("长整型配置值必须为整数");
                 }
             }
-            case "DATETIME" -> {
+            case DATETIME -> {
                 // 先核对 yyyy-MM-dd HH:mm:ss 形态，再严格解析拦截不存在的日期（如 2 月 30 日）
                 if (value == null || !DATETIME_PATTERN.matcher(value).matches()) {
                     throw new ValidationException("日期时间格式必须为 yyyy-MM-dd HH:mm:ss");

@@ -9,9 +9,9 @@ import cn.codesensi.amour.common.util.IpUtil;
 import cn.codesensi.amour.common.util.LoginUserUtil;
 import cn.codesensi.amour.common.util.ServletUtil;
 import cn.codesensi.amour.model.entity.SysLog;
+import cn.codesensi.amour.model.request.LoginRequest;
 import cn.codesensi.amour.service.SysLogService;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,6 +22,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,9 +30,7 @@ import org.zalando.logbook.BodyFilter;
 import org.zalando.logbook.autoconfigure.LogbookProperties;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 操作日志切面 —— 拦截标注了 {@link Log} 注解的接口，组装操作日志并异步写入 {@code sys_log} 表。
@@ -188,12 +187,7 @@ public class LogAspect {
      * @return 脱敏后的参数 JSON；无任何参数时返回 {@code null}
      */
     private String buildParam(HttpServletRequest request, ProceedingJoinPoint joinPoint) {
-        Map<String, Object> param = new LinkedHashMap<>();
         String queryString = request.getQueryString();
-        if (StrUtil.isNotBlank(queryString)) {
-            param.put("query", queryString);
-        }
-
         List<Object> params = new ArrayList<>();
         for (Object arg : joinPoint.getArgs()) {
             if (arg == null) {
@@ -201,48 +195,37 @@ public class LogAspect {
             }
             if (arg instanceof MultipartFile file) {
                 // 文件上传：仅记录元信息，不序列化二进制内容
-                Map<String, Object> fileMap = new LinkedHashMap<>();
-                fileMap.put("name", file.getName());
-                fileMap.put("originalFilename", file.getOriginalFilename());
-                fileMap.put("size", file.getSize());
-                params.add(fileMap);
+                params.add(new FileMeta(file.getName(), file.getOriginalFilename(), file.getSize()));
             } else if (arg instanceof HttpServletRequest || arg instanceof HttpServletResponse || arg instanceof BindingResult) {
                 // 排除请求对象、响应对象与校验结果对象
             } else {
                 params.add(arg);
             }
         }
-        if (!params.isEmpty()) {
-            param.put("params", params);
-        }
-        if (param.isEmpty()) {
+        if (StrUtil.isBlank(queryString) && params.isEmpty()) {
             return null;
         }
-        return mask(toJson(param));
+        // 组件为 null 时 Hutool 默认忽略该键,输出 JSON 结构与键序(query → params)保持不变
+        return mask(toJson(new ParamLog(StrUtil.isBlank(queryString) ? null : queryString,
+                params.isEmpty() ? null : params)));
     }
 
     /**
      * 未登录场景下从请求参数中提取用户名（覆盖登录接口的审计需求）：
-     * 取第一个含非空 username 属性的入参。
+     * 登录类请求参数为强类型的 {@link LoginRequest}，直接读取其账号字段，
+     * 避免按字段名字符串解析形成的跨类隐式契约。
      *
      * @param joinPoint 切点
      * @param sysLog    待填充的日志实体
      */
     private void fillUsernameFromArgs(ProceedingJoinPoint joinPoint, SysLog sysLog) {
         for (Object arg : joinPoint.getArgs()) {
-            if (arg == null || arg instanceof MultipartFile || arg instanceof HttpServletRequest
-                    || arg instanceof HttpServletResponse || arg instanceof BindingResult) {
-                continue;
-            }
-            try {
-                JSONObject json = JSONUtil.parseObj(toJson(arg));
-                String username = json.getStr("username");
+            if (arg instanceof LoginRequest loginRequest) {
+                String username = loginRequest.getUsername();
                 if (StrUtil.isNotBlank(username)) {
                     sysLog.setUsername(username);
                     return;
                 }
-            } catch (Exception ignored) {
-                // 非对象类型参数无法解析出用户名，跳过
             }
         }
     }
@@ -266,7 +249,7 @@ public class LogAspect {
      * @return 脱敏后的 JSON 文本
      */
     private String mask(String json) {
-        return bodyFilter.filter("application/json", json);
+        return bodyFilter.filter(MediaType.APPLICATION_JSON_VALUE, json);
     }
 
     /**
@@ -299,6 +282,19 @@ public class LogAspect {
             return json;
         }
         return JSONUtil.toJsonStr(new TruncatedJson(true, json.length(), StrUtil.subPre(json, maxLength)));
+    }
+
+    /**
+     * 日志参数的顶层存储结构 —— JSON 键名即存储格式（query/params），由组件名生成；
+     * 组件为 null 时由 Hutool 默认忽略，不输出对应键。
+     */
+    private record ParamLog(String query, List<Object> params) {
+    }
+
+    /**
+     * 文件上传参数的日志元信息 —— JSON 键名即存储格式（name/originalFilename/size），由组件名生成
+     */
+    private record FileMeta(String name, String originalFilename, long size) {
     }
 
     /**

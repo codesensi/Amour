@@ -29,6 +29,11 @@ import java.io.IOException;
 public class TraceIdFilter extends OncePerRequestFilter {
 
     /**
+     * 链路追踪 ID 的响应头名称（与 MDC 键 {@link AppConst#TRACE_ID} 的值同源传递）。
+     */
+    private static final String HEADER_TRACE_ID = "X-Trace-Id";
+
+    /**
      * 对每个 HTTP 请求执行链路追踪 ID 的注入与清理。
      * <p>
      * 处理流程：
@@ -36,6 +41,7 @@ public class TraceIdFilter extends OncePerRequestFilter {
      *   <li>生成 traceId</li>
      *   <li>将 traceId 放入 MDC 上下文；</li>
      *   <li>放行请求，执行后续过滤器及业务逻辑；</li>
+     *   <li>在 {@code finally} 块中将 traceId 回写至响应头 {@code X-Trace-Id}（前端报障凭此头关联服务端日志）；</li>
      *   <li>在 {@code finally} 块中清理 MDC，避免线程上下文污染。</li>
      * </ol>
      *
@@ -49,11 +55,17 @@ public class TraceIdFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        String traceId = IdUtil.fastSimpleUUID();
         try {
             // 将 traceId 放入 MDC 上下文
-            MDC.put(AppConst.TRACE_ID, IdUtil.fastSimpleUUID());
+            MDC.put(AppConst.TRACE_ID, traceId);
             filterChain.doFilter(request, response);
         } finally {
+            // MDC 清理前将 traceId 回写响应头,前端报障时凭此头关联服务端日志;
+            // 响应已提交(如异步/异常中断)后不再回写,避免对已定型响应设置头导致异常
+            if (!response.isCommitted()) {
+                response.setHeader(HEADER_TRACE_ID, traceId);
+            }
             // 确保清理，避免线程复用导致上下文污染
             MDC.remove(AppConst.TRACE_ID);
         }

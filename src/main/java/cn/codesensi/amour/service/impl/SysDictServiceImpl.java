@@ -70,24 +70,12 @@ public class SysDictServiceImpl implements SysDictService {
         if (StrUtil.isBlank(code)) {
             return List.of();
         }
-        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.DICT));
-        if (cache == null) {
-            // 缓存未注册/未就绪：降级为直接查库
-            log.debug("dict 缓存未注册，降级为直接查库：code={}", code);
-            return listByCodeDb(code);
-        }
-        try {
-            // 原子回源：未命中时执行 loader 查库并写入，防止缓存击穿；空列表可直接缓存（防穿透）
-            return cache.get(code, () -> {
-                List<DictDTO> items = listByCodeDb(code);
-                log.debug("dict 缓存回源查库：code={}，count={}", code, items.size());
-                return items;
-            });
-        } catch (Cache.ValueRetrievalException e) {
-            // 回源异常时降级为直接查库，避免缓存故障阻断字典读取
-            log.debug("dict 缓存回源异常，降级为直接查库：code={}", code, e);
-            return listByCodeDb(code);
-        }
+        // 统一缓存读取：原子回源 + 缓存故障降级（空列表可直接缓存，防穿透）
+        return CacheUtil.load(cacheManager, CacheConst.DICT, code, k -> {
+            List<DictDTO> items = listByCodeDb(k);
+            log.debug("dict 缓存回源查库：code={}，count={}", k, items.size());
+            return items;
+        });
     }
 
     /**

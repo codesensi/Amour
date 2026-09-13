@@ -1,6 +1,7 @@
 package cn.codesensi.amour.common.core;
 
 import cn.codesensi.amour.common.util.LoginUserUtil;
+import cn.hutool.core.date.DatePattern;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.InsertListener;
@@ -38,7 +39,7 @@ public class BaseEntity implements Serializable, InsertListener, UpdateListener 
     /**
      * 创建时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = DatePattern.NORM_DATETIME_PATTERN)
     @Column(onInsertValue = "now()")
     private LocalDateTime createTime;
 
@@ -50,7 +51,7 @@ public class BaseEntity implements Serializable, InsertListener, UpdateListener 
     /**
      * 更新时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = DatePattern.NORM_DATETIME_PATTERN)
     @Column(onInsertValue = "now()", onUpdateValue = "now()")
     private LocalDateTime updateTime;
 

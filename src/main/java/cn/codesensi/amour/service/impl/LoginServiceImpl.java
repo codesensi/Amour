@@ -48,6 +48,10 @@ public class LoginServiceImpl implements LoginService {
 
     /**
      * 登录。
+     * <p>
+     * 账号条件（用户名/QQ号）的 OR 组合以括号包裹：与全局逻辑删除列自动追加的 del_flag=0
+     * 条件组合时避免 AND/OR 优先级歧义（否则可能生成 username=? OR (qq=? AND del_flag=0)），
+     * 确保生成 SQL 为 (username=? OR qq=?) AND del_flag=0。
      *
      * @param loginDTO 登录用户信息
      * @return 登录成功后信息
@@ -74,10 +78,10 @@ public class LoginServiceImpl implements LoginService {
         }
 
         // 校验用户及密码（用户名/QQ号任一匹配即可登录）
+        // OR 组合必须括号包裹,避免与全局逻辑删除 del_flag=0 组合时产生 AND/OR 优先级歧义
         List<SysUser> candidates = sysUserService.queryChain()
                 .select(SYS_USER.ID, SYS_USER.USERNAME, SYS_USER.PASSWORD, SYS_USER.STATUS)
-                .where(SYS_USER.USERNAME.eq(username))
-                .or(SYS_USER.QQ.eq(username))
+                .where(SYS_USER.USERNAME.eq(username).or(SYS_USER.QQ.eq(username)))
                 .list();
         // 用户名匹配优先（他人 QQ 号可能恰好与本用户名相同），未命中再取 QQ 匹配的记录
         SysUser sysUser = candidates.stream()

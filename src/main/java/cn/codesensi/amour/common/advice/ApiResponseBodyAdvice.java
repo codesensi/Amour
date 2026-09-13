@@ -2,7 +2,9 @@ package cn.codesensi.amour.common.advice;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.common.core.Result;
-import cn.hutool.json.JSONUtil;
+import cn.codesensi.amour.common.core.ResultCode;
+import cn.codesensi.amour.common.exception.SystemException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.core.MethodParameter;
@@ -13,6 +15,8 @@ import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 import java.lang.annotation.Annotation;
 
@@ -23,6 +27,7 @@ import java.lang.annotation.Annotation;
  * @since 1.0
  */
 @Slf4j
+@RequiredArgsConstructor
 @RestControllerAdvice
 public class ApiResponseBodyAdvice implements ResponseBodyAdvice<Object> {
 
@@ -32,6 +37,11 @@ public class ApiResponseBodyAdvice implements ResponseBodyAdvice<Object> {
      * 只有标注了该注解的类或方法，其返回值才会被本处理器拦截并包装。
      */
     private static final Class<? extends Annotation> ANNOTATION_TYPE = ApiResponseBody.class;
+
+    /**
+     * Jackson 序列化器（Spring MVC 注入，与全局 JSON 序列化配置保持一致）。
+     */
+    private final ObjectMapper objectMapper;
 
     /**
      * 判断当前请求的 Controller 类或方法是否标注了 {@link ApiResponseBody} 注解。
@@ -60,7 +70,8 @@ public class ApiResponseBodyAdvice implements ResponseBodyAdvice<Object> {
      * <ol>
      *   <li><b>String 类型特殊处理</b> — Spring MVC 的 {@code StringHttpMessageConverter}
      *       会直接将字符串写入响应流，不再经过全局 JSON 序列化。
-     *       因此需要手动将包装结果转为 JSON 字符串，确保统一响应格式一致；</li>
+     *       因此需要手动用 Jackson 将包装结果转为 JSON 字符串，并将 Content-Type
+     *       置为 application/json（避免默认落为 text/html），确保统一响应格式一致；</li>
      *   <li><b>Result 类型直接放行</b> — 如果返回结果已经是 {@link Result} 实例
      *       （例如 Feign 调用或已手动包装的结果），则直接返回，避免重复包装；</li>
      *   <li><b>默认包装</b> — 其他类型统一使用 {@code Result.success(body)} 包装为成功响应。</li>
@@ -82,9 +93,15 @@ public class ApiResponseBodyAdvice implements ResponseBodyAdvice<Object> {
                                   @NonNull ServerHttpRequest request,
                                   @NonNull ServerHttpResponse response) {
         // 处理 String 类型 —— StringHttpMessageConverter 绕过 JSON 序列化，
-        // 必须手动将 Result 转为 JSON 字符串写入响应流
+        // 必须手动用 Jackson 将 Result 序列化为 JSON 字符串写入响应流（与全局序列化配置一致），
+        // 并将 Content-Type 置为 application/json，避免 StringHttpMessageConverter 默认的 text/html
         if (body instanceof String) {
-            return JSONUtil.toJsonStr(Result.success(body));
+            response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+            try {
+                return objectMapper.writeValueAsString(Result.success(body));
+            } catch (JacksonException e) {
+                throw new SystemException(ResultCode.INTERNAL_SERVER_ERROR.getCode(), "响应体序列化为 JSON 失败", e);
+            }
         }
         // 如果已经被包装过（Result 类型），则直接放行，避免双重包装
         if (body instanceof Result) {

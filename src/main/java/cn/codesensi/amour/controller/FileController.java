@@ -3,6 +3,7 @@ package cn.codesensi.amour.controller;
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.common.annotation.Log;
 import cn.codesensi.amour.common.enums.LogTypeEnum;
+import cn.codesensi.amour.common.properties.AppFileProperties;
 import cn.codesensi.amour.model.converter.FileConverter;
 import cn.codesensi.amour.model.dto.FileInfoDTO;
 import cn.codesensi.amour.model.dto.FilePageDTO;
@@ -47,6 +48,7 @@ public class FileController {
 
     private final FileService fileService;
     private final FileConverter fileConverter;
+    private final AppFileProperties appFileProperties;
 
     /**
      * 上传文件。
@@ -154,7 +156,7 @@ public class FileController {
         }
         return ResponseEntity.ok()
                 .contentType(mediaType)
-                .cacheControl(CacheControl.maxAge(365, TimeUnit.DAYS).cachePublic())
+                .cacheControl(CacheControl.maxAge(appFileProperties.getViewCacheDays(), TimeUnit.DAYS).cachePublic())
                 .body(result.resource());
     }
 

@@ -140,8 +140,7 @@ public class SysRoleController {
     @SaCheckPermission("system:role:update")
     @GetMapping("/menu-ids/{id}")
     public List<String> menuIds(@PathVariable Long id) {
-        return sysRoleService.listMenuIdsByRoleId(id)
-                .stream().map(String::valueOf).toList();
+        return sysRoleService.listMenuIdStrings(id);
     }
 
 }

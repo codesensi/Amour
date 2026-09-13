@@ -110,6 +110,8 @@ app:
   # 文件存储配置(存储方式运行时以 sys_config 的 file.storage 为准,此处为配置缺失时的兜底值)
   file:
     storage: local
+    # 预览接口响应的浏览器缓存天数(文件内容不可变故可长缓存;调整仅影响之后的响应,已缓存客户端不受控)
+    view-cache-days: 365
     local:
       # 本地存储根目录,实际文件按 {bizType}/{yyyyMM}/{fileId}.{ext} 落盘
       base-path: ./data/files

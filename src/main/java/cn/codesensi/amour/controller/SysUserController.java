@@ -189,8 +189,7 @@ public class SysUserController {
     @SaCheckPermission("system:user:update")
     @GetMapping("/role-ids/{id}")
     public List<String> roleIds(@PathVariable Long id) {
-        return sysUserService.listRoleIdsByUserId(id)
-                .stream().map(String::valueOf).toList();
+        return sysUserService.listRoleIdStrings(id);
     }
 
 }

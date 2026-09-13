@@ -1,5 +1,6 @@
 package cn.codesensi.amour.model.request;
 
+import cn.codesensi.amour.common.consts.AppConst;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -44,7 +45,7 @@ public class MenuUpdateRequest implements Serializable {
     /**
      * 路由路径(目录/菜单必填，按钮无需填写)
      */
-    @Size(max = 512, message = "路由路径长度不能超过512")
+    @Size(max = AppConst.PATH_MAX_LENGTH, message = "路由路径长度不能超过" + AppConst.PATH_MAX_LENGTH)
     private String path;
 
     /**
@@ -83,7 +84,7 @@ public class MenuUpdateRequest implements Serializable {
     /**
      * 备注
      */
-    @Size(max = 512, message = "备注长度不能超过512")
+    @Size(max = AppConst.REMARK_MAX_LENGTH, message = "备注长度不能超过" + AppConst.REMARK_MAX_LENGTH)
     private String remark;
 
 }
