@@ -181,13 +181,9 @@ FROM (
              (1505, 1500, '删除', 'B', NULL, NULL, 5, NULL, 'system:dict:delete', 1),
              (1600, 1000, '缓存监控', 'M', '/admin/system/cache', 'system/cache/index', 6, 'ep:monitor', NULL, 1),
              (1601, 1600, '查询', 'B', NULL, NULL, 1, NULL, 'system:cache:list', 1),
-             (2000, 0, '日志管理', 'D', '/admin/log', NULL, 2, 'ep:document', NULL, 1),
-             (2100, 2000, '登录日志', 'M', '/admin/log/login', 'log/login/index', 1, 'ep:key', NULL, 1),
-             (2101, 2100, '分页查询', 'B', NULL, NULL, 1, NULL, 'log:login:page', 1),
-             (2102, 2100, '详情', 'B', NULL, NULL, 2, NULL, 'log:login:detail', 1),
-             (2200, 2000, '操作日志', 'M', '/admin/log/operate', 'log/operate/index', 2, 'ep:list', NULL, 1),
-             (2201, 2200, '分页查询', 'B', NULL, NULL, 1, NULL, 'log:operate:page', 1),
-             (2202, 2200, '详情', 'B', NULL, NULL, 2, NULL, 'log:operate:detail', 1),
+             (1700, 1000, '日志管理', 'M', '/admin/system/log', 'system/log/index', 7, 'ep:document', NULL, 1),
+             (1701, 1700, '登录日志分页查询', 'B', NULL, NULL, 1, NULL, 'log:login:page', 1),
+             (1702, 1700, '操作日志分页查询', 'B', NULL, NULL, 2, NULL, 'log:operate:page', 1),
              (3000, 0, '个人中心', 'M', '/admin/profile', 'profile/index', 3, 'ep:avatar', NULL, 1)
      ) AS t(id, pid, title, type, path, component, sort, icon, perms, builtin)
 WHERE NOT EXISTS (
