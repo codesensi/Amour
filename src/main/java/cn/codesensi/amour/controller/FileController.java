@@ -4,6 +4,8 @@ import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.common.annotation.Log;
 import cn.codesensi.amour.common.enums.LogTypeEnum;
 import cn.codesensi.amour.model.converter.FileConverter;
+import cn.codesensi.amour.model.dto.FileInfoDTO;
+import cn.codesensi.amour.model.dto.FilePageDTO;
 import cn.codesensi.amour.model.entity.SysFile;
 import cn.codesensi.amour.model.request.FilePageRequest;
 import cn.codesensi.amour.model.response.FilePageResponse;
@@ -59,7 +61,7 @@ public class FileController {
     @PostMapping("/upload/{bizType}")
     public FileUploadResponse upload(@PathVariable("bizType") String bizType,
                                      @RequestParam("file") MultipartFile file) {
-        return fileService.upload(bizType, file);
+        return fileConverter.toResponse(fileService.upload(bizType, file));
     }
 
     /**
@@ -74,7 +76,9 @@ public class FileController {
     @SaCheckPermission("system:file:page")
     @GetMapping("/page")
     public Page<FilePageResponse> page(@Valid FilePageRequest request) {
-        return fileService.page(fileConverter.toPageDTO(request));
+        FilePageDTO filePageDTO = fileConverter.toPageDTO(request);
+        Page<FileInfoDTO> dtoPage = fileService.page(filePageDTO);
+        return fileConverter.toResponsePage(dtoPage);
     }
 
     /**

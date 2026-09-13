@@ -1,9 +1,9 @@
 package cn.codesensi.amour.service;
 
 import cn.codesensi.amour.common.enums.FileBizTypeEnum;
+import cn.codesensi.amour.model.dto.FileInfoDTO;
 import cn.codesensi.amour.model.dto.FilePageDTO;
-import cn.codesensi.amour.model.response.FilePageResponse;
-import cn.codesensi.amour.model.response.FileUploadResponse;
+import cn.codesensi.amour.model.dto.FileUploadResultDTO;
 import cn.codesensi.amour.service.file.FileViewResult;
 import com.mybatisflex.core.paginate.Page;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,7 +30,7 @@ public interface FileService {
      * @param file    上传的文件
      * @return 文件ID、访问地址与原始文件名
      */
-    FileUploadResponse upload(String bizType, MultipartFile file);
+    FileUploadResultDTO upload(String bizType, MultipartFile file);
 
     /**
      * 加载文件记录与存储资源。
@@ -53,7 +53,7 @@ public interface FileService {
      * @param pageDTO 分页查询参数
      * @return 文件分页结果
      */
-    Page<FilePageResponse> page(FilePageDTO pageDTO);
+    Page<FileInfoDTO> page(FilePageDTO pageDTO);
 
     /**
      * 删除文件到回收站：仅逻辑删除记录，物理文件保留，

@@ -1,9 +1,9 @@
 package cn.codesensi.amour.service.impl;
 
 import cn.codesensi.amour.common.consts.CacheConst;
-import cn.codesensi.amour.model.response.CacheEntryResponse;
-import cn.codesensi.amour.model.response.CacheResponse;
-import cn.codesensi.amour.model.response.CacheStatsResponse;
+import cn.codesensi.amour.model.dto.CacheDTO;
+import cn.codesensi.amour.model.dto.CacheEntryDTO;
+import cn.codesensi.amour.model.dto.CacheStatsDTO;
 import cn.codesensi.amour.service.CacheService;
 import com.github.benmanes.caffeine.cache.Policy;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
@@ -45,8 +45,8 @@ public class CacheServiceImpl implements CacheService {
      * @return 各缓存的名称、过期策略与条目列表；无缓存时返回空列表
      */
     @Override
-    public List<CacheResponse> listAll() {
-        List<CacheResponse> result = new ArrayList<>();
+    public List<CacheDTO> listAll() {
+        List<CacheDTO> result = new ArrayList<>();
         for (String cacheName : cacheManager.getCacheNames()) {
             Cache cache = cacheManager.getCache(cacheName);
             if (!(cache instanceof CaffeineCache caffeineCache)) {
@@ -54,46 +54,46 @@ public class CacheServiceImpl implements CacheService {
                 continue;
             }
 
-            CacheResponse response = new CacheResponse();
-            response.setCacheName(cacheName);
-            fillPolicy(response, caffeineCache);
-            fillStats(response, caffeineCache);
-            response.setEntries(listEntries(caffeineCache));
-            result.add(response);
+            CacheDTO cacheDTO = new CacheDTO();
+            cacheDTO.setCacheName(cacheName);
+            fillPolicy(cacheDTO, caffeineCache);
+            fillStats(cacheDTO, caffeineCache);
+            cacheDTO.setEntries(listEntries(caffeineCache));
+            result.add(cacheDTO);
         }
         // 按缓存名排序，保证输出顺序稳定
-        result.sort(Comparator.comparing(CacheResponse::getCacheName));
+        result.sort(Comparator.comparing(CacheDTO::getCacheName));
         return result;
     }
 
     /**
-     * 读取缓存实际生效的过期策略并填充到响应对象。
+     * 读取缓存实际生效的过期策略并填充到 DTO。
      * <p>
      * 从原生 Caffeine 缓存的 {@code policy()} 读取（而非回读 yml 配置），保证与运行期
-     * 实际生效的策略一致；未配置的维度不赋值，呈现在响应中为 {@code null}（表示不限制）。
+     * 实际生效的策略一致；未配置的维度不赋值，呈现在 DTO 中为 {@code null}（表示不限制）。
      *
-     * @param response      响应对象
+     * @param cacheDTO      缓存 DTO
      * @param caffeineCache Spring 缓存的 Caffeine 实现
      */
-    private void fillPolicy(CacheResponse response, CaffeineCache caffeineCache) {
+    private void fillPolicy(CacheDTO cacheDTO, CaffeineCache caffeineCache) {
         Policy<Object, Object> policy = caffeineCache.getNativeCache().policy();
-        policy.expireAfterWrite().ifPresent(fixed -> response.setExpireAfterWrite(fixed.getExpiresAfter(TimeUnit.SECONDS)));
-        policy.expireAfterAccess().ifPresent(fixed -> response.setExpireAfterAccess(fixed.getExpiresAfter(TimeUnit.SECONDS)));
-        policy.eviction().ifPresent(eviction -> response.setMaximumSize(eviction.getMaximum()));
+        policy.expireAfterWrite().ifPresent(fixed -> cacheDTO.setExpireAfterWrite(fixed.getExpiresAfter(TimeUnit.SECONDS)));
+        policy.expireAfterAccess().ifPresent(fixed -> cacheDTO.setExpireAfterAccess(fixed.getExpiresAfter(TimeUnit.SECONDS)));
+        policy.eviction().ifPresent(eviction -> cacheDTO.setMaximumSize(eviction.getMaximum()));
     }
 
     /**
-     * 读取缓存命中统计并填充到响应对象。
+     * 读取缓存命中统计并填充到 DTO。
      * <p>
      * 数据来源于 Caffeine 原生 {@code CacheStats}（缓存构建时经 {@code recordStats()} 开启），
      * 为自缓存实例创建（应用启动）起的累计值，重启后归零。
      *
-     * @param response      响应对象
+     * @param cacheDTO      缓存 DTO
      * @param caffeineCache Spring 缓存的 Caffeine 实现
      */
-    private void fillStats(CacheResponse response, CaffeineCache caffeineCache) {
+    private void fillStats(CacheDTO cacheDTO, CaffeineCache caffeineCache) {
         CacheStats stats = caffeineCache.getNativeCache().stats();
-        CacheStatsResponse statsResponse = new CacheStatsResponse()
+        CacheStatsDTO statsDTO = new CacheStatsDTO()
                 .setHitCount(stats.hitCount())
                 .setMissCount(stats.missCount())
                 .setHitRate(stats.hitRate())
@@ -102,7 +102,7 @@ public class CacheServiceImpl implements CacheService {
                 .setLoadFailureCount(stats.loadFailureCount())
                 // Caffeine 以纳秒计平均加载耗时，换算为毫秒展示
                 .setAverageLoadPenaltyMillis(stats.averageLoadPenalty() / 1_000_000.0);
-        response.setStats(statsResponse);
+        cacheDTO.setStats(statsDTO);
     }
 
     /**
@@ -110,23 +110,23 @@ public class CacheServiceImpl implements CacheService {
      * <p>
      * 剩余过期时间经 {@link Policy#getEntryIfPresentQuietly(Object)} 获取条目元数据后计算，
      * 该方法为只读查询，不会刷新条目的访问时间；缓存配置了任一过期维度时其值为正数秒，
-     * 驻留不过期的缓存呈现在响应中为 {@code null}。
+     * 驻留不过期的缓存呈现在 DTO 中为 {@code null}。
      *
      * @param caffeineCache Spring 缓存的 Caffeine 实现
      * @return 缓存条目列表
      */
-    private List<CacheEntryResponse> listEntries(CaffeineCache caffeineCache) {
+    private List<CacheEntryDTO> listEntries(CaffeineCache caffeineCache) {
         Policy<Object, Object> policy = caffeineCache.getNativeCache().policy();
         // 缓存是否配置了过期维度：均未配置时条目永不过期，无需查询剩余时间
         boolean expirable = policy.expireAfterWrite().isPresent() || policy.expireAfterAccess().isPresent();
 
-        List<CacheEntryResponse> entries = new ArrayList<>();
+        List<CacheEntryDTO> entries = new ArrayList<>();
         for (Map.Entry<Object, Object> entry : caffeineCache.getNativeCache().asMap().entrySet()) {
-            CacheEntryResponse entryResponse = new CacheEntryResponse();
-            entryResponse.setKey(String.valueOf(entry.getKey()));
-            entryResponse.setValue(renderValue(entry.getValue()));
-            entryResponse.setRemainExpire(remainExpire(policy, entry.getKey(), expirable));
-            entries.add(entryResponse);
+            CacheEntryDTO entryDTO = new CacheEntryDTO();
+            entryDTO.setKey(String.valueOf(entry.getKey()));
+            entryDTO.setValue(renderValue(entry.getValue()));
+            entryDTO.setRemainExpire(remainExpire(policy, entry.getKey(), expirable));
+            entries.add(entryDTO);
         }
         return entries;
     }

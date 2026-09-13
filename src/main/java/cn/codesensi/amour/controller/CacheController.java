@@ -1,6 +1,7 @@
 package cn.codesensi.amour.controller;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
+import cn.codesensi.amour.model.converter.CacheConverter;
 import cn.codesensi.amour.model.response.CacheResponse;
 import cn.codesensi.amour.service.CacheService;
 import cn.dev33.satoken.annotation.SaCheckPermission;
@@ -24,6 +25,7 @@ import java.util.List;
 public class CacheController {
 
     private final CacheService cacheService;
+    private final CacheConverter cacheConverter;
 
     /**
      * 查询全部缓存内容
@@ -31,6 +33,6 @@ public class CacheController {
     @SaCheckPermission("system:cache:list")
     @GetMapping("/list-all")
     public List<CacheResponse> listAll() {
-        return cacheService.listAll();
+        return cacheConverter.toResponseList(cacheService.listAll());
     }
 }

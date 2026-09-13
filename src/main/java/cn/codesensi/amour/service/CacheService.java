@@ -1,6 +1,6 @@
 package cn.codesensi.amour.service;
 
-import cn.codesensi.amour.model.response.CacheResponse;
+import cn.codesensi.amour.model.dto.CacheDTO;
 
 import java.util.List;
 
@@ -17,5 +17,5 @@ public interface CacheService {
      *
      * @return 各缓存的名称与条目列表；无缓存时返回空列表
      */
-    List<CacheResponse> listAll();
+    List<CacheDTO> listAll();
 }

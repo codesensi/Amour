@@ -9,11 +9,11 @@ import cn.codesensi.amour.mapper.SysFileMapper;
 import cn.codesensi.amour.mapper.SysUserMapper;
 import cn.codesensi.amour.model.converter.FileConverter;
 import cn.codesensi.amour.model.dto.ConfigDTO;
+import cn.codesensi.amour.model.dto.FileInfoDTO;
 import cn.codesensi.amour.model.dto.FilePageDTO;
+import cn.codesensi.amour.model.dto.FileUploadResultDTO;
 import cn.codesensi.amour.model.entity.SysFile;
 import cn.codesensi.amour.model.entity.SysUser;
-import cn.codesensi.amour.model.response.FilePageResponse;
-import cn.codesensi.amour.model.response.FileUploadResponse;
 import cn.codesensi.amour.service.FileService;
 import cn.codesensi.amour.service.SysConfigService;
 import cn.codesensi.amour.service.file.FileStorage;
@@ -24,8 +24,9 @@ import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
+import com.mybatisflex.core.logicdelete.LogicDeleteManager;
 import com.mybatisflex.core.paginate.Page;
-import com.mybatisflex.core.query.QueryWrapper;
+import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -115,7 +116,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public FileUploadResponse upload(String bizType, MultipartFile file) {
+    public FileUploadResultDTO upload(String bizType, MultipartFile file) {
         // 1. 业务类型校验
         FileBizTypeEnum bizTypeEnum = BaseEnum.fromCode(FileBizTypeEnum.class, bizType);
         if (bizTypeEnum == null) {
@@ -196,7 +197,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         // 8. 单条 SQL 入库(主键/MD5/存储 key 均已就绪;主键已有值时框架自动跳过再生成)
         sysFileMapper.insert(sysFile, true);
 
-        FileUploadResponse response = new FileUploadResponse()
+        FileUploadResultDTO response = new FileUploadResultDTO()
                 .setId(sysFile.getId())
                 .setUrl(VIEW_URL_PREFIX + sysFile.getId())
                 .setOriginalName(originalName);
@@ -216,7 +217,9 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
      */
     @Override
     public FileViewResult load(Long id) {
-        SysFile sysFile = sysFileMapper.selectOneById(id);
+        // 绕过全局逻辑删除:预览需覆盖回收站内的已删除文件,删除标识不作为过滤条件
+        SysFile sysFile = LogicDeleteManager.execWithoutLogicDelete(() ->
+                sysFileMapper.selectOneById(id));
         if (sysFile == null) {
             throw new BusinessException("文件不存在");
         }
@@ -241,8 +244,10 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
      * 分页查询文件记录。
      * <p>
      * 按删除标识区分数据域：0-未删除（文件列表，缺省），1-已删除（回收站）；
+     * 查询显式绕过全局逻辑删除（否则自动追加的 del_flag=0 会与回收站条件冲突），
+     * 数据域条件由本方法自行指定；
      * 文件名模糊、业务类型/存储类型精确、上传人用户名模糊
-     * （子查询先按用户名解析用户ID集合）、上传时间范围（起止均含边界），
+     * （先按用户名解析用户ID集合再 IN）、上传时间范围（起止均含边界），
      * 条件缺省时自动忽略；按 ID 倒序（最新在前）；
      * 上传人用户名按本页出现的 creator 批量回填，避免逐行查询。
      *
@@ -250,40 +255,65 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
      * @return 文件分页结果
      */
     @Override
-    public Page<FilePageResponse> page(FilePageDTO pageDTO) {
+    public Page<FileInfoDTO> page(FilePageDTO pageDTO) {
         boolean recycled = DelFlagEnum.DELETED.getCode().equals(pageDTO.getDelFlag());
-        QueryWrapper wrapper = QueryWrapper.create()
-                .where(SYS_FILE.DEL_FLAG.eq(recycled
-                        ? DelFlagEnum.DELETED.getCode()
-                        : DelFlagEnum.NOT_DELETED.getCode()))
-                .and(SYS_FILE.ORIGINAL_NAME.like(pageDTO.getOriginalName(), StrUtil::isNotBlank))
-                .and(SYS_FILE.BIZ_TYPE.eq(pageDTO.getBizType(), StrUtil::isNotBlank))
-                .and(SYS_FILE.STORAGE_TYPE.eq(pageDTO.getStorageType(), StrUtil::isNotBlank))
-                .and(SYS_FILE.CREATE_TIME.ge(parseTime(pageDTO.getBeginTime(), false), Objects::nonNull))
-                .and(SYS_FILE.CREATE_TIME.le(parseTime(pageDTO.getEndTime(), true), Objects::nonNull))
-                .orderBy(SYS_FILE.ID, false);
+        // 上传人按用户名模糊匹配:先解析用户ID集合再 IN,避免联表分页(对齐用户模块的既有惯例);
+        // 与主查询同处绕过逻辑删除的作用域,已删除用户的文件仍可按用户名命中(与原 IN 子查询行为一致)
+        List<Long> creatorIds;
         if (StrUtil.isNotBlank(pageDTO.getCreatorName())) {
-            // 上传人按用户名模糊匹配:子查询解析用户ID集合,避免联表分页
-            QueryWrapper creatorQuery = QueryWrapper.create()
-                    .select(SYS_USER.ID)
-                    .from(SYS_USER)
-                    .where(SYS_USER.USERNAME.like(pageDTO.getCreatorName()));
-            wrapper.and(SYS_FILE.CREATOR.in(creatorQuery));
+            List<Long> resolved = LogicDeleteManager.execWithoutLogicDelete(() ->
+                    QueryChain.of(sysUserMapper)
+                            .select(SYS_USER.ID)
+                            .where(SYS_USER.USERNAME.like(pageDTO.getCreatorName()))
+                            .listAs(Long.class));
+            if (resolved.isEmpty()) {
+                // 上传人条件无匹配用户,直接返回空页,避免空 IN 查询
+                return Page.of(pageDTO.getPageNumber(), pageDTO.getPageSize(), 0);
+            }
+            creatorIds = resolved;
+        } else {
+            creatorIds = List.of();
         }
-        Page<SysFile> page = sysFileMapper.paginate(
-                Page.of(pageDTO.getPageNumber(), pageDTO.getPageSize()), wrapper);
+        // 绕过全局逻辑删除:回收站需按 del_flag=1 命中已删除记录,
+        // 数据域由本方法显式的 DEL_FLAG 条件圈定(0-文件列表,1-回收站)
+        Page<SysFile> page = LogicDeleteManager.execWithoutLogicDelete(() -> {
+            QueryChain<SysFile> query = QueryChain.of(sysFileMapper)
+                    .where(SYS_FILE.DEL_FLAG.eq(recycled
+                            ? DelFlagEnum.DELETED.getCode()
+                            : DelFlagEnum.NOT_DELETED.getCode()))
+                    .and(SYS_FILE.ORIGINAL_NAME.like(pageDTO.getOriginalName(), StrUtil::isNotBlank))
+                    .and(SYS_FILE.BIZ_TYPE.eq(pageDTO.getBizType(), StrUtil::isNotBlank))
+                    .and(SYS_FILE.STORAGE_TYPE.eq(pageDTO.getStorageType(), StrUtil::isNotBlank))
+                    .and(SYS_FILE.CREATE_TIME.ge(parseTime(pageDTO.getBeginTime(), false), Objects::nonNull))
+                    .and(SYS_FILE.CREATE_TIME.le(parseTime(pageDTO.getEndTime(), true), Objects::nonNull))
+                    .orderBy(SYS_FILE.ID, false);
+            if (CollUtil.isNotEmpty(creatorIds)) {
+                query.and(SYS_FILE.CREATOR.in(creatorIds));
+            }
+            return query.page(Page.of(pageDTO.getPageNumber(), pageDTO.getPageSize()));
+        });
 
         // 批量回填上传人用户名:仅对本页出现的 creator 查询一次
-        List<Long> creatorIds = page.getRecords().stream()
+        List<Long> pageCreatorIds = page.getRecords().stream()
                 .map(SysFile::getCreator)
                 .filter(Objects::nonNull)
                 .distinct()
                 .toList();
-        Map<Long, String> nameMap = creatorIds.isEmpty()
-                ? Map.of()
-                : sysUserMapper.selectListByIds(creatorIds).stream()
+        Map<Long, String> nameMap;
+        if (CollUtil.isNotEmpty(pageCreatorIds)) {
+            List<SysUser> sysUsers = sysUserMapper.selectListByIds(pageCreatorIds);
+            // username 理论非空(登录账号),防御 toMap 对 null value 抛 NPE
+            if (CollUtil.isNotEmpty(sysUsers)) {
+                nameMap = sysUsers.stream()
+                        .filter(row -> row.getUsername() != null)
                         .collect(Collectors.toMap(SysUser::getId, SysUser::getUsername, (a, b) -> a));
-        Page<FilePageResponse> result = fileConverter.toPageResponse(page);
+            } else {
+                nameMap = Map.of();
+            }
+        } else {
+            nameMap = Map.of();
+        }
+        Page<FileInfoDTO> result = fileConverter.toItemDTOPage(page);
         result.getRecords().forEach(row -> {
             // creator 可能为空(未登录来源的历史记录),不可变 Map 拒绝 null key 查询,须先行判空
             if (row.getCreator() != null) {
@@ -304,7 +334,9 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
      */
     @Override
     public void delete(Long id) {
-        SysFile sysFile = sysFileMapper.selectOneById(id);
+        // 绕过全局逻辑删除,才能识别已在回收站的记录并给出准确的重复删除提示
+        SysFile sysFile = LogicDeleteManager.execWithoutLogicDelete(() ->
+                sysFileMapper.selectOneById(id));
         if (sysFile == null) {
             throw new BusinessException("文件不存在");
         }
@@ -329,18 +361,21 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
      */
     @Override
     public void restore(Long id) {
-        SysFile sysFile = sysFileMapper.selectOneById(id);
+        // 绕过全局逻辑删除:恢复的目标是已删除记录,查询与回置 del_flag 均需触达 del_flag=1 的行
+        SysFile sysFile = LogicDeleteManager.execWithoutLogicDelete(() ->
+                sysFileMapper.selectOneById(id));
         if (sysFile == null) {
             throw new BusinessException("文件不存在");
         }
         if (!DelFlagEnum.DELETED.getCode().equals(sysFile.getDelFlag())) {
             throw new BusinessException("文件不在回收站中,无需恢复");
         }
-        UpdateChain.of(SysFile.class)
-                .set(SYS_FILE.DEL_FLAG, DelFlagEnum.NOT_DELETED.getCode())
-                .where(SYS_FILE.ID.eq(id))
-                .and(SYS_FILE.DEL_FLAG.eq(DelFlagEnum.DELETED.getCode()))
-                .update();
+        LogicDeleteManager.execWithoutLogicDelete(() ->
+                UpdateChain.of(SysFile.class)
+                        .set(SYS_FILE.DEL_FLAG, DelFlagEnum.NOT_DELETED.getCode())
+                        .where(SYS_FILE.ID.eq(id))
+                        .and(SYS_FILE.DEL_FLAG.eq(DelFlagEnum.DELETED.getCode()))
+                        .update());
     }
 
     /**
@@ -355,7 +390,10 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
      */
     @Override
     public void physicalDelete(Long id) {
-        SysFile sysFile = sysFileMapper.selectOneById(id);
+        // 绕过全局逻辑删除:彻底删除的目标是已删除记录,且须执行真正的物理 DELETE
+        //(默认 deleteById 会被框架改写为逻辑删除并对 del_flag=0 过滤,对已删除行是空操作)
+        SysFile sysFile = LogicDeleteManager.execWithoutLogicDelete(() ->
+                sysFileMapper.selectOneById(id));
         if (sysFile == null) {
             throw new BusinessException("文件不存在");
         }
@@ -368,7 +406,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         }
         requireStorage(storageType).delete(sysFile.getPath());
 
-        sysFileMapper.deleteById(id);
+        LogicDeleteManager.execWithoutLogicDelete(() -> sysFileMapper.deleteById(id));
     }
 
     /**
