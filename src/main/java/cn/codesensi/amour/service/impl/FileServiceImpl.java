@@ -407,6 +407,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         requireStorage(storageType).delete(sysFile.getPath());
 
         LogicDeleteManager.execWithoutLogicDelete(() -> sysFileMapper.deleteById(id));
+        log.debug("文件彻底删除完成：id={}, storageType={}, path={}", id, storageType.getCode(), sysFile.getPath());
     }
 
     /**
@@ -438,6 +439,15 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
                 .filter(Objects::nonNull)
                 .distinct()
                 .toList();
+        // 跳过的 URL 记录 debug,便于排查业务引用未采纳的问题
+        long skippedCount = urls.stream()
+                .filter(StrUtil::isNotBlank)
+                .filter(url -> !VIEW_URL_PATTERN.matcher(url).matches())
+                .count();
+        if (skippedCount > 0) {
+            log.debug("存在无法解析为本系统文件的 URL，已跳过：bizType={}, bizId={}, skipped={}",
+                    bizType.getCode(), bizId, skippedCount);
+        }
         if (CollUtil.isEmpty(fileIds)) {
             return;
         }

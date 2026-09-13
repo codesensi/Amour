@@ -17,6 +17,7 @@ import cn.hutool.core.util.StrUtil;
 import com.mybatisflex.core.paginate.Page;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
@@ -38,6 +39,7 @@ import java.util.concurrent.TimeUnit;
  * @author codesensi
  * @since 1.0
  */
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/file")
@@ -147,6 +149,7 @@ public class FileController {
             mediaType = MediaType.parseMediaType(StrUtil.blankToDefault(
                     result.sysFile().getContentType(), MediaType.APPLICATION_OCTET_STREAM_VALUE));
         } catch (Exception e) {
+            log.debug("文件 Content-Type 解析失败，回退为通用二进制类型：id={}", id, e);
             mediaType = MediaType.APPLICATION_OCTET_STREAM;
         }
         return ResponseEntity.ok()

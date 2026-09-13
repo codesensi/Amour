@@ -15,6 +15,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import com.mybatisflex.core.query.QueryChain;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,6 +33,7 @@ import static cn.codesensi.amour.model.entity.table.SysUserTableDef.SYS_USER;
  * @author codesensi
  * @since 1.0
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PortalHeroServiceImpl implements PortalHeroService {
@@ -56,6 +58,7 @@ public class PortalHeroServiceImpl implements PortalHeroService {
                 .and(SYS_ROLE.STATUS.eq(EnableEnum.ENABLE.getCode()))
                 .one();
         if (ObjUtil.isNull(heroRole)) {
+            log.debug("门户主角角色未配置，返回空数据");
             return new PortalHeroResultDTO();
         }
 
@@ -65,6 +68,7 @@ public class PortalHeroServiceImpl implements PortalHeroService {
                 .where(SYS_USER_ROLE.ROLE_ID.eq(heroRole.getId()))
                 .listAs(Long.class);
         if (CollUtil.isEmpty(userIds)) {
+            log.debug("门户主角角色未绑定候选用户，返回空数据");
             return new PortalHeroResultDTO();
         }
 
