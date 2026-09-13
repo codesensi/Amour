@@ -2,6 +2,7 @@ package cn.codesensi.amour.service.impl;
 
 import cn.codesensi.amour.common.consts.CacheConst;
 import cn.codesensi.amour.common.consts.RegexConst;
+import cn.codesensi.amour.common.enums.YesEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.exception.ValidationException;
 import cn.codesensi.amour.common.util.CacheUtil;
@@ -122,6 +123,23 @@ public class SysConfigServiceImpl implements SysConfigService {
             }
         }
         return result;
+    }
+
+    /**
+     * 按配置键集合查询可公开下发的配置（免登录配置下发接口专用）。
+     * <p>
+     * 在 {@link #listByKeys} 结果基础上剔除敏感配置（{@code sensitive=1}），
+     * 敏感键在响应中的表现与"键不存在"一致，不暴露其存在性；
+     * 服务端内部消费敏感配置（如 uapi-key）请走 {@link #oneByKey}。
+     *
+     * @param keys 待查询的配置键集合；为空时返回空列表
+     * @return 可公开下发的配置 DTO 列表；无命中时返回空列表
+     */
+    @Override
+    public List<ConfigDTO> listByKeysPublic(List<String> keys) {
+        return listByKeys(keys).stream()
+                .filter(config -> YesEnum.NO.getCode().equals(config.getSensitive()))
+                .toList();
     }
 
     /**

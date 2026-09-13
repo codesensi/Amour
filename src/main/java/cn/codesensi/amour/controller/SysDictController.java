@@ -10,7 +10,6 @@ import cn.codesensi.amour.model.request.DictChangeStatusRequest;
 import cn.codesensi.amour.model.request.DictInsertRequest;
 import cn.codesensi.amour.model.request.DictPageRequest;
 import cn.codesensi.amour.model.request.DictUpdateRequest;
-import cn.codesensi.amour.model.response.DictGroupResponse;
 import cn.codesensi.amour.model.response.DictPageResponse;
 import cn.codesensi.amour.model.response.DictTypeResponse;
 import cn.codesensi.amour.service.SysDictService;
@@ -23,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 数据字典相关接口 前端控制器。
+ * 数据字典管理相关接口 前端控制器（免登录的门户字典下发已迁至 {@link PortalDictController}）。
  *
  * @author codesensi
  * @since 1.0
@@ -47,19 +46,6 @@ public class SysDictController {
     public List<DictTypeResponse> typeList() {
         List<DictTypeDTO> dictTypeDTOS = sysDictService.listTypes();
         return dictConverter.toListTypeResponse(dictTypeDTOS);
-    }
-
-    /**
-     * 按字典编码集合批量查询启用中的字典项列表（免登录；供前端下拉框与枚举展示统一消费）。
-     * <p>逗号分隔传输（?codes=gender,enable），Spring 默认按逗号拆分为 List&lt;String&gt;。
-     *
-     * @param codes 字典编码集合（如 gender、enable）；为空时返回空分组
-     * @return 字典分组列表（每组含 dictCode 与组内条目，条目按 sort 升序）；无命中时返回空列表
-     */
-    @GetMapping("/list-by-codes")
-    public List<DictGroupResponse> listByCodes(@RequestParam(value = "codes", required = false) List<String> codes) {
-        List<DictGroupDTO> dictGroups = sysDictService.listByCodes(codes);
-        return dictConverter.toListGroupResponse(dictGroups);
     }
 
     /**

@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS `sys_config` (
     `config_value` VARCHAR(4000) NULL DEFAULT NULL       COMMENT '配置值',
     `value_type`   VARCHAR(16)   NULL DEFAULT NULL       COMMENT '值类型: STRING, INTEGER, LONG, BOOLEAN',
     `config_group` VARCHAR(64)   NULL DEFAULT NULL       COMMENT '分组',
+    `sensitive`    TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '是否敏感: 0-否, 1-是（敏感配置不经过免登录配置下发接口）',
     `remark`       VARCHAR(512)  NULL DEFAULT NULL       COMMENT '备注',
     `creator`      BIGINT        NULL DEFAULT NULL       COMMENT '创建人',
     `create_time`  DATETIME      NULL DEFAULT CURRENT_TIMESTAMP       COMMENT '创建时间',

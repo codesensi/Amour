@@ -69,25 +69,17 @@ public class RbacConst {
     public static final String H2_CONSOLE_PATH = "/h2-console/**";
 
     /**
-     * 公共配置下发接口路径（免登录；仅下发站点公共配置，新增敏感键时务必确认其不经过该接口）
-     */
-    public static final String SYS_CONFIG_PUBLIC_PATH = "/sys/config/list-by-keys";
-
-    /**
-     * 公共字典下发接口路径（免登录；供前端下拉框与枚举展示统一消费）
-     */
-    public static final String SYS_DICT_PUBLIC_PATH = "/sys/dict/list-by-codes";
-
-    /**
      * QQ 信息查询接口路径（免登录；供门户留言、资料展示等场景查询头像与昵称）
      */
     public static final String QQ_INFO_PATH = "/qq-info";
 
     /**
      * 公开路径清单 —— 免登录接口的唯一放行口径：验证码、登录、登出、门户 /portal/**、
-     * 文件预览、公共配置/字典下发、QQ 信息查询。
+     * 文件预览、QQ 信息查询。
      * <p>
      * 鉴权与演示模式两个拦截器共用本清单统一放行；
+     * 门户公共配置/字典下发（/portal/config/list-by-keys、/portal/dict/list-by-codes）
+     * 由 PORTAL_PATH 统一覆盖，无需单列；
      * H2 控制台不在此列——仅鉴权拦截器额外豁免，演示模式拦截器保留对其写操作的拦截。
      * 新增公开接口时仅需在此追加对应路径。
      */
@@ -97,8 +89,6 @@ public class RbacConst {
             LOGOUT_PATH,
             PORTAL_PATH,
             FILE_VIEW_PATH,
-            SYS_CONFIG_PUBLIC_PATH,
-            SYS_DICT_PUBLIC_PATH,
             QQ_INFO_PATH
     };
 

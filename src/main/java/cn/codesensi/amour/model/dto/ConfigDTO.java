@@ -42,4 +42,9 @@ public class ConfigDTO implements Serializable {
      */
     private String configGroup;
 
+    /**
+     * 是否敏感: 0-否, 1-是（敏感配置仅供服务端内部消费，不经过免登录配置下发接口）
+     */
+    private Integer sensitive;
+
 }

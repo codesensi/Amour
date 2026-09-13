@@ -4,7 +4,7 @@ SET REFERENTIAL_INTEGRITY FALSE;
 -- 数据填充：sys_config（幂等插入）
 -- ----------------------------
 INSERT INTO `sys_config` (
-    `id`, `config_key`, `config_value`, `value_type`, `config_group`, `remark`
+    `id`, `config_key`, `config_value`, `value_type`, `config_group`, `sensitive`, `remark`
 )
 SELECT
     t.id,
@@ -12,22 +12,23 @@ SELECT
     t.config_value,
     t.value_type,
     t.config_group,
+    t.sensitive,
     t.remark
 FROM (
          VALUES
              -- base（1000 段）
-             (1001, 'name', '爱慕情侣小站', 'STRING', 'base', '项目/站点名称'),
-             (1002, 'icp', '京ICP备2026010001号', 'STRING', 'base', 'ICP备案文案'),
-             (1003, 'copyright-year', '2026', 'STRING', 'base', '版权年份'),
-             (1004, 'uapi-key', NULL, 'STRING', 'base', 'UApiPro接口密钥(https://uapis.cn)'),
+             (1001, 'name', '爱慕情侣小站', 'STRING', 'base', 0, '项目/站点名称'),
+             (1002, 'icp', '京ICP备2026010001号', 'STRING', 'base', 0, 'ICP备案文案'),
+             (1003, 'copyright-year', '2026', 'STRING', 'base', 0, '版权年份'),
+             (1004, 'uapi-key', NULL, 'STRING', 'base', 1, 'UApiPro接口密钥(https://uapis.cn)'),
              -- site（2000 段）
-             (2001, 'site.love-start-date', '2018-07-15 00:00:00', 'DATETIME', 'site', '门户恋爱计时起点'),
+             (2001, 'site.love-start-date', '2018-07-15 00:00:00', 'DATETIME', 'site', 0, '门户恋爱计时起点'),
              -- captcha（3000 段）
-             (3001, 'captcha.enabled', 'true', 'BOOLEAN', 'captcha', '验证码开关'),
-             (3002, 'captcha.image-type', 'arithmetic', 'STRING', 'captcha', '图形验证码类型'),
+             (3001, 'captcha.enabled', 'true', 'BOOLEAN', 'captcha', 0, '验证码开关'),
+             (3002, 'captcha.image-type', 'arithmetic', 'STRING', 'captcha', 0, '图形验证码类型'),
              -- file（4000 段）
-             (4001, 'file.storage', 'local', 'STRING', 'file', '文件存储方式: local-本地, oss-对象存储')
-     ) AS t(id, config_key, config_value, value_type, config_group, remark)
+             (4001, 'file.storage', 'local', 'STRING', 'file', 0, '文件存储方式: local-本地, oss-对象存储')
+     ) AS t(id, config_key, config_value, value_type, config_group, sensitive, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_config` WHERE `sys_config`.`id` = t.id
 );

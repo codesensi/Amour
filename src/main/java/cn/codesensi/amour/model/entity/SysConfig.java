@@ -55,6 +55,11 @@ public class SysConfig extends BaseEntity implements Serializable {
     private String configGroup;
 
     /**
+     * 是否敏感: 0-否, 1-是（敏感配置不经过免登录配置下发接口）
+     */
+    private Integer sensitive;
+
+    /**
      * 备注
      */
     private String remark;
