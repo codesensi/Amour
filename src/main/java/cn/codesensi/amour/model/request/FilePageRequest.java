@@ -55,4 +55,9 @@ public class FilePageRequest extends BasePage implements Serializable {
      */
     private String endTime;
 
+    /**
+     * 删除标识: 0-未删除(缺省), 1-已删除(回收站)
+     */
+    private Integer delFlag;
+
 }

@@ -240,7 +240,8 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
     /**
      * 分页查询文件记录。
      * <p>
-     * 仅查询未删除记录：文件名模糊、业务类型/存储类型精确、上传人用户名模糊
+     * 按删除标识区分数据域：0-未删除（文件列表，缺省），1-已删除（回收站）；
+     * 文件名模糊、业务类型/存储类型精确、上传人用户名模糊
      * （子查询先按用户名解析用户ID集合）、上传时间范围（起止均含边界），
      * 条件缺省时自动忽略；按 ID 倒序（最新在前）；
      * 上传人用户名按本页出现的 creator 批量回填，避免逐行查询。
@@ -250,8 +251,11 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
      */
     @Override
     public Page<FilePageResponse> page(FilePageDTO pageDTO) {
+        boolean recycled = DelFlagEnum.DELETED.getCode().equals(pageDTO.getDelFlag());
         QueryWrapper wrapper = QueryWrapper.create()
-                .where(SYS_FILE.DEL_FLAG.eq(DelFlagEnum.NOT_DELETED.getCode()))
+                .where(SYS_FILE.DEL_FLAG.eq(recycled
+                        ? DelFlagEnum.DELETED.getCode()
+                        : DelFlagEnum.NOT_DELETED.getCode()))
                 .and(SYS_FILE.ORIGINAL_NAME.like(pageDTO.getOriginalName(), StrUtil::isNotBlank))
                 .and(SYS_FILE.BIZ_TYPE.eq(pageDTO.getBizType(), StrUtil::isNotBlank))
                 .and(SYS_FILE.STORAGE_TYPE.eq(pageDTO.getStorageType(), StrUtil::isNotBlank))
@@ -290,43 +294,81 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
     }
 
     /**
-     * 删除文件。
+     * 删除文件到回收站。
      * <p>
-     * 已被业务采纳（{@code biz_id} 非空）的文件默认拒绝删除（防止误删导致业务展示异常），
-     * {@code force=true} 表示管理端已确认业务影响后的强制删除；
-     * 物理文件按文件自身记录的 storage_type 路由清理，记录逻辑删除保留审计，
-     * 免登录预览因物理文件已清理而自然失效。
+     * 仅逻辑删除记录，物理文件保留，业务展示不受影响
+     * （预览按 id 加载，不校验删除标识）；物理文件在回收站“彻底删除”时统一清理，
+     * 该口径与 {@code bindBizFiles} 的替换语义保持一致。
      *
-     * @param id    文件ID
-     * @param force 是否强制删除被业务引用的文件
+     * @param id 文件ID
      */
     @Override
-    public void delete(Long id, boolean force) {
+    public void delete(Long id) {
         SysFile sysFile = sysFileMapper.selectOneById(id);
         if (sysFile == null) {
             throw new BusinessException("文件不存在");
         }
-        if (sysFile.getBizId() != null && !force) {
-            FileBizTypeEnum bizType = BaseEnum.fromCode(FileBizTypeEnum.class, sysFile.getBizType());
-            String bizDesc = bizType == null ? sysFile.getBizType() : bizType.getDesc();
-            throw new BusinessException("文件已被业务「" + bizDesc + "」引用(关联ID " + sysFile.getBizId()
-                    + "),删除可能导致相关业务无法展示;确认无误请强制删除");
+        if (DelFlagEnum.DELETED.getCode().equals(sysFile.getDelFlag())) {
+            throw new BusinessException("文件已在回收站中,请勿重复删除");
         }
+        UpdateChain.of(SysFile.class)
+                .set(SYS_FILE.DEL_FLAG, DelFlagEnum.DELETED.getCode())
+                .where(SYS_FILE.ID.eq(id))
+                .and(SYS_FILE.DEL_FLAG.eq(DelFlagEnum.NOT_DELETED.getCode()))
+                .update();
+    }
 
-        // 物理文件清理:按记录自身的 storage_type 路由,与当前配置无关;
-        // 存储实现对删除失败仅告警不抛出,不允许清理动作反向影响调用方
+    /**
+     * 恢复回收站文件。
+     * <p>
+     * 仅将逻辑删除记录的删除标识置回未删除，不自动回滚业务引用：
+     * 如替换头像产生的旧文件，恢复后 biz_id 仍在，但页面展示跟随业务字段
+     * （sys_user.avatar 等）不会变化；条件携带 del_flag 保证幂等。
+     *
+     * @param id 文件ID
+     */
+    @Override
+    public void restore(Long id) {
+        SysFile sysFile = sysFileMapper.selectOneById(id);
+        if (sysFile == null) {
+            throw new BusinessException("文件不存在");
+        }
+        if (!DelFlagEnum.DELETED.getCode().equals(sysFile.getDelFlag())) {
+            throw new BusinessException("文件不在回收站中,无需恢复");
+        }
+        UpdateChain.of(SysFile.class)
+                .set(SYS_FILE.DEL_FLAG, DelFlagEnum.NOT_DELETED.getCode())
+                .where(SYS_FILE.ID.eq(id))
+                .and(SYS_FILE.DEL_FLAG.eq(DelFlagEnum.DELETED.getCode()))
+                .update();
+    }
+
+    /**
+     * 彻底删除回收站文件。
+     * <p>
+     * 仅允许对已逻辑删除（回收站内）的记录执行；先兜底清理可能残留的物理文件
+     * ——文件管理页删除的记录物理文件已清理，此处主要覆盖业务替换语义
+     * （{@code bindBizFiles}）产生的孤儿文件——再物理删除记录。
+     * 存储清理失败仅告警不抛出，不阻塞删行。
+     *
+     * @param id 文件ID
+     */
+    @Override
+    public void physicalDelete(Long id) {
+        SysFile sysFile = sysFileMapper.selectOneById(id);
+        if (sysFile == null) {
+            throw new BusinessException("文件不存在");
+        }
+        if (!DelFlagEnum.DELETED.getCode().equals(sysFile.getDelFlag())) {
+            throw new BusinessException("未删除的文件请先删除到回收站");
+        }
         StorageTypeEnum storageType = BaseEnum.fromCode(StorageTypeEnum.class, sysFile.getStorageType());
         if (storageType == null) {
             throw new SystemException("不支持的存储类型：" + sysFile.getStorageType());
         }
         requireStorage(storageType).delete(sysFile.getPath());
 
-        // 逻辑删除记录(保留审计)
-        UpdateChain.of(SysFile.class)
-                .set(SYS_FILE.DEL_FLAG, DelFlagEnum.DELETED.getCode())
-                .where(SYS_FILE.ID.eq(id))
-                .and(SYS_FILE.DEL_FLAG.eq(DelFlagEnum.NOT_DELETED.getCode()))
-                .update();
+        sysFileMapper.deleteById(id);
     }
 
     /**

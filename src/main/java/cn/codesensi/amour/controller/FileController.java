@@ -78,21 +78,51 @@ public class FileController {
     }
 
     /**
-     * 删除文件。
+     * 删除文件到回收站。
      * <p>
-     * 逻辑删除记录并按存储类型路由清理物理文件；已被业务采纳（{@code biz_id} 非空）
-     * 的文件须显式携带 {@code force=true} 才允许删除。
+     * 仅逻辑删除记录，物理文件保留，业务展示不受影响；
+     * 可在回收站恢复或彻底删除（物理文件在彻底删除时统一清理）。
      *
-     * @param id    文件ID
-     * @param force 是否强制删除被业务引用的文件
+     * @param id 文件ID
      */
     @ApiResponseBody
     @Log(module = "文件管理", operation = "删除文件", type = LogTypeEnum.DELETE, saveResult = false)
     @SaCheckPermission("system:file:delete")
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable("id") Long id,
-                       @RequestParam(value = "force", required = false, defaultValue = "false") boolean force) {
-        fileService.delete(id, force);
+    public void delete(@PathVariable("id") Long id) {
+        fileService.delete(id);
+    }
+
+    /**
+     * 恢复回收站文件。
+     * <p>
+     * 仅恢复文件记录本身（删除标识置回未删除），不自动回滚业务引用；
+     * 如用户头像仍指向现文件，恢复旧头像不会改变页面展示。
+     *
+     * @param id 文件ID
+     */
+    @ApiResponseBody
+    @Log(module = "文件管理", operation = "恢复文件", type = LogTypeEnum.UPDATE)
+    @SaCheckPermission("system:file:delete")
+    @PutMapping("/{id}/restore")
+    public void restore(@PathVariable("id") Long id) {
+        fileService.restore(id);
+    }
+
+    /**
+     * 彻底删除回收站文件。
+     * <p>
+     * 仅允许对已逻辑删除（回收站内）的记录执行；兜底清理可能残留的物理文件
+     * （如业务替换语义产生的孤儿文件）后物理删除记录，不可恢复。
+     *
+     * @param id 文件ID
+     */
+    @ApiResponseBody
+    @Log(module = "文件管理", operation = "彻底删除文件", type = LogTypeEnum.DELETE, saveResult = false)
+    @SaCheckPermission("system:file:delete")
+    @DeleteMapping("/{id}/physical")
+    public void physicalDelete(@PathVariable("id") Long id) {
+        fileService.physicalDelete(id);
     }
 
     /**

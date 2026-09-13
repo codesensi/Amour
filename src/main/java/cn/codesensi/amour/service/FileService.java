@@ -46,7 +46,8 @@ public interface FileService {
     /**
      * 分页查询文件记录。
      * <p>
-     * 仅查询未删除记录，条件缺省时自动忽略；按 ID 倒序（最新在前）；
+     * 按删除标识区分数据域：0-未删除（文件列表，缺省），1-已删除（回收站）；
+     * 条件缺省时自动忽略；按 ID 倒序（最新在前）；
      * 上传人用户名按本页出现的 creator 批量回填。
      *
      * @param pageDTO 分页查询参数
@@ -55,15 +56,30 @@ public interface FileService {
     Page<FilePageResponse> page(FilePageDTO pageDTO);
 
     /**
-     * 删除文件：按存储类型路由清理物理文件，并逻辑删除记录（保留审计）。
-     * <p>
-     * 已被业务采纳（{@code biz_id} 非空）的文件默认拒绝删除，
-     * {@code force=true} 表示管理端已确认业务影响后的强制删除。
+     * 删除文件到回收站：仅逻辑删除记录，物理文件保留，
+     * 待回收站“彻底删除”时统一清理；业务展示不受影响（预览按 id 加载，不校验删除标识）。
      *
-     * @param id    文件ID
-     * @param force 是否强制删除被业务引用的文件
+     * @param id 文件ID
      */
-    void delete(Long id, boolean force);
+    void delete(Long id);
+
+    /**
+     * 恢复回收站文件：将逻辑删除记录的删除标识置回未删除。
+     * <p>
+     * 仅恢复文件记录本身，不自动回滚业务引用（如用户头像仍指向现文件）。
+     *
+     * @param id 文件ID
+     */
+    void restore(Long id);
+
+    /**
+     * 彻底删除回收站文件：兜底清理可能残留的物理文件后物理删除记录。
+     * <p>
+     * 仅允许对已逻辑删除（回收站内）的记录执行；存储清理失败仅告警不阻塞删行。
+     *
+     * @param id 文件ID
+     */
+    void physicalDelete(Long id);
 
     /**
      * 将文件集合绑定到业务对象（采纳语义）。
