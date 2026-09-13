@@ -1,8 +1,11 @@
 package cn.codesensi.amour.service;
 
 import cn.codesensi.amour.common.enums.FileBizTypeEnum;
+import cn.codesensi.amour.model.dto.FilePageDTO;
+import cn.codesensi.amour.model.response.FilePageResponse;
 import cn.codesensi.amour.model.response.FileUploadResponse;
 import cn.codesensi.amour.service.file.FileViewResult;
+import com.mybatisflex.core.paginate.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
@@ -39,6 +42,28 @@ public interface FileService {
      * @return 文件记录与存储资源
      */
     FileViewResult load(Long id);
+
+    /**
+     * 分页查询文件记录。
+     * <p>
+     * 仅查询未删除记录，条件缺省时自动忽略；按 ID 倒序（最新在前）；
+     * 上传人用户名按本页出现的 creator 批量回填。
+     *
+     * @param pageDTO 分页查询参数
+     * @return 文件分页结果
+     */
+    Page<FilePageResponse> page(FilePageDTO pageDTO);
+
+    /**
+     * 删除文件：按存储类型路由清理物理文件，并逻辑删除记录（保留审计）。
+     * <p>
+     * 已被业务采纳（{@code biz_id} 非空）的文件默认拒绝删除，
+     * {@code force=true} 表示管理端已确认业务影响后的强制删除。
+     *
+     * @param id    文件ID
+     * @param force 是否强制删除被业务引用的文件
+     */
+    void delete(Long id, boolean force);
 
     /**
      * 将文件集合绑定到业务对象（采纳语义）。

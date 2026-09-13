@@ -3,11 +3,17 @@ package cn.codesensi.amour.controller;
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.common.annotation.Log;
 import cn.codesensi.amour.common.enums.LogTypeEnum;
+import cn.codesensi.amour.model.converter.FileConverter;
 import cn.codesensi.amour.model.entity.SysFile;
+import cn.codesensi.amour.model.request.FilePageRequest;
+import cn.codesensi.amour.model.response.FilePageResponse;
 import cn.codesensi.amour.model.response.FileUploadResponse;
 import cn.codesensi.amour.service.FileService;
 import cn.codesensi.amour.service.file.FileViewResult;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.util.StrUtil;
+import com.mybatisflex.core.paginate.Page;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
@@ -36,6 +42,7 @@ import java.util.concurrent.TimeUnit;
 public class FileController {
 
     private final FileService fileService;
+    private final FileConverter fileConverter;
 
     /**
      * 上传文件。
@@ -53,6 +60,39 @@ public class FileController {
     public FileUploadResponse upload(@PathVariable("bizType") String bizType,
                                      @RequestParam("file") MultipartFile file) {
         return fileService.upload(bizType, file);
+    }
+
+    /**
+     * 分页查询文件记录。
+     * <p>
+     * 管理端文件管理页列表数据源；条件缺省时自动忽略，按 ID 倒序（最新在前）。
+     *
+     * @param request 分页查询参数
+     * @return 文件分页结果
+     */
+    @ApiResponseBody
+    @SaCheckPermission("system:file:page")
+    @GetMapping("/page")
+    public Page<FilePageResponse> page(@Valid FilePageRequest request) {
+        return fileService.page(fileConverter.toPageDTO(request));
+    }
+
+    /**
+     * 删除文件。
+     * <p>
+     * 逻辑删除记录并按存储类型路由清理物理文件；已被业务采纳（{@code biz_id} 非空）
+     * 的文件须显式携带 {@code force=true} 才允许删除。
+     *
+     * @param id    文件ID
+     * @param force 是否强制删除被业务引用的文件
+     */
+    @ApiResponseBody
+    @Log(module = "文件管理", operation = "删除文件", type = LogTypeEnum.DELETE, saveResult = false)
+    @SaCheckPermission("system:file:delete")
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable("id") Long id,
+                       @RequestParam(value = "force", required = false, defaultValue = "false") boolean force) {
+        fileService.delete(id, force);
     }
 
     /**

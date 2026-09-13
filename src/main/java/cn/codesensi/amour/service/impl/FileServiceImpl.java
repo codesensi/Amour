@@ -6,18 +6,26 @@ import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.exception.SystemException;
 import cn.codesensi.amour.common.properties.AppFileProperties;
 import cn.codesensi.amour.mapper.SysFileMapper;
+import cn.codesensi.amour.mapper.SysUserMapper;
+import cn.codesensi.amour.model.converter.FileConverter;
 import cn.codesensi.amour.model.dto.ConfigDTO;
+import cn.codesensi.amour.model.dto.FilePageDTO;
 import cn.codesensi.amour.model.entity.SysFile;
+import cn.codesensi.amour.model.entity.SysUser;
+import cn.codesensi.amour.model.response.FilePageResponse;
 import cn.codesensi.amour.model.response.FileUploadResponse;
 import cn.codesensi.amour.service.FileService;
 import cn.codesensi.amour.service.SysConfigService;
 import cn.codesensi.amour.service.file.FileStorage;
 import cn.codesensi.amour.service.file.FileViewResult;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -30,15 +38,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static cn.codesensi.amour.model.entity.table.SysFileTableDef.SYS_FILE;
+import static cn.codesensi.amour.model.entity.table.SysUserTableDef.SYS_USER;
 
 /**
  * 文件服务实现。
@@ -65,25 +71,33 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
     private static final Pattern VIEW_URL_PATTERN = Pattern.compile(RegexConst.FILE_VIEW_URL);
 
     private final SysFileMapper sysFileMapper;
+    private final SysUserMapper sysUserMapper;
     private final AppFileProperties props;
     private final SysConfigService sysConfigService;
+    private final FileConverter fileConverter;
     private final Map<StorageTypeEnum, FileStorage> storageMap;
 
     /**
      * 构造时将全部存储实现按类型索引，运行时按配置路由。
      *
      * @param sysFileMapper    文件记录 Mapper
+     * @param sysUserMapper    用户 Mapper（分页结果回填上传人用户名）
      * @param props            文件存储配置
      * @param sysConfigService 系统配置服务（读取 file.storage）
+     * @param fileConverter    文件转换器（实体 → 行响应对象）
      * @param storages         全部存储实现（本地/对象存储等）
      */
     public FileServiceImpl(SysFileMapper sysFileMapper,
+                           SysUserMapper sysUserMapper,
                            AppFileProperties props,
                            SysConfigService sysConfigService,
+                           FileConverter fileConverter,
                            List<FileStorage> storages) {
         this.sysFileMapper = sysFileMapper;
+        this.sysUserMapper = sysUserMapper;
         this.props = props;
         this.sysConfigService = sysConfigService;
+        this.fileConverter = fileConverter;
         this.storageMap = storages.stream()
                 .collect(Collectors.toUnmodifiableMap(FileStorage::getStorageType, Function.identity()));
     }
@@ -176,6 +190,8 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
             throw new SystemException("读取上传文件失败");
         }
         sysFile.setMd5(md5);
+        // 回填存储 key:预览/下载均按该 key 定位物理文件,缺失会导致 NPE
+        sysFile.setPath(key);
 
         // 8. 单条 SQL 入库(主键/MD5/存储 key 均已就绪;主键已有值时框架自动跳过再生成)
         sysFileMapper.insert(sysFile, true);
@@ -204,6 +220,10 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         if (sysFile == null) {
             throw new BusinessException("文件不存在");
         }
+        // 防御:存储 key 缺失的历史记录直接判不可用,避免物理定位时空指针
+        if (StrUtil.isBlank(sysFile.getPath())) {
+            throw new BusinessException("文件不存在或已被清理");
+        }
         // 按文件自身记录的 storage_type 分发(与当前配置无关,切换存储不影响历史文件)
         StorageTypeEnum storageType = BaseEnum.fromCode(StorageTypeEnum.class, sysFile.getStorageType());
         if (storageType == null) {
@@ -215,6 +235,98 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
             throw new BusinessException("文件不存在或已被清理");
         }
         return new FileViewResult(sysFile, resource);
+    }
+
+    /**
+     * 分页查询文件记录。
+     * <p>
+     * 仅查询未删除记录：文件名模糊、业务类型/存储类型精确、上传人用户名模糊
+     * （子查询先按用户名解析用户ID集合）、上传时间范围（起止均含边界），
+     * 条件缺省时自动忽略；按 ID 倒序（最新在前）；
+     * 上传人用户名按本页出现的 creator 批量回填，避免逐行查询。
+     *
+     * @param pageDTO 分页查询参数
+     * @return 文件分页结果
+     */
+    @Override
+    public Page<FilePageResponse> page(FilePageDTO pageDTO) {
+        QueryWrapper wrapper = QueryWrapper.create()
+                .where(SYS_FILE.DEL_FLAG.eq(DelFlagEnum.NOT_DELETED.getCode()))
+                .and(SYS_FILE.ORIGINAL_NAME.like(pageDTO.getOriginalName(), StrUtil::isNotBlank))
+                .and(SYS_FILE.BIZ_TYPE.eq(pageDTO.getBizType(), StrUtil::isNotBlank))
+                .and(SYS_FILE.STORAGE_TYPE.eq(pageDTO.getStorageType(), StrUtil::isNotBlank))
+                .and(SYS_FILE.CREATE_TIME.ge(parseTime(pageDTO.getBeginTime(), false), Objects::nonNull))
+                .and(SYS_FILE.CREATE_TIME.le(parseTime(pageDTO.getEndTime(), true), Objects::nonNull))
+                .orderBy(SYS_FILE.ID, false);
+        if (StrUtil.isNotBlank(pageDTO.getCreatorName())) {
+            // 上传人按用户名模糊匹配:子查询解析用户ID集合,避免联表分页
+            QueryWrapper creatorQuery = QueryWrapper.create()
+                    .select(SYS_USER.ID)
+                    .from(SYS_USER)
+                    .where(SYS_USER.USERNAME.like(pageDTO.getCreatorName()));
+            wrapper.and(SYS_FILE.CREATOR.in(creatorQuery));
+        }
+        Page<SysFile> page = sysFileMapper.paginate(
+                Page.of(pageDTO.getPageNumber(), pageDTO.getPageSize()), wrapper);
+
+        // 批量回填上传人用户名:仅对本页出现的 creator 查询一次
+        List<Long> creatorIds = page.getRecords().stream()
+                .map(SysFile::getCreator)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+        Map<Long, String> nameMap = creatorIds.isEmpty()
+                ? Map.of()
+                : sysUserMapper.selectListByIds(creatorIds).stream()
+                        .collect(Collectors.toMap(SysUser::getId, SysUser::getUsername, (a, b) -> a));
+        Page<FilePageResponse> result = fileConverter.toPageResponse(page);
+        result.getRecords().forEach(row -> {
+            // creator 可能为空(未登录来源的历史记录),不可变 Map 拒绝 null key 查询,须先行判空
+            if (row.getCreator() != null) {
+                row.setCreatorName(nameMap.get(row.getCreator()));
+            }
+        });
+        return result;
+    }
+
+    /**
+     * 删除文件。
+     * <p>
+     * 已被业务采纳（{@code biz_id} 非空）的文件默认拒绝删除（防止误删导致业务展示异常），
+     * {@code force=true} 表示管理端已确认业务影响后的强制删除；
+     * 物理文件按文件自身记录的 storage_type 路由清理，记录逻辑删除保留审计，
+     * 免登录预览因物理文件已清理而自然失效。
+     *
+     * @param id    文件ID
+     * @param force 是否强制删除被业务引用的文件
+     */
+    @Override
+    public void delete(Long id, boolean force) {
+        SysFile sysFile = sysFileMapper.selectOneById(id);
+        if (sysFile == null) {
+            throw new BusinessException("文件不存在");
+        }
+        if (sysFile.getBizId() != null && !force) {
+            FileBizTypeEnum bizType = BaseEnum.fromCode(FileBizTypeEnum.class, sysFile.getBizType());
+            String bizDesc = bizType == null ? sysFile.getBizType() : bizType.getDesc();
+            throw new BusinessException("文件已被业务「" + bizDesc + "」引用(关联ID " + sysFile.getBizId()
+                    + "),删除可能导致相关业务无法展示;确认无误请强制删除");
+        }
+
+        // 物理文件清理:按记录自身的 storage_type 路由,与当前配置无关;
+        // 存储实现对删除失败仅告警不抛出,不允许清理动作反向影响调用方
+        StorageTypeEnum storageType = BaseEnum.fromCode(StorageTypeEnum.class, sysFile.getStorageType());
+        if (storageType == null) {
+            throw new SystemException("不支持的存储类型：" + sysFile.getStorageType());
+        }
+        requireStorage(storageType).delete(sysFile.getPath());
+
+        // 逻辑删除记录(保留审计)
+        UpdateChain.of(SysFile.class)
+                .set(SYS_FILE.DEL_FLAG, DelFlagEnum.DELETED.getCode())
+                .where(SYS_FILE.ID.eq(id))
+                .and(SYS_FILE.DEL_FLAG.eq(DelFlagEnum.NOT_DELETED.getCode()))
+                .update();
     }
 
     /**
@@ -266,6 +378,28 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
                 .and(SYS_FILE.ID.notIn(fileIds))
                 .and(SYS_FILE.DEL_FLAG.eq(DelFlagEnum.NOT_DELETED.getCode()))
                 .update();
+    }
+
+    /**
+     * 解析上传时间范围边界。
+     * <p>
+     * 起边界取当日零点、止边界取当日末尾（含边界）；空值返回 null（查询条件自动忽略），
+     * 解析失败抛出业务异常给出可读提示。
+     *
+     * @param date     日期文本（yyyy-MM-dd）
+     * @param endOfDay true-取当日末尾（止边界），false-取当日零点（起边界）
+     * @return 边界时间；空文本返回 null
+     */
+    private Date parseTime(String date, boolean endOfDay) {
+        if (StrUtil.isBlank(date)) {
+            return null;
+        }
+        try {
+            Date parsed = DateUtil.parse(date);
+            return endOfDay ? DateUtil.endOfDay(parsed) : DateUtil.beginOfDay(parsed);
+        } catch (Exception e) {
+            throw new BusinessException("时间格式不正确：" + date);
+        }
     }
 
     /**

@@ -49,8 +49,7 @@ public class AppCacheProperties {
     /**
      * 各缓存个性化配置列表。
      */
-    @Valid
-    private List<CacheItem> caches = new ArrayList<>();
+    private List<@Valid CacheItem> caches = new ArrayList<>();
 
     /**
      * 单个缓存的配置项。

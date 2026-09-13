@@ -184,6 +184,9 @@ FROM (
              (1700, 1000, '日志管理', 'M', '/admin/system/log', 'system/log/index', 7, 'ep:document', NULL, 1),
              (1701, 1700, '登录日志分页查询', 'B', NULL, NULL, 1, NULL, 'log:login:page', 1),
              (1702, 1700, '操作日志分页查询', 'B', NULL, NULL, 2, NULL, 'log:operate:page', 1),
+             (1800, 1000, '文件管理', 'M', '/admin/system/file', 'system/file/index', 8, 'ep:folder-opened', NULL, 1),
+             (1801, 1800, '文件分页查询', 'B', NULL, NULL, 1, NULL, 'system:file:page', 1),
+             (1802, 1800, '删除文件', 'B', NULL, NULL, 2, NULL, 'system:file:delete', 1),
              (3000, 0, '个人中心', 'M', '/admin/profile', 'profile/index', 3, 'ep:avatar', NULL, 1)
      ) AS t(id, pid, title, type, path, component, sort, icon, perms, builtin)
 WHERE NOT EXISTS (
