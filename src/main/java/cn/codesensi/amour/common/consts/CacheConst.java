@@ -48,13 +48,19 @@ public class CacheConst {
      * QQ 信息缓存名（基础缓存名，实际使用时经 {@link CacheUtil#withAppEnv(String)} 拼接项目名_运行环境前缀），
      * Key 为 QQ 号，存储上游服务解析出的头像地址与昵称
      */
-    public static final String QQ = "qq";
+    public static final String QQ_INFO = "qq-info";
 
     /**
      * 数据字典缓存名（基础缓存名，实际使用时经 {@link CacheUtil#withAppEnv(String)} 拼接项目名_运行环境前缀），
      * Key 为字典编码（dict_code），存储该编码下启用中的字典项列表
      */
     public static final String DICT = "dict";
+
+    /**
+     * 接口限流计数缓存名（基础缓存名，实际使用时经 {@link CacheUtil#withAppEnv(String)} 拼接项目名_运行环境前缀），
+     * Key 为「接口键:IP」，存储固定窗口计数器（窗口起点由计数器自身管理，条目过期仅作内存回收）
+     */
+    public static final String RATE_LIMIT = "rate-limit";
 
     /**
      * 缓存空值哨兵：Caffeine 不允许缓存 {@code null}，用该哨兵占位表示"数据不存在"，

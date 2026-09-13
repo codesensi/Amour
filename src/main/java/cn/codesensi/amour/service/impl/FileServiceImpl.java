@@ -1,5 +1,6 @@
 package cn.codesensi.amour.service.impl;
 
+import cn.codesensi.amour.common.consts.AppConst;
 import cn.codesensi.amour.common.consts.RegexConst;
 import cn.codesensi.amour.common.enums.*;
 import cn.codesensi.amour.common.exception.BusinessException;
@@ -133,7 +134,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
                 FileNameUtil.getName(StrUtil.blankToDefault(file.getOriginalFilename(), "file")));
         String extension = FileNameUtil.extName(originalName).toLowerCase();
         if (StrUtil.isBlank(extension) || !bizTypeEnum.getExtensions().contains(extension)) {
-            throw new BusinessException("不支持的文件格式,仅支持：" + String.join("/", bizTypeEnum.getExtensions()));
+            throw new BusinessException("不支持的文件格式,仅支持：" + String.join(AppConst.SLASH, bizTypeEnum.getExtensions()));
         }
         long maxBytes = bizTypeEnum.getMaxMb() * 1024L * 1024L;
         if (file.getSize() > maxBytes) {

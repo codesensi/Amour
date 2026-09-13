@@ -1,6 +1,8 @@
 package cn.codesensi.amour.controller;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
+import cn.codesensi.amour.common.annotation.RateLimit;
+import cn.codesensi.amour.common.enums.RateLimitKey;
 import cn.codesensi.amour.model.converter.CaptchaConverter;
 import cn.codesensi.amour.model.dto.CaptchaResultDTO;
 import cn.codesensi.amour.model.response.CaptchaResponse;
@@ -26,6 +28,7 @@ public class CaptchaController {
     /**
      * 生成验证码
      */
+    @RateLimit(key = RateLimitKey.CAPTCHA, fallbackLimit = 10, fallbackWindowSeconds = 60)
     @GetMapping("/captcha")
     public CaptchaResponse captcha() {
         CaptchaResultDTO captchaResultDTO = captchaService.genCaptcha();

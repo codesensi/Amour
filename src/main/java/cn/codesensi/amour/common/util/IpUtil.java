@@ -1,10 +1,13 @@
 package cn.codesensi.amour.common.util;
 
+import cn.codesensi.amour.common.consts.AppConst;
 import cn.hutool.core.lang.Validator;
 import jakarta.servlet.http.HttpServletRequest;
 
-import java.net.*;
-import java.util.Enumeration;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * IP 地址工具类 —— 从请求中解析真实客户端 IP。
@@ -30,11 +33,6 @@ public class IpUtil {
      * IPv6 本地回环地址的完整展开形式。
      */
     private static final String LOCALHOST_IPV6 = "0:0:0:0:0:0:0:1";
-
-    /**
-     * 多级代理下 X-Forwarded-For 头中多个 IP 之间的分隔符。
-     */
-    private static final String SEPARATOR = ",";
 
     /**
      * 优先解析的多级代理请求头名称（从右向左取第一个非内网 IP）。
@@ -71,7 +69,7 @@ public class IpUtil {
         //    从左向右取"第一个非内网 IP"会被客户端伪造的头部内容欺骗。
         String ip = request.getHeader(HEADER_X_FORWARDED_FOR);
         if (isValidIp(ip)) {
-            String[] ips = ip.split(SEPARATOR);
+            String[] ips = ip.split(AppConst.COMMA);
             for (int i = ips.length - 1; i >= 0; i--) {
                 String trimIp = ips[i].trim();
                 if (isValidIp(trimIp) && !isInternalIp(trimIp)) {

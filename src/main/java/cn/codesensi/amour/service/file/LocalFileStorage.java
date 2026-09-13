@@ -1,5 +1,6 @@
 package cn.codesensi.amour.service.file;
 
+import cn.codesensi.amour.common.consts.AppConst;
 import cn.codesensi.amour.common.enums.StorageTypeEnum;
 import cn.codesensi.amour.common.exception.SystemException;
 import cn.codesensi.amour.common.properties.AppFileProperties;
@@ -58,7 +59,7 @@ public class LocalFileStorage implements FileStorage {
     public String upload(SysFile file, InputStream in) {
         // 相对 key:{bizType}/{yyyyMM}/{fileId}.{ext},分月目录防单目录文件膨胀
         String month = DateUtil.format(new Date(), DatePattern.SIMPLE_MONTH_PATTERN);
-        String key = file.getBizType() + "/" + month + "/" + file.getId() + "." + file.getExtension();
+        String key = file.getBizType() + AppConst.SLASH + month + AppConst.SLASH + file.getId() + AppConst.DOT + file.getExtension();
         Path target = resolve(key);
         try {
             Files.createDirectories(target.getParent());

@@ -2,7 +2,9 @@ package cn.codesensi.amour.controller;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.common.annotation.Log;
+import cn.codesensi.amour.common.annotation.RateLimit;
 import cn.codesensi.amour.common.enums.LogTypeEnum;
+import cn.codesensi.amour.common.enums.RateLimitKey;
 import cn.codesensi.amour.model.converter.LoginConverter;
 import cn.codesensi.amour.model.dto.LoginDTO;
 import cn.codesensi.amour.model.dto.LoginResultDTO;
@@ -32,6 +34,7 @@ public class LoginController {
     /**
      * 登录
      */
+    @RateLimit(key = RateLimitKey.LOGIN, fallbackLimit = 5, fallbackWindowSeconds = 60)
     @Log(module = "系统管理", operation = "登录", type = LogTypeEnum.LOGIN)
     @PostMapping("/login")
     public LoginResponse login(@Valid @RequestBody LoginRequest request) {

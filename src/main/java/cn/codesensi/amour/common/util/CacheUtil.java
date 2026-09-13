@@ -1,5 +1,6 @@
 package cn.codesensi.amour.common.util;
 
+import cn.codesensi.amour.common.consts.AppConst;
 import cn.codesensi.amour.common.consts.CacheConst;
 import cn.codesensi.amour.common.context.AppEnvContext;
 import lombok.extern.slf4j.Slf4j;
@@ -29,11 +30,6 @@ import java.util.function.Function;
 public class CacheUtil {
 
     /**
-     * 项目名、运行环境与缓存名之间的分隔符。
-     */
-    private static final String SEPARATOR = "_";
-
-    /**
      * 为给定缓存名拼接「项目名_运行环境」前缀。
      * <p>
      * 例如 {@code withAppEnv("captcha")} 在项目名 {@code amour}、环境 {@code dev} 时返回
@@ -49,7 +45,7 @@ public class CacheUtil {
             // 实例就绪前调用属于编程错误，给出明确报错而非 NPE
             throw new IllegalStateException("AppEnvContext 尚未由 Spring 装配完成，无法拼接带环境前缀的缓存名");
         }
-        return ctx.getAppName() + SEPARATOR + ctx.getFirstActiveProfile() + SEPARATOR + cacheName;
+        return ctx.getAppName() + AppConst.UNDERSCORE + ctx.getFirstActiveProfile() + AppConst.UNDERSCORE + cacheName;
     }
 
     /**

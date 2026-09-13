@@ -1,6 +1,8 @@
 package cn.codesensi.amour.controller;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
+import cn.codesensi.amour.common.annotation.RateLimit;
+import cn.codesensi.amour.common.enums.RateLimitKey;
 import cn.codesensi.amour.model.converter.QqInfoConverter;
 import cn.codesensi.amour.model.dto.QqInfoResultDTO;
 import cn.codesensi.amour.model.request.QqInfoRequest;
@@ -37,6 +39,7 @@ public class QqInfoController {
      * @param request 查询入参（Jakarta Validation 校验，失败走全局 BindException 处理器返回 400）
      * @return 头像地址与昵称；昵称可能为空，由前端提示手动填写
      */
+    @RateLimit(key = RateLimitKey.QQ_INFO, fallbackLimit = 10, fallbackWindowSeconds = 60)
     @GetMapping("/qq-info")
     public QqInfoResponse qqInfo(@Valid QqInfoRequest request) {
         QqInfoResultDTO qqInfoResultDTO = qqInfoService.getQqInfo(request.getQq());

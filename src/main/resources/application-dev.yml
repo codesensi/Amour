@@ -99,13 +99,18 @@ app:
         # 用户信息缓存：写后 30 天左右兜底过期，写侧显式失效（资料/角色/权限/菜单任一变更时清除）
         expire-after-write: 2592000
         expire-after-access: 0
-      - name: qq
-        # QQ 信息缓存：写后 15 分钟过期，同一 QQ 号短时复用，避免失焦/翻页的高频调用穿透上游
-        expire-after-write: 900
-        expire-after-access: 0
       - name: dict
         # 数据字典缓存：Key 为字典编码（dict_code），写后 30 天左右兜底过期，写侧显式失效（字典增删改时清除对应编码）
         expire-after-write: 2592000
+        expire-after-access: 0
+      - name: qq-info
+        # QQ 信息缓存：写后 15 分钟过期，同一 QQ 号短时复用，避免失焦/翻页的高频调用穿透上游
+        expire-after-write: 900
+        expire-after-access: 0
+      - name: rate-limit
+        # 接口限流计数:真实限流窗口由计数器自带时间戳按 sys_config 配置管理,
+        # 本过期时间仅作条目内存回收,需大于可配置的最大窗口(秒)
+        expire-after-write: 3600
         expire-after-access: 0
   # 文件存储配置(存储方式运行时以 sys_config 的 file.storage 为准,此处为配置缺失时的兜底值)
   file:

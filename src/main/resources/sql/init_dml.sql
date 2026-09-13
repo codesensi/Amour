@@ -27,7 +27,14 @@ FROM (
              (3001, 'captcha.enabled', 'true', 'BOOLEAN', 'captcha', 0, '验证码开关'),
              (3002, 'captcha.image-type', 'arithmetic', 'STRING', 'captcha', 0, '图形验证码类型'),
              -- file（4000 段）
-             (4001, 'file.storage', 'local', 'STRING', 'file', 0, '文件存储方式: local-本地, oss-对象存储')
+             (4001, 'file.storage', 'local', 'STRING', 'file', 0, '文件存储方式: local-本地, oss-对象存储'),
+             -- rate-limit（5000 段）
+             (5001, 'rate-limit.login.limit', '5', 'INTEGER', 'rate-limit', 0, '登录接口-窗口内最大请求数(0 表示拒绝全部请求)'),
+             (5002, 'rate-limit.login.window', '60', 'INTEGER', 'rate-limit', 0, '登录接口-时间窗口(秒)'),
+             (5003, 'rate-limit.captcha.limit', '10', 'INTEGER', 'rate-limit', 0, '验证码接口-窗口内最大请求数(0 表示拒绝全部请求)'),
+             (5004, 'rate-limit.captcha.window', '60', 'INTEGER', 'rate-limit', 0, '验证码接口-时间窗口(秒)'),
+             (5005, 'rate-limit.qq.limit', '10', 'INTEGER', 'rate-limit', 0, 'QQ信息接口-窗口内最大请求数(0 表示拒绝全部请求)'),
+             (5006, 'rate-limit.qq.window', '60', 'INTEGER', 'rate-limit', 0, 'QQ信息接口-时间窗口(秒)')
      ) AS t(id, config_key, config_value, value_type, config_group, sensitive, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_config` WHERE `sys_config`.`id` = t.id
@@ -241,11 +248,12 @@ FROM (
              -- success（成功状态，对应 SuccessEnum：1-成功,0-失败；10600 段）
              (10601, 'success', '成功状态', '1', '成功', 1, 0, 1, '与 SuccessEnum(1/0) 对齐'),
              (10602, 'success', '成功状态', '0', '失败', 2, 0, 1, '与 SuccessEnum(1/0) 对齐'),
-             -- config-group（配置分组，与 sys_config.config_group 对齐：base-基础,site-门户,captcha-验证码,file-文件；10700 段）
+             -- config-group（配置分组，与 sys_config.config_group 对齐：base-基础,site-门户,captcha-验证码,file-文件,rate-limit-接口限流；10700 段）
              (10701, 'config-group', '配置分组', 'base', '基础配置', 1, 0, 1, '与 sys_config.config_group(base/site/captcha) 对齐'),
              (10702, 'config-group', '配置分组', 'site', '门户配置', 2, 0, 1, '与 sys_config.config_group(base/site/captcha) 对齐'),
              (10703, 'config-group', '配置分组', 'captcha', '验证码配置', 3, 0, 1, '与 sys_config.config_group(base/site/captcha) 对齐'),
              (10704, 'config-group', '配置分组', 'file', '文件配置', 4, 0, 1, '与 sys_config.config_group(base/site/captcha/file) 对齐'),
+             (10705, 'config-group', '配置分组', 'rate-limit', '接口限流', 5, 0, 1, '与 sys_config.config_group(base/site/captcha/file/rate-limit) 对齐'),
              -- config-value-type（配置值类型，与 sys_config.value_type 对齐：STRING/INTEGER/LONG/BOOLEAN/DATETIME；10800 段）
              (10801, 'config-value-type', '配置值类型', 'STRING', '字符串', 1, 0, 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN) 对齐'),
              (10802, 'config-value-type', '配置值类型', 'INTEGER', '整数', 2, 0, 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN) 对齐'),
@@ -254,7 +262,22 @@ FROM (
              (10805, 'config-value-type', '配置值类型', 'DATETIME', '日期时间', 5, 0, 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN/DATETIME) 对齐'),
              -- file-storage-type（存储类型，对应 StorageTypeEnum：local-本地,oss-对象存储；10900 段）
              (10901, 'file-storage-type', '存储类型', 'local', '本地存储', 1, 0, 1, '与 StorageTypeEnum(local/oss) 对齐'),
-             (10902, 'file-storage-type', '存储类型', 'oss', '对象存储', 2, 0, 1, '与 StorageTypeEnum(local/oss) 对齐')
+             (10902, 'file-storage-type', '存储类型', 'oss', '对象存储', 2, 0, 1, '与 StorageTypeEnum(local/oss) 对齐'),
+             -- biz-type（文件业务类型，对应 FileBizTypeEnum：avatar-用户头像,photo-相册照片,markdown-点滴配图；11000 段）
+             (11001, 'biz-type', '文件业务类型', 'avatar', '用户头像', 1, 0, 1, '与 FileBizTypeEnum(avatar/photo/markdown) 对齐'),
+             (11002, 'biz-type', '文件业务类型', 'photo', '相册照片', 2, 0, 1, '与 FileBizTypeEnum(avatar/photo/markdown) 对齐'),
+             (11003, 'biz-type', '文件业务类型', 'markdown', '点滴配图', 3, 0, 1, '与 FileBizTypeEnum(avatar/photo/markdown) 对齐'),
+             -- log-type（日志类型，对应 LogTypeEnum：0-未知,1-登录,2-登出,3-查询,4-新增,5-修改,6-删除,7-授权,8-上传,9-下载；11100 段）
+             (11101, 'log-type', '日志类型', '0', '未知', 1, 0, 1, '与 LogTypeEnum 对齐'),
+             (11102, 'log-type', '日志类型', '1', '登录', 2, 0, 1, '与 LogTypeEnum 对齐'),
+             (11103, 'log-type', '日志类型', '2', '登出', 3, 0, 1, '与 LogTypeEnum 对齐'),
+             (11104, 'log-type', '日志类型', '3', '查询', 4, 0, 1, '与 LogTypeEnum 对齐'),
+             (11105, 'log-type', '日志类型', '4', '新增', 5, 0, 1, '与 LogTypeEnum 对齐'),
+             (11106, 'log-type', '日志类型', '5', '修改', 6, 0, 1, '与 LogTypeEnum 对齐'),
+             (11107, 'log-type', '日志类型', '6', '删除', 7, 0, 1, '与 LogTypeEnum 对齐'),
+             (11108, 'log-type', '日志类型', '7', '授权', 8, 0, 1, '与 LogTypeEnum 对齐'),
+             (11109, 'log-type', '日志类型', '8', '上传', 9, 0, 1, '与 LogTypeEnum 对齐'),
+             (11110, 'log-type', '日志类型', '9', '下载', 10, 0, 1, '与 LogTypeEnum 对齐')
      ) AS t(id, dict_code, dict_name, dict_value, dict_label, sort, status, builtin, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_dict` WHERE `sys_dict`.`id` = t.id

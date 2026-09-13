@@ -79,18 +79,33 @@ public class AppConst {
     public static final String DEFAULT_PASSWORD = "123456";
 
     /**
-     * 用户上下文标识
-     */
-    public static final String USER_CONTEXT = "userContext";
-
-    /**
-     * MDC上下文标识
-     */
-    public static final String MDC_CONTEXT = "mdcContext";
-
-    /**
      * UApiPro 密钥请求头名（sys_config {@code uapi-key} 的值非空时携带）
      */
     public static final String UAPI_KEY_HEADER = "X-API-KEY";
+
+    /**
+     * 点号分隔符 —— sys_config 配置键分段（rate-limit.login.limit）、对象存储 key 扩展名等连接
+     */
+    public static final String DOT = ".";
+
+    /**
+     * 冒号分隔符 —— 限流缓存键（接口键:IP）等多段标识连接
+     */
+    public static final String COLON = ":";
+
+    /**
+     * 斜杠分隔符 —— 对象存储对象键的路径分段连接
+     */
+    public static final String SLASH = "/";
+
+    /**
+     * 下划线分隔符 —— 缓存名「项目名_运行环境」前缀拼接
+     */
+    public static final String UNDERSCORE = "_";
+
+    /**
+     * 逗号分隔符 —— 多值拆分（如 X-Forwarded-For 多 IP）与多值文案连接
+     */
+    public static final String COMMA = ",";
 
 }
