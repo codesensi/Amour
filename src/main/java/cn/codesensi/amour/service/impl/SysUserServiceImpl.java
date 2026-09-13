@@ -34,7 +34,10 @@ import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static cn.codesensi.amour.model.entity.table.SysRoleTableDef.SYS_ROLE;
 import static cn.codesensi.amour.model.entity.table.SysUserRoleTableDef.SYS_USER_ROLE;
@@ -294,7 +297,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
         // 1. 校验用户是否存在（逻辑删除的用户视为不存在）
         List<SysUser> sysUsers = listByIds(ids);
-        List<Long> existingIds = sysUsers.stream().map(SysUser::getId).toList();
+        Set<Long> existingIds = sysUsers.stream().map(SysUser::getId).collect(Collectors.toSet());
         List<Long> missingIds = ids.stream()
                 .filter(id -> !existingIds.contains(id))
                 .toList();
@@ -500,10 +503,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      * @param roleIds 去重后的角色ID列表
      */
     private void checkRolesExist(List<Long> roleIds) {
-        List<Long> existingIds = QueryChain.of(sysRoleMapper)
+        Set<Long> existingIds = new HashSet<>(QueryChain.of(sysRoleMapper)
                 .select(SYS_ROLE.ID)
                 .where(SYS_ROLE.ID.in(roleIds))
-                .listAs(Long.class);
+                .listAs(Long.class));
         List<Long> missingIds = roleIds.stream()
                 .filter(id -> !existingIds.contains(id))
                 .toList();

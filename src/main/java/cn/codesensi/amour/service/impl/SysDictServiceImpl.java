@@ -15,6 +15,7 @@ import cn.codesensi.amour.service.SysDictService;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
+import com.mybatisflex.core.logicdelete.LogicDeleteManager;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static cn.codesensi.amour.model.entity.table.SysDictTableDef.SYS_DICT;
 
@@ -90,8 +92,9 @@ public class SysDictServiceImpl implements SysDictService {
 
     /**
      * 按字典编码集合批量查询启用中的字典项分组；入参为空（{@code null} 或不含元素）时返回空列表。
-     * <p>逐编码复用 {@link #listByCode(String)}（优先走缓存，未命中回源查库并回填），
-     * 无启用条目的编码不出现在结果中，集合中的 {@code null} 元素会被跳过。
+     * <p>
+     * 先逐编码命中缓存，未命中的编码合并为一条 IN 查询回源并按编码回填缓存（空结果同样缓存，防穿透），
+     * 避免逐编码点查的开销；无启用条目的编码不出现在结果中，集合中的 {@code null} 元素会被跳过。
      *
      * @param codes 待查询的字典编码集合；为空时返回空列表
      * @return 字典分组列表（每组含字典编码与组内条目）；无命中时返回空列表
@@ -101,12 +104,84 @@ public class SysDictServiceImpl implements SysDictService {
         if (CollUtil.isEmpty(codes)) {
             return List.of();
         }
+        // 待回源编码去重（保序、跳过 null）
+        List<String> distinctCodes = codes.stream().filter(code -> code != null).distinct().toList();
+        if (distinctCodes.isEmpty()) {
+            return List.of();
+        }
+        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.DICT));
+        if (cache == null) {
+            // 缓存未注册/未就绪：降级为一条 IN 查询直查库
+            log.debug("dict 缓存未注册，降级为直接查库：codes={}", distinctCodes);
+            return buildGroups(codes, listByCodesDb(distinctCodes));
+        }
+        // 1. 逐编码命中缓存，收集未命中的编码
+        Map<String, List<DictDTO>> loaded = new LinkedHashMap<>();
+        List<String> missingCodes = new ArrayList<>();
+        for (String code : distinctCodes) {
+            Cache.ValueWrapper wrapper = cache.get(code);
+            if (wrapper == null) {
+                missingCodes.add(code);
+            } else {
+                loaded.put(code, castDictList(wrapper.get()));
+            }
+        }
+        // 2. 未命中的编码合并一条 IN 查询回源，并逐编码回填缓存（空结果同样缓存，防穿透）
+        if (!missingCodes.isEmpty()) {
+            Map<String, List<DictDTO>> fromDb = listByCodesDb(missingCodes);
+            for (String code : missingCodes) {
+                List<DictDTO> items = fromDb.getOrDefault(code, List.of());
+                cache.put(code, items);
+                loaded.put(code, items);
+            }
+        }
+        return buildGroups(codes, loaded);
+    }
+
+    /**
+     * 还原缓存中的字典项列表（缓存层以非泛型形式存取，此处统一收口强转）。
+     *
+     * @param cached 缓存值
+     * @return 字典项列表；缓存值为 null 时为空列表
+     */
+    @SuppressWarnings("unchecked")
+    private List<DictDTO> castDictList(Object cached) {
+        return cached == null ? List.of() : (List<DictDTO>) cached;
+    }
+
+    /**
+     * 从 sys_dict 表按编码集合批量查询启用中的字典项（编码 -> 组内条目，组内按 sort 升序）。
+     * <p>逻辑删除（del_flag）由 MyBatis-Flex 全局配置自动追加过滤。
+     *
+     * @param codes 字典编码集合（去重后非空）
+     * @return 编码 -> 启用中的字典项列表
+     */
+    private Map<String, List<DictDTO>> listByCodesDb(List<String> codes) {
+        return QueryChain.of(sysDictMapper)
+                .where(SYS_DICT.DICT_CODE.in(codes))
+                .and(SYS_DICT.STATUS.eq(EnableEnum.ENABLE.getCode()))
+                .orderBy(SYS_DICT.SORT, true)
+                .orderBy(SYS_DICT.ID, true)
+                .list()
+                .stream()
+                .collect(Collectors.groupingBy(SysDict::getDictCode, LinkedHashMap::new,
+                        Collectors.mapping(dictConverter::toDTO, Collectors.toList())));
+    }
+
+    /**
+     * 按入参顺序组装字典分组列表（编码为 null 或无启用条目的编码不出现）。
+     *
+     * @param codes  原始编码集合（保持输出顺序与入参一致）
+     * @param loaded 编码 -> 字典项列表
+     * @return 字典分组列表
+     */
+    private List<DictGroupDTO> buildGroups(List<String> codes, Map<String, List<DictDTO>> loaded) {
         List<DictGroupDTO> groups = new ArrayList<>();
         for (String code : codes) {
             if (code == null) {
                 continue;
             }
-            List<DictDTO> items = listByCode(code);
+            List<DictDTO> items = loaded.getOrDefault(code, List.of());
             if (!items.isEmpty()) {
                 groups.add(new DictGroupDTO().setDictCode(code).setItems(items));
             }
@@ -289,16 +364,18 @@ public class SysDictServiceImpl implements SysDictService {
     }
 
     /**
-     * 校验同编码下字典值唯一（逻辑删除的行由全局配置自动排除）。
+     * 校验同编码下字典值唯一（含已删除记录，全生命周期唯一，与唯一索引 uk_d_code_value 口径对齐，
+     * 避免服务层放行后由数据库唯一约束抛出非友好错误）。
      *
      * @param dictCode  字典编码
      * @param dictValue 字典值
      */
     private void checkValueUnique(String dictCode, String dictValue) {
-        long count = QueryChain.of(sysDictMapper)
-                .where(SYS_DICT.DICT_CODE.eq(dictCode))
-                .and(SYS_DICT.DICT_VALUE.eq(dictValue))
-                .count();
+        long count = LogicDeleteManager.execWithoutLogicDelete(() ->
+                QueryChain.of(sysDictMapper)
+                        .where(SYS_DICT.DICT_CODE.eq(dictCode))
+                        .and(SYS_DICT.DICT_VALUE.eq(dictValue))
+                        .count());
         if (count > 0) {
             throw new BusinessException("字典编码[" + dictCode + "]下字典值[" + dictValue + "]已存在");
         }

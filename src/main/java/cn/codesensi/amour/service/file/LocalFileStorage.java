@@ -12,8 +12,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Date;
 
 /**
@@ -45,25 +47,28 @@ public class LocalFileStorage implements FileStorage {
 
     /**
      * 存储文件内容到本地磁盘。
+     * <p>
+     * 流式拷贝到目标文件，不将内容整包读入内存。
      *
-     * @param file  文件记录（id/bizType/extension 等已就绪，path 待写盘后回填）
-     * @param bytes 文件字节内容
+     * @param file 文件记录（id/bizType/extension 等已就绪）
+     * @param in   文件内容输入流（由调用方打开并关闭）
      * @return 相对存储 key
      */
     @Override
-    public String upload(SysFile file, byte[] bytes) {
+    public String upload(SysFile file, InputStream in) {
         // 相对 key:{bizType}/{yyyyMM}/{fileId}.{ext},分月目录防单目录文件膨胀
         String month = DateUtil.format(new Date(), DatePattern.SIMPLE_MONTH_PATTERN);
         String key = file.getBizType() + "/" + month + "/" + file.getId() + "." + file.getExtension();
         Path target = resolve(key);
         try {
             Files.createDirectories(target.getParent());
-            Files.write(target, bytes);
+            // 主键唯一,正常不会同名;REPLACE_EXISTING 仅作防御,清理重试等极端场景下覆盖旧文件
+            Files.copy(in, target, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             log.error("本地文件写入失败：key={}", key, e);
             throw new SystemException("文件写入失败：" + key);
         }
-        log.debug("本地文件写入成功：key={}, size={}", key, bytes.length);
+        log.debug("本地文件写入成功：key={}, size={}", key, file.getSize());
         return key;
     }
 

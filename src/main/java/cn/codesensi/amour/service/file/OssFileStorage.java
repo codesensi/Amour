@@ -6,6 +6,8 @@ import cn.codesensi.amour.model.entity.SysFile;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
+import java.io.InputStream;
+
 /**
  * 对象存储（OSS）实现
  * <p>
@@ -31,12 +33,12 @@ public class OssFileStorage implements FileStorage {
     /**
      * 存储文件内容到对象存储（预留,未接入）。
      *
-     * @param file  文件记录
-     * @param bytes 文件字节内容
+     * @param file 文件记录
+     * @param in   文件内容输入流（由调用方打开并关闭）
      * @return 相对存储 key（object key）
      */
     @Override
-    public String upload(SysFile file, byte[] bytes) {
+    public String upload(SysFile file, InputStream in) {
         throw new SystemException("OSS 对象存储尚未接入,请先将系统配置 file.storage 切换为 local");
     }
 

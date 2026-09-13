@@ -15,6 +15,7 @@ import cn.codesensi.amour.service.file.FileStorage;
 import cn.codesensi.amour.service.file.FileViewResult;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.file.FileNameUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.mybatisflex.core.update.UpdateChain;
@@ -28,6 +29,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -41,8 +43,8 @@ import static cn.codesensi.amour.model.entity.table.SysFileTableDef.SYS_FILE;
 /**
  * 文件服务实现。
  * <p>
- * 上传流程：业务类型校验 → 扩展名/大小校验 → 落库取得主键 → 以主键命名写盘 → 回填存储 key，
- * 任一环节失败整体回滚。存储实现按 sys_config 的 {@code file.storage} 运行时路由
+ * 上传流程：业务类型校验 → 扩展名/大小校验 → 预生成主键 → 流式写盘 → 二次读取计算 MD5 → 单条 SQL 落库，
+ * 任一环节失败整体回滚并清理已写盘文件。存储实现按 sys_config 的 {@code file.storage} 运行时路由
  * （实时读取支持系统配置页热更新），读取则按文件自身记录的 storage_type 分发，
  * 切换存储只影响新上传，历史文件不受影响。
  *
@@ -89,8 +91,9 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
     /**
      * 上传文件。
      * <p>
-     * 按业务类型完成扩展名与大小校验后，先落库取得主键，再以主键命名写盘，
-     * 任一环节失败整体回滚；返回的分发地址形如 {@code /file/view/{id}}。
+     * 按业务类型完成扩展名与大小校验后，预生成主键并流式写盘，再对上传源二次读取计算 MD5，
+     * 最后以单条 SQL 落库（含存储 key 与 MD5），任一环节失败整体回滚并清理已写盘文件；
+     * 返回的分发地址形如 {@code /file/view/{id}}。
      *
      * @param bizType 业务类型编码（avatar/photo/markdown）
      * @param file    上传的文件
@@ -131,26 +134,26 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
             throw new SystemException("不支持的文件存储方式：file.storage=" + storageCode);
         }
         FileStorage storage = requireStorage(storageType);
-        // 落库(主键由全局雪花生成器填充,path 待写盘后回填)
-        byte[] bytes;
-        try {
-            bytes = file.getBytes();
-        } catch (IOException e) {
-            throw new SystemException("读取上传文件失败");
-        }
+
+        // 4. 预生成主键并组装记录:存储 key 由主键参与拼装,先行生成可使入库合并为单条 SQL
         SysFile sysFile = new SysFile()
+                .setId(IdUtil.getSnowflakeNextId())
                 .setOriginalName(originalName)
                 .setSize(file.getSize())
-                .setMd5(DigestUtil.md5Hex(bytes))
                 .setStorageType(storage.getStorageType().getCode())
                 .setExtension(extension)
                 .setContentType(StrUtil.blankToDefault(file.getContentType(), "application/octet-stream"))
                 .setBizType(bizTypeEnum.getCode());
-        sysFileMapper.insert(sysFile, true);
 
-        // 4. 写盘(物理文件名使用主键ID)
-        String key = storage.upload(sysFile, bytes);
-        // 注册回滚清理:本事务回滚时删除已写盘的物理文件,避免残留孤儿文件
+        // 5. 流式写盘:不将文件整包读入内存,避免并发上传大文件时的内存尖峰
+        String key;
+        try (InputStream in = file.getInputStream()) {
+            key = storage.upload(sysFile, in);
+        } catch (IOException e) {
+            throw new SystemException("读取上传文件失败");
+        }
+
+        // 6. 注册回滚清理:注册须先于 MD5 计算与入库,写盘之后任一环节失败回滚时同样清理已写盘的物理文件,避免残留孤儿文件
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
@@ -164,9 +167,18 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
             });
         }
 
-        // 5. 回填存储 key
-        SysFile pathUpdate = new SysFile().setId(sysFile.getId()).setPath(key);
-        sysFileMapper.update(pathUpdate);
+        // 7. 对上传源二次读取计算 MD5(Hutool 一次性消费流,返回小写十六进制);
+        //    MultipartFile 底层为磁盘临时文件,可重复打开流,与存储实现解耦(本地/OSS 均适用)
+        String md5;
+        try (InputStream in = file.getInputStream()) {
+            md5 = DigestUtil.md5Hex(in);
+        } catch (IOException e) {
+            throw new SystemException("读取上传文件失败");
+        }
+        sysFile.setMd5(md5);
+
+        // 8. 单条 SQL 入库(主键/MD5/存储 key 均已就绪;主键已有值时框架自动跳过再生成)
+        sysFileMapper.insert(sysFile, true);
 
         FileUploadResponse response = new FileUploadResponse()
                 .setId(sysFile.getId())

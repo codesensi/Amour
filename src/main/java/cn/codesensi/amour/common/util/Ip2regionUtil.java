@@ -71,15 +71,37 @@ public class Ip2regionUtil {
             if (search.contains("Reserved")) {
                 return "内网";
             }
-            // 去掉 |0 及 0|
-            search = search.replace("|0", "").replace("0|", "");
-            // 去掉最后一个 | 及后边的内容
-            search = search.substring(0, search.lastIndexOf("|"));
-            return search;
+            return formatRegion(search);
         } catch (Exception e) {
             log.warn("ip2region 查询失败，ip={}", ip, e);
             return "未知";
         }
+    }
+
+    /**
+     * 格式化 ip2region 原始归属地串。
+     * <p>
+     * 原始格式为 {@code 国家|区域|省份|城市|ISP}，按段解析后过滤「0」占位段
+     * （保留末尾的 ISP 运营商段），再按原有分隔符拼接，如
+     * {@code 中国|0|广东省|深圳市|电信} → {@code 中国|广东省|深圳市|电信}；
+     * 全部为占位段时返回「未知」。
+     *
+     * @param region ip2region 原始归属地串
+     * @return 格式化后的归属地；无有效段时返回「未知」
+     */
+    private static String formatRegion(String region) {
+        String[] segments = region.split("\\|");
+        StringBuilder formatted = new StringBuilder();
+        for (String segment : segments) {
+            if (segment.isEmpty() || "0".equals(segment)) {
+                continue;
+            }
+            if (!formatted.isEmpty()) {
+                formatted.append('|');
+            }
+            formatted.append(segment);
+        }
+        return !formatted.isEmpty() ? formatted.toString() : "未知";
     }
 
 }

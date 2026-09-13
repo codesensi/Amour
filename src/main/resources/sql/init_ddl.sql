@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `sys_config` (
 -- ----------------------------
 -- 表结构：sys_user（用户信息表）
 -- 幂等建表：仅当表不存在时创建
--- 唯一性：username 全生命周期唯一（含逻辑删除记录），服务层全量查重先行拦截并给出友好提示
+-- 唯一性：username / qq 全生命周期唯一（含逻辑删除记录），服务层全量查重先行拦截并给出友好提示
 -- ----------------------------
 CREATE TABLE IF NOT EXISTS `sys_user` (
     `id`          BIGINT        NOT NULL                COMMENT '用户ID',
@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS `sys_user` (
     `del_flag`    TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
     PRIMARY KEY (`id`),
     UNIQUE INDEX `uk_u_username` (`username`),
+    UNIQUE INDEX `uk_u_qq` (`qq`),
     INDEX `idx_u_status`   (`status` ASC)
     ) ENGINE = InnoDB
     CHARACTER SET = utf8mb4
@@ -227,6 +228,7 @@ CREATE TABLE IF NOT EXISTS `sys_file` (
 -- ----------------------------
 -- 表结构：sys_dict（数据字典表）
 -- 幂等建表：仅当表不存在时创建
+-- 唯一性：同编码下字典值全生命周期唯一（含逻辑删除记录），服务层全量查重先行拦截并给出友好提示
 -- ----------------------------
 CREATE TABLE IF NOT EXISTS `sys_dict` (
     `id`          BIGINT        NOT NULL                COMMENT '主键ID',
@@ -244,6 +246,7 @@ CREATE TABLE IF NOT EXISTS `sys_dict` (
     `update_time` DATETIME      NULL DEFAULT CURRENT_TIMESTAMP       COMMENT '更新时间',
     `del_flag`    TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
     PRIMARY KEY (`id`),
+    UNIQUE INDEX `uk_d_code_value` (`dict_code`, `dict_value`),
     INDEX `idx_d_dict_code` (`dict_code` ASC),
     INDEX `idx_d_status` (`status` ASC)
     ) ENGINE = InnoDB

@@ -311,35 +311,41 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     /**
      * 收集指定菜单的全部下级菜单ID(不含自身)。
      * <p>
-     * 菜单表数据量小，一次性加载后沿 pid 向下遍历；visited 兼作防环终止条件，
-     * 规避 pid 环脏数据导致的死循环。
+     * 菜单表数据量小，一次性加载后按 pid 建立子级索引向下遍历，
+     * 避免逐层全量扫描；visited 兼作防环终止条件，规避 pid 环脏数据导致的死循环。
      *
      * @param menuId 菜单ID
      * @return 全部下级菜单ID集合
      */
     private Set<Long> listDescendantIdsById(Long menuId) {
-        Map<Long, SysMenu> menuMap = QueryChain.of(sysMenuMapper)
+        // 按 pid 建立子级索引，向下遍历仅需沿索引推进
+        Map<Long, List<SysMenu>> childrenMap = QueryChain.of(sysMenuMapper)
                 .select(SYS_MENU.ALL_COLUMNS)
                 .list()
                 .stream()
-                .collect(Collectors.toMap(SysMenu::getId, Function.identity(), (a, b) -> a));
+                .collect(Collectors.groupingBy(SysMenu::getPid));
 
         Set<Long> descendantIds = new HashSet<>();
-        collectDescendantIds(menuId, menuMap, descendantIds);
+        collectDescendantIds(menuId, childrenMap, descendantIds);
         return descendantIds;
     }
 
     /**
-     * 沿 pid 向下递归收集 menuId 的全部下级菜单ID(不含自身)。
+     * 沿子级索引递归收集 menuId 的全部下级菜单ID(不含自身)。
      *
      * @param menuId        菜单ID
-     * @param menuMap       id -> 菜单 映射
+     * @param childrenMap   pid -> 子菜单列表 索引
      * @param descendantIds 已收集的下级ID集合(防环:同一 ID 仅收集一次)
      */
-    private void collectDescendantIds(Long menuId, Map<Long, SysMenu> menuMap, Set<Long> descendantIds) {
-        for (SysMenu menu : menuMap.values()) {
-            if (menuId.equals(menu.getPid()) && descendantIds.add(menu.getId())) {
-                collectDescendantIds(menu.getId(), menuMap, descendantIds);
+    private void collectDescendantIds(Long menuId, Map<Long, List<SysMenu>> childrenMap, Set<Long> descendantIds) {
+        List<SysMenu> children = childrenMap.get(menuId);
+        if (children == null) {
+            return;
+        }
+        for (SysMenu child : children) {
+            // add 返回 false 说明该 ID 已收集过，兼作防环终止条件
+            if (descendantIds.add(child.getId())) {
+                collectDescendantIds(child.getId(), childrenMap, descendantIds);
             }
         }
     }

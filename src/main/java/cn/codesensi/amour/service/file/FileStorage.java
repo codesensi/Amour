@@ -4,6 +4,8 @@ import cn.codesensi.amour.common.enums.StorageTypeEnum;
 import cn.codesensi.amour.model.entity.SysFile;
 import org.springframework.core.io.Resource;
 
+import java.io.InputStream;
+
 /**
  * 文件存储抽象 —— 本地磁盘与对象存储（OSS）的统一访问口子。
  * <p>
@@ -23,12 +25,14 @@ public interface FileStorage {
 
     /**
      * 存储文件内容。
+     * <p>
+     * 实现方负责完整读取输入流并写入存储；流由调用方打开并关闭。
      *
-     * @param file  文件记录（id/bizType/extension 等已就绪，path 待写盘后回填）
-     * @param bytes 文件字节内容
+     * @param file 文件记录（id/bizType/extension 等已就绪）
+     * @param in   文件内容输入流（流式写入，避免整包读入内存）
      * @return 相对存储 key（与 sys_file.path 同语义）
      */
-    String upload(SysFile file, byte[] bytes);
+    String upload(SysFile file, InputStream in);
 
     /**
      * 加载已存储的文件资源。
