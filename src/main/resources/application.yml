@@ -68,6 +68,7 @@ logbook:
       - oldPassword
       - newPassword
       - confirmPassword
+      - configValue
 
 # sa-token配置
 sa-token:

@@ -212,6 +212,7 @@ public class LogAspect {
                 params.add(new FileMeta(file.getName(), file.getOriginalFilename(), file.getSize()));
             } else if (arg instanceof HttpServletRequest || arg instanceof HttpServletResponse || arg instanceof BindingResult) {
                 // 排除请求对象、响应对象与校验结果对象
+                log.debug("排除请求对象、响应对象与校验结果对象");
             } else {
                 params.add(arg);
             }
