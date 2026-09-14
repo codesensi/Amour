@@ -23,6 +23,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.MediaTypeFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -137,6 +138,7 @@ public class FileController {
      * 预览文件（内联）。
      * <p>
      * 免登录接口,按文件自身记录的 storage_type 分发读取；
+     * Content-Type 由扩展名强推导,不采信记录中的历史声明值,杜绝伪装类型内联渲染；
      * 文件路径与内容一一对应,设置长期强缓存,二次访问直接命中浏览器缓存。
      *
      * @param id 文件ID
@@ -145,17 +147,14 @@ public class FileController {
     @GetMapping("/view/{id}")
     public ResponseEntity<Resource> view(@PathVariable("id") Long id) {
         FileViewResult result = fileService.load(id);
-        // Content-Type 缺失或非法时回退为二进制流
-        MediaType mediaType;
-        try {
-            mediaType = MediaType.parseMediaType(StrUtil.blankToDefault(
-                    result.sysFile().getContentType(), MediaType.APPLICATION_OCTET_STREAM_VALUE));
-        } catch (Exception e) {
-            log.debug("文件 Content-Type 解析失败，回退为通用二进制类型：id={}", id, e);
-            mediaType = MediaType.APPLICATION_OCTET_STREAM;
-        }
+        // Content-Type 由扩展名查 Spring 内置 mime.types 强推导,不采信库中历史声明值(防伪装 text/html 的存储型 XSS);
+        // 与上传侧 FileServiceImpl#resolveContentType 同口径,未识别的扩展名一律以二进制流回显(浏览器不内联渲染)
+        String extension = StrUtil.blankToDefault(result.sysFile().getExtension(), "").toLowerCase();
+        MediaType mediaType = MediaTypeFactory.getMediaType("file." + extension)
+                .orElse(MediaType.APPLICATION_OCTET_STREAM);
         return ResponseEntity.ok()
                 .contentType(mediaType)
+                .header("X-Content-Type-Options", "nosniff")
                 .cacheControl(CacheControl.maxAge(appFileProperties.getViewCacheDays(), TimeUnit.DAYS).cachePublic())
                 .body(result.resource());
     }

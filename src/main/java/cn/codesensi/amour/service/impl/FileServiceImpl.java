@@ -33,6 +33,7 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.http.MediaTypeFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -153,13 +154,17 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         FileStorage storage = requireStorage(storageType);
 
         // 4. 预生成主键并组装记录:存储 key 由主键参与拼装,先行生成可使入库合并为单条 SQL
+        // Content-Type 由扩展名查 Spring 内置 mime.types 强推导,不采信客户端声明值(防伪装类型的存储型 XSS)
+        String contentType = MediaTypeFactory.getMediaType("file." + extension)
+                .map(MediaType::toString)
+                .orElse(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         SysFile sysFile = new SysFile()
                 .setId(IdUtil.getSnowflakeNextId())
                 .setOriginalName(originalName)
                 .setSize(file.getSize())
                 .setStorageType(storage.getStorageType().getCode())
                 .setExtension(extension)
-                .setContentType(StrUtil.blankToDefault(file.getContentType(), MediaType.APPLICATION_OCTET_STREAM_VALUE))
+                .setContentType(contentType)
                 .setBizType(bizTypeEnum.getCode());
 
         // 5. 流式写盘:不将文件整包读入内存,避免并发上传大文件时的内存尖峰
