@@ -23,7 +23,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
  */
 @EnableAsync
 @ConfigurationPropertiesScan
-@EnableCaching
 @MapperScan("cn.codesensi.amour.**.mapper")
 @SpringBootApplication
 public class AmourApplication {
