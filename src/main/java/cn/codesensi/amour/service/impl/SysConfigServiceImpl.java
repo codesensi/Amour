@@ -1,5 +1,6 @@
 package cn.codesensi.amour.service.impl;
 
+import cn.codesensi.amour.common.consts.CacheConst;
 import cn.codesensi.amour.common.consts.RegexConst;
 import cn.codesensi.amour.common.enums.BaseEnum;
 import cn.codesensi.amour.common.enums.CacheNameEnum;
@@ -25,21 +26,22 @@ import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static cn.codesensi.amour.model.entity.table.SysConfigTableDef.SYS_CONFIG;
 
 /**
  * 运行时配置查询服务实现。
  * <p>
- * 优先从 Caffeine 缓存（配置名 {@code config}，见 {@link CacheConst#CONFIG}）读取以点分路径
+ * 优先从 Caffeine 缓存（配置名 {@code config}，见 {@link CacheNameEnum#CONFIG}）读取以点分路径
  * （如 {@code name}、{@code captcha.enabled}）作为 {@code config_key} 存储的配置，未命中时回源查库并回填，
  * 减少高频配置点的数据库压力。
  * <p>
@@ -89,7 +91,8 @@ public class SysConfigServiceImpl implements SysConfigService {
     /**
      * 按配置键集合批量查询配置；入参为空（{@code null} 或不含元素）时返回空列表。
      * <p>
-     * 指定 keys 时逐个按键读取（优先走缓存，未命中回源查库并回填），
+     * 命中缓存的键直接取用，未命中的合并为一条 IN 查询回源并逐键回填
+     * （不存在的键以空值哨兵占位，防穿透，语义与 {@link #oneByKey} 对齐），
      * 不存在的配置键不出现在结果中，集合中的 {@code null} 元素会被跳过。
      *
      * @param keys 待查询的配置键集合（app 之下的点分路径）；为空时返回空列表
@@ -100,17 +103,61 @@ public class SysConfigServiceImpl implements SysConfigService {
         if (CollUtil.isEmpty(keys)) {
             return List.of();
         }
-        List<ConfigDTO> result = new ArrayList<>();
-        for (String key : keys) {
-            if (key == null) {
+        // 待回源键去重（保序、跳过 null）
+        List<String> distinctKeys = keys.stream().filter(Objects::nonNull).distinct().toList();
+        if (distinctKeys.isEmpty()) {
+            return List.of();
+        }
+        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheNameEnum.CONFIG.getCode()));
+        if (cache == null) {
+            // 缓存未注册/未就绪：降级为一条 IN 查询直查库
+            log.debug("config 缓存未注册，降级为直接查库：keys={}", distinctKeys);
+            return listByKeysDb(distinctKeys).values().stream().map(configConverter::toDTO).toList();
+        }
+        Map<String, SysConfig> loaded = new LinkedHashMap<>();
+        List<String> missingKeys = new ArrayList<>();
+        // 1. 逐键命中缓存，收集未命中键（空值哨兵表示"该键确认不存在"，不算未命中）
+        for (String key : distinctKeys) {
+            Cache.ValueWrapper wrapper = cache.get(key);
+            if (wrapper == null) {
+                missingKeys.add(key);
                 continue;
             }
-            SysConfig config = oneByKey(key);
-            if (config != null) {
-                result.add(configConverter.toDTO(config));
+            Object cached = wrapper.get();
+            if (cached != null && cached != CacheConst.NULL_MARKER) {
+                loaded.put(key, (SysConfig) cached);
             }
         }
-        return result;
+        // 2. 未命中键合并一条 IN 查询回源，并逐键回填（不存在的键以空值哨兵占位，防穿透）
+        if (!missingKeys.isEmpty()) {
+            Map<String, SysConfig> fromDb = listByKeysDb(missingKeys);
+            for (String key : missingKeys) {
+                SysConfig config = fromDb.get(key);
+                cache.put(key, config == null ? CacheConst.NULL_MARKER : config);
+                if (config != null) {
+                    loaded.put(key, config);
+                }
+            }
+        }
+        return loaded.values()
+                .stream()
+                .map(configConverter::toDTO)
+                .toList();
+    }
+
+    /**
+     * 从 sys_config 表按配置键集合批量查询配置记录（一条 IN 查询）。
+     *
+     * @param keys 配置键集合（去重后非空）
+     * @return 配置键 -> 配置实体
+     */
+    private Map<String, SysConfig> listByKeysDb(List<String> keys) {
+        return QueryChain.of(sysConfigMapper)
+                .where(SYS_CONFIG.CONFIG_KEY.in(keys))
+                .list()
+                .stream()
+                .collect(Collectors.toMap(SysConfig::getConfigKey, config -> config,
+                        (first, second) -> first, LinkedHashMap::new));
     }
 
     /**
