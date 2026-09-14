@@ -62,14 +62,6 @@ public class LoginServiceImpl implements LoginService {
         String username = loginDTO.getUsername();
         String password = loginDTO.getPassword();
 
-        // 校验必填项
-        if (StrUtil.isBlank(username)) {
-            throw new ValidationException("账号不能为空");
-        }
-        if (StrUtil.isBlank(password)) {
-            throw new ValidationException("密码不能为空");
-        }
-
         // 校验验证码（开关缺失/停用时视为关闭）
         boolean captchaEnabled = sysConfigService.listByKeys(List.of(ConfigKeyEnum.CAPTCHA_ENABLED.getCode())).stream()
                 .anyMatch(config -> Boolean.parseBoolean(config.getConfigValue()));
