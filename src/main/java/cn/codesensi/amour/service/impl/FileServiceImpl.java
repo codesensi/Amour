@@ -23,6 +23,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.mybatisflex.core.logicdelete.LogicDeleteManager;
@@ -122,10 +123,10 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
     public FileUploadResultDTO upload(String bizType, MultipartFile file) {
         // 1. 业务类型校验
         FileBizTypeEnum bizTypeEnum = BaseEnum.fromCode(FileBizTypeEnum.class, bizType);
-        if (bizTypeEnum == null) {
+        if (ObjUtil.isNull(bizTypeEnum)) {
             throw new BusinessException("不支持的文件业务类型：" + bizType);
         }
-        if (file == null || file.isEmpty()) {
+        if (ObjUtil.isNull(file) || file.isEmpty()) {
             throw new BusinessException("上传文件不能为空");
         }
 
@@ -148,7 +149,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
                 .stream().findFirst().map(ConfigDTO::getConfigValue)
                 .orElse(props.getStorage());
         StorageTypeEnum storageType = BaseEnum.fromCode(StorageTypeEnum.class, storageCode);
-        if (storageType == null) {
+        if (ObjUtil.isNull(storageType)) {
             throw new SystemException("不支持的文件存储方式：file.storage=" + storageCode);
         }
         FileStorage storage = requireStorage(storageType);
@@ -227,7 +228,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         // 绕过全局逻辑删除:预览需覆盖回收站内的已删除文件,删除标识不作为过滤条件
         SysFile sysFile = LogicDeleteManager.execWithoutLogicDelete(() ->
                 sysFileMapper.selectOneById(id));
-        if (sysFile == null) {
+        if (ObjUtil.isNull(sysFile)) {
             throw new BusinessException("文件不存在");
         }
         // 防御:存储 key 缺失的历史记录直接判不可用,避免物理定位时空指针
@@ -236,7 +237,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         }
         // 按文件自身记录的 storage_type 分发(与当前配置无关,切换存储不影响历史文件)
         StorageTypeEnum storageType = BaseEnum.fromCode(StorageTypeEnum.class, sysFile.getStorageType());
-        if (storageType == null) {
+        if (ObjUtil.isNull(storageType)) {
             throw new SystemException("不支持的存储类型：" + sysFile.getStorageType());
         }
         FileStorage storage = requireStorage(storageType);
@@ -273,7 +274,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
                             .select(SYS_USER.ID)
                             .where(SYS_USER.USERNAME.like(pageDTO.getCreatorName()))
                             .listAs(Long.class));
-            if (resolved.isEmpty()) {
+            if (CollUtil.isEmpty(resolved)) {
                 // 上传人条件无匹配用户,直接返回空页,避免空 IN 查询
                 return Page.of(pageDTO.getPageNumber(), pageDTO.getPageSize(), 0);
             }
@@ -312,7 +313,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
             // username 理论非空(登录账号),防御 toMap 对 null value 抛 NPE
             if (CollUtil.isNotEmpty(sysUsers)) {
                 nameMap = sysUsers.stream()
-                        .filter(row -> row.getUsername() != null)
+                        .filter(row -> ObjUtil.isNotNull(row.getUsername()))
                         .collect(Collectors.toMap(SysUser::getId, SysUser::getUsername, (a, b) -> a));
             } else {
                 nameMap = Map.of();
@@ -323,7 +324,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         Page<FileInfoDTO> result = fileConverter.toItemDTOPage(page);
         result.getRecords().forEach(row -> {
             // creator 可能为空(未登录来源的历史记录),不可变 Map 拒绝 null key 查询,须先行判空
-            if (row.getCreator() != null) {
+            if (ObjUtil.isNotNull(row.getCreator())) {
                 row.setCreatorName(nameMap.get(row.getCreator()));
             }
         });
@@ -344,7 +345,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         // 绕过全局逻辑删除,才能识别已在回收站的记录并给出准确的重复删除提示
         SysFile sysFile = LogicDeleteManager.execWithoutLogicDelete(() ->
                 sysFileMapper.selectOneById(id));
-        if (sysFile == null) {
+        if (ObjUtil.isNull(sysFile)) {
             throw new BusinessException("文件不存在");
         }
         if (DelFlagEnum.DELETED.getCode().equals(sysFile.getDelFlag())) {
@@ -371,7 +372,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         // 绕过全局逻辑删除:恢复的目标是已删除记录,查询与回置 del_flag 均需触达 del_flag=1 的行
         SysFile sysFile = LogicDeleteManager.execWithoutLogicDelete(() ->
                 sysFileMapper.selectOneById(id));
-        if (sysFile == null) {
+        if (ObjUtil.isNull(sysFile)) {
             throw new BusinessException("文件不存在");
         }
         if (!DelFlagEnum.DELETED.getCode().equals(sysFile.getDelFlag())) {
@@ -401,14 +402,14 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         //(默认 deleteById 会被框架改写为逻辑删除并对 del_flag=0 过滤,对已删除行是空操作)
         SysFile sysFile = LogicDeleteManager.execWithoutLogicDelete(() ->
                 sysFileMapper.selectOneById(id));
-        if (sysFile == null) {
+        if (ObjUtil.isNull(sysFile)) {
             throw new BusinessException("文件不存在");
         }
         if (!DelFlagEnum.DELETED.getCode().equals(sysFile.getDelFlag())) {
             throw new BusinessException("未删除的文件请先删除到回收站");
         }
         StorageTypeEnum storageType = BaseEnum.fromCode(StorageTypeEnum.class, sysFile.getStorageType());
-        if (storageType == null) {
+        if (ObjUtil.isNull(storageType)) {
             throw new SystemException("不支持的存储类型：" + sysFile.getStorageType());
         }
         // 先物理删除记录（保持绕过全局逻辑删除的真正 DELETE）,成功后再清理物理文件,
@@ -434,7 +435,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void bindBizFiles(FileBizTypeEnum bizType, Long bizId, Collection<String> urls) {
-        if (bizType == null || bizId == null || CollUtil.isEmpty(urls)) {
+        if (ObjUtil.isNull(bizType) || ObjUtil.isNull(bizId) || CollUtil.isEmpty(urls)) {
             return;
         }
 
@@ -509,7 +510,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
      */
     private FileStorage requireStorage(StorageTypeEnum type) {
         FileStorage storage = storageMap.get(type);
-        if (storage == null) {
+        if (ObjUtil.isNull(storage)) {
             throw new SystemException("文件存储实现未注册：" + type.getCode());
         }
         return storage;

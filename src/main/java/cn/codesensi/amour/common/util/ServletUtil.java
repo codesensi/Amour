@@ -1,5 +1,6 @@
 package cn.codesensi.amour.common.util;
 
+import cn.hutool.core.util.ObjUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -24,7 +25,7 @@ public class ServletUtil {
      */
     public static HttpServletRequest getRequest() {
         ServletRequestAttributes attributes = getRequestAttributes();
-        return attributes == null ? null : attributes.getRequest();
+        return ObjUtil.isNull(attributes) ? null : attributes.getRequest();
     }
 
     /**

@@ -1,6 +1,7 @@
 package cn.codesensi.amour.common.util;
 
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.util.ObjUtil;
 
 /**
  * 当前登录用户工具 —— 统一收敛 StpUtil 的登录态读取语义。
@@ -32,7 +33,7 @@ public final class LoginUserUtil {
      */
     public static Long getLoginIdOrNull() {
         Long boundId = LOGIN_ID_HOLDER.get();
-        if (boundId != null) {
+        if (ObjUtil.isNotNull(boundId)) {
             return boundId;
         }
         try {
@@ -59,7 +60,7 @@ public final class LoginUserUtil {
      * @param userId 登录用户ID，可为 null（解绑）
      */
     public static void bindLoginId(Long userId) {
-        if (userId != null) {
+        if (ObjUtil.isNotNull(userId)) {
             LOGIN_ID_HOLDER.set(userId);
         } else {
             LOGIN_ID_HOLDER.remove();

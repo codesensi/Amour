@@ -8,6 +8,7 @@ import cn.codesensi.amour.model.entity.SysLog;
 import cn.codesensi.amour.model.entity.SysUser;
 import cn.codesensi.amour.service.SysLogService;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
@@ -50,9 +51,9 @@ public class SysLogServiceImpl implements SysLogService {
     public void record(SysLog sysLog) {
         try {
             // 登录人用户名缺失（如公开接口未登录场景）不强制补齐；已登录时按主键补全用户名
-            if (sysLog.getUserId() != null && StrUtil.isBlank(sysLog.getUsername())) {
+            if (ObjUtil.isNotNull(sysLog.getUserId()) && StrUtil.isBlank(sysLog.getUsername())) {
                 SysUser user = sysUserMapper.selectOneById(sysLog.getUserId());
-                if (user != null) {
+                if (ObjUtil.isNotNull(user)) {
                     sysLog.setUsername(user.getUsername());
                 }
             }
@@ -78,7 +79,7 @@ public class SysLogServiceImpl implements SysLogService {
         List<Integer> scope = CollUtil.isEmpty(pageDTO.getLogTypes())
                 ? logTypes
                 : logTypes.stream().filter(pageDTO.getLogTypes()::contains).toList();
-        if (scope.isEmpty()) {
+        if (CollUtil.isEmpty(scope)) {
             // 所选类型均不在本端点范围内,交集为空直接返回空页,避免空 IN 查询
             return Page.of(pageDTO.getPageNumber(), pageDTO.getPageSize(), 0);
         }

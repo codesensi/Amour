@@ -5,6 +5,7 @@ import cn.codesensi.amour.common.enums.CacheNameEnum;
 import cn.codesensi.amour.common.exception.SystemException;
 import cn.codesensi.amour.common.properties.AppCacheProperties;
 import cn.codesensi.amour.common.util.CacheUtil;
+import cn.hutool.core.collection.CollUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.cache.CacheManager;
@@ -84,7 +85,7 @@ public class CacheConfig {
                 .map(CacheNameEnum::getCode)
                 .filter(code -> !registered.contains(code))
                 .toList();
-        if (!missing.isEmpty()) {
+        if (CollUtil.isNotEmpty(missing)) {
             throw new SystemException("以下缓存未在 app.cache.caches 中注册：" + missing);
         }
     }

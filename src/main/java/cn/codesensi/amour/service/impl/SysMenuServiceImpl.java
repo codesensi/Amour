@@ -254,7 +254,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         QueryChain<SysMenu> query = QueryChain.of(sysMenuMapper)
                 .where(SYS_MENU.PID.eq(pid))
                 .and(SYS_MENU.TITLE.eq(title));
-        if (excludeId != null) {
+        if (ObjUtil.isNotNull(excludeId)) {
             query.and(SYS_MENU.ID.ne(excludeId));
         }
         if (query.count() > 0) {
@@ -274,7 +274,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         }
         QueryChain<SysMenu> query = QueryChain.of(sysMenuMapper)
                 .where(SYS_MENU.PERMS.eq(perms));
-        if (excludeId != null) {
+        if (ObjUtil.isNotNull(excludeId)) {
             query.and(SYS_MENU.ID.ne(excludeId));
         }
         if (query.count() > 0) {
@@ -338,7 +338,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      */
     private void collectDescendantIds(Long menuId, Map<Long, List<SysMenu>> childrenMap, Set<Long> descendantIds) {
         List<SysMenu> children = childrenMap.get(menuId);
-        if (children == null) {
+        if (ObjUtil.isNull(children)) {
             return;
         }
         for (SysMenu child : children) {
@@ -482,9 +482,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      */
     private void collectAncestorIds(Long menuId, Map<Long, SysMenu> menuMap, Set<Long> visited) {
         Long current = menuId;
-        while (current != null && !AppConst.ZERO_LONG.equals(current) && visited.add(current)) {
+        while (ObjUtil.isNotNull(current) && !AppConst.ZERO_LONG.equals(current) && visited.add(current)) {
             SysMenu menu = menuMap.get(current);
-            if (menu == null) {
+            if (ObjUtil.isNull(menu)) {
                 break;
             }
             current = menu.getPid();

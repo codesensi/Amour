@@ -4,6 +4,7 @@ import cn.codesensi.amour.common.enums.CacheNameEnum;
 import cn.codesensi.amour.common.util.CacheUtil;
 import cn.codesensi.amour.service.CacheEvictService;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
@@ -97,7 +98,7 @@ public class CacheEvictServiceImpl implements CacheEvictService {
     @Override
     public void clearCache(String cacheName) {
         Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(cacheName));
-        if (cache != null) {
+        if (ObjUtil.isNotNull(cache)) {
             cache.clear();
             log.debug("已清空缓存：cache={}", cacheName);
         }
@@ -117,11 +118,11 @@ public class CacheEvictServiceImpl implements CacheEvictService {
             return;
         }
         Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(cacheName));
-        if (cache == null) {
+        if (ObjUtil.isNull(cache)) {
             return;
         }
         for (Object key : keys) {
-            if (key != null) {
+            if (ObjUtil.isNotNull(key)) {
                 cache.evict(key);
             }
         }

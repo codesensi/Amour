@@ -2,6 +2,7 @@ package cn.codesensi.amour.common.util;
 
 import cn.codesensi.amour.common.consts.AppConst;
 import cn.hutool.core.lang.Validator;
+import cn.hutool.core.util.ObjUtil;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.net.Inet4Address;
@@ -64,7 +65,7 @@ public class IpUtil {
      * @return 真实客户端 IP；无法解析时返回 {@code unknown}
      */
     public static String getIpAddr(HttpServletRequest request, boolean trustProxyHeaders) {
-        if (request == null) {
+        if (ObjUtil.isNull(request)) {
             return UNKNOWN;
         }
 
@@ -113,7 +114,7 @@ public class IpUtil {
      * @return 合法返回 {@code true}
      */
     private static boolean isValidIp(String ip) {
-        return ip != null && (Validator.isIpv4(ip) || Validator.isIpv6(ip));
+        return ObjUtil.isNotNull(ip) && (Validator.isIpv4(ip) || Validator.isIpv6(ip));
     }
 
     /**
@@ -129,7 +130,7 @@ public class IpUtil {
      */
     private static boolean isInternalIp(String ip) {
         InetAddress addr = parseIp(ip);
-        if (addr == null) {
+        if (ObjUtil.isNull(addr)) {
             return false;
         }
         if (addr.isLoopbackAddress() || addr.isSiteLocalAddress() || addr.isLinkLocalAddress()) {
@@ -152,7 +153,7 @@ public class IpUtil {
      * @return 解析后的 InetAddress；入参非法时返回 {@code null}
      */
     private static InetAddress parseIp(String ip) {
-        if (ip == null) {
+        if (ObjUtil.isNull(ip)) {
             return null;
         }
         try {

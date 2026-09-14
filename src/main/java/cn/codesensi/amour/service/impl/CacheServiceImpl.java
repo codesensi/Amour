@@ -4,6 +4,7 @@ import cn.codesensi.amour.common.consts.CacheConst;
 import cn.codesensi.amour.model.dto.CacheDTO;
 import cn.codesensi.amour.model.dto.CacheEntryDTO;
 import cn.codesensi.amour.model.dto.CacheStatsDTO;
+import cn.hutool.core.util.ObjUtil;
 import cn.codesensi.amour.service.CacheService;
 import com.github.benmanes.caffeine.cache.Policy;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
@@ -145,7 +146,7 @@ public class CacheServiceImpl implements CacheService {
         }
         Policy.CacheEntry<Object, Object> entry = policy.getEntryIfPresentQuietly(key);
         // 条目在遍历间隙被淘汰/移除时视为已无剩余时间
-        return entry == null ? null : entry.expiresAfter().toSeconds();
+        return ObjUtil.isNull(entry) ? null : entry.expiresAfter().toSeconds();
     }
 
     /**

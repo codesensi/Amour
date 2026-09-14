@@ -1,6 +1,7 @@
 package cn.codesensi.amour.common.context;
 
 import cn.codesensi.amour.common.util.LoginUserUtil;
+import cn.hutool.core.util.ObjUtil;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.MDC;
 import org.springframework.core.task.TaskDecorator;
@@ -27,14 +28,14 @@ public class ContextTaskDecorator implements TaskDecorator {
         return () -> {
             Map<String, String> previousMdc = MDC.getCopyOfContextMap();
             Long previousLoginId = LoginUserUtil.getBoundId();
-            if (context != null) {
+            if (ObjUtil.isNotNull(context)) {
                 MDC.setContextMap(context);
             }
             LoginUserUtil.bindLoginId(loginId);
             try {
                 runnable.run();
             } finally {
-                if (previousMdc != null) {
+                if (ObjUtil.isNotNull(previousMdc)) {
                     MDC.setContextMap(previousMdc);
                 } else {
                     MDC.clear();

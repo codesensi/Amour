@@ -148,14 +148,14 @@ public class LoginServiceImpl implements LoginService {
             throw new ValidationException("验证码不能为空");
         }
         Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheNameEnum.CAPTCHA.getCode()));
-        if (cache == null) {
+        if (ObjUtil.isNull(cache)) {
             throw new BusinessException("验证码缓存未注册，请检查缓存配置");
         }
         // 原子取删：asMap().remove 一次调用同时完成「读答案 + 失效」，并发提交无法复用同一 captchaKey
         // （Spring Cache 抽象无 getAndDelete，借原生 Caffeine 的原子 remove 实现）
         com.github.benmanes.caffeine.cache.Cache<Object, Object> nativeCache = ((CaffeineCache) cache).getNativeCache();
         String cachedAnswer = (String) nativeCache.asMap().remove(loginDTO.getCaptchaKey());
-        if (cachedAnswer == null) {
+        if (ObjUtil.isNull(cachedAnswer)) {
             throw new BusinessException("验证码不存在");
         }
         if (!StrUtil.equalsIgnoreCase(loginDTO.getCaptchaValue(), cachedAnswer)) {

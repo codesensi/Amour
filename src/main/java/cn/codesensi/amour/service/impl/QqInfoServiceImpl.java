@@ -10,6 +10,7 @@ import cn.codesensi.amour.model.dto.QqInfoResultDTO;
 import cn.codesensi.amour.model.entity.SysConfig;
 import cn.codesensi.amour.service.QqInfoService;
 import cn.codesensi.amour.service.SysConfigService;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
@@ -57,11 +58,11 @@ public class QqInfoServiceImpl implements QqInfoService {
     @Override
     public QqInfoResultDTO getQqInfo(String qq) {
         Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheNameEnum.QQ_INFO.getCode()));
-        if (cache == null) {
+        if (ObjUtil.isNull(cache)) {
             throw new SystemException("QQ信息缓存未注册，请检查缓存配置");
         }
         QqInfoResultDTO cached = cache.get(qq, QqInfoResultDTO.class);
-        if (cached != null) {
+        if (ObjUtil.isNotNull(cached)) {
             return cached;
         }
         QqInfoResultDTO result = loadFromQqApi(qq);
@@ -88,7 +89,7 @@ public class QqInfoServiceImpl implements QqInfoService {
         try {
             // 密钥实时读取 sys_config（管理端修改后事务提交即失效缓存，下次请求即生效），空时不携带请求头
             SysConfig apiKeyConfig = sysConfigService.oneByKey(ConfigKeyEnum.UAPI_KEY.getCode());
-            String apiKey = apiKeyConfig == null ? null : apiKeyConfig.getConfigValue();
+            String apiKey = ObjUtil.isNull(apiKeyConfig) ? null : apiKeyConfig.getConfigValue();
             HttpRequest request = HttpRequest.get(
                     String.format(qqApiUrl, URLEncoder.encode(qq, StandardCharsets.UTF_8)));
             if (StrUtil.isNotBlank(apiKey)) {

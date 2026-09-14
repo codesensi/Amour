@@ -1,6 +1,7 @@
 package cn.codesensi.amour.common.constraint;
 
 import cn.codesensi.amour.common.enums.BaseEnum;
+import cn.hutool.core.util.StrUtil;
 import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -50,7 +51,7 @@ public @interface InEnum {
 
         @Override
         public boolean isValid(String value, ConstraintValidatorContext context) {
-            if (value == null || value.isBlank()) {
+            if (StrUtil.isBlank(value)) {
                 return true;
             }
             return Arrays.stream(enumClass.getEnumConstants())

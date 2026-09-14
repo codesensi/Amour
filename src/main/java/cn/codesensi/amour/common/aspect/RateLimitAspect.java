@@ -13,6 +13,7 @@ import cn.codesensi.amour.common.util.IpUtil;
 import cn.codesensi.amour.common.util.ServletUtil;
 import cn.codesensi.amour.model.entity.SysConfig;
 import cn.codesensi.amour.service.SysConfigService;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -64,14 +65,14 @@ public class RateLimitAspect {
         // 代理头可信开关:sys_config 基础分组(trust-proxy-headers)热更新,仅部署于可信反向代理之后时开启;
         // 直连形态取连接对端地址,避免客户端伪造 X-Real-IP 等代理头绕过限流
         SysConfig trustSwitch = sysConfigService.oneByKey(ConfigKeyEnum.TRUST_PROXY_HEADERS.getCode());
-        boolean trustProxyHeaders = trustSwitch != null && Boolean.parseBoolean(trustSwitch.getConfigValue());
+        boolean trustProxyHeaders = ObjUtil.isNotNull(trustSwitch) && Boolean.parseBoolean(trustSwitch.getConfigValue());
         String ip = IpUtil.getIpAddr(ServletUtil.getRequest(), trustProxyHeaders);
         ConfigKeys configKeys = CONFIG_KEYS.get(rateLimit.key());
         int limit = resolve(configKeys.limit(), rateLimit.fallbackLimit(), 0);
         long windowMillis = resolve(configKeys.window(), rateLimit.fallbackWindowSeconds(), 1) * 1000L;
 
         Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheNameEnum.RATE_LIMIT.getCode()));
-        if (cache == null) {
+        if (ObjUtil.isNull(cache)) {
             // 缓存未注册（如 yml 漏配）：fail-open，限流失效但不阻断业务；
             // 注册完备性已由 CacheConfig 启动期校验兜底，正常配置下不会走到这里，error 级别确保可被监控发现
             log.error("rate-limit 缓存未注册，限流已失效，请检查 app.cache.caches 配置");
@@ -80,7 +81,7 @@ public class RateLimitAspect {
         long now = System.currentTimeMillis();
         // get(key, callable) 原子创建计数器；窗口判断与重置在计数器内部同步完成
         WindowCounter counter = cache.get(rateLimit.key().getCode() + AppConst.COLON + ip, () -> new WindowCounter(now));
-        if (counter == null) {
+        if (ObjUtil.isNull(counter)) {
             // 理论不可达：该重载契约是未命中时执行 callable 并返回其结果，callable 恒非 null；
             // 显式防御接口的 @Nullable 标注，与缓存未注册同策略 fail-open
             return;
@@ -104,7 +105,7 @@ public class RateLimitAspect {
     private int resolve(ConfigKeyEnum configKey, int fallback, int minValue) {
         try {
             SysConfig config = sysConfigService.oneByKey(configKey.getCode());
-            if (config != null && StrUtil.isNotBlank(config.getConfigValue())) {
+            if (ObjUtil.isNotNull(config) && StrUtil.isNotBlank(config.getConfigValue())) {
                 int value = Integer.parseInt(config.getConfigValue().trim());
                 if (value < minValue) {
                     log.warn("限流阈值配置小于允许最小值，回退兜底值：key={}，value={}，minValue={}，fallback={}",
@@ -130,7 +131,7 @@ public class RateLimitAspect {
         for (RateLimitKey key : RateLimitKey.values()) {
             ConfigKeyEnum limit = ConfigKeyEnum.rateLimitKeyOf(key, RateLimitField.LIMIT);
             ConfigKeyEnum window = ConfigKeyEnum.rateLimitKeyOf(key, RateLimitField.WINDOW);
-            if (limit == null || window == null) {
+            if (ObjUtil.isNull(limit) || ObjUtil.isNull(window)) {
                 throw new IllegalStateException("限流键缺少对应的 sys_config 配置键枚举：key=" + key.getCode()
                         + "，请在 ConfigKeyEnum 中补充 rate-limit." + key.getCode() + ".{limit|window}");
             }

@@ -93,12 +93,12 @@ public class SysDictServiceImpl implements SysDictService {
             return List.of();
         }
         // 待回源编码去重（保序、跳过 null）
-        List<String> distinctCodes = codes.stream().filter(code -> code != null).distinct().toList();
-        if (distinctCodes.isEmpty()) {
+        List<String> distinctCodes = codes.stream().filter(ObjUtil::isNotNull).distinct().toList();
+        if (CollUtil.isEmpty(distinctCodes)) {
             return List.of();
         }
         Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheNameEnum.DICT.getCode()));
-        if (cache == null) {
+        if (ObjUtil.isNull(cache)) {
             // 缓存未注册/未就绪：降级为一条 IN 查询直查库
             log.debug("dict 缓存未注册，降级为直接查库：codes={}", distinctCodes);
             return buildGroups(codes, listByCodesDb(distinctCodes));
@@ -108,14 +108,14 @@ public class SysDictServiceImpl implements SysDictService {
         List<String> missingCodes = new ArrayList<>();
         for (String code : distinctCodes) {
             Cache.ValueWrapper wrapper = cache.get(code);
-            if (wrapper == null) {
+            if (ObjUtil.isNull(wrapper)) {
                 missingCodes.add(code);
             } else {
                 loaded.put(code, castDictList(wrapper.get()));
             }
         }
         // 2. 未命中的编码合并一条 IN 查询回源，并逐编码回填缓存（空结果同样缓存，防穿透）
-        if (!missingCodes.isEmpty()) {
+        if (CollUtil.isNotEmpty(missingCodes)) {
             Map<String, List<DictDTO>> fromDb = listByCodesDb(missingCodes);
             for (String code : missingCodes) {
                 List<DictDTO> items = fromDb.getOrDefault(code, List.of());
@@ -134,7 +134,7 @@ public class SysDictServiceImpl implements SysDictService {
      */
     @SuppressWarnings("unchecked")
     private List<DictDTO> castDictList(Object cached) {
-        return cached == null ? List.of() : (List<DictDTO>) cached;
+        return (List<DictDTO>) ObjUtil.defaultIfNull(cached, List.of());
     }
 
     /**
@@ -166,11 +166,11 @@ public class SysDictServiceImpl implements SysDictService {
     private List<DictGroupDTO> buildGroups(List<String> codes, Map<String, List<DictDTO>> loaded) {
         List<DictGroupDTO> groups = new ArrayList<>();
         for (String code : codes) {
-            if (code == null) {
+            if (ObjUtil.isNull(code)) {
                 continue;
             }
             List<DictDTO> items = loaded.getOrDefault(code, List.of());
-            if (!items.isEmpty()) {
+            if (CollUtil.isNotEmpty(items)) {
                 groups.add(new DictGroupDTO().setDictCode(code).setItems(items));
             }
         }
@@ -243,7 +243,7 @@ public class SysDictServiceImpl implements SysDictService {
                 .where(SYS_DICT.DICT_CODE.eq(insertDTO.getDictCode()))
                 .limit(1)
                 .one();
-        String groupName = existDict == null ? null : existDict.getDictName();
+        String groupName = ObjUtil.isNull(existDict) ? null : existDict.getDictName();
         sysDict.setDictName(StrUtil.blankToDefault(groupName, insertDTO.getDictCode()));
         sysDictMapper.insert(sysDict, true);
 

@@ -8,6 +8,7 @@ import cn.codesensi.amour.model.dto.SayingTextDTO;
 import cn.codesensi.amour.model.entity.SysConfig;
 import cn.codesensi.amour.service.SayingService;
 import cn.codesensi.amour.service.SysConfigService;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
@@ -54,7 +55,7 @@ public class SayingServiceImpl implements SayingService {
         try {
             // 密钥实时读取 sys_config（管理端修改后事务提交即失效缓存，下次请求即生效），空时不携带请求头
             SysConfig apiKeyConfig = sysConfigService.oneByKey(ConfigKeyEnum.UAPI_KEY.getCode());
-            String apiKey = apiKeyConfig == null ? null : apiKeyConfig.getConfigValue();
+            String apiKey = ObjUtil.isNull(apiKeyConfig) ? null : apiKeyConfig.getConfigValue();
             HttpRequest request = HttpRequest.get(sayingUrl);
             if (StrUtil.isNotBlank(apiKey)) {
                 request.header(AppConst.UAPI_KEY_HEADER, apiKey);

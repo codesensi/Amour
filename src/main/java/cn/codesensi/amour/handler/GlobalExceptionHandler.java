@@ -247,7 +247,7 @@ public class GlobalExceptionHandler {
             return HttpStatus.INTERNAL_SERVER_ERROR;
         }
         HttpStatus status = HttpStatus.resolve(code);
-        return status != null && status.isError() ? status : HttpStatus.BAD_REQUEST;
+        return ObjUtil.isNotNull(status) && status.isError() ? status : HttpStatus.BAD_REQUEST;
     }
 
     /**

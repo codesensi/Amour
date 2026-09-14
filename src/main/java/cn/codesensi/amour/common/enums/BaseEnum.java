@@ -1,5 +1,7 @@
 package cn.codesensi.amour.common.enums;
 
+import cn.hutool.core.util.ObjUtil;
+
 /**
  * 通用枚举接口，提供 {@link #getCode()} 与 {@link #getDesc()} 两个基本维度，
  * 供业务枚举统一实现，便于以统一的 code 语义在前后端之间传递与反查。
@@ -37,7 +39,9 @@ public interface BaseEnum<T> {
      * @return code 匹配的枚举实例；未匹配时返回 null
      */
     static <E extends Enum<E> & BaseEnum<T>, T> E fromCode(Class<E> enumClass, T code) {
-        if (code == null) return null;
+        if (ObjUtil.isNull(code)) {
+            return null;
+        }
         for (E e : enumClass.getEnumConstants()) {
             if (code.equals(e.getCode())) {
                 return e;

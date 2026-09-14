@@ -1,5 +1,7 @@
 package cn.codesensi.amour.common.util;
 
+import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.lionsoul.ip2region.service.Config;
 import org.lionsoul.ip2region.service.InvalidConfigException;
@@ -62,7 +64,7 @@ public class Ip2regionUtil {
      * @return IP 归属地描述；内网地址返回「内网」，失败返回「未知」
      */
     public static String search(String ip) {
-        if (IP_2_REGION == null) {
+        if (ObjUtil.isNull(IP_2_REGION)) {
             log.warn("ip2region 未初始化，ip={}", ip);
             return "未知";
         }
@@ -93,15 +95,15 @@ public class Ip2regionUtil {
         String[] segments = region.split("\\|");
         StringBuilder formatted = new StringBuilder();
         for (String segment : segments) {
-            if (segment.isEmpty() || "0".equals(segment)) {
+            if (StrUtil.isEmpty(segment) || "0".equals(segment)) {
                 continue;
             }
-            if (!formatted.isEmpty()) {
+            if (StrUtil.isNotEmpty(formatted)) {
                 formatted.append('|');
             }
             formatted.append(segment);
         }
-        return !formatted.isEmpty() ? formatted.toString() : "未知";
+        return StrUtil.emptyToDefault(formatted.toString(), "未知");
     }
 
 }

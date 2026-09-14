@@ -3,6 +3,7 @@ package cn.codesensi.amour.common.util;
 import cn.codesensi.amour.common.consts.AppConst;
 import cn.codesensi.amour.common.consts.CacheConst;
 import cn.codesensi.amour.common.context.AppEnvContext;
+import cn.hutool.core.util.ObjUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -41,7 +42,7 @@ public class CacheUtil {
      */
     public static String withAppEnv(String cacheName) {
         AppEnvContext ctx = AppEnvContext.getInstance();
-        if (ctx == null) {
+        if (ObjUtil.isNull(ctx)) {
             // 实例就绪前调用属于编程错误，给出明确报错而非 NPE
             throw new IllegalStateException("AppEnvContext 尚未由 Spring 装配完成，无法拼接带环境前缀的缓存名");
         }
@@ -71,7 +72,7 @@ public class CacheUtil {
     @SuppressWarnings("unchecked")
     public static <K, T> T load(CacheManager cacheManager, String cacheName, K key, Function<K, T> loader) {
         Cache cache = cacheManager.getCache(withAppEnv(cacheName));
-        if (cache == null) {
+        if (ObjUtil.isNull(cache)) {
             // 缓存未注册/未就绪：降级为直接回源
             log.debug("{} 缓存未注册，降级为直接查库：key={}", cacheName, key);
             return loader.apply(key);
@@ -80,7 +81,7 @@ public class CacheUtil {
             // 原子回源：未命中时执行 loader 查库并写入，防止缓存击穿；null 以空值哨兵占位防穿透
             Object cached = cache.get(key, () -> {
                 T value = loader.apply(key);
-                return value != null ? value : CacheConst.NULL_MARKER;
+                return ObjUtil.defaultIfNull(value, CacheConst.NULL_MARKER);
             });
             return cached == CacheConst.NULL_MARKER ? null : (T) cached;
         } catch (Cache.ValueRetrievalException e) {

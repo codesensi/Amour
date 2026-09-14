@@ -3,6 +3,7 @@ package cn.codesensi.amour.config;
 import cn.codesensi.amour.common.consts.ThreadConst;
 import cn.codesensi.amour.common.context.ContextTaskDecorator;
 import cn.codesensi.amour.common.properties.ThreadPoolProperties;
+import cn.hutool.core.util.ObjUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
@@ -179,8 +180,8 @@ public class ThreadPoolConfig implements AsyncConfigurer {
      * @return 对应的拒绝策略处理器
      */
     private RejectedExecutionHandler resolveHandler(String name, RejectedExecutionHandler fallback) {
-        RejectedExecutionHandler handler = name == null ? null : REJECTED_HANDLER_MAP.get(name);
-        if (handler == null) {
+        RejectedExecutionHandler handler = ObjUtil.isNull(name) ? null : REJECTED_HANDLER_MAP.get(name);
+        if (ObjUtil.isNull(handler)) {
             log.warn("未知的拒绝策略配置：{}，回退为调用方默认策略", name);
             return fallback;
         }

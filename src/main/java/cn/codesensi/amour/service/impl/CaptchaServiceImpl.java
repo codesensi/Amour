@@ -12,6 +12,7 @@ import cn.codesensi.amour.model.dto.ConfigDTO;
 import cn.codesensi.amour.service.CaptchaService;
 import cn.codesensi.amour.service.SysConfigService;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ObjUtil;
 import com.wf.captcha.*;
 import com.wf.captcha.base.Captcha;
 import lombok.RequiredArgsConstructor;
@@ -76,7 +77,7 @@ public class CaptchaServiceImpl implements CaptchaService {
                 .map(ConfigDTO::getConfigValue)
                 .orElse(ImageType.ARITHMETIC.getCode());
         ImageType imageType = BaseEnum.fromCode(ImageType.class, imageTypeCode);
-        if (imageType == null) {
+        if (ObjUtil.isNull(imageType)) {
             throw new SystemException("不支持的图形验证码类型：captcha.image-type=" + imageTypeCode);
         }
 
@@ -112,7 +113,7 @@ public class CaptchaServiceImpl implements CaptchaService {
      */
     private Cache captchaCache() {
         Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheNameEnum.CAPTCHA.getCode()));
-        if (cache == null) {
+        if (ObjUtil.isNull(cache)) {
             throw new BusinessException("验证码缓存未注册，请检查缓存配置");
         }
         return cache;

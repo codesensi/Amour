@@ -2,6 +2,7 @@ package cn.codesensi.amour.common.core;
 
 import cn.codesensi.amour.common.util.LoginUserUtil;
 import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.util.ObjUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.InsertListener;
@@ -69,7 +70,7 @@ public class BaseEntity implements Serializable, InsertListener, UpdateListener 
     public void onInsert(Object entity) {
         if (entity instanceof BaseEntity base) {
             Long userId = LoginUserUtil.getLoginIdOrNull();
-            if (userId != null && base.getCreator() == null) {
+            if (ObjUtil.isNotNull(userId) && ObjUtil.isNull(base.getCreator())) {
                 base.setCreator(userId);
             }
         }
@@ -84,7 +85,7 @@ public class BaseEntity implements Serializable, InsertListener, UpdateListener 
     public void onUpdate(Object entity) {
         if (entity instanceof BaseEntity base) {
             Long userId = LoginUserUtil.getLoginIdOrNull();
-            if (userId != null && base.getUpdater() == null) {
+            if (ObjUtil.isNotNull(userId) && ObjUtil.isNull(base.getUpdater())) {
                 base.setUpdater(userId);
             }
         }

@@ -83,7 +83,7 @@ public class SysConfigServiceImpl implements SysConfigService {
         // 统一缓存读取：原子回源 + 空值哨兵 + 缓存故障降级（见 CacheUtil#load）
         return CacheUtil.load(cacheManager, CacheNameEnum.CONFIG.getCode(), key, k -> {
             SysConfig config = oneByKeyDb(k);
-            log.debug("config 缓存回源查库：key={}，result={}", k, config == null ? "不存在，以空值哨兵占位" : "已加载");
+            log.debug("config 缓存回源查库：key={}，result={}", k, ObjUtil.isNull(config) ? "不存在，以空值哨兵占位" : "已加载");
             return config;
         });
     }
@@ -105,11 +105,11 @@ public class SysConfigServiceImpl implements SysConfigService {
         }
         // 待回源键去重（保序、跳过 null）
         List<String> distinctKeys = keys.stream().filter(Objects::nonNull).distinct().toList();
-        if (distinctKeys.isEmpty()) {
+        if (CollUtil.isEmpty(distinctKeys)) {
             return List.of();
         }
         Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheNameEnum.CONFIG.getCode()));
-        if (cache == null) {
+        if (ObjUtil.isNull(cache)) {
             // 缓存未注册/未就绪：降级为一条 IN 查询直查库
             log.debug("config 缓存未注册，降级为直接查库：keys={}", distinctKeys);
             return listByKeysDb(distinctKeys).values().stream().map(configConverter::toDTO).toList();
@@ -119,22 +119,22 @@ public class SysConfigServiceImpl implements SysConfigService {
         // 1. 逐键命中缓存，收集未命中键（空值哨兵表示"该键确认不存在"，不算未命中）
         for (String key : distinctKeys) {
             Cache.ValueWrapper wrapper = cache.get(key);
-            if (wrapper == null) {
+            if (ObjUtil.isNull(wrapper)) {
                 missingKeys.add(key);
                 continue;
             }
             Object cached = wrapper.get();
-            if (cached != null && cached != CacheConst.NULL_MARKER) {
+            if (ObjUtil.isNotNull(cached) && cached != CacheConst.NULL_MARKER) {
                 loaded.put(key, (SysConfig) cached);
             }
         }
         // 2. 未命中键合并一条 IN 查询回源，并逐键回填（不存在的键以空值哨兵占位，防穿透）
-        if (!missingKeys.isEmpty()) {
+        if (CollUtil.isNotEmpty(missingKeys)) {
             Map<String, SysConfig> fromDb = listByKeysDb(missingKeys);
             for (String key : missingKeys) {
                 SysConfig config = fromDb.get(key);
-                cache.put(key, config == null ? CacheConst.NULL_MARKER : config);
-                if (config != null) {
+                cache.put(key, ObjUtil.defaultIfNull(config, CacheConst.NULL_MARKER));
+                if (ObjUtil.isNotNull(config)) {
                     loaded.put(key, config);
                 }
             }
@@ -248,7 +248,7 @@ public class SysConfigServiceImpl implements SysConfigService {
     private void validateValueByType(String valueType, String value) {
         // 未知/空类型按 STRING 口径处理（不做格式限制），与既有行为一致
         ValueType type = BaseEnum.fromCode(ValueType.class, valueType);
-        switch (type == null ? ValueType.STRING : type) {
+        switch (ObjUtil.defaultIfNull(type, ValueType.STRING)) {
             case BOOLEAN -> {
                 if (!"true".equals(value) && !"false".equals(value)) {
                     throw new ValidationException("布尔型配置值只能为 true 或 false");
@@ -266,7 +266,7 @@ public class SysConfigServiceImpl implements SysConfigService {
             }
             case DATETIME -> {
                 // 先核对 yyyy-MM-dd HH:mm:ss 形态，再严格解析拦截不存在的日期（如 2 月 30 日）
-                if (value == null || !DATETIME_PATTERN.matcher(value).matches()) {
+                if (ObjUtil.isNull(value) || !DATETIME_PATTERN.matcher(value).matches()) {
                     throw new ValidationException("日期时间格式必须为 yyyy-MM-dd HH:mm:ss");
                 }
                 try {

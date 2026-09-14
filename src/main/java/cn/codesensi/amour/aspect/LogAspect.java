@@ -14,6 +14,8 @@ import cn.codesensi.amour.model.entity.SysLog;
 import cn.codesensi.amour.model.request.LoginRequest;
 import cn.codesensi.amour.service.SysConfigService;
 import cn.codesensi.amour.service.SysLogService;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -111,7 +113,7 @@ public class LogAspect {
         Long userId = LoginUserUtil.getLoginIdOrNull();
         try {
             Object result = joinPoint.proceed();
-            if (userId == null) {
+            if (ObjUtil.isNull(userId)) {
                 // 登录场景：执行前未登录，执行后新会话已建立，补采一次
                 userId = LoginUserUtil.getLoginIdOrNull();
             }
@@ -148,18 +150,18 @@ public class LogAspect {
             // 本条日志在异步线程入库，BaseEntity 监听器在日志线程内取不到登录用户（无会话上下文），
             // creator 必须趁请求线程上下文仍在时手动填充，不可删除
             sysLog.setCreator(userId);
-            if (userId == null) {
+            if (ObjUtil.isNull(userId)) {
                 // 未登录（如登录接口）：用户名从请求参数中提取
                 fillUsernameFromArgs(joinPoint, sysLog);
             }
 
             // 非 Web 线程触发时无请求上下文,请求维度字段(url/ip/region/param)整体跳过
             HttpServletRequest request = ServletUtil.getRequest();
-            if (request != null) {
+            if (ObjUtil.isNotNull(request)) {
                 sysLog.setUrl(request.getRequestURI());
                 // 代理头可信开关与限流切面同口径:不信任代理头时记录连接对端地址
                 SysConfig trustSwitch = sysConfigService.oneByKey(ConfigKeyEnum.TRUST_PROXY_HEADERS.getCode());
-                boolean trustProxyHeaders = trustSwitch != null && Boolean.parseBoolean(trustSwitch.getConfigValue());
+                boolean trustProxyHeaders = ObjUtil.isNotNull(trustSwitch) && Boolean.parseBoolean(trustSwitch.getConfigValue());
                 String ip = IpUtil.getIpAddr(request, trustProxyHeaders);
                 sysLog.setIp(ip);
                 sysLog.setRegion(Ip2regionUtil.search(ip));
@@ -168,7 +170,7 @@ public class LogAspect {
                 }
             }
 
-            if (e != null) {
+            if (ObjUtil.isNotNull(e)) {
                 sysLog.setStatus(SuccessEnum.FAIL.getCode());
                 sysLog.setMsg(StrUtil.subPre(e.getMessage(), AppConst.MSG_MAX_LENGTH));
             } else {
@@ -204,7 +206,7 @@ public class LogAspect {
         String queryString = request.getQueryString();
         List<Object> params = new ArrayList<>();
         for (Object arg : joinPoint.getArgs()) {
-            if (arg == null) {
+            if (ObjUtil.isNull(arg)) {
                 continue;
             }
             if (arg instanceof MultipartFile file) {
@@ -217,12 +219,12 @@ public class LogAspect {
                 params.add(arg);
             }
         }
-        if (StrUtil.isBlank(queryString) && params.isEmpty()) {
+        if (StrUtil.isBlank(queryString) && CollUtil.isEmpty(params)) {
             return null;
         }
         // 组件为 null 时 Hutool 默认忽略该键,输出 JSON 结构与键序(query → params)保持不变
-        return mask(toJson(new ParamLog(StrUtil.isBlank(queryString) ? null : queryString,
-                params.isEmpty() ? null : params)));
+        return mask(toJson(new ParamLog(StrUtil.blankToDefault(queryString, null),
+                CollUtil.isEmpty(params) ? null : params)));
     }
 
     /**
@@ -293,7 +295,7 @@ public class LogAspect {
      * @return 适配后的 JSON 文本；入参为 null 时返回 null
      */
     private String fitJson(String json, int maxLength) {
-        if (json == null || json.length() <= maxLength) {
+        if (StrUtil.length(json) <= maxLength) {
             return json;
         }
         return JSONUtil.toJsonStr(new TruncatedJson(true, json.length(), StrUtil.subPre(json, maxLength)));
