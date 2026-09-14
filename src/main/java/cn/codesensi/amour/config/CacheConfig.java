@@ -1,6 +1,8 @@
 package cn.codesensi.amour.config;
 
 import cn.codesensi.amour.common.context.AppEnvContext;
+import cn.codesensi.amour.common.enums.CacheNameEnum;
+import cn.codesensi.amour.common.exception.SystemException;
 import cn.codesensi.amour.common.properties.AppCacheProperties;
 import cn.codesensi.amour.common.util.CacheUtil;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -10,8 +12,12 @@ import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * 缓存配置。
@@ -55,7 +61,32 @@ public class CacheConfig {
             // registerCustomCache：注册自定义过期策略的原生 Caffeine 缓存（绕过全局 spec）
             manager.registerCustomCache(cacheName, nativeCache);
         }
+        // 启动期校验注册完备性：枚举声明的缓存必须全部注册，缺失即启动失败
+        checkAllCachesRegistered(props);
         return manager;
+    }
+
+    /**
+     * 启动期校验缓存注册完备性：{@link CacheNameEnum} 声明的缓存必须全部在
+     * yml（{@code app.cache.caches}）中注册，任一缺失直接终止启动。
+     * <p>
+     * 把 yml 漏配暴露在部署期而非运行时——rate-limit 缺失时限流静默失效（fail-open）、
+     * captcha 缺失时验证码链路报错，二者都不应等到业务请求发生才被发现。
+     *
+     * @param props 缓存配置属性（承载 yml 中实际注册的缓存清单）
+     */
+    private void checkAllCachesRegistered(AppCacheProperties props) {
+        Set<String> registered = props.getCaches().stream()
+                .map(AppCacheProperties.CacheItem::getName)
+                .collect(Collectors.toSet());
+        // yml 中的 name 为基础缓存名（前缀在注册时才拼接），与枚举 code 直接比对
+        List<String> missing = Arrays.stream(CacheNameEnum.values())
+                .map(CacheNameEnum::getCode)
+                .filter(code -> !registered.contains(code))
+                .toList();
+        if (!missing.isEmpty()) {
+            throw new SystemException("以下缓存未在 app.cache.caches 中注册：" + missing);
+        }
     }
 
     /**
@@ -64,8 +95,8 @@ public class CacheConfig {
      * 开启 {@code recordStats()} 记录命中/未命中/驱逐等统计，供缓存监控读取；
      * 过期时间经 {@link #applyJitter(long, AppCacheProperties)} 随机抖动后生效。
      *
-     * @param item    缓存配置项
-     * @param props   缓存配置属性（提供最大容量与抖动配置）
+     * @param item  缓存配置项
+     * @param props 缓存配置属性（提供最大容量与抖动配置）
      * @return 构建完成的原生缓存
      */
     private Cache<Object, Object> build(AppCacheProperties.CacheItem item, AppCacheProperties props) {

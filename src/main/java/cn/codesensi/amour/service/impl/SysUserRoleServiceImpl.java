@@ -1,7 +1,7 @@
 package cn.codesensi.amour.service.impl;
 
-import cn.codesensi.amour.common.consts.CacheConst;
 import cn.codesensi.amour.common.consts.RbacConst;
+import cn.codesensi.amour.common.enums.CacheNameEnum;
 import cn.codesensi.amour.common.util.CacheUtil;
 import cn.codesensi.amour.mapper.SysRoleMapper;
 import cn.codesensi.amour.mapper.SysUserRoleMapper;
@@ -64,7 +64,7 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
     @Override
     public List<String> listRoleCodeByUserId(Long userId) {
         // 统一缓存读取：原子回源 + 缓存故障降级（见 CacheUtil#load）
-        return CacheUtil.load(cacheManager, CacheConst.ROLE, userId, this::loadRoleCodes);
+        return CacheUtil.load(cacheManager, CacheNameEnum.ROLE.getCode(), userId, this::loadRoleCodes);
     }
 
     /**

@@ -1,8 +1,8 @@
 package cn.codesensi.amour.service.impl;
 
-import cn.codesensi.amour.common.consts.CacheConst;
 import cn.codesensi.amour.common.consts.RegexConst;
 import cn.codesensi.amour.common.enums.BaseEnum;
+import cn.codesensi.amour.common.enums.CacheNameEnum;
 import cn.codesensi.amour.common.enums.ValueType;
 import cn.codesensi.amour.common.enums.YesEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
@@ -79,7 +79,7 @@ public class SysConfigServiceImpl implements SysConfigService {
     @Override
     public SysConfig oneByKey(String key) {
         // 统一缓存读取：原子回源 + 空值哨兵 + 缓存故障降级（见 CacheUtil#load）
-        return CacheUtil.load(cacheManager, CacheConst.CONFIG, key, k -> {
+        return CacheUtil.load(cacheManager, CacheNameEnum.CONFIG.getCode(), key, k -> {
             SysConfig config = oneByKeyDb(k);
             log.debug("config 缓存回源查库：key={}，result={}", k, config == null ? "不存在，以空值哨兵占位" : "已加载");
             return config;

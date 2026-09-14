@@ -22,6 +22,7 @@ public enum ConfigKeyEnum implements BaseEnum<String> {
     ICP("icp", "ICP备案文案"),
     COPYRIGHT_YEAR("copyright-year", "版权年份"),
     UAPI_KEY("uapi-key", "UApiPro接口密钥"),
+    TRUST_PROXY_HEADERS("trust-proxy-headers", "是否信任代理头(X-Real-IP等)"),
 
     // ---------- 门户站点配置（site 分组：2000 段） ----------
     SITE_LOVE_START_DATE("site.love-start-date", "门户恋爱计时起点"),

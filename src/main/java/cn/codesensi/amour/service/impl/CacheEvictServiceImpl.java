@@ -1,6 +1,6 @@
 package cn.codesensi.amour.service.impl;
 
-import cn.codesensi.amour.common.consts.CacheConst;
+import cn.codesensi.amour.common.enums.CacheNameEnum;
 import cn.codesensi.amour.common.util.CacheUtil;
 import cn.codesensi.amour.service.CacheEvictService;
 import cn.hutool.core.collection.CollUtil;
@@ -36,7 +36,7 @@ public class CacheEvictServiceImpl implements CacheEvictService {
      */
     @Override
     public void evictUserCache(List<Long> userIds) {
-        evictByKeys(CacheConst.USER, userIds);
+        evictByKeys(CacheNameEnum.USER.getCode(), userIds);
     }
 
     /**
@@ -46,7 +46,7 @@ public class CacheEvictServiceImpl implements CacheEvictService {
      */
     @Override
     public void evictRoleCache(List<Long> userIds) {
-        evictByKeys(CacheConst.ROLE, userIds);
+        evictByKeys(CacheNameEnum.ROLE.getCode(), userIds);
     }
 
     /**
@@ -56,7 +56,7 @@ public class CacheEvictServiceImpl implements CacheEvictService {
      */
     @Override
     public void evictPermCache(List<Long> userIds) {
-        evictByKeys(CacheConst.PERM, userIds);
+        evictByKeys(CacheNameEnum.PERM.getCode(), userIds);
     }
 
     /**
@@ -66,7 +66,7 @@ public class CacheEvictServiceImpl implements CacheEvictService {
      */
     @Override
     public void evictMenuCache(List<Long> userIds) {
-        evictByKeys(CacheConst.MENU, userIds);
+        evictByKeys(CacheNameEnum.MENU.getCode(), userIds);
     }
 
     /**
@@ -76,7 +76,7 @@ public class CacheEvictServiceImpl implements CacheEvictService {
      */
     @Override
     public void evictDictCache(List<String> codes) {
-        evictByKeys(CacheConst.DICT, codes);
+        evictByKeys(CacheNameEnum.DICT.getCode(), codes);
     }
 
     /**
@@ -86,7 +86,7 @@ public class CacheEvictServiceImpl implements CacheEvictService {
      */
     @Override
     public void evictConfigCache(List<String> keys) {
-        evictByKeys(CacheConst.CONFIG, keys);
+        evictByKeys(CacheNameEnum.CONFIG.getCode(), keys);
     }
 
     /**

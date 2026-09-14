@@ -1,6 +1,6 @@
 package cn.codesensi.amour.service.impl;
 
-import cn.codesensi.amour.common.consts.CacheConst;
+import cn.codesensi.amour.common.enums.CacheNameEnum;
 import cn.codesensi.amour.common.enums.ConfigKeyEnum;
 import cn.codesensi.amour.common.enums.EnableEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
@@ -146,7 +146,7 @@ public class LoginServiceImpl implements LoginService {
         if (StrUtil.isBlank(loginDTO.getCaptchaValue())) {
             throw new ValidationException("验证码不能为空");
         }
-        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.CAPTCHA));
+        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheNameEnum.CAPTCHA.getCode()));
         if (cache == null) {
             throw new BusinessException("验证码缓存未注册，请检查缓存配置");
         }

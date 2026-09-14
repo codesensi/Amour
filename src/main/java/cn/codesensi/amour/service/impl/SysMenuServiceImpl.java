@@ -1,9 +1,9 @@
 package cn.codesensi.amour.service.impl;
 
 import cn.codesensi.amour.common.consts.AppConst;
-import cn.codesensi.amour.common.consts.CacheConst;
 import cn.codesensi.amour.common.consts.RbacConst;
 import cn.codesensi.amour.common.enums.BuiltinEnum;
+import cn.codesensi.amour.common.enums.CacheNameEnum;
 import cn.codesensi.amour.common.enums.EnableEnum;
 import cn.codesensi.amour.common.enums.MenuType;
 import cn.codesensi.amour.common.exception.BusinessException;
@@ -357,8 +357,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      */
     private void evictAllCaches() {
         CacheUtil.evictAfterCommit(() -> {
-            cacheEvictService.clearCache(CacheConst.PERM);
-            cacheEvictService.clearCache(CacheConst.MENU);
+            cacheEvictService.clearCache(CacheNameEnum.PERM.getCode());
+            cacheEvictService.clearCache(CacheNameEnum.MENU.getCode());
         });
     }
 
@@ -374,7 +374,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     @Override
     public List<String> listPermCodeByUserId(Long userId) {
         // 统一缓存读取：原子回源 + 缓存故障降级（见 CacheUtil#load）
-        return CacheUtil.load(cacheManager, CacheConst.PERM, userId, this::loadPermCodes);
+        return CacheUtil.load(cacheManager, CacheNameEnum.PERM.getCode(), userId, this::loadPermCodes);
     }
 
     /**
@@ -416,7 +416,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     @Override
     public List<SysMenu> listMenuByUserId(Long userId) {
         // 统一缓存读取：原子回源 + 缓存故障降级（见 CacheUtil#load）
-        return CacheUtil.load(cacheManager, CacheConst.MENU, userId, this::loadMenus);
+        return CacheUtil.load(cacheManager, CacheNameEnum.MENU.getCode(), userId, this::loadMenus);
     }
 
     /**

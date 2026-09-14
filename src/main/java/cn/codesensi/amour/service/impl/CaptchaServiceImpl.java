@@ -1,7 +1,7 @@
 package cn.codesensi.amour.service.impl;
 
-import cn.codesensi.amour.common.consts.CacheConst;
 import cn.codesensi.amour.common.enums.BaseEnum;
+import cn.codesensi.amour.common.enums.CacheNameEnum;
 import cn.codesensi.amour.common.enums.ConfigKeyEnum;
 import cn.codesensi.amour.common.enums.ImageType;
 import cn.codesensi.amour.common.exception.BusinessException;
@@ -111,7 +111,7 @@ public class CaptchaServiceImpl implements CaptchaService {
      * @return captcha 缓存
      */
     private Cache captchaCache() {
-        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.CAPTCHA));
+        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheNameEnum.CAPTCHA.getCode()));
         if (cache == null) {
             throw new BusinessException("验证码缓存未注册，请检查缓存配置");
         }

@@ -2,8 +2,8 @@ package cn.codesensi.amour.common.aspect;
 
 import cn.codesensi.amour.common.annotation.RateLimit;
 import cn.codesensi.amour.common.consts.AppConst;
-import cn.codesensi.amour.common.consts.CacheConst;
 import cn.codesensi.amour.common.core.ResultCode;
+import cn.codesensi.amour.common.enums.CacheNameEnum;
 import cn.codesensi.amour.common.enums.ConfigKeyEnum;
 import cn.codesensi.amour.common.enums.RateLimitField;
 import cn.codesensi.amour.common.enums.RateLimitKey;
@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  * 接口限流切面 —— 拦截标注了 {@link RateLimit} 的接口，按「接口键 + 来源 IP」固定窗口计数限流。
  * <p>
- * 计数存储于统一的 rate-limit 缓存（{@link CacheConst#RATE_LIMIT}，经 CacheManager 装配，
+ * 计数存储于统一的 rate-limit 缓存（{@link CacheNameEnum#RATE_LIMIT}，经 CacheManager 装配，
  * 与项目其他缓存共用多环境前缀与容量/过期策略）；限流窗口由计数器自带时间戳管理，
  * 缓存条目的过期仅作内存回收，因此 sys_config 动态调整窗口不会导致计数提前清零。
  * <p>
@@ -61,14 +61,20 @@ public class RateLimitAspect {
      */
     @Before("@annotation(rateLimit)")
     public void check(RateLimit rateLimit) {
-        String ip = IpUtil.getIpAddr(ServletUtil.getRequest());
+        // 代理头可信开关:sys_config 基础分组(trust-proxy-headers)热更新,仅部署于可信反向代理之后时开启;
+        // 直连形态取连接对端地址,避免客户端伪造 X-Real-IP 等代理头绕过限流
+        SysConfig trustSwitch = sysConfigService.oneByKey(ConfigKeyEnum.TRUST_PROXY_HEADERS.getCode());
+        boolean trustProxyHeaders = trustSwitch != null && Boolean.parseBoolean(trustSwitch.getConfigValue());
+        String ip = IpUtil.getIpAddr(ServletUtil.getRequest(), trustProxyHeaders);
         ConfigKeys configKeys = CONFIG_KEYS.get(rateLimit.key());
         int limit = resolve(configKeys.limit(), rateLimit.fallbackLimit(), 0);
         long windowMillis = resolve(configKeys.window(), rateLimit.fallbackWindowSeconds(), 1) * 1000L;
 
-        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.RATE_LIMIT));
+        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheNameEnum.RATE_LIMIT.getCode()));
         if (cache == null) {
-            // 缓存未注册（如 yml 漏配）：fail-open，限流失效但不阻断业务
+            // 缓存未注册（如 yml 漏配）：fail-open，限流失效但不阻断业务；
+            // 注册完备性已由 CacheConfig 启动期校验兜底，正常配置下不会走到这里，error 级别确保可被监控发现
+            log.error("rate-limit 缓存未注册，限流已失效，请检查 app.cache.caches 配置");
             return;
         }
         long now = System.currentTimeMillis();

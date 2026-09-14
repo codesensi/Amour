@@ -1,8 +1,8 @@
 package cn.codesensi.amour.service.impl;
 
-import cn.codesensi.amour.common.consts.CacheConst;
 import cn.codesensi.amour.common.core.BasePage;
 import cn.codesensi.amour.common.enums.BuiltinEnum;
+import cn.codesensi.amour.common.enums.CacheNameEnum;
 import cn.codesensi.amour.common.enums.EnableEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.util.CacheUtil;
@@ -71,7 +71,7 @@ public class SysDictServiceImpl implements SysDictService {
             return List.of();
         }
         // 统一缓存读取：原子回源 + 缓存故障降级（空列表可直接缓存，防穿透）
-        return CacheUtil.load(cacheManager, CacheConst.DICT, code, k -> {
+        return CacheUtil.load(cacheManager, CacheNameEnum.DICT.getCode(), code, k -> {
             List<DictDTO> items = listByCodeDb(k);
             log.debug("dict 缓存回源查库：code={}，count={}", k, items.size());
             return items;
@@ -97,7 +97,7 @@ public class SysDictServiceImpl implements SysDictService {
         if (distinctCodes.isEmpty()) {
             return List.of();
         }
-        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.DICT));
+        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheNameEnum.DICT.getCode()));
         if (cache == null) {
             // 缓存未注册/未就绪：降级为一条 IN 查询直查库
             log.debug("dict 缓存未注册，降级为直接查库：codes={}", distinctCodes);

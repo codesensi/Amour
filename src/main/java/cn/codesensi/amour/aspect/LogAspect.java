@@ -3,13 +3,16 @@ package cn.codesensi.amour.aspect;
 import cn.codesensi.amour.common.annotation.Log;
 import cn.codesensi.amour.common.consts.AppConst;
 import cn.codesensi.amour.common.core.Result;
+import cn.codesensi.amour.common.enums.ConfigKeyEnum;
 import cn.codesensi.amour.common.enums.SuccessEnum;
 import cn.codesensi.amour.common.util.Ip2regionUtil;
 import cn.codesensi.amour.common.util.IpUtil;
 import cn.codesensi.amour.common.util.LoginUserUtil;
 import cn.codesensi.amour.common.util.ServletUtil;
+import cn.codesensi.amour.model.entity.SysConfig;
 import cn.codesensi.amour.model.entity.SysLog;
 import cn.codesensi.amour.model.request.LoginRequest;
+import cn.codesensi.amour.service.SysConfigService;
 import cn.codesensi.amour.service.SysLogService;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
@@ -66,18 +69,26 @@ public class LogAspect {
     private final SysLogService sysLogService;
 
     /**
+     * 系统配置服务 —— 读取代理头可信开关（trust-proxy-headers），IP 解析口径与限流切面保持一致
+     */
+    private final SysConfigService sysConfigService;
+
+    /**
      * 注入 Logbook 的 JSON 字段脱敏过滤器与截断上限 —— 与 Logbook 文件日志共用同一份 yml 配置，一处配置两处生效。
      *
      * @param bodyFilter        Logbook 的 JSON 字段脱敏过滤器（jsonBodyFieldsFilter Bean）
      * @param logbookProperties Logbook 配置属性（write 板块）
      * @param sysLogService     操作日志服务
+     * @param sysConfigService  系统配置服务（代理头可信开关）
      */
     public LogAspect(@Qualifier("jsonBodyFieldsFilter") BodyFilter bodyFilter,
                      LogbookProperties logbookProperties,
-                     SysLogService sysLogService) {
+                     SysLogService sysLogService,
+                     SysConfigService sysConfigService) {
         this.bodyFilter = bodyFilter;
         this.maxTextLength = logbookProperties.getWrite().getMaxBodySize();
         this.sysLogService = sysLogService;
+        this.sysConfigService = sysConfigService;
     }
 
     /**
@@ -146,7 +157,10 @@ public class LogAspect {
             HttpServletRequest request = ServletUtil.getRequest();
             if (request != null) {
                 sysLog.setUrl(request.getRequestURI());
-                String ip = IpUtil.getIpAddr(request);
+                // 代理头可信开关与限流切面同口径:不信任代理头时记录连接对端地址
+                SysConfig trustSwitch = sysConfigService.oneByKey(ConfigKeyEnum.TRUST_PROXY_HEADERS.getCode());
+                boolean trustProxyHeaders = trustSwitch != null && Boolean.parseBoolean(trustSwitch.getConfigValue());
+                String ip = IpUtil.getIpAddr(request, trustProxyHeaders);
                 sysLog.setIp(ip);
                 sysLog.setRegion(Ip2regionUtil.search(ip));
                 if (log.saveParam()) {

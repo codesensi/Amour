@@ -47,7 +47,10 @@ public class IpUtil {
     /**
      * 获取真实客户端 IP。
      * <p>
-     * 解析优先级：
+     * 代理转发头（X-Forwarded-For/X-Real-IP 等）可被客户端伪造，是否采信由调用方按部署形态决定：
+     * 仅当应用部署于可信反向代理之后时解析代理头，直连部署必须取连接对端地址。
+     * <p>
+     * 信任代理头时的解析优先级：
      * <ol>
      *   <li>{@code X-Forwarded-For}：多级代理下<b>从右向左</b>跳过内网（可信代理）IP，
      *       取第一个非内网 IP——最右侧的条目由最靠近应用的可信代理追加，无法被客户端伪造，
@@ -56,12 +59,18 @@ public class IpUtil {
      *   <li>{@code request.getRemoteAddr()} 兜底，IPv6 回环地址归一化为 {@code 127.0.0.1}。</li>
      * </ol>
      *
-     * @param request HTTP 请求，为 {@code null} 时返回 {@code unknown}
+     * @param request           HTTP 请求，为 {@code null} 时返回 {@code unknown}
+     * @param trustProxyHeaders 是否信任代理转发头；仅部署于可信反向代理之后时为 {@code true}
      * @return 真实客户端 IP；无法解析时返回 {@code unknown}
      */
-    public static String getIpAddr(HttpServletRequest request) {
+    public static String getIpAddr(HttpServletRequest request, boolean trustProxyHeaders) {
         if (request == null) {
             return UNKNOWN;
+        }
+
+        // 直连部署:代理转发头可被客户端伪造,不参与解析,直接取连接对端地址
+        if (!trustProxyHeaders) {
+            return normalizeLoopback(request.getRemoteAddr());
         }
 
         // 1. 优先检查 X-Forwarded-For（处理多级代理）。

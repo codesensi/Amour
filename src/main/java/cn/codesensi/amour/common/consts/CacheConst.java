@@ -1,66 +1,15 @@
 package cn.codesensi.amour.common.consts;
 
-import cn.codesensi.amour.common.util.CacheUtil;
-
 /**
  * 缓存常量 —— 项目内缓存层使用的公共常量。
+ * <p>
+ * 缓存名已枚举化（见 {@link cn.codesensi.amour.common.enums.CacheNameEnum}），
+ * 本类仅保留与具体缓存无关的公共常量。
  *
  * @author codesensi
  * @since 1.0
  */
 public class CacheConst {
-
-    /**
-     * 验证码缓存名（基础缓存名，实际使用时经 {@link CacheUtil#withAppEnv(String)} 拼接项目名_运行环境前缀）
-     */
-    public static final String CAPTCHA = "captcha";
-
-    /**
-     * 系统配置缓存名（基础缓存名，实际使用时经 {@link CacheUtil#withAppEnv(String)} 拼接项目名_运行环境前缀）
-     */
-    public static final String CONFIG = "config";
-
-    /**
-     * 角色编码缓存名（基础缓存名，实际使用时经 {@link CacheUtil#withAppEnv(String)} 拼接项目名_运行环境前缀），
-     * Key 为用户ID，供 Sa-Token 鉴权读取角色编码列表
-     */
-    public static final String ROLE = "role";
-
-    /**
-     * 权限编码缓存名（基础缓存名，实际使用时经 {@link CacheUtil#withAppEnv(String)} 拼接项目名_运行环境前缀），
-     * Key 为用户ID，供 Sa-Token 鉴权读取权限编码列表
-     */
-    public static final String PERM = "perm";
-
-    /**
-     * 路由菜单缓存名（基础缓存名，实际使用时经 {@link CacheUtil#withAppEnv(String)} 拼接项目名_运行环境前缀），
-     * Key 为用户ID，存储用户可访问的路由菜单列表
-     */
-    public static final String MENU = "menu";
-
-    /**
-     * 用户信息缓存名（基础缓存名，实际使用时经 {@link CacheUtil#withAppEnv(String)} 拼接项目名_运行环境前缀），
-     * Key 为用户ID，存储用户资料快照（不含角色/权限/菜单，聚合字段每次实时装配）
-     */
-    public static final String USER = "user";
-
-    /**
-     * QQ 信息缓存名（基础缓存名，实际使用时经 {@link CacheUtil#withAppEnv(String)} 拼接项目名_运行环境前缀），
-     * Key 为 QQ 号，存储上游服务解析出的头像地址与昵称
-     */
-    public static final String QQ_INFO = "qq-info";
-
-    /**
-     * 数据字典缓存名（基础缓存名，实际使用时经 {@link CacheUtil#withAppEnv(String)} 拼接项目名_运行环境前缀），
-     * Key 为字典编码（dict_code），存储该编码下启用中的字典项列表
-     */
-    public static final String DICT = "dict";
-
-    /**
-     * 接口限流计数缓存名（基础缓存名，实际使用时经 {@link CacheUtil#withAppEnv(String)} 拼接项目名_运行环境前缀），
-     * Key 为「接口键:IP」，存储固定窗口计数器（窗口起点由计数器自身管理，条目过期仅作内存回收）
-     */
-    public static final String RATE_LIMIT = "rate-limit";
 
     /**
      * 缓存空值哨兵：Caffeine 不允许缓存 {@code null}，用该哨兵占位表示"数据不存在"，

@@ -1,7 +1,7 @@
 package cn.codesensi.amour.service.impl;
 
 import cn.codesensi.amour.common.consts.AppConst;
-import cn.codesensi.amour.common.consts.CacheConst;
+import cn.codesensi.amour.common.enums.CacheNameEnum;
 import cn.codesensi.amour.common.enums.ConfigKeyEnum;
 import cn.codesensi.amour.common.exception.SystemException;
 import cn.codesensi.amour.common.properties.AppProperties;
@@ -56,7 +56,7 @@ public class QqInfoServiceImpl implements QqInfoService {
      */
     @Override
     public QqInfoResultDTO getQqInfo(String qq) {
-        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheConst.QQ_INFO));
+        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheNameEnum.QQ_INFO.getCode()));
         if (cache == null) {
             throw new SystemException("QQ信息缓存未注册，请检查缓存配置");
         }

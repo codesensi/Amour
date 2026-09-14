@@ -1,9 +1,9 @@
 package cn.codesensi.amour.service.impl;
 
 import cn.codesensi.amour.common.consts.AppConst;
-import cn.codesensi.amour.common.consts.CacheConst;
 import cn.codesensi.amour.common.core.BasePage;
 import cn.codesensi.amour.common.enums.BuiltinEnum;
+import cn.codesensi.amour.common.enums.CacheNameEnum;
 import cn.codesensi.amour.common.enums.EnableEnum;
 import cn.codesensi.amour.common.enums.FileBizTypeEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
@@ -102,7 +102,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         Long userId = StpUtil.getLoginIdAsLong();
         // 资料部分走 user 缓存（仅 DB 维度的用户资料，不含角色/权限/菜单）；
         // 统一缓存读取：原子回源 + 空值哨兵 + 缓存故障降级（见 CacheUtil#load）
-        UserInfoDTO userInfoDTO = CacheUtil.load(cacheManager, CacheConst.USER, userId, this::loadUserProfile);
+        UserInfoDTO userInfoDTO = CacheUtil.load(cacheManager, CacheNameEnum.USER.getCode(), userId, this::loadUserProfile);
         if (ObjUtil.isNotNull(userInfoDTO)) {
             // 缓存返回的是共享实例，拷贝一份再装配聚合字段，避免写后突变缓存中的对象
             userInfoDTO = userConverter.copy(userInfoDTO);
