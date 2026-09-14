@@ -74,10 +74,12 @@ public class RbacConst {
     public static final String QQ_INFO_PATH = "/qq-info";
 
     /**
-     * 公开路径清单 —— 免登录接口的唯一放行口径：验证码、登录、登出、门户 /portal/**、
+     * 公开路径清单 —— 免登录接口的唯一放行口径：验证码、登录、门户 /portal/**、
      * 文件预览、QQ 信息查询。
      * <p>
      * 鉴权与演示模式两个拦截器共用本清单统一放行；
+     * 登出不在此列——登出属登录态操作，未登录调用由鉴权拦截器返回 401，
+     * 演示模式拦截器在 WebMvcConfig 注册处对其单独豁免；
      * 门户公共配置/字典下发（/portal/config/list-by-keys、/portal/dict/list-by-codes）
      * 由 PORTAL_PATH 统一覆盖，无需单列；
      * H2 控制台不在此列——仅鉴权拦截器额外豁免，演示模式拦截器保留对其写操作的拦截。
@@ -86,7 +88,6 @@ public class RbacConst {
     public static final String[] PUBLIC_PATHS = {
             CAPTCHA_PATH,
             LOGIN_PATH,
-            LOGOUT_PATH,
             PORTAL_PATH,
             FILE_VIEW_PATH,
             QQ_INFO_PATH

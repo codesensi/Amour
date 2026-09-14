@@ -18,8 +18,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * Web MVC 拦截器链配置 —— 统一注册应用的拦截器。
  * <p>
  * 拦截链按 order 从小到大执行：鉴权（order 1）→ 演示模式（order 2）。
- * 两个拦截器共享同一份公开路径清单（{@link RbacConst#PUBLIC_PATHS}：验证码、登录、登出、
+ * 两个拦截器共享同一份公开路径清单（{@link RbacConst#PUBLIC_PATHS}：验证码、登录、
  * 门户 /portal/**、文件预览），调整公开口径时仅需维护该常量；
+ * 例外：退出登录（/logout）需登录态方可调用，不在公开清单内；
+ * 演示模式拦截器在注册处对其单独豁免（登出非数据写操作）；
  * 例外：H2 控制台（/h2-console/**，仅 dev 启用）仅从鉴权拦截器豁免——
  * 演示模式拦截器不豁免它，保留演示开关对控制台写操作的拦截能力；
  * 鉴权拦截器还对非 Controller 处理器（静态资源、404 兜底）不做登录校验。
@@ -58,10 +60,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .order(1);
 
         // 2. 演示模式拦截器：演示开关(app.demo-mode)开启时仅放行 GET/HEAD 等只读请求,
-        //    拒绝 POST/PUT/DELETE 等写操作;公开路径(PUBLIC_PATHS)豁免
+        //    拒绝 POST/PUT/DELETE 等写操作;公开路径(PUBLIC_PATHS)豁免;
+        //    登出虽为 POST,但非数据写操作,注册处单独豁免,保证演示用户可正常退出
         registry.addInterceptor(demoModeInterceptor)
                 .addPathPatterns(RbacConst.ROOT_PATH)
                 .excludePathPatterns(RbacConst.PUBLIC_PATHS)
+                .excludePathPatterns(RbacConst.LOGOUT_PATH)
                 .order(2);
     }
 
