@@ -12,6 +12,7 @@ import cn.hutool.core.util.ObjUtil;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -216,6 +217,22 @@ public class GlobalExceptionHandler {
         String path = e.getResourcePath();
         log.warn("NoResourceFoundException 资源异常：path={}", path);
         return wrap(HttpStatus.NOT_FOUND, Result.notFound("[" + path + "]不存在"));
+    }
+
+    /**
+     * 处理数据库唯一约束冲突 —— 并发窗口内「先查后插」同时通过时由本兜底承接，
+     * 将裸 DuplicateKey 的 500 收敛为友好 400（覆盖用户名、角色编码、字典值等同型场景）。
+     * <p>
+     * Service 层预检查保留（提供字段级提示），本兜底仅承接预检查与落库之间的并发窗口；
+     * Spring 异常解析按最具体类型匹配，优先级高于 {@link Exception} 兜底。
+     *
+     * @param e 唯一约束冲突异常
+     * @return 请求参数错误（400 语义）统一响应
+     */
+    @ExceptionHandler(DuplicateKeyException.class)
+    public ResponseEntity<Result<Void>> handleDuplicateKeyException(DuplicateKeyException e) {
+        log.warn("DuplicateKeyException 唯一约束冲突：{}", e.getMessage());
+        return wrap(HttpStatus.BAD_REQUEST, Result.badRequest("内容已存在，请修改后重试"));
     }
 
     /**
