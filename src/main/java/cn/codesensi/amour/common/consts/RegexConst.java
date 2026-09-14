@@ -10,21 +10,21 @@ package cn.codesensi.amour.common.consts;
 public class RegexConst {
 
     /**
-     * 身份证号码:15 位或 18 位(末位可为 X/x)
+     * 身份证号码(选填):允许空串(未填写),非空时校验 15/18 位形态
      */
-    public static final String ID_CARD = "^\\d{15}$|^\\d{17}[\\dXx]$";
+    public static final String ID_CARD_OPTIONAL = "^$|^\\d{15}$|^\\d{17}[\\dXx]$";
     public static final String ID_CARD_MESSAGE = "身份证号码格式不正确";
 
     /**
-     * 大陆手机号:1 开头 11 位
+     * 大陆手机号(选填):允许空串(未填写),非空时校验 1 开头 11 位
      */
-    public static final String PHONE = "^1[3-9]\\d{9}$";
+    public static final String PHONE_OPTIONAL = "^$|^1[3-9]\\d{9}$";
     public static final String PHONE_MESSAGE = "手机号格式不正确";
 
     /**
-     * QQ 号码:6-12 位数字
+     * QQ 号码(选填):允许空串(未填写),非空时校验 6-12 位数字
      */
-    public static final String QQ = "^[0-9]{6,12}$";
+    public static final String QQ_OPTIONAL = "^$|^[0-9]{6,12}$";
     public static final String QQ_MESSAGE = "QQ号码格式错误，请输入6-12位数字";
 
     /**

@@ -50,7 +50,7 @@ public class UserProfileUpdateRequest implements Serializable {
     /**
      * 用户QQ号码
      */
-    @Pattern(regexp = RegexConst.QQ, message = RegexConst.QQ_MESSAGE)
+    @Pattern(regexp = RegexConst.QQ_OPTIONAL, message = RegexConst.QQ_MESSAGE)
     private String qq;
 
     /**

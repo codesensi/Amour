@@ -42,7 +42,7 @@ public class UserUpdateRequest implements Serializable {
     /**
      * 用户身份证号码
      */
-    @Pattern(regexp = RegexConst.ID_CARD, message = RegexConst.ID_CARD_MESSAGE)
+    @Pattern(regexp = RegexConst.ID_CARD_OPTIONAL, message = RegexConst.ID_CARD_MESSAGE)
     private String idCard;
 
     /**
@@ -55,13 +55,13 @@ public class UserUpdateRequest implements Serializable {
     /**
      * 用户手机号码
      */
-    @Pattern(regexp = RegexConst.PHONE, message = RegexConst.PHONE_MESSAGE)
+    @Pattern(regexp = RegexConst.PHONE_OPTIONAL, message = RegexConst.PHONE_MESSAGE)
     private String phone;
 
     /**
      * 用户QQ号码
      */
-    @Pattern(regexp = RegexConst.QQ, message = RegexConst.QQ_MESSAGE)
+    @Pattern(regexp = RegexConst.QQ_OPTIONAL, message = RegexConst.QQ_MESSAGE)
     private String qq;
 
     /**
