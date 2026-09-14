@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -150,13 +151,14 @@ public class LoginServiceImpl implements LoginService {
         if (cache == null) {
             throw new BusinessException("验证码缓存未注册，请检查缓存配置");
         }
-        // Spring Cache 抽象无 getAndDelete，以 get + evict 组合实现取即删
-        Cache.ValueWrapper wrapper = cache.get(loginDTO.getCaptchaKey());
-        cache.evict(loginDTO.getCaptchaKey());
-        if (wrapper == null) {
+        // 原子取删：asMap().remove 一次调用同时完成「读答案 + 失效」，并发提交无法复用同一 captchaKey
+        // （Spring Cache 抽象无 getAndDelete，借原生 Caffeine 的原子 remove 实现）
+        com.github.benmanes.caffeine.cache.Cache<Object, Object> nativeCache = ((CaffeineCache) cache).getNativeCache();
+        String cachedAnswer = (String) nativeCache.asMap().remove(loginDTO.getCaptchaKey());
+        if (cachedAnswer == null) {
             throw new BusinessException("验证码不存在");
         }
-        if (!StrUtil.equalsIgnoreCase(loginDTO.getCaptchaValue(), (String) wrapper.get())) {
+        if (!StrUtil.equalsIgnoreCase(loginDTO.getCaptchaValue(), cachedAnswer)) {
             throw new BusinessException("验证码错误");
         }
     }
