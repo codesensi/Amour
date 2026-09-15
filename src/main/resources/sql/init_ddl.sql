@@ -302,216 +302,216 @@ CREATE TABLE IF NOT EXISTS `sys_notice_read` (
     ROW_FORMAT = DYNAMIC
     COMMENT = '通知阅读记录表';
 
--- -- ----------------------------
--- -- 表结构：portal_moments（点点滴滴文章表）
--- -- 幂等建表：仅当表不存在时创建
--- -- ----------------------------
--- CREATE TABLE IF NOT EXISTS `portal_moments` (
---     `id`          BIGINT        NOT NULL                COMMENT '主键ID',
---     `title`       VARCHAR(256)  NOT NULL                COMMENT '文章标题',
---     `author`      VARCHAR(64)   NULL DEFAULT NULL       COMMENT '作者',
---     `content`     TEXT          NULL DEFAULT NULL       COMMENT '文章内容',
---     `record_date` DATE          NULL DEFAULT NULL       COMMENT '记录日期',
---     `sort`        INT           NOT NULL DEFAULT 0      COMMENT '排序（数字越小越靠前）',
---     `status`      TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '状态: 0-显示, 1-隐藏',
---     `creator`     BIGINT        NULL DEFAULT NULL       COMMENT '创建人',
---     `create_time` DATETIME      NULL DEFAULT NULL       COMMENT '创建时间',
---     `updater`     BIGINT        NULL DEFAULT NULL       COMMENT '更新人',
---     `update_time` DATETIME      NULL DEFAULT NULL       COMMENT '更新时间',
---     `del_flag`    TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
---     PRIMARY KEY (`id`),
---     INDEX `idx_plt_record_date` (`record_date` ASC)
---     ) ENGINE = InnoDB
---     CHARACTER SET = utf8mb4
---     COLLATE = utf8mb4_general_ci
---     ROW_FORMAT = DYNAMIC
---     COMMENT = '点点滴滴文章表';
---
--- -- ----------------------------
--- -- 表结构：portal_message（留言表）
--- -- 幂等建表：仅当表不存在时创建
--- -- ----------------------------
--- CREATE TABLE IF NOT EXISTS `portal_message` (
---     `id`           BIGINT        NOT NULL                COMMENT '主键ID',
---     `nickname`     VARCHAR(64)   NOT NULL                COMMENT '访客昵称',
---     `avatar`       VARCHAR(512)  NULL DEFAULT NULL       COMMENT '留言头像',
---     `content`      VARCHAR(1024) NOT NULL                COMMENT '留言内容',
---     `ip`           VARCHAR(64)   NULL DEFAULT NULL       COMMENT '留言IP',
---     `region`       VARCHAR(64)   NULL DEFAULT NULL       COMMENT 'IP归属地',
---     `audit_status` TINYINT(1)    NOT NULL DEFAULT 1      COMMENT '审核状态: 0-待审核, 1-通过, 2-驳回',
---     `creator`      BIGINT        NULL DEFAULT NULL       COMMENT '创建人',
---     `create_time`  DATETIME      NULL DEFAULT NULL       COMMENT '留言时间',
---     `updater`      BIGINT        NULL DEFAULT NULL       COMMENT '更新人',
---     `update_time`  DATETIME      NULL DEFAULT NULL       COMMENT '更新时间',
---     `del_flag`     TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
---     PRIMARY KEY (`id`),
---     INDEX `idx_plv_create_time` (`create_time` ASC)
---     ) ENGINE = InnoDB
---     CHARACTER SET = utf8mb4
---     COLLATE = utf8mb4_general_ci
---     ROW_FORMAT = DYNAMIC
---     COMMENT = '留言表';
---
--- -- ----------------------------
--- -- 表结构：portal_love_photo（恋爱相册照片表）
--- -- 幂等建表：仅当表不存在时创建
--- -- ----------------------------
--- CREATE TABLE IF NOT EXISTS `portal_love_photo` (
---     `id`          BIGINT        NOT NULL                COMMENT '主键ID',
---     `url`         VARCHAR(512)  NOT NULL                COMMENT '照片地址',
---     `description` VARCHAR(256)  NULL DEFAULT NULL       COMMENT '悬浮文案（日期）',
---     `tag`         VARCHAR(64)   NULL DEFAULT NULL       COMMENT '照片标签（旅行/日常/节日等）',
---     `sort`        INT           NOT NULL DEFAULT 0      COMMENT '排序（数字越小越靠前）',
---     `status`      TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '状态: 0-显示, 1-隐藏',
---     `creator`     BIGINT        NULL DEFAULT NULL       COMMENT '创建人',
---     `create_time` DATETIME      NULL DEFAULT NULL       COMMENT '创建时间',
---     `updater`     BIGINT        NULL DEFAULT NULL       COMMENT '更新人',
---     `update_time` DATETIME      NULL DEFAULT NULL       COMMENT '更新时间',
---     `del_flag`    TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
---     PRIMARY KEY (`id`),
---     INDEX `idx_pp_sort` (`sort` ASC)
---     ) ENGINE = InnoDB
---     CHARACTER SET = utf8mb4
---     COLLATE = utf8mb4_general_ci
---     ROW_FORMAT = DYNAMIC
---     COMMENT = '恋爱相册照片表';
---
--- -- ----------------------------
--- -- 表结构：portal_love_list（恋爱清单表）
--- -- 幂等建表：仅当表不存在时创建
--- -- ----------------------------
--- CREATE TABLE IF NOT EXISTS `portal_love_list` (
---     `id`          BIGINT        NOT NULL                COMMENT '主键ID',
---     `content`     VARCHAR(256)  NOT NULL                COMMENT '清单内容',
---     `done`        TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '完成状态: 0-未完成, 1-已完成',
---     `img`         VARCHAR(512)  NULL DEFAULT NULL       COMMENT '纪念照地址（完成项可选）',
---     `sort`        INT           NOT NULL DEFAULT 0      COMMENT '排序（数字越小越靠前）',
---     `status`      TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '状态: 0-显示, 1-隐藏',
---     `creator`     BIGINT        NULL DEFAULT NULL       COMMENT '创建人',
---     `create_time` DATETIME      NULL DEFAULT NULL       COMMENT '创建时间',
---     `updater`     BIGINT        NULL DEFAULT NULL       COMMENT '更新人',
---     `update_time` DATETIME      NULL DEFAULT NULL       COMMENT '更新时间',
---     `del_flag`    TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
---     PRIMARY KEY (`id`),
---     INDEX `idx_pe_sort` (`sort` ASC)
---     ) ENGINE = InnoDB
---     CHARACTER SET = utf8mb4
---     COLLATE = utf8mb4_general_ci
---     ROW_FORMAT = DYNAMIC
---     COMMENT = '恋爱清单表';
---
--- -- ----------------------------
--- -- 表结构：portal_anniversary（纪念日表）
--- -- 幂等建表：仅当表不存在时创建
--- -- ----------------------------
--- CREATE TABLE IF NOT EXISTS `portal_anniversary` (
---     `id`                BIGINT        NOT NULL                COMMENT '主键ID',
---     `name`              VARCHAR(128)  NOT NULL                COMMENT '纪念日名称',
---     `type`              TINYINT(1)    NULL DEFAULT NULL       COMMENT '纪念日类型: 1-生日, 2-纪念日, 3-节日',
---     `anniversary_date`  DATE          NOT NULL                COMMENT '纪念日日期（每年重复时仅取月/日）',
---     `repeat_yearly`     TINYINT(1)    NOT NULL DEFAULT 1      COMMENT '是否每年重复: 0-否, 1-是',
---     `sort`              INT           NOT NULL DEFAULT 0      COMMENT '排序（数字越小越靠前）',
---     `status`            TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '状态: 0-显示, 1-隐藏',
---     `creator`           BIGINT        NULL DEFAULT NULL       COMMENT '创建人',
---     `create_time`       DATETIME      NULL DEFAULT NULL       COMMENT '创建时间',
---     `updater`           BIGINT        NULL DEFAULT NULL       COMMENT '更新人',
---     `update_time`       DATETIME      NULL DEFAULT NULL       COMMENT '更新时间',
---     `del_flag`          TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
---     PRIMARY KEY (`id`),
---     INDEX `idx_pan_date` (`anniversary_date` ASC)
---     ) ENGINE = InnoDB
---     CHARACTER SET = utf8mb4
---     COLLATE = utf8mb4_general_ci
---     ROW_FORMAT = DYNAMIC
---     COMMENT = '纪念日表';
---
--- -- ----------------------------
--- -- 表结构：portal_letter（时间胶囊表）
--- -- 幂等建表：仅当表不存在时创建
--- -- ----------------------------
--- CREATE TABLE IF NOT EXISTS `portal_letter` (
---     `id`          BIGINT        NOT NULL                COMMENT '主键ID',
---     `title`       VARCHAR(128)  NULL DEFAULT NULL       COMMENT '标题',
---     `content`     TEXT          NULL                    COMMENT '信件内容',
---     `open_time`   DATETIME      NULL DEFAULT NULL       COMMENT '解锁时间',
---     `status`      TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '状态: 0-显示, 1-隐藏',
---     `creator`     BIGINT        NULL DEFAULT NULL       COMMENT '创建人',
---     `create_time` DATETIME      NULL DEFAULT NULL       COMMENT '创建时间',
---     `updater`     BIGINT        NULL DEFAULT NULL       COMMENT '更新人',
---     `update_time` DATETIME      NULL DEFAULT NULL       COMMENT '更新时间',
---     `del_flag`    TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
---     PRIMARY KEY (`id`),
---     INDEX `idx_ple_open_time` (`open_time` ASC)
---     ) ENGINE = InnoDB
---     CHARACTER SET = utf8mb4
---     COLLATE = utf8mb4_general_ci
---     ROW_FORMAT = DYNAMIC
---     COMMENT = '时间胶囊表';
---
--- -- ----------------------------
--- -- 表结构：portal_diary（情侣日记表）
--- -- 幂等建表：仅当表不存在时创建
--- -- ----------------------------
--- CREATE TABLE IF NOT EXISTS `portal_diary` (
---     `id`          BIGINT        NOT NULL                COMMENT '主键ID',
---     `user_id`     BIGINT        NOT NULL                COMMENT '记录人ID',
---     `diary_date`  DATE          NOT NULL                COMMENT '记录日期',
---     `mood`        VARCHAR(16)   NULL DEFAULT NULL       COMMENT '心情标识',
---     `content`     TEXT          NULL                    COMMENT '日记内容',
---     `creator`     BIGINT        NULL DEFAULT NULL       COMMENT '创建人',
---     `create_time` DATETIME      NULL DEFAULT NULL       COMMENT '创建时间',
---     `updater`     BIGINT        NULL DEFAULT NULL       COMMENT '更新人',
---     `update_time` DATETIME      NULL DEFAULT NULL       COMMENT '更新时间',
---     `del_flag`    TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
---     PRIMARY KEY (`id`),
---     INDEX `idx_pd_user_date` (`user_id` ASC, `diary_date` ASC)
---     ) ENGINE = InnoDB
---     CHARACTER SET = utf8mb4
---     COLLATE = utf8mb4_general_ci
---     ROW_FORMAT = DYNAMIC
---     COMMENT = '情侣日记表';
---
--- -- ----------------------------
--- -- 表结构：portal_footprint（足迹地图表）
--- -- 幂等建表：仅当表不存在时创建
--- -- ----------------------------
--- CREATE TABLE IF NOT EXISTS `portal_footprint` (
---     `id`           BIGINT         NOT NULL                COMMENT '主键ID',
---     `city`         VARCHAR(128)   NOT NULL                COMMENT '城市/地点名称',
---     `longitude`    DECIMAL(10,6)  NULL DEFAULT NULL       COMMENT '经度',
---     `latitude`     DECIMAL(10,6)  NULL DEFAULT NULL       COMMENT '纬度',
---     `arrival_date` DATE           NULL DEFAULT NULL       COMMENT '到访日期',
---     `photo_id`     BIGINT         NULL DEFAULT NULL       COMMENT '关联照片ID（portal_photo.id）',
---     `remark`       VARCHAR(512)   NULL DEFAULT NULL       COMMENT '备注',
---     `creator`      BIGINT         NULL DEFAULT NULL       COMMENT '创建人',
---     `create_time`  DATETIME       NULL DEFAULT NULL       COMMENT '创建时间',
---     `updater`      BIGINT         NULL DEFAULT NULL       COMMENT '更新人',
---     `update_time`  DATETIME       NULL DEFAULT NULL       COMMENT '更新时间',
---     `del_flag`     TINYINT(1)     NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
---     PRIMARY KEY (`id`),
---     INDEX `idx_pf_arrival_date` (`arrival_date` ASC)
---     ) ENGINE = InnoDB
---     CHARACTER SET = utf8mb4
---     COLLATE = utf8mb4_general_ci
---     ROW_FORMAT = DYNAMIC
---     COMMENT = '足迹地图表';
---
--- -- ----------------------------
--- -- 表结构：portal_visit（门户访问统计表）
--- -- 幂等建表：仅当表不存在时创建
--- -- 说明：系统生成的日粒度统计数据，无审计列与逻辑删除
--- -- ----------------------------
--- CREATE TABLE IF NOT EXISTS `portal_visit` (
---     `id`          BIGINT     NOT NULL                COMMENT '主键ID',
---     `stat_date`   DATE       NOT NULL                COMMENT '统计日期',
---     `pv`          INT        NOT NULL DEFAULT 0      COMMENT '当日访问量（PV）',
---     `uv`          INT        NOT NULL DEFAULT 0      COMMENT '当日独立访客数（UV）',
---     `create_time` DATETIME   NULL DEFAULT NULL       COMMENT '创建时间',
---     `update_time` DATETIME   NULL DEFAULT NULL       COMMENT '更新时间',
---     PRIMARY KEY (`id`),
---     INDEX `idx_pv_stat_date` (`stat_date` ASC)
---     ) ENGINE = InnoDB
---     CHARACTER SET = utf8mb4
---     COLLATE = utf8mb4_general_ci
---     ROW_FORMAT = DYNAMIC
---     COMMENT = '门户访问统计表';
+-- ----------------------------
+-- 表结构：portal_moments（点点滴滴文章表）
+-- 幂等建表：仅当表不存在时创建
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `portal_moments` (
+    `id`          BIGINT        NOT NULL                COMMENT '主键ID',
+    `title`       VARCHAR(256)  NOT NULL                COMMENT '文章标题',
+    `author`      VARCHAR(64)   NULL DEFAULT NULL       COMMENT '作者',
+    `content`     TEXT          NULL DEFAULT NULL       COMMENT '文章内容',
+    `record_date` DATE          NULL DEFAULT NULL       COMMENT '记录日期',
+    `sort`        INT           NOT NULL DEFAULT 0      COMMENT '排序（数字越小越靠前）',
+    `status`      TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '状态: 0-显示, 1-隐藏',
+    `creator`     BIGINT        NULL DEFAULT NULL       COMMENT '创建人',
+    `create_time` DATETIME      NULL DEFAULT NULL       COMMENT '创建时间',
+    `updater`     BIGINT        NULL DEFAULT NULL       COMMENT '更新人',
+    `update_time` DATETIME      NULL DEFAULT NULL       COMMENT '更新时间',
+    `del_flag`    TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
+    PRIMARY KEY (`id`),
+    INDEX `idx_plt_record_date` (`record_date` ASC)
+    ) ENGINE = InnoDB
+    CHARACTER SET = utf8mb4
+    COLLATE = utf8mb4_general_ci
+    ROW_FORMAT = DYNAMIC
+    COMMENT = '点点滴滴文章表';
+
+-- ----------------------------
+-- 表结构：portal_message（留言表）
+-- 幂等建表：仅当表不存在时创建
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `portal_message` (
+    `id`           BIGINT        NOT NULL                COMMENT '主键ID',
+    `nickname`     VARCHAR(64)   NOT NULL                COMMENT '访客昵称',
+    `avatar`       VARCHAR(512)  NULL DEFAULT NULL       COMMENT '留言头像',
+    `content`      VARCHAR(1024) NOT NULL                COMMENT '留言内容',
+    `ip`           VARCHAR(64)   NULL DEFAULT NULL       COMMENT '留言IP',
+    `region`       VARCHAR(64)   NULL DEFAULT NULL       COMMENT 'IP归属地',
+    `audit_status` TINYINT(1)    NOT NULL DEFAULT 1      COMMENT '审核状态: 0-待审核, 1-通过, 2-驳回',
+    `creator`      BIGINT        NULL DEFAULT NULL       COMMENT '创建人',
+    `create_time`  DATETIME      NULL DEFAULT NULL       COMMENT '留言时间',
+    `updater`      BIGINT        NULL DEFAULT NULL       COMMENT '更新人',
+    `update_time`  DATETIME      NULL DEFAULT NULL       COMMENT '更新时间',
+    `del_flag`     TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
+    PRIMARY KEY (`id`),
+    INDEX `idx_plv_create_time` (`create_time` ASC)
+    ) ENGINE = InnoDB
+    CHARACTER SET = utf8mb4
+    COLLATE = utf8mb4_general_ci
+    ROW_FORMAT = DYNAMIC
+    COMMENT = '留言表';
+
+-- ----------------------------
+-- 表结构：portal_love_photo（恋爱相册照片表）
+-- 幂等建表：仅当表不存在时创建
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `portal_love_photo` (
+    `id`          BIGINT        NOT NULL                COMMENT '主键ID',
+    `url`         VARCHAR(512)  NOT NULL                COMMENT '照片地址',
+    `description` VARCHAR(256)  NULL DEFAULT NULL       COMMENT '悬浮文案（日期）',
+    `tag`         VARCHAR(64)   NULL DEFAULT NULL       COMMENT '照片标签（旅行/日常/节日等）',
+    `sort`        INT           NOT NULL DEFAULT 0      COMMENT '排序（数字越小越靠前）',
+    `status`      TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '状态: 0-显示, 1-隐藏',
+    `creator`     BIGINT        NULL DEFAULT NULL       COMMENT '创建人',
+    `create_time` DATETIME      NULL DEFAULT NULL       COMMENT '创建时间',
+    `updater`     BIGINT        NULL DEFAULT NULL       COMMENT '更新人',
+    `update_time` DATETIME      NULL DEFAULT NULL       COMMENT '更新时间',
+    `del_flag`    TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
+    PRIMARY KEY (`id`),
+    INDEX `idx_pp_sort` (`sort` ASC)
+    ) ENGINE = InnoDB
+    CHARACTER SET = utf8mb4
+    COLLATE = utf8mb4_general_ci
+    ROW_FORMAT = DYNAMIC
+    COMMENT = '恋爱相册照片表';
+
+-- ----------------------------
+-- 表结构：portal_love_list（恋爱清单表）
+-- 幂等建表：仅当表不存在时创建
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `portal_love_list` (
+    `id`          BIGINT        NOT NULL                COMMENT '主键ID',
+    `content`     VARCHAR(256)  NOT NULL                COMMENT '清单内容',
+    `done`        TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '完成状态: 0-未完成, 1-已完成',
+    `img`         VARCHAR(512)  NULL DEFAULT NULL       COMMENT '纪念照地址（完成项可选）',
+    `sort`        INT           NOT NULL DEFAULT 0      COMMENT '排序（数字越小越靠前）',
+    `status`      TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '状态: 0-显示, 1-隐藏',
+    `creator`     BIGINT        NULL DEFAULT NULL       COMMENT '创建人',
+    `create_time` DATETIME      NULL DEFAULT NULL       COMMENT '创建时间',
+    `updater`     BIGINT        NULL DEFAULT NULL       COMMENT '更新人',
+    `update_time` DATETIME      NULL DEFAULT NULL       COMMENT '更新时间',
+    `del_flag`    TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
+    PRIMARY KEY (`id`),
+    INDEX `idx_pe_sort` (`sort` ASC)
+    ) ENGINE = InnoDB
+    CHARACTER SET = utf8mb4
+    COLLATE = utf8mb4_general_ci
+    ROW_FORMAT = DYNAMIC
+    COMMENT = '恋爱清单表';
+
+-- ----------------------------
+-- 表结构：portal_anniversary（纪念日表）
+-- 幂等建表：仅当表不存在时创建
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `portal_anniversary` (
+    `id`                BIGINT        NOT NULL                COMMENT '主键ID',
+    `name`              VARCHAR(128)  NOT NULL                COMMENT '纪念日名称',
+    `type`              TINYINT(1)    NULL DEFAULT NULL       COMMENT '纪念日类型: 1-生日, 2-纪念日, 3-节日',
+    `anniversary_date`  DATE          NOT NULL                COMMENT '纪念日日期（每年重复时仅取月/日）',
+    `repeat_yearly`     TINYINT(1)    NOT NULL DEFAULT 1      COMMENT '是否每年重复: 0-否, 1-是',
+    `sort`              INT           NOT NULL DEFAULT 0      COMMENT '排序（数字越小越靠前）',
+    `status`            TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '状态: 0-显示, 1-隐藏',
+    `creator`           BIGINT        NULL DEFAULT NULL       COMMENT '创建人',
+    `create_time`       DATETIME      NULL DEFAULT NULL       COMMENT '创建时间',
+    `updater`           BIGINT        NULL DEFAULT NULL       COMMENT '更新人',
+    `update_time`       DATETIME      NULL DEFAULT NULL       COMMENT '更新时间',
+    `del_flag`          TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
+    PRIMARY KEY (`id`),
+    INDEX `idx_pan_date` (`anniversary_date` ASC)
+    ) ENGINE = InnoDB
+    CHARACTER SET = utf8mb4
+    COLLATE = utf8mb4_general_ci
+    ROW_FORMAT = DYNAMIC
+    COMMENT = '纪念日表';
+
+-- ----------------------------
+-- 表结构：portal_time_capsule（时间胶囊表）
+-- 幂等建表：仅当表不存在时创建
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `portal_time_capsule` (
+    `id`          BIGINT        NOT NULL                COMMENT '主键ID',
+    `title`       VARCHAR(128)  NULL DEFAULT NULL       COMMENT '标题',
+    `content`     TEXT          NULL                    COMMENT '信件内容',
+    `open_time`   DATETIME      NULL DEFAULT NULL       COMMENT '解锁时间',
+    `status`      TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '状态: 0-显示, 1-隐藏',
+    `creator`     BIGINT        NULL DEFAULT NULL       COMMENT '创建人',
+    `create_time` DATETIME      NULL DEFAULT NULL       COMMENT '创建时间',
+    `updater`     BIGINT        NULL DEFAULT NULL       COMMENT '更新人',
+    `update_time` DATETIME      NULL DEFAULT NULL       COMMENT '更新时间',
+    `del_flag`    TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
+    PRIMARY KEY (`id`),
+    INDEX `idx_ple_open_time` (`open_time` ASC)
+    ) ENGINE = InnoDB
+    CHARACTER SET = utf8mb4
+    COLLATE = utf8mb4_general_ci
+    ROW_FORMAT = DYNAMIC
+    COMMENT = '时间胶囊表';
+
+-- ----------------------------
+-- 表结构：portal_diary（情侣日记表）
+-- 幂等建表：仅当表不存在时创建
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `portal_diary` (
+    `id`          BIGINT        NOT NULL                COMMENT '主键ID',
+    `user_id`     BIGINT        NOT NULL                COMMENT '记录人ID',
+    `diary_date`  DATE          NOT NULL                COMMENT '记录日期',
+    `mood`        VARCHAR(16)   NULL DEFAULT NULL       COMMENT '心情标识',
+    `content`     TEXT          NULL                    COMMENT '日记内容',
+    `creator`     BIGINT        NULL DEFAULT NULL       COMMENT '创建人',
+    `create_time` DATETIME      NULL DEFAULT NULL       COMMENT '创建时间',
+    `updater`     BIGINT        NULL DEFAULT NULL       COMMENT '更新人',
+    `update_time` DATETIME      NULL DEFAULT NULL       COMMENT '更新时间',
+    `del_flag`    TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
+    PRIMARY KEY (`id`),
+    INDEX `idx_pd_user_date` (`user_id` ASC, `diary_date` ASC)
+    ) ENGINE = InnoDB
+    CHARACTER SET = utf8mb4
+    COLLATE = utf8mb4_general_ci
+    ROW_FORMAT = DYNAMIC
+    COMMENT = '情侣日记表';
+
+-- ----------------------------
+-- 表结构：portal_footprint（足迹地图表）
+-- 幂等建表：仅当表不存在时创建
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `portal_footprint` (
+    `id`           BIGINT         NOT NULL                COMMENT '主键ID',
+    `city`         VARCHAR(128)   NOT NULL                COMMENT '城市/地点名称',
+    `longitude`    DECIMAL(10,6)  NULL DEFAULT NULL       COMMENT '经度',
+    `latitude`     DECIMAL(10,6)  NULL DEFAULT NULL       COMMENT '纬度',
+    `arrival_date` DATE           NULL DEFAULT NULL       COMMENT '到访日期',
+    `photo_id`     BIGINT         NULL DEFAULT NULL       COMMENT '关联照片ID（portal_photo.id）',
+    `remark`       VARCHAR(512)   NULL DEFAULT NULL       COMMENT '备注',
+    `creator`      BIGINT         NULL DEFAULT NULL       COMMENT '创建人',
+    `create_time`  DATETIME       NULL DEFAULT NULL       COMMENT '创建时间',
+    `updater`      BIGINT         NULL DEFAULT NULL       COMMENT '更新人',
+    `update_time`  DATETIME       NULL DEFAULT NULL       COMMENT '更新时间',
+    `del_flag`     TINYINT(1)     NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
+    PRIMARY KEY (`id`),
+    INDEX `idx_pf_arrival_date` (`arrival_date` ASC)
+    ) ENGINE = InnoDB
+    CHARACTER SET = utf8mb4
+    COLLATE = utf8mb4_general_ci
+    ROW_FORMAT = DYNAMIC
+    COMMENT = '足迹地图表';
+
+-- ----------------------------
+-- 表结构：portal_visit（门户访问统计表）
+-- 幂等建表：仅当表不存在时创建
+-- 说明：系统生成的日粒度统计数据，无审计列与逻辑删除
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `portal_visit` (
+    `id`          BIGINT     NOT NULL                COMMENT '主键ID',
+    `stat_date`   DATE       NOT NULL                COMMENT '统计日期',
+    `pv`          INT        NOT NULL DEFAULT 0      COMMENT '当日访问量（PV）',
+    `uv`          INT        NOT NULL DEFAULT 0      COMMENT '当日独立访客数（UV）',
+    `create_time` DATETIME   NULL DEFAULT NULL       COMMENT '创建时间',
+    `update_time` DATETIME   NULL DEFAULT NULL       COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    INDEX `idx_pv_stat_date` (`stat_date` ASC)
+    ) ENGINE = InnoDB
+    CHARACTER SET = utf8mb4
+    COLLATE = utf8mb4_general_ci
+    ROW_FORMAT = DYNAMIC
+    COMMENT = '门户访问统计表';
