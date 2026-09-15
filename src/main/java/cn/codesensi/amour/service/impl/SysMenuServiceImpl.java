@@ -251,13 +251,11 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      * @param excludeId 修改时排除自身，新增时传 null
      */
     private void validateSiblingTitleUnique(Long pid, String title, Long excludeId) {
-        QueryChain<SysMenu> query = QueryChain.of(sysMenuMapper)
+        if (QueryChain.of(sysMenuMapper)
                 .where(SYS_MENU.PID.eq(pid))
-                .and(SYS_MENU.TITLE.eq(title));
-        if (ObjUtil.isNotNull(excludeId)) {
-            query.and(SYS_MENU.ID.ne(excludeId));
-        }
-        if (query.count() > 0) {
+                .and(SYS_MENU.TITLE.eq(title))
+                .and(SYS_MENU.ID.ne(excludeId, ObjUtil::isNotNull))
+                .count() > 0) {
             throw new BusinessException("同级下已存在同名菜单");
         }
     }
@@ -272,12 +270,10 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         if (StrUtil.isBlank(perms)) {
             return;
         }
-        QueryChain<SysMenu> query = QueryChain.of(sysMenuMapper)
-                .where(SYS_MENU.PERMS.eq(perms));
-        if (ObjUtil.isNotNull(excludeId)) {
-            query.and(SYS_MENU.ID.ne(excludeId));
-        }
-        if (query.count() > 0) {
+        if (QueryChain.of(sysMenuMapper)
+                .where(SYS_MENU.PERMS.eq(perms))
+                .and(SYS_MENU.ID.ne(excludeId, ObjUtil::isNotNull))
+                .count() > 0) {
             throw new BusinessException("权限标识已存在");
         }
     }

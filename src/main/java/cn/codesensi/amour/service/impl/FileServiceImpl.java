@@ -285,22 +285,19 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         }
         // 绕过全局逻辑删除:回收站需按 del_flag=1 命中已删除记录,
         // 数据域由本方法显式的 DEL_FLAG 条件圈定(0-文件列表,1-回收站)
-        Page<SysFile> page = LogicDeleteManager.execWithoutLogicDelete(() -> {
-            QueryChain<SysFile> query = QueryChain.of(sysFileMapper)
-                    .where(SYS_FILE.DEL_FLAG.eq(recycled
-                            ? DelFlagEnum.DELETED.getCode()
-                            : DelFlagEnum.NOT_DELETED.getCode()))
-                    .and(SYS_FILE.ORIGINAL_NAME.like(pageDTO.getOriginalName(), StrUtil::isNotBlank))
-                    .and(SYS_FILE.BIZ_TYPE.eq(pageDTO.getBizType(), StrUtil::isNotBlank))
-                    .and(SYS_FILE.STORAGE_TYPE.eq(pageDTO.getStorageType(), StrUtil::isNotBlank))
-                    .and(SYS_FILE.CREATE_TIME.ge(parseTime(pageDTO.getBeginTime(), false), Objects::nonNull))
-                    .and(SYS_FILE.CREATE_TIME.le(parseTime(pageDTO.getEndTime(), true), Objects::nonNull))
-                    .orderBy(SYS_FILE.ID, false);
-            if (CollUtil.isNotEmpty(creatorIds)) {
-                query.and(SYS_FILE.CREATOR.in(creatorIds));
-            }
-            return query.page(Page.of(pageDTO.getPageNumber(), pageDTO.getPageSize()));
-        });
+        Page<SysFile> page = LogicDeleteManager.execWithoutLogicDelete(() ->
+                QueryChain.of(sysFileMapper)
+                        .where(SYS_FILE.DEL_FLAG.eq(recycled
+                                ? DelFlagEnum.DELETED.getCode()
+                                : DelFlagEnum.NOT_DELETED.getCode()))
+                        .and(SYS_FILE.ORIGINAL_NAME.like(pageDTO.getOriginalName(), StrUtil::isNotBlank))
+                        .and(SYS_FILE.BIZ_TYPE.eq(pageDTO.getBizType(), StrUtil::isNotBlank))
+                        .and(SYS_FILE.STORAGE_TYPE.eq(pageDTO.getStorageType(), StrUtil::isNotBlank))
+                        .and(SYS_FILE.CREATE_TIME.ge(parseTime(pageDTO.getBeginTime(), false), Objects::nonNull))
+                        .and(SYS_FILE.CREATE_TIME.le(parseTime(pageDTO.getEndTime(), true), Objects::nonNull))
+                        .and(SYS_FILE.CREATOR.in(creatorIds, CollUtil::isNotEmpty))
+                        .orderBy(SYS_FILE.ID, false)
+                        .page(Page.of(pageDTO.getPageNumber(), pageDTO.getPageSize())));
 
         // 批量回填上传人用户名:仅对本页出现的 creator 查询一次
         List<Long> pageCreatorIds = page.getRecords().stream()
