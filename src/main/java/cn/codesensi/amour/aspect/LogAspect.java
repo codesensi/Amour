@@ -5,6 +5,8 @@ import cn.codesensi.amour.common.consts.AppConst;
 import cn.codesensi.amour.common.core.Result;
 import cn.codesensi.amour.common.enums.ConfigKeyEnum;
 import cn.codesensi.amour.common.enums.SuccessEnum;
+import cn.codesensi.amour.common.exception.BusinessException;
+import cn.codesensi.amour.common.exception.SystemException;
 import cn.codesensi.amour.common.util.Ip2regionUtil;
 import cn.codesensi.amour.common.util.IpUtil;
 import cn.codesensi.amour.common.util.LoginUserUtil;
@@ -47,7 +49,7 @@ import java.util.List;
  * 采集口径：
  * <ul>
  *     <li>请求参数：查询字符串 + 方法入参（JSON 序列化，覆盖路径变量、JSON/表单体、文件上传），脱敏后存储，超长时降级为截断标记对象；</li>
- *     <li>响应结果：{@link Result} 整体序列化后存储（超长时降级为截断标记对象）；异常时仅记录失败原因；</li>
+ *     <li>响应结果：{@link Result} 整体序列化后存储（超长时降级为截断标记对象）；异常时按全局异常处理器的转换口径构造失败响应存储；</li>
  *     <li>登录人：优先取当前登录用户，未登录（如登录接口）时从请求参数中提取用户名。</li>
  * </ul>
  *
@@ -173,6 +175,10 @@ public class LogAspect {
             if (ObjUtil.isNotNull(e)) {
                 sysLog.setStatus(SuccessEnum.FAIL.getCode());
                 sysLog.setMsg(StrUtil.subPre(e.getMessage(), AppConst.MSG_MAX_LENGTH));
+                if (log.saveResult()) {
+                    // 失败响应与全局异常处理器口径一致:按异常类型构造失败 Result 记录,详情可完整回放响应体
+                    sysLog.setResult(fitJson(mask(toJson(buildFailResult(e))), maxTextLength));
+                }
             } else {
                 // 响应结果与真实响应体保持一致：@ApiResponseBody 会把原始返回值包装为 Result.success(...)
                 sysLog.setStatus(SuccessEnum.SUCCESS.getCode());
@@ -190,6 +196,26 @@ public class LogAspect {
         } catch (Exception ex) {
             LogAspect.log.warn("操作日志采集失败：{}", ex.getMessage());
         }
+    }
+
+    /**
+     * 构建失败响应结果：与全局异常处理器对各类异常的转换口径保持一致。
+     * <p>
+     * {@code ValidationException}/{@code AuthorizationException} 均为 {@code BusinessException} 子类
+     * （默认码 400/403），统一由父类分支透传业务码；{@code SystemException} 透传系统错误码；
+     * 兜底口径对齐"未捕获异常不透传内部细节"的原则。
+     *
+     * @param e 业务抛出的异常
+     * @return 失败响应体
+     */
+    private Result<Void> buildFailResult(Throwable e) {
+        if (e instanceof BusinessException be) {
+            return Result.error(be.getCode(), be.getMsg());
+        }
+        if (e instanceof SystemException se) {
+            return Result.error(se.getCode(), se.getMsg());
+        }
+        return Result.systemError("系统繁忙，请稍后重试");
     }
 
     /**
