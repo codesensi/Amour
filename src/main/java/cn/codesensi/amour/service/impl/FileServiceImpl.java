@@ -19,6 +19,7 @@ import cn.codesensi.amour.service.FileService;
 import cn.codesensi.amour.service.SysConfigService;
 import cn.codesensi.amour.service.file.FileStorage;
 import cn.codesensi.amour.service.file.FileViewResult;
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.file.FileNameUtil;
@@ -337,6 +338,11 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
      * 仅逻辑删除记录，物理文件保留，业务展示不受影响
      * （预览按 id 加载，不校验删除标识）；物理文件在回收站“彻底删除”时统一清理，
      * 该口径与 {@code bindBizFiles} 的替换语义保持一致。
+     * <p>
+     * 权限口径：上传人本人或具备 system:file:delete 权限——
+     * 本人口径兼容业务侧清除图片（头像/站点Logo等）复用本接口，
+     * 权限口径保留文件管理页对任意文件的删除能力；
+     * 对已在回收站内的文件幂等成功，便于业务侧未保存场景下的重复清除。
      *
      * @param id 文件ID
      */
@@ -348,8 +354,15 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         if (ObjUtil.isNull(sysFile)) {
             throw new BusinessException("文件不存在");
         }
+        // 归属校验:上传人本人(creator 可能为空的历史记录不匹配)或具备文件删除权限
+        boolean ownFile = ObjUtil.equals(StpUtil.getLoginIdAsLong(), sysFile.getCreator());
+        if (!ownFile && !StpUtil.hasPermission("system:file:delete")) {
+            throw new BusinessException("仅可删除自己上传的文件");
+        }
+        // 已在回收站时幂等成功:业务侧"清除图片"未保存前可重复触发,
+        // 且 UpdateChain 携带 del_flag=0 条件,重复执行本就无副作用
         if (DelFlagEnum.DELETED.getCode().equals(sysFile.getDelFlag())) {
-            throw new BusinessException("文件已在回收站中,请勿重复删除");
+            return;
         }
         UpdateChain.of(SysFile.class)
                 .set(SYS_FILE.DEL_FLAG, DelFlagEnum.DELETED.getCode())

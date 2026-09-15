@@ -21,6 +21,7 @@ public enum FileBizTypeEnum implements BaseEnum<String> {
     AVATAR("avatar", "用户头像", List.of("jpg", "jpeg", "png", "gif", "webp"), 2),
     PHOTO("photo", "相册照片", List.of("jpg", "jpeg", "png", "webp"), 20),
     MARKDOWN("markdown", "点滴配图", List.of("jpg", "jpeg", "png", "gif", "webp"), 10),
+    LOGO("logo", "基础设施", List.of("jpg", "jpeg", "png", "gif", "webp"), 2),
     ;
 
     /**

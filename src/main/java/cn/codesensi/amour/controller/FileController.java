@@ -89,6 +89,8 @@ public class FileController {
     /**
      * 删除文件到回收站。
      * <p>
+     * 登录即可调用，服务端按归属校验（上传人本人或具备 system:file:delete 权限），
+     * 兼作业务侧清除图片（头像/站点Logo等）的删除入口；
      * 仅逻辑删除记录，物理文件保留，业务展示不受影响；
      * 可在回收站恢复或彻底删除（物理文件在彻底删除时统一清理）。
      *
@@ -96,7 +98,6 @@ public class FileController {
      */
     @ApiResponseBody
     @Log(module = "文件管理", operation = "删除文件", type = LogTypeEnum.DELETE, saveResult = false)
-    @SaCheckPermission("system:file:delete")
     @DeleteMapping("/{id}")
     public void delete(@PathVariable("id") Long id) {
         fileService.delete(id);

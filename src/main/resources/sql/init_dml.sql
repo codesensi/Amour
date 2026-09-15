@@ -22,6 +22,7 @@ FROM (
              (1003, 'copyright-year', '2026', 'STRING', 'base', 0, '版权年份'),
              (1004, 'uapi-key', NULL, 'STRING', 'base', 1, 'UApiPro接口密钥(https://uapis.cn)'),
              (1005, 'trust-proxy-headers', 'true', 'BOOLEAN', 'base', 0, '是否信任X-Real-IP等代理头(仅部署于可信反向代理后开启)'),
+             (1006, 'logo', NULL, 'STRING', 'base', 0, '项目/站点logo图片(登录页/管理端/门户端统一;值为文件访问地址/file/view/{id})'),
              -- site（2000 段）
              (2001, 'site.love-start-date', '2018-07-15 00:00:00', 'DATETIME', 'site', 0, '门户恋爱计时起点'),
              -- captcha（3000 段）
