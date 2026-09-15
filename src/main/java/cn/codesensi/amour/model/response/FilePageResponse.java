@@ -59,7 +59,7 @@ public class FilePageResponse implements Serializable {
     private String path;
 
     /**
-     * 业务来源: avatar-用户头像, photo-相册照片, markdown-点滴配图
+     * 业务来源: infra-基础设施, avatar-用户头像, photo-相册照片, markdown-点滴配图
      */
     private String bizType;
 

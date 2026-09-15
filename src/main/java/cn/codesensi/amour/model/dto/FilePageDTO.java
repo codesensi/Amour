@@ -28,7 +28,7 @@ public class FilePageDTO extends BasePage implements Serializable {
     private String originalName;
 
     /**
-     * 业务类型编码: avatar-用户头像, photo-相册照片, markdown-点滴配图
+     * 业务类型编码: infra-基础设施, avatar-用户头像, photo-相册照片, markdown-点滴配图
      */
     private String bizType;
 

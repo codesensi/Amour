@@ -265,10 +265,11 @@ FROM (
              -- file-storage-type（存储类型，对应 StorageTypeEnum：local-本地,oss-对象存储；10900 段）
              (10901, 'file-storage-type', '存储类型', 'local', '本地存储', 1, 0, 1, '与 StorageTypeEnum(local/oss) 对齐'),
              (10902, 'file-storage-type', '存储类型', 'oss', '对象存储', 2, 0, 1, '与 StorageTypeEnum(local/oss) 对齐'),
-             -- biz-type（文件业务类型，对应 FileBizTypeEnum：avatar-用户头像,photo-相册照片,markdown-点滴配图；11000 段）
-             (11001, 'biz-type', '文件业务类型', 'avatar', '用户头像', 1, 0, 1, '与 FileBizTypeEnum(avatar/photo/markdown) 对齐'),
-             (11002, 'biz-type', '文件业务类型', 'photo', '相册照片', 2, 0, 1, '与 FileBizTypeEnum(avatar/photo/markdown) 对齐'),
-             (11003, 'biz-type', '文件业务类型', 'markdown', '点滴配图', 3, 0, 1, '与 FileBizTypeEnum(avatar/photo/markdown) 对齐'),
+             -- biz-type（文件业务类型，对应 FileBizTypeEnum：infra-基础设施,avatar-用户头像,photo-相册照片,markdown-点滴配图；11000 段）
+             (11001, 'biz-type', '文件业务类型', 'infra', '基础设施', 1, 0, 1, '与 FileBizTypeEnum(infra/avatar/photo/markdown) 对齐'),
+             (11002, 'biz-type', '文件业务类型', 'avatar', '用户头像', 2, 0, 1, '与 FileBizTypeEnum(infra/avatar/photo/markdown) 对齐'),
+             (11003, 'biz-type', '文件业务类型', 'photo', '相册照片', 3, 0, 1, '与 FileBizTypeEnum(infra/avatar/photo/markdown) 对齐'),
+             (11004, 'biz-type', '文件业务类型', 'markdown', '点滴配图', 4, 0, 1, '与 FileBizTypeEnum(infra/avatar/photo/markdown) 对齐'),
              -- log-type（日志类型，对应 LogTypeEnum：0-未知,1-登录,2-登出,3-查询,4-新增,5-修改,6-删除,7-授权,8-上传,9-下载；11100 段）
              (11101, 'log-type', '日志类型', '0', '未知', 1, 0, 1, '与 LogTypeEnum 对齐'),
              (11102, 'log-type', '日志类型', '1', '登录', 2, 0, 1, '与 LogTypeEnum 对齐'),

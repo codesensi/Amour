@@ -115,7 +115,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
      * 最后以单条 SQL 落库（含存储 key 与 MD5），任一环节失败整体回滚并清理已写盘文件；
      * 返回的分发地址形如 {@code /file/view/{id}}。
      *
-     * @param bizType 业务类型编码（avatar/photo/markdown）
+     * @param bizType 业务类型编码（infra/avatar/photo/markdown，详见 FileBizTypeEnum）
      * @param file    上传的文件
      * @return 文件ID、访问地址与原始文件名
      */

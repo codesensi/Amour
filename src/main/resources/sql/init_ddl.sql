@@ -213,7 +213,7 @@ CREATE TABLE IF NOT EXISTS `sys_file` (
     `storage_type`  VARCHAR(16)   NULL DEFAULT NULL       COMMENT '存储类型: local-本地, oss-对象存储',
     `extension`     VARCHAR(16)   NULL DEFAULT NULL       COMMENT '文件扩展名',
     `content_type`  VARCHAR(128)  NULL DEFAULT NULL       COMMENT '文件类型',
-    `biz_type`      VARCHAR(64)   NULL DEFAULT NULL       COMMENT '业务来源: avatar-用户头像, markdown-点滴配图, photo-相册照片',
+    `biz_type`      VARCHAR(64)   NULL DEFAULT NULL       COMMENT '业务来源: infra-基础设施, avatar-用户头像, photo-相册照片, markdown-点滴配图',
     `biz_id`        BIGINT        NULL DEFAULT NULL       COMMENT '业务关联ID',
     `creator`       BIGINT        NULL DEFAULT NULL       COMMENT '创建人',
     `create_time`   DATETIME      NULL DEFAULT CURRENT_TIMESTAMP       COMMENT '创建时间',

@@ -57,7 +57,7 @@ public class FileController {
      * 登录即可上传（个人中心与用户管理表单均使用），业务类型决定扩展名与大小校验规则。
      * 类级未标注 {@code ApiResponseBody}（预览/下载需原样流式输出），仅上传方法单独标注。
      *
-     * @param bizType 业务类型（avatar/photo/markdown）
+     * @param bizType 业务类型（infra/avatar/photo/markdown，详见 FileBizTypeEnum）
      * @param file    上传的文件
      * @return 文件ID、访问地址与原始文件名
      */
