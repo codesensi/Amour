@@ -20,6 +20,7 @@ public enum ConfigKeyEnum implements BaseEnum<String> {
     // ---------- 基础配置（base 分组：1000 段） ----------
     NAME("name", "项目/站点名称"),
     LOGO("logo", "项目/站点logo图片"),
+    FAVICON("favicon", "项目/站点favicon图标"),
     ICP("icp", "ICP备案文案"),
     COPYRIGHT_YEAR("copyright-year", "版权年份"),
     UAPI_KEY("uapi-key", "UApiPro接口密钥"),
