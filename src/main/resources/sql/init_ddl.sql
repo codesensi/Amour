@@ -231,16 +231,39 @@ CREATE TABLE IF NOT EXISTS `sys_file` (
     COMMENT = '文件记录表';
 
 -- ----------------------------
--- 表结构：sys_dict（数据字典表）
+-- 表结构：sys_dict_type（数据字典类型表）
+-- 幂等建表：仅当表不存在时创建
+-- 唯一性：dict_code 全生命周期唯一（含逻辑删除记录），服务层先行查重并给出友好提示
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `sys_dict_type` (
+    `id`          BIGINT       NOT NULL               COMMENT '主键ID',
+    `dict_code`   VARCHAR(64)  NOT NULL               COMMENT '字典编码',
+    `dict_name`   VARCHAR(64)  NOT NULL               COMMENT '字典名称',
+    `builtin`     TINYINT(1)   NOT NULL DEFAULT 0     COMMENT '是否内置: 0-否, 1-是',
+    `remark`      VARCHAR(512) NULL DEFAULT NULL      COMMENT '备注',
+    `creator`     BIGINT       NULL DEFAULT NULL      COMMENT '创建人',
+    `create_time` DATETIME     NULL DEFAULT CURRENT_TIMESTAMP      COMMENT '创建时间',
+    `updater`     BIGINT       NULL DEFAULT NULL      COMMENT '更新人',
+    `update_time` DATETIME     NULL DEFAULT CURRENT_TIMESTAMP      COMMENT '更新时间',
+    `del_flag`    TINYINT(1)   NOT NULL DEFAULT 0     COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `uk_dt_code` (`dict_code`)
+    ) ENGINE = InnoDB
+    CHARACTER SET = utf8mb4
+    COLLATE = utf8mb4_general_ci
+    ROW_FORMAT = DYNAMIC
+    COMMENT = '数据字典类型表';
+
+-- ----------------------------
+-- 表结构：sys_dict_data（数据字典数据表）
 -- 幂等建表：仅当表不存在时创建
 -- 唯一性：同编码下字典值全生命周期唯一（含逻辑删除记录），服务层全量查重先行拦截并给出友好提示
 -- ----------------------------
-CREATE TABLE IF NOT EXISTS `sys_dict` (
+CREATE TABLE IF NOT EXISTS `sys_dict_data` (
     `id`          BIGINT        NOT NULL                COMMENT '主键ID',
-    `dict_code`   VARCHAR(64)   NULL DEFAULT NULL       COMMENT '字典编码',
-    `dict_name`   VARCHAR(64)   NULL DEFAULT NULL       COMMENT '字典名称',
-    `dict_value`  VARCHAR(128)  NULL DEFAULT NULL       COMMENT '字典值',
-    `dict_label`  VARCHAR(128)  NULL DEFAULT NULL       COMMENT '字典标签',
+    `dict_code`   VARCHAR(64)   NOT NULL                COMMENT '字典编码',
+    `dict_value`  VARCHAR(128)  NOT NULL                COMMENT '字典值',
+    `dict_label`  VARCHAR(128)  NOT NULL                COMMENT '字典标签',
     `sort`        INT           NOT NULL DEFAULT 0      COMMENT '排序（数字越小越靠前）',
     `status`      TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '状态: 0-启用, 1-禁用',
     `builtin`     TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '是否内置: 0-否, 1-是',
@@ -251,14 +274,14 @@ CREATE TABLE IF NOT EXISTS `sys_dict` (
     `update_time` DATETIME      NULL DEFAULT CURRENT_TIMESTAMP       COMMENT '更新时间',
     `del_flag`    TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
     PRIMARY KEY (`id`),
-    UNIQUE INDEX `uk_d_code_value` (`dict_code`, `dict_value`),
-    INDEX `idx_d_dict_code` (`dict_code` ASC),
-    INDEX `idx_d_status` (`status` ASC)
+    UNIQUE INDEX `uk_dd_code_value` (`dict_code`, `dict_value`),
+    INDEX `idx_dd_dict_code` (`dict_code` ASC),
+    INDEX `idx_dd_status` (`status` ASC)
     ) ENGINE = InnoDB
     CHARACTER SET = utf8mb4
     COLLATE = utf8mb4_general_ci
     ROW_FORMAT = DYNAMIC
-    COMMENT = '数据字典表';
+    COMMENT = '数据字典数据表';
 
 -- ----------------------------
 -- 表结构：sys_notice（通知表）

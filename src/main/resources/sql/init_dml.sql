@@ -204,19 +204,51 @@ WHERE NOT EXISTS (
 );
 
 -- ----------------------------
--- 数据填充：sys_dict（幂等插入）
--- dict_code 命名与 common/enums 下现有枚举类对齐（取枚举类名去 Enum 后缀的小写 kebab 形式，
--- 如 GenderEnum → gender、EnableEnum → enable、MenuType → menu-type），
--- 内置条目（builtin=1）仅承载展示层（label/排序/启停），业务校验仍由对应枚举类负责；
--- 组内条目顺序与枚举声明顺序一致，id 按编码分段预留（10000 段起，每编码预留 100）
+-- 数据填充：sys_dict_type（幂等插入）
+-- 内置类型（builtin=1）编码与 common/enums 下现有枚举类对齐（取枚举类名去 Enum 后缀的小写
+-- kebab 形式，如 GenderEnum → gender、EnableEnum → enable、MenuType → menu-type）；
+-- id 使用独立的 99000 段顺序预留（与条目表 10000 段互相独立）
 -- ----------------------------
-INSERT INTO `sys_dict` (
-    `id`, `dict_code`, `dict_name`, `dict_value`, `dict_label`, `sort`, `status`, `builtin`, `remark`
+INSERT INTO `sys_dict_type` (
+    `id`, `dict_code`, `dict_name`, `builtin`, `remark`
 )
 SELECT
     t.id,
     t.dict_code,
     t.dict_name,
+    t.builtin,
+    t.remark
+FROM (
+         VALUES
+             (99001, 'gender', '性别', 1, '与 GenderEnum(U/M/F) 对齐'),
+             (99002, 'enable', '启用状态', 1, '与 EnableEnum(0/1) 对齐'),
+             (99003, 'yes', '是否', 1, '与 YesEnum(1/0) 对齐'),
+             (99004, 'del-flag', '删除标识', 1, '与 DelFlagEnum(1/0) 对齐'),
+             (99005, 'menu-type', '菜单类型', 1, '与 MenuType(D/M/B) 对齐'),
+             (99006, 'image-type', '图形验证码类型', 1, '与 ImageType(spec/gif/chinese/chinese-gif/arithmetic) 对齐'),
+             (99007, 'success', '成功状态', 1, '与 SuccessEnum(1/0) 对齐'),
+             (99008, 'config-group', '配置分组', 1, '与 sys_config.config_group(base/site/captcha/file/rate-limit) 对齐'),
+             (99009, 'config-value-type', '配置值类型', 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN/DATETIME) 对齐'),
+             (99010, 'file-storage-type', '存储类型', 1, '与 StorageTypeEnum(local/oss) 对齐'),
+             (99011, 'biz-type', '文件业务类型', 1, '与 FileBizTypeEnum(infra/avatar/photo/markdown) 对齐'),
+             (99012, 'log-type', '日志类型', 1, '与 LogTypeEnum 对齐')
+     ) AS t(id, dict_code, dict_name, builtin, remark)
+WHERE NOT EXISTS (
+    SELECT 1 FROM `sys_dict_type` WHERE `sys_dict_type`.`id` = t.id
+);
+
+-- ----------------------------
+-- 数据填充：sys_dict_data（幂等插入）
+-- dict_code 与 sys_dict_type 内置类型对齐，内置条目（builtin=1）仅承载展示层
+-- （label/排序/启停），业务校验仍由对应枚举类负责；
+-- 组内条目顺序与枚举声明顺序一致，id 按编码分段预留（10000 段起，每编码预留 100）
+-- ----------------------------
+INSERT INTO `sys_dict_data` (
+    `id`, `dict_code`, `dict_value`, `dict_label`, `sort`, `status`, `builtin`, `remark`
+)
+SELECT
+    t.id,
+    t.dict_code,
     t.dict_value,
     t.dict_label,
     t.sort,
@@ -226,65 +258,65 @@ SELECT
 FROM (
          VALUES
              -- gender（性别，对应 GenderEnum：U-未知,M-男,F-女；10000 段）
-             (10001, 'gender', '性别', 'U', '未知', 1, 0, 1, '与 GenderEnum(U/M/F) 对齐'),
-             (10002, 'gender', '性别', 'M', '男', 2, 0, 1, '与 GenderEnum(U/M/F) 对齐'),
-             (10003, 'gender', '性别', 'F', '女', 3, 0, 1, '与 GenderEnum(U/M/F) 对齐'),
+             (10001, 'gender', 'U', '未知', 1, 0, 1, '与 GenderEnum(U/M/F) 对齐'),
+             (10002, 'gender', 'M', '男', 2, 0, 1, '与 GenderEnum(U/M/F) 对齐'),
+             (10003, 'gender', 'F', '女', 3, 0, 1, '与 GenderEnum(U/M/F) 对齐'),
              -- enable（通用启停状态，对应 EnableEnum：0-启用,1-禁用；10100 段）
-             (10101, 'enable', '启用状态', '0', '启用', 1, 0, 1, '与 EnableEnum(0/1) 对齐'),
-             (10102, 'enable', '启用状态', '1', '禁用', 2, 0, 1, '与 EnableEnum(0/1) 对齐'),
+             (10101, 'enable', '0', '启用', 1, 0, 1, '与 EnableEnum(0/1) 对齐'),
+             (10102, 'enable', '1', '禁用', 2, 0, 1, '与 EnableEnum(0/1) 对齐'),
              -- yes（是否，对应 YesEnum：1-是,0-否；10200 段）
-             (10201, 'yes', '是否', '1', '是', 1, 0, 1, '与 YesEnum(1/0) 对齐'),
-             (10202, 'yes', '是否', '0', '否', 2, 0, 1, '与 YesEnum(1/0) 对齐'),
+             (10201, 'yes', '1', '是', 1, 0, 1, '与 YesEnum(1/0) 对齐'),
+             (10202, 'yes', '0', '否', 2, 0, 1, '与 YesEnum(1/0) 对齐'),
              -- del-flag（删除标识，对应 DelFlagEnum：1-已删除,0-未删除；10300 段）
-             (10301, 'del-flag', '删除标识', '0', '未删除', 1, 0, 1, '与 DelFlagEnum(1/0) 对齐'),
-             (10302, 'del-flag', '删除标识', '1', '已删除', 2, 0, 1, '与 DelFlagEnum(1/0) 对齐'),
+             (10301, 'del-flag', '0', '未删除', 1, 0, 1, '与 DelFlagEnum(1/0) 对齐'),
+             (10302, 'del-flag', '1', '已删除', 2, 0, 1, '与 DelFlagEnum(1/0) 对齐'),
              -- menu-type（菜单类型，对应 MenuType：D-目录,M-菜单,B-按钮；10400 段）
-             (10401, 'menu-type', '菜单类型', 'D', '目录', 1, 0, 1, '与 MenuType(D/M/B) 对齐'),
-             (10402, 'menu-type', '菜单类型', 'M', '菜单', 2, 0, 1, '与 MenuType(D/M/B) 对齐'),
-             (10403, 'menu-type', '菜单类型', 'B', '按钮', 3, 0, 1, '与 MenuType(D/M/B) 对齐'),
+             (10401, 'menu-type', 'D', '目录', 1, 0, 1, '与 MenuType(D/M/B) 对齐'),
+             (10402, 'menu-type', 'M', '菜单', 2, 0, 1, '与 MenuType(D/M/B) 对齐'),
+             (10403, 'menu-type', 'B', '按钮', 3, 0, 1, '与 MenuType(D/M/B) 对齐'),
              -- image-type（图形验证码类型，对应 ImageType；10500 段）
-             (10501, 'image-type', '图形验证码类型', 'spec', 'PNG字符验证码', 1, 0, 1, '与 ImageType(spec/gif/chinese/chinese-gif/arithmetic) 对齐'),
-             (10502, 'image-type', '图形验证码类型', 'gif', 'GIF字符验证码', 2, 0, 1, '与 ImageType(spec/gif/chinese/chinese-gif/arithmetic) 对齐'),
-             (10503, 'image-type', '图形验证码类型', 'chinese', '中文字符验证码', 3, 0, 1, '与 ImageType(spec/gif/chinese/chinese-gif/arithmetic) 对齐'),
-             (10504, 'image-type', '图形验证码类型', 'chinese-gif', '中文GIF字符验证码', 4, 0, 1, '与 ImageType(spec/gif/chinese/chinese-gif/arithmetic) 对齐'),
-             (10505, 'image-type', '图形验证码类型', 'arithmetic', '算术验证码', 5, 0, 1, '与 ImageType(spec/gif/chinese/chinese-gif/arithmetic) 对齐'),
+             (10501, 'image-type', 'spec', 'PNG字符验证码', 1, 0, 1, '与 ImageType(spec/gif/chinese/chinese-gif/arithmetic) 对齐'),
+             (10502, 'image-type', 'gif', 'GIF字符验证码', 2, 0, 1, '与 ImageType(spec/gif/chinese/chinese-gif/arithmetic) 对齐'),
+             (10503, 'image-type', 'chinese', '中文字符验证码', 3, 0, 1, '与 ImageType(spec/gif/chinese/chinese-gif/arithmetic) 对齐'),
+             (10504, 'image-type', 'chinese-gif', '中文GIF字符验证码', 4, 0, 1, '与 ImageType(spec/gif/chinese/chinese-gif/arithmetic) 对齐'),
+             (10505, 'image-type', 'arithmetic', '算术验证码', 5, 0, 1, '与 ImageType(spec/gif/chinese/chinese-gif/arithmetic) 对齐'),
              -- success（成功状态，对应 SuccessEnum：1-成功,0-失败；10600 段）
-             (10601, 'success', '成功状态', '1', '成功', 1, 0, 1, '与 SuccessEnum(1/0) 对齐'),
-             (10602, 'success', '成功状态', '0', '失败', 2, 0, 1, '与 SuccessEnum(1/0) 对齐'),
+             (10601, 'success', '1', '成功', 1, 0, 1, '与 SuccessEnum(1/0) 对齐'),
+             (10602, 'success', '0', '失败', 2, 0, 1, '与 SuccessEnum(1/0) 对齐'),
              -- config-group（配置分组，与 sys_config.config_group 对齐：base-基础,site-门户,captcha-验证码,file-文件,rate-limit-接口限流；10700 段）
-             (10701, 'config-group', '配置分组', 'base', '基础配置', 1, 0, 1, '与 sys_config.config_group(base/site/captcha) 对齐'),
-             (10702, 'config-group', '配置分组', 'site', '门户配置', 2, 0, 1, '与 sys_config.config_group(base/site/captcha) 对齐'),
-             (10703, 'config-group', '配置分组', 'captcha', '验证码配置', 3, 0, 1, '与 sys_config.config_group(base/site/captcha) 对齐'),
-             (10704, 'config-group', '配置分组', 'file', '文件配置', 4, 0, 1, '与 sys_config.config_group(base/site/captcha/file) 对齐'),
-             (10705, 'config-group', '配置分组', 'rate-limit', '接口限流', 5, 0, 1, '与 sys_config.config_group(base/site/captcha/file/rate-limit) 对齐'),
+             (10701, 'config-group', 'base', '基础配置', 1, 0, 1, '与 sys_config.config_group(base/site/captcha) 对齐'),
+             (10702, 'config-group', 'site', '门户配置', 2, 0, 1, '与 sys_config.config_group(base/site/captcha) 对齐'),
+             (10703, 'config-group', 'captcha', '验证码配置', 3, 0, 1, '与 sys_config.config_group(base/site/captcha) 对齐'),
+             (10704, 'config-group', 'file', '文件配置', 4, 0, 1, '与 sys_config.config_group(base/site/captcha/file) 对齐'),
+             (10705, 'config-group', 'rate-limit', '接口限流', 5, 0, 1, '与 sys_config.config_group(base/site/captcha/file/rate-limit) 对齐'),
              -- config-value-type（配置值类型，与 sys_config.value_type 对齐：STRING/INTEGER/LONG/BOOLEAN/DATETIME；10800 段）
-             (10801, 'config-value-type', '配置值类型', 'STRING', '字符串', 1, 0, 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN) 对齐'),
-             (10802, 'config-value-type', '配置值类型', 'INTEGER', '整数', 2, 0, 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN) 对齐'),
-             (10803, 'config-value-type', '配置值类型', 'LONG', '长整数', 3, 0, 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN) 对齐'),
-             (10804, 'config-value-type', '配置值类型', 'BOOLEAN', '布尔', 4, 0, 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN) 对齐'),
-             (10805, 'config-value-type', '配置值类型', 'DATETIME', '日期时间', 5, 0, 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN/DATETIME) 对齐'),
+             (10801, 'config-value-type', 'STRING', '字符串', 1, 0, 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN) 对齐'),
+             (10802, 'config-value-type', 'INTEGER', '整数', 2, 0, 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN) 对齐'),
+             (10803, 'config-value-type', 'LONG', '长整数', 3, 0, 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN) 对齐'),
+             (10804, 'config-value-type', 'BOOLEAN', '布尔', 4, 0, 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN) 对齐'),
+             (10805, 'config-value-type', 'DATETIME', '日期时间', 5, 0, 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN/DATETIME) 对齐'),
              -- file-storage-type（存储类型，对应 StorageTypeEnum：local-本地,oss-对象存储；10900 段）
-             (10901, 'file-storage-type', '存储类型', 'local', '本地存储', 1, 0, 1, '与 StorageTypeEnum(local/oss) 对齐'),
-             (10902, 'file-storage-type', '存储类型', 'oss', '对象存储', 2, 0, 1, '与 StorageTypeEnum(local/oss) 对齐'),
+             (10901, 'file-storage-type', 'local', '本地存储', 1, 0, 1, '与 StorageTypeEnum(local/oss) 对齐'),
+             (10902, 'file-storage-type', 'oss', '对象存储', 2, 0, 1, '与 StorageTypeEnum(local/oss) 对齐'),
              -- biz-type（文件业务类型，对应 FileBizTypeEnum：infra-基础设施,avatar-用户头像,photo-相册照片,markdown-点滴配图；11000 段）
-             (11001, 'biz-type', '文件业务类型', 'infra', '基础设施', 1, 0, 1, '与 FileBizTypeEnum(infra/avatar/photo/markdown) 对齐'),
-             (11002, 'biz-type', '文件业务类型', 'avatar', '用户头像', 2, 0, 1, '与 FileBizTypeEnum(infra/avatar/photo/markdown) 对齐'),
-             (11003, 'biz-type', '文件业务类型', 'photo', '相册照片', 3, 0, 1, '与 FileBizTypeEnum(infra/avatar/photo/markdown) 对齐'),
-             (11004, 'biz-type', '文件业务类型', 'markdown', '点滴配图', 4, 0, 1, '与 FileBizTypeEnum(infra/avatar/photo/markdown) 对齐'),
+             (11001, 'biz-type', 'infra', '基础设施', 1, 0, 1, '与 FileBizTypeEnum(infra/avatar/photo/markdown) 对齐'),
+             (11002, 'biz-type', 'avatar', '用户头像', 2, 0, 1, '与 FileBizTypeEnum(infra/avatar/photo/markdown) 对齐'),
+             (11003, 'biz-type', 'photo', '相册照片', 3, 0, 1, '与 FileBizTypeEnum(infra/avatar/photo/markdown) 对齐'),
+             (11004, 'biz-type', 'markdown', '点滴配图', 4, 0, 1, '与 FileBizTypeEnum(infra/avatar/photo/markdown) 对齐'),
              -- log-type（日志类型，对应 LogTypeEnum：0-未知,1-登录,2-登出,3-查询,4-新增,5-修改,6-删除,7-授权,8-上传,9-下载；11100 段）
-             (11101, 'log-type', '日志类型', '0', '未知', 1, 0, 1, '与 LogTypeEnum 对齐'),
-             (11102, 'log-type', '日志类型', '1', '登录', 2, 0, 1, '与 LogTypeEnum 对齐'),
-             (11103, 'log-type', '日志类型', '2', '登出', 3, 0, 1, '与 LogTypeEnum 对齐'),
-             (11104, 'log-type', '日志类型', '3', '查询', 4, 0, 1, '与 LogTypeEnum 对齐'),
-             (11105, 'log-type', '日志类型', '4', '新增', 5, 0, 1, '与 LogTypeEnum 对齐'),
-             (11106, 'log-type', '日志类型', '5', '修改', 6, 0, 1, '与 LogTypeEnum 对齐'),
-             (11107, 'log-type', '日志类型', '6', '删除', 7, 0, 1, '与 LogTypeEnum 对齐'),
-             (11108, 'log-type', '日志类型', '7', '授权', 8, 0, 1, '与 LogTypeEnum 对齐'),
-             (11109, 'log-type', '日志类型', '8', '上传', 9, 0, 1, '与 LogTypeEnum 对齐'),
-             (11110, 'log-type', '日志类型', '9', '下载', 10, 0, 1, '与 LogTypeEnum 对齐')
-     ) AS t(id, dict_code, dict_name, dict_value, dict_label, sort, status, builtin, remark)
+             (11101, 'log-type', '0', '未知', 1, 0, 1, '与 LogTypeEnum 对齐'),
+             (11102, 'log-type', '1', '登录', 2, 0, 1, '与 LogTypeEnum 对齐'),
+             (11103, 'log-type', '2', '登出', 3, 0, 1, '与 LogTypeEnum 对齐'),
+             (11104, 'log-type', '3', '查询', 4, 0, 1, '与 LogTypeEnum 对齐'),
+             (11105, 'log-type', '4', '新增', 5, 0, 1, '与 LogTypeEnum 对齐'),
+             (11106, 'log-type', '5', '修改', 6, 0, 1, '与 LogTypeEnum 对齐'),
+             (11107, 'log-type', '6', '删除', 7, 0, 1, '与 LogTypeEnum 对齐'),
+             (11108, 'log-type', '7', '授权', 8, 0, 1, '与 LogTypeEnum 对齐'),
+             (11109, 'log-type', '8', '上传', 9, 0, 1, '与 LogTypeEnum 对齐'),
+             (11110, 'log-type', '9', '下载', 10, 0, 1, '与 LogTypeEnum 对齐')
+     ) AS t(id, dict_code, dict_value, dict_label, sort, status, builtin, remark)
 WHERE NOT EXISTS (
-    SELECT 1 FROM `sys_dict` WHERE `sys_dict`.`id` = t.id
+    SELECT 1 FROM `sys_dict_data` WHERE `sys_dict_data`.`id` = t.id
 );
 
 SET REFERENTIAL_INTEGRITY TRUE;

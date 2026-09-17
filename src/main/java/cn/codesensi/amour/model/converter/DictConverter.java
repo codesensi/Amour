@@ -1,11 +1,9 @@
 package cn.codesensi.amour.model.converter;
 
 import cn.codesensi.amour.model.dto.*;
-import cn.codesensi.amour.model.entity.SysDict;
-import cn.codesensi.amour.model.request.DictChangeStatusRequest;
-import cn.codesensi.amour.model.request.DictInsertRequest;
-import cn.codesensi.amour.model.request.DictPageRequest;
-import cn.codesensi.amour.model.request.DictUpdateRequest;
+import cn.codesensi.amour.model.entity.SysDictData;
+import cn.codesensi.amour.model.entity.SysDictType;
+import cn.codesensi.amour.model.request.*;
 import cn.codesensi.amour.model.response.DictGroupResponse;
 import cn.codesensi.amour.model.response.DictPageResponse;
 import cn.codesensi.amour.model.response.DictResponse;
@@ -18,11 +16,11 @@ import org.mapstruct.MappingConstants;
 import java.util.List;
 
 /**
- * 数据字典转换器 —— {@link SysDict} 实体转 {@link DictDTO}（MapStruct 编译期生成实现类）。
+ * 数据字典转换器 —— 字典类型/数据实体与 DTO、请求、响应对象间的映射
+ * （MapStruct 编译期生成实现类）。
  * <p>
- * 以 Spring Bean 方式注入使用（生成的 {@code DictConvertImpl} 为 Spring 组件）；
- * 两侧字段（{@code dictValue}、{@code dictLabel}、{@code sort}）同名，
- * 由 MapStruct 自动映射，无需显式 {@code @Mapping}。
+ * 以 Spring Bean 方式注入使用（生成的 {@code DictConverterImpl} 为 Spring 组件）；
+ * 同名业务字段由 MapStruct 自动映射，仅审计字段与不可提交字段显式忽略。
  *
  * @author codesensi
  * @since 1.0
@@ -31,20 +29,20 @@ import java.util.List;
 public interface DictConverter {
 
     /**
-     * 将字典实体转换为字典项 DTO。
+     * 将字典数据实体转换为字典项 DTO。
      *
-     * @param dict 字典实体
+     * @param dictData 字典数据实体
      * @return 字典项 DTO
      */
-    DictDTO toDTO(SysDict dict);
+    DictDTO toDTO(SysDictData dictData);
 
     /**
-     * 将字典实体列表转换为字典项 DTO 列表（逐元素复用 {@link #toDTO(SysDict)} 的映射规则）。
+     * 将字典数据实体列表转换为字典项 DTO 列表（逐元素复用 {@link #toDTO(SysDictData)} 的映射规则）。
      *
-     * @param dictList 字典实体列表
+     * @param dictDataList 字典数据实体列表
      * @return 字典项 DTO 列表
      */
-    List<DictDTO> toListDTO(List<SysDict> dictList);
+    List<DictDTO> toListDTO(List<SysDictData> dictDataList);
 
     /**
      * 将字典项 DTO 转换为响应对象。
@@ -100,7 +98,7 @@ public interface DictConverter {
      * @param request 分页查询请求
      * @return 分页查询参数 DTO
      */
-    DictPageDTO toPageDTO(DictPageRequest request);
+    DictDataPageDTO toPageDTO(DictDataPageRequest request);
 
     /**
      * DictInsertRequest → DictInsertDTO。
@@ -108,7 +106,7 @@ public interface DictConverter {
      * @param request 新增字典条目请求
      * @return 新增字典条目 DTO
      */
-    DictInsertDTO toInsertDTO(DictInsertRequest request);
+    DictDataInsertDTO toInsertDTO(DictDataInsertRequest request);
 
     /**
      * DictUpdateRequest → DictUpdateDTO。
@@ -116,7 +114,7 @@ public interface DictConverter {
      * @param request 修改字典条目请求
      * @return 修改字典条目 DTO
      */
-    DictUpdateDTO toUpdateDTO(DictUpdateRequest request);
+    DictDataUpdateDTO toUpdateDTO(DictDataUpdateRequest request);
 
     /**
      * DictChangeStatusRequest → DictChangeStatusDTO。
@@ -127,13 +125,28 @@ public interface DictConverter {
     DictChangeStatusDTO toChangeStatusDTO(DictChangeStatusRequest request);
 
     /**
-     * DictInsertDTO → SysDict。
+     * DictTypeInsertRequest → DictTypeInsertDTO。
+     *
+     * @param request 新增字典类型请求
+     * @return 新增字典类型 DTO
+     */
+    DictTypeInsertDTO toInsertDTO(DictTypeInsertRequest request);
+
+    /**
+     * DictTypeUpdateRequest → DictTypeUpdateDTO。
+     *
+     * @param request 修改字典类型请求
+     * @return 修改字典类型 DTO
+     */
+    DictTypeUpdateDTO toUpdateDTO(DictTypeUpdateRequest request);
+
+    /**
+     * DictInsertDTO → SysDictData。
      * <p>
-     * id 由雪花生成器填充，审计字段由实体监听器填充，builtin 走数据库默认值；
-     * dictName 为组内共享属性，由服务层按分组继承回填，均不参与映射。
+     * id 由雪花生成器填充，审计字段由实体监听器填充，builtin 走数据库默认值，均不参与映射。
      *
      * @param insertDTO 新增字典条目 DTO
-     * @return 字典实体
+     * @return 字典数据实体
      */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "creator", ignore = true)
@@ -143,16 +156,16 @@ public interface DictConverter {
     @Mapping(target = "delFlag", ignore = true)
     @Mapping(target = "builtin", ignore = true)
     @Mapping(target = "dictName", ignore = true)
-    SysDict toEntity(DictInsertDTO insertDTO);
+    SysDictData toEntity(DictDataInsertDTO insertDTO);
 
     /**
-     * DictUpdateDTO → SysDict。
+     * DictUpdateDTO → SysDictData。
      * <p>
      * 审计字段由实体监听器维护；dictCode 创建后不可修改，status 由独立的状态接口维护；
-     * dictName 为组内共享属性，不在单条修改范围，均不参与映射。
+     * builtin 与 dictName（回填展示字段）不在单条修改范围，均不参与映射。
      *
      * @param updateDTO 修改字典条目 DTO
-     * @return 字典实体
+     * @return 字典数据实体
      */
     @Mapping(target = "creator", ignore = true)
     @Mapping(target = "createTime", ignore = true)
@@ -160,19 +173,54 @@ public interface DictConverter {
     @Mapping(target = "updateTime", ignore = true)
     @Mapping(target = "delFlag", ignore = true)
     @Mapping(target = "dictCode", ignore = true)
-    @Mapping(target = "dictName", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "builtin", ignore = true)
-    SysDict toEntity(DictUpdateDTO updateDTO);
+    @Mapping(target = "dictName", ignore = true)
+    SysDictData toEntity(DictDataUpdateDTO updateDTO);
 
     /**
-     * Page&lt;SysDict&gt; → Page&lt;DictPageResponse&gt;
-     * （records 逐元素复用实体 → 行响应对象的映射规则）。
+     * DictTypeInsertDTO → SysDictType。
+     * <p>
+     * id 由雪花生成器填充，审计字段由实体监听器填充，builtin 走数据库默认值，均不参与映射。
      *
-     * @param page 字典实体分页
+     * @param insertDTO 新增字典类型 DTO
+     * @return 字典类型实体
+     */
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "creator", ignore = true)
+    @Mapping(target = "createTime", ignore = true)
+    @Mapping(target = "updater", ignore = true)
+    @Mapping(target = "updateTime", ignore = true)
+    @Mapping(target = "delFlag", ignore = true)
+    @Mapping(target = "builtin", ignore = true)
+    SysDictType toEntity(DictTypeInsertDTO insertDTO);
+
+    /**
+     * DictTypeUpdateDTO → SysDictType。
+     * <p>
+     * 审计字段由实体监听器维护；dictCode 创建后不可修改，builtin 为内置标识，
+     * 均不参与映射。
+     *
+     * @param updateDTO 修改字典类型 DTO
+     * @return 字典类型实体
+     */
+    @Mapping(target = "creator", ignore = true)
+    @Mapping(target = "createTime", ignore = true)
+    @Mapping(target = "updater", ignore = true)
+    @Mapping(target = "updateTime", ignore = true)
+    @Mapping(target = "delFlag", ignore = true)
+    @Mapping(target = "dictCode", ignore = true)
+    @Mapping(target = "builtin", ignore = true)
+    SysDictType toEntity(DictTypeUpdateDTO updateDTO);
+
+    /**
+     * Page&lt;SysDictData&gt; → Page&lt;DictPageResponse&gt;
+     * （records 逐元素复用实体 → 行响应对象的映射规则；dictName 为实体上的回填展示字段）。
+     *
+     * @param page 字典数据实体分页
      * @return 字典行响应对象分页
      */
     @Mapping(target = "optimizeCountQuery", ignore = true)
-    Page<DictPageResponse> toPageResponse(Page<SysDict> page);
+    Page<DictPageResponse> toPageResponse(Page<SysDictData> page);
 
 }

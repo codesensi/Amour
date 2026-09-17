@@ -1,17 +1,18 @@
 package cn.codesensi.amour.service.impl;
 
-import cn.codesensi.amour.common.core.BasePage;
 import cn.codesensi.amour.common.enums.BuiltinEnum;
 import cn.codesensi.amour.common.enums.CacheNameEnum;
 import cn.codesensi.amour.common.enums.EnableEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.util.CacheUtil;
-import cn.codesensi.amour.mapper.SysDictMapper;
+import cn.codesensi.amour.mapper.SysDictDataMapper;
+import cn.codesensi.amour.mapper.SysDictTypeMapper;
 import cn.codesensi.amour.model.converter.DictConverter;
 import cn.codesensi.amour.model.dto.*;
-import cn.codesensi.amour.model.entity.SysDict;
+import cn.codesensi.amour.model.entity.SysDictData;
+import cn.codesensi.amour.model.entity.SysDictType;
 import cn.codesensi.amour.service.CacheEvictService;
-import cn.codesensi.amour.service.SysDictService;
+import cn.codesensi.amour.service.SysDictDataService;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
@@ -30,12 +31,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static cn.codesensi.amour.model.entity.table.SysDictTableDef.SYS_DICT;
+import static cn.codesensi.amour.model.entity.table.SysDictDataTableDef.SYS_DICT_DATA;
+import static cn.codesensi.amour.model.entity.table.SysDictTypeTableDef.SYS_DICT_TYPE;
 
 /**
- * 数据字典查询服务实现。
+ * 数据字典数据服务实现。
  * <p>
- * 优先从 Caffeine 缓存（缓存名 {@code dict}，见 {@link CacheConst#DICT}）以字典编码
+ * 优先从 Caffeine 缓存（缓存名 {@code dict}，见 {@link CacheNameEnum#DICT}）以字典编码
  * （{@code dict_code}）为 Key 读取启用中的字典项列表，未命中时回源查库并回填，
  * 减少高频字典读取点的数据库压力。
  * <p>
@@ -51,9 +53,10 @@ import static cn.codesensi.amour.model.entity.table.SysDictTableDef.SYS_DICT;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SysDictServiceImpl implements SysDictService {
+public class SysDictDataServiceImpl implements SysDictDataService {
 
-    private final SysDictMapper sysDictMapper;
+    private final SysDictDataMapper sysDictDataMapper;
+    private final SysDictTypeMapper sysDictTypeMapper;
     private final CacheManager cacheManager;
     private final DictConverter dictConverter;
     private final CacheEvictService cacheEvictService;
@@ -138,21 +141,21 @@ public class SysDictServiceImpl implements SysDictService {
     }
 
     /**
-     * 从 sys_dict 表按编码集合批量查询启用中的字典项（编码 -> 组内条目，组内按 sort 升序）。
+     * 从 sys_dict_data 表按编码集合批量查询启用中的字典项（编码 -> 组内条目，组内按 sort 升序）。
      * <p>逻辑删除（del_flag）由 MyBatis-Flex 全局配置自动追加过滤。
      *
      * @param codes 字典编码集合（去重后非空）
      * @return 编码 -> 启用中的字典项列表
      */
     private Map<String, List<DictDTO>> listByCodesDb(List<String> codes) {
-        return QueryChain.of(sysDictMapper)
-                .where(SYS_DICT.DICT_CODE.in(codes))
-                .and(SYS_DICT.STATUS.eq(EnableEnum.ENABLE.getCode()))
-                .orderBy(SYS_DICT.SORT, true)
-                .orderBy(SYS_DICT.ID, true)
+        return QueryChain.of(sysDictDataMapper)
+                .where(SYS_DICT_DATA.DICT_CODE.in(codes))
+                .and(SYS_DICT_DATA.STATUS.eq(EnableEnum.ENABLE.getCode()))
+                .orderBy(SYS_DICT_DATA.SORT, true)
+                .orderBy(SYS_DICT_DATA.ID, true)
                 .list()
                 .stream()
-                .collect(Collectors.groupingBy(SysDict::getDictCode, LinkedHashMap::new,
+                .collect(Collectors.groupingBy(SysDictData::getDictCode, LinkedHashMap::new,
                         Collectors.mapping(dictConverter::toDTO, Collectors.toList())));
     }
 
@@ -178,74 +181,70 @@ public class SysDictServiceImpl implements SysDictService {
     }
 
     /**
-     * 查询全部字典类型(按编码聚合，含条目数；管理端左侧类型列表的数据源)。
-     * <p>字典为单表扁平结构，"类型"是由 {@code dict_code} 聚合出的分组视角:
-     * 全表按 id 升序加载后内存聚合，名称取组内首行，计数包含禁用条目。
-     *
-     * @return 字典类型列表
-     */
-    @Override
-    public List<DictTypeDTO> listTypes() {
-        List<SysDict> dictList = QueryChain.of(sysDictMapper)
-                .orderBy(SYS_DICT.ID, true)
-                .list();
-        Map<String, DictTypeDTO> types = new LinkedHashMap<>();
-        for (SysDict dict : dictList) {
-            DictTypeDTO type = types.computeIfAbsent(dict.getDictCode(),
-                    code -> new DictTypeDTO().setDictCode(code).setCount(0));
-            type.setDictName(dict.getDictName());
-            type.setCount(type.getCount() + 1);
-        }
-        return new ArrayList<>(types.values());
-    }
-
-    /**
      * 分页查询字典条目(管理端，含禁用条目与完整字段)。
      * <p>
-     * 编码、名称、值为模糊匹配，状态为精确匹配，条件缺省时自动忽略；
-     * 排序为编码升序 → 组内 sort 升序 → id 升序；页码与每页条数的缺省值由 {@link BasePage} 提供(1 与 20)。
+     * 编码、值为模糊匹配，状态为精确匹配，条件缺省时自动忽略；名称条件已归类型表，
+     * 先经类型表解析为编码集合再下推（无命中编码时直接返回空页）；
+     * 排序为编码升序 → 组内 sort 升序 → id 升序；页码与每页条数的缺省值由 {@code BasePage} 提供(1 与 20)。
      * <p>逻辑删除（del_flag）由 MyBatis-Flex 全局配置自动追加过滤。
      *
      * @param pageDTO 分页查询参数
-     * @return 字典条目分页结果
+     * @return 字典条目分页结果(dictName 为自类型表回填的展示字段)
      */
     @Override
-    public Page<SysDict> page(DictPageDTO pageDTO) {
-        return QueryChain.of(sysDictMapper)
-                .select(SYS_DICT.ALL_COLUMNS)
-                .where(SYS_DICT.DICT_CODE.like(pageDTO.getDictCode(), StrUtil::isNotBlank))
-                .and(SYS_DICT.DICT_NAME.like(pageDTO.getDictName(), StrUtil::isNotBlank))
-                .and(SYS_DICT.DICT_VALUE.like(pageDTO.getDictValue(), StrUtil::isNotBlank))
-                .and(SYS_DICT.STATUS.eq(pageDTO.getStatus(), ObjUtil::isNotNull))
-                .orderBy(SYS_DICT.DICT_CODE, true)
-                .orderBy(SYS_DICT.SORT, true)
-                .orderBy(SYS_DICT.ID, true)
+    public Page<SysDictData> dataPage(DictDataPageDTO pageDTO) {
+        // 名称条件经类型表解析为编码集合（名称已归 sys_dict_type 承载）；无命中时返回空页
+        List<String> nameMatchedCodes = null;
+        if (StrUtil.isNotBlank(pageDTO.getDictName())) {
+            nameMatchedCodes = QueryChain.of(sysDictTypeMapper)
+                    .select(SYS_DICT_TYPE.DICT_CODE)
+                    .where(SYS_DICT_TYPE.DICT_NAME.like(pageDTO.getDictName()))
+                    .list()
+                    .stream()
+                    .map(SysDictType::getDictCode)
+                    .toList();
+            if (CollUtil.isEmpty(nameMatchedCodes)) {
+                return new Page<>(List.of(), pageDTO.getPageNumber(), pageDTO.getPageSize(), 0);
+            }
+        }
+        var query = QueryChain.of(sysDictDataMapper)
+                .select(SYS_DICT_DATA.ALL_COLUMNS)
+                .where(SYS_DICT_DATA.DICT_CODE.like(pageDTO.getDictCode(), StrUtil::isNotBlank))
+                .and(SYS_DICT_DATA.DICT_VALUE.like(pageDTO.getDictValue(), StrUtil::isNotBlank))
+                .and(SYS_DICT_DATA.STATUS.eq(pageDTO.getStatus(), ObjUtil::isNotNull));
+        if (CollUtil.isNotEmpty(nameMatchedCodes)) {
+            query.and(SYS_DICT_DATA.DICT_CODE.in(nameMatchedCodes));
+        }
+        Page<SysDictData> page = query.orderBy(SYS_DICT_DATA.DICT_CODE, true)
+                .orderBy(SYS_DICT_DATA.SORT, true)
+                .orderBy(SYS_DICT_DATA.ID, true)
                 .page(Page.of(pageDTO.getPageNumber(), pageDTO.getPageSize()));
+
+        // 页内编码批量回填类型名(两次轻量查询，避免 join 映射复杂度)
+        fillDictNames(page);
+        return page;
     }
 
     /**
      * 新增字典条目。
      * <p>
-     * 字典名称即类型名（组内共享），自动继承该编码组内首条条目的名称，不接受外部传入；
+     * 校验字典类型存在（条目归属前置约束，类型经类型管理接口维护）；
      * 校验同编码下字典值唯一；写库后失效该编码的字典缓存。
      *
      * @param insertDTO 字典条目信息
      */
     @Override
-    public void insert(DictInsertDTO insertDTO) {
+    public void dataInsert(DictDataInsertDTO insertDTO) {
+        SysDictType type = QueryChain.of(sysDictTypeMapper)
+                .where(SYS_DICT_TYPE.DICT_CODE.eq(insertDTO.getDictCode()))
+                .one();
+        if (ObjUtil.isNull(type)) {
+            throw new BusinessException("字典类型[" + insertDTO.getDictCode() + "]不存在，请先创建字典类型");
+        }
         checkValueUnique(insertDTO.getDictCode(), insertDTO.getDictValue());
 
-        SysDict sysDict = dictConverter.toEntity(insertDTO);
-        // 组名继承:字典名称为组内共享属性(见 DictInsertRequest 类注释)，沿用同组已有条目的组名；
-        // 全新分组无既有条目时以字典编码占位，避免组名空缺
-        SysDict existDict = QueryChain.of(sysDictMapper)
-                .select(SYS_DICT.DICT_NAME)
-                .where(SYS_DICT.DICT_CODE.eq(insertDTO.getDictCode()))
-                .limit(1)
-                .one();
-        String groupName = ObjUtil.isNull(existDict) ? null : existDict.getDictName();
-        sysDict.setDictName(StrUtil.blankToDefault(groupName, insertDTO.getDictCode()));
-        sysDictMapper.insert(sysDict, true);
+        SysDictData entity = dictConverter.toEntity(insertDTO);
+        sysDictDataMapper.insert(entity, true);
 
         CacheUtil.evictAfterCommit(() -> cacheEvictService.evictDictCache(List.of(insertDTO.getDictCode())));
     }
@@ -253,36 +252,36 @@ public class SysDictServiceImpl implements SysDictService {
     /**
      * 修改字典条目。
      * <p>
-     * 字典编码、字典名称与内置标识不可修改（字典名称即类型名，组内共享）；状态不经本接口维护
-     * （经启停接口单独操作）；内置条目（builtin=1）锁定字典值（对齐前端 builtinLocked，
-     * 后端强校验防绕过）；非内置条目修改字典值时校验同编码下唯一；写库后失效该编码的字典缓存。
+     * 字典编码与内置标识不可修改；状态不经本接口维护（经启停接口单独操作）；
+     * 内置条目（builtin=1）锁定字典值（对齐前端 builtinLocked，后端强校验防绕过）；
+     * 非内置条目修改字典值时校验同编码下唯一；写库后失效该编码的字典缓存。
      *
      * @param updateDTO 字典条目信息
      */
     @Override
-    public void update(DictUpdateDTO updateDTO) {
-        SysDict sysDict = QueryChain.of(sysDictMapper)
-                .where(SYS_DICT.ID.eq(updateDTO.getId()))
+    public void dataUpdate(DictDataUpdateDTO updateDTO) {
+        SysDictData dictData = QueryChain.of(sysDictDataMapper)
+                .where(SYS_DICT_DATA.ID.eq(updateDTO.getId()))
                 .one();
-        if (ObjUtil.isNull(sysDict)) {
+        if (ObjUtil.isNull(dictData)) {
             throw new BusinessException("字典条目不存在");
         }
 
         // 内置条目锁定字典值
-        if (BuiltinEnum.YES.getCode().equals(sysDict.getBuiltin())
-                && !sysDict.getDictValue().equals(updateDTO.getDictValue())) {
+        if (BuiltinEnum.YES.getCode().equals(dictData.getBuiltin())
+                && !dictData.getDictValue().equals(updateDTO.getDictValue())) {
             throw new BusinessException("内置字典条目不允许修改字典值");
         }
 
         // 字典值变化时校验同编码下唯一
-        if (!sysDict.getDictValue().equals(updateDTO.getDictValue())) {
-            checkValueUnique(sysDict.getDictCode(), updateDTO.getDictValue());
+        if (!dictData.getDictValue().equals(updateDTO.getDictValue())) {
+            checkValueUnique(dictData.getDictCode(), updateDTO.getDictValue());
         }
 
-        SysDict entity = dictConverter.toEntity(updateDTO);
-        sysDictMapper.update(entity);
+        SysDictData entity = dictConverter.toEntity(updateDTO);
+        sysDictDataMapper.update(entity);
 
-        CacheUtil.evictAfterCommit(() -> cacheEvictService.evictDictCache(List.of(sysDict.getDictCode())));
+        CacheUtil.evictAfterCommit(() -> cacheEvictService.evictDictCache(List.of(dictData.getDictCode())));
     }
 
     /**
@@ -295,29 +294,29 @@ public class SysDictServiceImpl implements SysDictService {
      */
     @Override
     public void changeStatus(DictChangeStatusDTO changeStatusDTO) {
-        SysDict sysDict = QueryChain.of(sysDictMapper)
-                .where(SYS_DICT.ID.eq(changeStatusDTO.getId()))
+        SysDictData dictData = QueryChain.of(sysDictDataMapper)
+                .where(SYS_DICT_DATA.ID.eq(changeStatusDTO.getId()))
                 .one();
-        if (ObjUtil.isNull(sysDict)) {
+        if (ObjUtil.isNull(dictData)) {
             throw new BusinessException("字典条目不存在");
         }
 
         // 内置条目不允许更改状态
-        if (BuiltinEnum.YES.getCode().equals(sysDict.getBuiltin())) {
+        if (BuiltinEnum.YES.getCode().equals(dictData.getBuiltin())) {
             throw new BusinessException("内置字典条目不允许更改状态");
         }
 
         // 状态一致时幂等返回
-        if (changeStatusDTO.getStatus().equals(sysDict.getStatus())) {
+        if (changeStatusDTO.getStatus().equals(dictData.getStatus())) {
             return;
         }
 
-        SysDict entity = new SysDict();
+        SysDictData entity = new SysDictData();
         entity.setId(changeStatusDTO.getId());
         entity.setStatus(changeStatusDTO.getStatus());
-        sysDictMapper.update(entity);
+        sysDictDataMapper.update(entity);
 
-        CacheUtil.evictAfterCommit(() -> cacheEvictService.evictDictCache(List.of(sysDict.getDictCode())));
+        CacheUtil.evictAfterCommit(() -> cacheEvictService.evictDictCache(List.of(dictData.getDictCode())));
     }
 
     /**
@@ -329,10 +328,10 @@ public class SysDictServiceImpl implements SysDictService {
      * @param ids 字典条目ID列表
      */
     @Override
-    public void delete(List<Long> ids) {
+    public void dataDelete(List<Long> ids) {
         List<Long> distinctIds = ids.stream().distinct().toList();
-        List<SysDict> dictList = QueryChain.of(sysDictMapper)
-                .where(SYS_DICT.ID.in(distinctIds))
+        List<SysDictData> dictList = QueryChain.of(sysDictDataMapper)
+                .where(SYS_DICT_DATA.ID.in(distinctIds))
                 .list();
         if (dictList.size() < distinctIds.size()) {
             throw new BusinessException("字典条目不存在");
@@ -345,14 +344,14 @@ public class SysDictServiceImpl implements SysDictService {
             throw new BusinessException("内置字典条目不允许删除");
         }
 
-        sysDictMapper.deleteBatchByIds(distinctIds);
+        sysDictDataMapper.deleteBatchByIds(distinctIds);
 
-        List<String> codes = dictList.stream().map(SysDict::getDictCode).distinct().toList();
+        List<String> codes = dictList.stream().map(SysDictData::getDictCode).distinct().toList();
         CacheUtil.evictAfterCommit(() -> cacheEvictService.evictDictCache(codes));
     }
 
     /**
-     * 校验同编码下字典值唯一（含已删除记录，全生命周期唯一，与唯一索引 uk_d_code_value 口径对齐，
+     * 校验同编码下字典值唯一（含已删除记录，全生命周期唯一，与唯一索引 uk_dd_code_value 口径对齐，
      * 避免服务层放行后由数据库唯一约束抛出非友好错误）。
      *
      * @param dictCode  字典编码
@@ -360,9 +359,9 @@ public class SysDictServiceImpl implements SysDictService {
      */
     private void checkValueUnique(String dictCode, String dictValue) {
         long count = LogicDeleteManager.execWithoutLogicDelete(() ->
-                QueryChain.of(sysDictMapper)
-                        .where(SYS_DICT.DICT_CODE.eq(dictCode))
-                        .and(SYS_DICT.DICT_VALUE.eq(dictValue))
+                QueryChain.of(sysDictDataMapper)
+                        .where(SYS_DICT_DATA.DICT_CODE.eq(dictCode))
+                        .and(SYS_DICT_DATA.DICT_VALUE.eq(dictValue))
                         .count());
         if (count > 0) {
             throw new BusinessException("字典编码[" + dictCode + "]下字典值[" + dictValue + "]已存在");
@@ -370,20 +369,40 @@ public class SysDictServiceImpl implements SysDictService {
     }
 
     /**
-     * 从 sys_dict 表查询指定字典编码当前启用（status=启用）的字典项，按 sort 升序。
+     * 从 sys_dict_data 表查询指定字典编码当前启用（status=启用）的字典项，按 sort 升序。
      * <p>逻辑删除（del_flag）由 MyBatis-Flex 全局配置自动追加过滤。
      *
      * @param code 字典编码
      * @return 启用中的字典实体列表；无命中时返回空列表
      */
     private List<DictDTO> listByCodeDb(String code) {
-        List<SysDict> dictList = QueryChain.of(sysDictMapper)
-                .where(SYS_DICT.DICT_CODE.eq(code))
-                .and(SYS_DICT.STATUS.eq(EnableEnum.ENABLE.getCode()))
-                .orderBy(SYS_DICT.SORT, true)
-                .orderBy(SYS_DICT.ID, true)
+        List<SysDictData> dictList = QueryChain.of(sysDictDataMapper)
+                .where(SYS_DICT_DATA.DICT_CODE.eq(code))
+                .and(SYS_DICT_DATA.STATUS.eq(EnableEnum.ENABLE.getCode()))
+                .orderBy(SYS_DICT_DATA.SORT, true)
+                .orderBy(SYS_DICT_DATA.ID, true)
                 .list();
         return dictConverter.toListDTO(dictList);
     }
 
+    /**
+     * 页内编码批量回填类型名（dictName 为自 sys_dict_type 回填的展示字段）。
+     *
+     * @param page 字典条目分页
+     */
+    private void fillDictNames(Page<SysDictData> page) {
+        if (page == null || CollUtil.isEmpty(page.getRecords())) {
+            return;
+        }
+        List<String> codes = page.getRecords().stream()
+                .map(SysDictData::getDictCode)
+                .distinct()
+                .toList();
+        Map<String, String> nameMap = QueryChain.of(sysDictTypeMapper)
+                .where(SYS_DICT_TYPE.DICT_CODE.in(codes))
+                .list()
+                .stream()
+                .collect(Collectors.toMap(SysDictType::getDictCode, SysDictType::getDictName, (a, b) -> a));
+        page.getRecords().forEach(record -> record.setDictName(nameMap.get(record.getDictCode())));
+    }
 }

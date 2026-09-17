@@ -13,13 +13,13 @@ import java.io.Serializable;
 /**
  * 新增字典条目请求参数
  * <p>
- * 字典名称即类型名（组内共享），由后端自动继承该编码组内已有条目的名称，不在可提交字段之列。
+ * 字典名称即类型名（组内共享），由后端取自所属字典类型，不在可提交字段之列；字典编码必须为已创建的字典类型。
  *
  * @author codesensi
  * @since 1.0
  */
 @Data
-public class DictInsertRequest implements Serializable {
+public class DictDataInsertRequest implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

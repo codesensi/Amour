@@ -1,48 +1,43 @@
 package cn.codesensi.amour.service;
 
-import cn.codesensi.amour.model.dto.DictDTO;
-import cn.codesensi.amour.model.dto.DictChangeStatusDTO;
-import cn.codesensi.amour.model.dto.DictGroupDTO;
-import cn.codesensi.amour.model.dto.DictInsertDTO;
-import cn.codesensi.amour.model.dto.DictPageDTO;
-import cn.codesensi.amour.model.dto.DictTypeDTO;
-import cn.codesensi.amour.model.dto.DictUpdateDTO;
-import cn.codesensi.amour.model.entity.SysDict;
+import cn.codesensi.amour.model.dto.*;
+import cn.codesensi.amour.model.entity.SysDictData;
 import com.mybatisflex.core.paginate.Page;
 
 import java.util.List;
 
 /**
- * 数据字典服务。
+ * 数据字典数据服务。
  *
  * @author codesensi
  * @since 1.0
  */
-public interface SysDictService {
+public interface SysDictDataService {
 
     /**
      * 新增字典条目。
      * <p>
-     * 校验同编码下字典值唯一；写库后失效该编码的字典缓存。
+     * 校验字典类型存在、同编码下字典值唯一；写库后失效该编码的字典缓存。
      *
      * @param insertDTO 字典条目信息
      */
-    void insert(DictInsertDTO insertDTO);
+    void dataInsert(DictDataInsertDTO insertDTO);
 
     /**
      * 修改字典条目。
      * <p>
-     * 字典编码与内置标识不可修改；内置条目（builtin=1）仅允许修改名称/标签/排序/备注/状态；
-     * 非内置条目修改字典值时校验同编码下唯一；写库后失效该编码的字典缓存。
+     * 字典编码与内置标识不可修改；内置条目（builtin=1）锁定字典值（对齐前端 builtinLocked，
+     * 后端强校验防绕过）；非内置条目修改字典值时校验同编码下唯一；写库后失效该编码的字典缓存。
      *
      * @param updateDTO 字典条目信息
      */
-    void update(DictUpdateDTO updateDTO);
+    void dataUpdate(DictDataUpdateDTO updateDTO);
 
     /**
      * 修改字典条目状态。
      * <p>
-     * 内置条目仅承载展示层，允许启停；状态变化后失效该编码的字典缓存。
+     * 内置条目（builtin=1）为系统功能依赖，不允许更改状态（始终启用）；
+     * 同状态幂等返回；状态变化后失效该编码的字典缓存。
      *
      * @param changeStatusDTO 字典状态信息
      */
@@ -55,24 +50,18 @@ public interface SysDictService {
      *
      * @param ids 字典条目ID列表
      */
-    void delete(List<Long> ids);
+    void dataDelete(List<Long> ids);
 
     /**
      * 分页查询字典条目(管理端右侧数据表格的数据源，含禁用条目与完整字段)。
      * <p>
-     * 编码、名称、值为模糊匹配，状态为精确匹配，条件缺省时自动忽略。
+     * 编码、名称、值为模糊匹配，状态为精确匹配，条件缺省时自动忽略；
+     * 名称条件经类型表解析为编码集合后下推。
      *
      * @param pageDTO 分页查询参数
-     * @return 字典条目分页结果
+     * @return 字典条目分页结果(dictName 为自类型表回填的展示字段)
      */
-    Page<SysDict> page(DictPageDTO pageDTO);
-
-    /**
-     * 查询全部字典类型（按编码聚合，含条目数；管理端左侧类型列表的数据源）。
-     *
-     * @return 字典类型列表
-     */
-    List<DictTypeDTO> listTypes();
+    Page<SysDictData> dataPage(DictDataPageDTO pageDTO);
 
     /**
      * 按字典编码集合批量查询启用中的字典项分组（组内按 sort 升序）。
@@ -87,7 +76,7 @@ public interface SysDictService {
     /**
      * 按字典编码查询启用中的字典项列表（按 sort 升序）。
      * <p>
-     * 结果按编码整组缓存（见 {@code CacheConst#DICT}），编码为空白时直接返回空列表。
+     * 结果按编码整组缓存（见 {@code CacheNameEnum#DICT}），编码为空白时直接返回空列表。
      *
      * @param code 字典编码（如 gender、enable）；可为空（此时返回空列表）
      * @return 启用中的字典项列表；无命中时返回空列表

@@ -4,7 +4,7 @@ import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.model.converter.DictConverter;
 import cn.codesensi.amour.model.dto.DictGroupDTO;
 import cn.codesensi.amour.model.response.DictGroupResponse;
-import cn.codesensi.amour.service.SysDictService;
+import cn.codesensi.amour.service.SysDictDataService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,7 +27,7 @@ import java.util.List;
 @RequestMapping("/portal")
 public class PortalDictController {
 
-    private final SysDictService sysDictService;
+    private final SysDictDataService sysDictDataService;
     private final DictConverter dictConverter;
 
     /**
@@ -39,7 +39,7 @@ public class PortalDictController {
      */
     @GetMapping("/dict/list-by-codes")
     public List<DictGroupResponse> listByCodes(@RequestParam(value = "codes", required = false) List<String> codes) {
-        List<DictGroupDTO> dictGroups = sysDictService.listByCodes(codes);
+        List<DictGroupDTO> dictGroups = sysDictDataService.listByCodes(codes);
         return dictConverter.toListGroupResponse(dictGroups);
     }
 }

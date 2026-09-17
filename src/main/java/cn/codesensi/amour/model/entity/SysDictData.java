@@ -1,6 +1,7 @@
 package cn.codesensi.amour.model.entity;
 
 import cn.codesensi.amour.common.core.BaseEntity;
+import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 import lombok.Data;
@@ -12,12 +13,11 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 数据字典实体。
+ * 数据字典数据实体。
  * <p>
- * 扁平单表结构：每行代表一个字典项，{@code dict_code} 为字典编码（一组字典项的标识，
- * 命名与 {@code common/enums} 下现有枚举类对齐），{@code dict_value}/{@code dict_label}
- * 为字典项的值与展示标签。内置字典（builtin=1）仅承载展示层（标签、排序、启停），
- * 对应编码的业务校验仍由枚举类负责。
+ * 每行代表一个字典条目，归属 {@code dict_code} 指向的字典类型（见 {@link SysDictType}）；
+ * {@code dict_value}/{@code dict_label} 为字典项的值与展示标签。内置条目（builtin=1）
+ * 仅承载展示层（标签、排序、启停），对应编码的业务校验仍由枚举类负责。
  *
  * @since 1.0
  */
@@ -25,8 +25,8 @@ import java.io.Serializable;
 @Accessors(chain = true)
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@Table("sys_dict")
-public class SysDict extends BaseEntity implements Serializable {
+@Table("sys_dict_data")
+public class SysDictData extends BaseEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -41,11 +41,6 @@ public class SysDict extends BaseEntity implements Serializable {
      * 字典编码（如 gender、enable）
      */
     private String dictCode;
-
-    /**
-     * 字典名称（编码对应的字典名，同一编码下各行相同）
-     */
-    private String dictName;
 
     /**
      * 字典值（统一字符串存储；数字型枚举由调用侧自行转换类型）
@@ -68,7 +63,7 @@ public class SysDict extends BaseEntity implements Serializable {
     private Integer status;
 
     /**
-     * 是否内置:0-否，1-是
+     * 是否内置:0-否，1-是（内置条目锁定字典值）
      */
     private Integer builtin;
 
@@ -76,5 +71,11 @@ public class SysDict extends BaseEntity implements Serializable {
      * 备注
      */
     private String remark;
+
+    /**
+     * 字典名称（类型名，查询时自 sys_dict_type 回填的展示字段，非本表列）
+     */
+    @Column(ignore = true)
+    private String dictName;
 
 }

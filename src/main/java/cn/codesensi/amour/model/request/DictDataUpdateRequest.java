@@ -19,7 +19,7 @@ import java.io.Serializable;
  * @since 1.0
  */
 @Data
-public class DictUpdateRequest implements Serializable {
+public class DictDataUpdateRequest implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

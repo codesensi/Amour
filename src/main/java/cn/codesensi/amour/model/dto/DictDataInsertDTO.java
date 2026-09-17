@@ -6,21 +6,21 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 修改字典条目业务数据
+ * 新增字典条目业务数据
  *
  * @author codesensi
  * @since 1.0
  */
 @Data
-public class DictUpdateDTO implements Serializable {
+public class DictDataInsertDTO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
-     * 字典条目ID
+     * 字典编码
      */
-    private Long id;
+    private String dictCode;
 
     /**
      * 字典值
@@ -36,6 +36,11 @@ public class DictUpdateDTO implements Serializable {
      * 排序（数字越小越靠前）
      */
     private Integer sort;
+
+    /**
+     * 状态:0-启用，1-禁用
+     */
+    private Integer status;
 
     /**
      * 备注
