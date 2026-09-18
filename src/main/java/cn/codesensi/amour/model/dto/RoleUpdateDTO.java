@@ -1,15 +1,14 @@
 package cn.codesensi.amour.model.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 修改角色业务数据
+ * 修改角色业务数据。
+ * <p>
+ * 字段校验在 Request 层（控制器 @Valid）完成，DTO 不重复标注。
  *
  * @author codesensi
  * @since 1.0
@@ -23,14 +22,11 @@ public class RoleUpdateDTO implements Serializable {
     /**
      * 角色ID
      */
-    @NotNull(message = "角色ID不能为空")
     private Long id;
 
     /**
      * 角色名称
      */
-    @NotBlank(message = "角色名称不能为空")
-    @Size(max = 20, message = "角色名称长度不能超过20")
     private String name;
 
     /**
