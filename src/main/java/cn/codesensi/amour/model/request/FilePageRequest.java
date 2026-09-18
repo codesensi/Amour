@@ -1,5 +1,6 @@
 package cn.codesensi.amour.model.request;
 
+import cn.codesensi.amour.common.consts.AppConst;
 import cn.codesensi.amour.common.core.BasePage;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -26,7 +27,7 @@ public class FilePageRequest extends BasePage implements Serializable {
     /**
      * 原始文件名(模糊匹配)
      */
-    @Size(max = 256, message = "文件名长度不能超过256")
+    @Size(max = AppConst.MAX_LENGTH_256, message = "文件名长度不能超过" + AppConst.MAX_LENGTH_256)
     private String originalName;
 
     /**
@@ -42,7 +43,7 @@ public class FilePageRequest extends BasePage implements Serializable {
     /**
      * 上传人用户名(模糊匹配)
      */
-    @Size(max = 128, message = "上传人长度不能超过128")
+    @Size(max = AppConst.MAX_LENGTH_64, message = "上传人长度不能超过" + AppConst.MAX_LENGTH_64)
     private String creatorName;
 
     /**

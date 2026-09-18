@@ -1,4 +1,4 @@
-package cn.codesensi.amour.controller;
+package cn.codesensi.amour.controller.admin;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.common.annotation.Log;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 数据字典管理相关接口 前端控制器（免登录的门户字典下发已迁至 {@link PortalDictController}）。
+ * 数据字典管理相关接口 前端控制器
  *
  * @author codesensi
  * @since 1.0
@@ -43,7 +43,8 @@ public class SysDictController {
     @SaCheckPermission("system:dict:page")
     @GetMapping("/type/list")
     public List<DictTypeResponse> typeList() {
-        return dictConverter.toListTypeResponse(sysDictTypeService.listTypes());
+        List<DictTypeDTO> dictTypeList = sysDictTypeService.listTypes();
+        return dictConverter.toListTypeResponse(dictTypeList);
     }
 
     /**

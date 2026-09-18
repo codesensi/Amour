@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -74,7 +75,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
     /**
      * 文件分发 URL 解析器：仅识别本系统 /file/view/{id} 形态
      */
-    private static final Pattern VIEW_URL_PATTERN = Pattern.compile(RegexConst.FILE_VIEW_URL);
+    private static final Pattern VIEW_URL_PATTERN = Pattern.compile(RegexConst.LITERALS_FILE_VIEW_DIGITS);
 
     private final SysFileMapper sysFileMapper;
     private final SysUserMapper sysUserMapper;
@@ -305,25 +306,22 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
                 .filter(Objects::nonNull)
                 .distinct()
                 .toList();
-        Map<Long, String> nameMap;
+        Map<Long, String> usernameMap = Map.of();
         if (CollUtil.isNotEmpty(pageCreatorIds)) {
             List<SysUser> sysUsers = sysUserMapper.selectListByIds(pageCreatorIds);
             // username 理论非空(登录账号),防御 toMap 对 null value 抛 NPE
             if (CollUtil.isNotEmpty(sysUsers)) {
-                nameMap = sysUsers.stream()
+                usernameMap = sysUsers.stream()
                         .filter(row -> ObjUtil.isNotNull(row.getUsername()))
                         .collect(Collectors.toMap(SysUser::getId, SysUser::getUsername, (a, b) -> a));
-            } else {
-                nameMap = Map.of();
             }
-        } else {
-            nameMap = Map.of();
         }
+        final Map<Long, String> finalUsernameMap = usernameMap;
         Page<FileInfoDTO> result = fileConverter.toItemDTOPage(page);
         result.getRecords().forEach(row -> {
-            // creator 可能为空(未登录来源的历史记录),不可变 Map 拒绝 null key 查询,须先行判空
-            if (ObjUtil.isNotNull(row.getCreator())) {
-                row.setCreatorName(nameMap.get(row.getCreator()));
+            // creator 可能为空(未登录来源记录),不可变 Map 拒绝 null key 查询,须先行判空
+            if (ObjUtil.isNotNull(row.getCreator()) && CollUtil.isNotEmpty(finalUsernameMap)) {
+                row.setCreatorName(finalUsernameMap.get(row.getCreator()));
             }
         });
         return result;
@@ -357,15 +355,11 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
             throw new BusinessException("仅可删除自己上传的文件");
         }
         // 已在回收站时幂等成功:业务侧"清除图片"未保存前可重复触发,
-        // 且 UpdateChain 携带 del_flag=0 条件,重复执行本就无副作用
+        // 且逻辑删除改写自动携带 del_flag=0 条件,重复执行本就无副作用
         if (DelFlagEnum.DELETED.getCode().equals(sysFile.getDelFlag())) {
             return;
         }
-        UpdateChain.of(SysFile.class)
-                .set(SYS_FILE.DEL_FLAG, DelFlagEnum.DELETED.getCode())
-                .where(SYS_FILE.ID.eq(id))
-                .and(SYS_FILE.DEL_FLAG.eq(DelFlagEnum.NOT_DELETED.getCode()))
-                .update();
+        sysFileMapper.deleteById(id);
     }
 
     /**
@@ -410,8 +404,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
     public void physicalDelete(Long id) {
         // 绕过全局逻辑删除:彻底删除的目标是已删除记录,且须执行真正的物理 DELETE
         //(默认 deleteById 会被框架改写为逻辑删除并对 del_flag=0 过滤,对已删除行是空操作)
-        SysFile sysFile = LogicDeleteManager.execWithoutLogicDelete(() ->
-                sysFileMapper.selectOneById(id));
+        SysFile sysFile = LogicDeleteManager.execWithoutLogicDelete(() -> sysFileMapper.selectOneById(id));
         if (ObjUtil.isNull(sysFile)) {
             throw new BusinessException("文件不存在");
         }
@@ -453,7 +446,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         List<Long> fileIds = urls.stream()
                 .filter(StrUtil::isNotBlank)
                 .map(url -> {
-                    var matcher = VIEW_URL_PATTERN.matcher(url);
+                    Matcher matcher = VIEW_URL_PATTERN.matcher(url);
                     return matcher.matches() ? Long.valueOf(matcher.group(1)) : null;
                 })
                 .filter(Objects::nonNull)
@@ -480,14 +473,32 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
                 .and(SYS_FILE.DEL_FLAG.eq(DelFlagEnum.NOT_DELETED.getCode()))
                 .update();
 
-        // 3. 替换:同业务下本次未引用的旧文件标记逻辑删除(如更换头像后的旧文件)
-        UpdateChain.of(SysFile.class)
-                .set(SYS_FILE.DEL_FLAG, DelFlagEnum.DELETED.getCode())
+        // 3. 替换:同业务下本次未引用的旧文件标记逻辑删除(如更换头像后的旧文件);
+        // deleteByQuery 走全局逻辑删除,自动携带 del_flag=0 条件保证幂等
+        sysFileMapper.deleteByQuery(QueryChain.of(sysFileMapper)
                 .where(SYS_FILE.BIZ_TYPE.eq(bizType.getCode()))
                 .and(SYS_FILE.BIZ_ID.eq(bizId))
-                .and(SYS_FILE.ID.notIn(fileIds))
-                .and(SYS_FILE.DEL_FLAG.eq(DelFlagEnum.NOT_DELETED.getCode()))
-                .update();
+                .and(SYS_FILE.ID.notIn(fileIds)));
+    }
+
+    /**
+     * 将业务对象当前绑定的文件全部解除引用（替换语义的空集形态）。
+     * <p>
+     * 将同业务类型与业务ID下的文件标记逻辑删除（进回收站），用于业务字段被置空的场景
+     * （如清空头像）；物理文件保留，待回收站“彻底删除”时统一清理；
+     * 走全局逻辑删除（自动携带 del_flag=0 条件），方法幂等可重入。
+     *
+     * @param bizType 业务类型
+     * @param bizId   业务对象ID
+     */
+    @Override
+    public void unbindBizFiles(FileBizTypeEnum bizType, Long bizId) {
+        if (ObjUtil.isNull(bizType) || ObjUtil.isNull(bizId)) {
+            return;
+        }
+        sysFileMapper.deleteByQuery(QueryChain.of(sysFileMapper)
+                .where(SYS_FILE.BIZ_TYPE.eq(bizType.getCode()))
+                .and(SYS_FILE.BIZ_ID.eq(bizId)));
     }
 
     /**

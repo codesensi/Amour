@@ -1,4 +1,4 @@
-package cn.codesensi.amour.controller;
+package cn.codesensi.amour.controller.portal;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.model.converter.PortalHeroConverter;

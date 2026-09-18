@@ -33,7 +33,7 @@ public class MenuInsertRequest implements Serializable {
      * 菜单名称
      */
     @NotBlank(message = "菜单名称不能为空")
-    @Size(max = 256, message = "菜单名称长度不能超过256")
+    @Size(max = AppConst.MAX_LENGTH_64, message = "菜单名称长度不能超过" + AppConst.MAX_LENGTH_64)
     private String title;
 
     /**
@@ -46,13 +46,13 @@ public class MenuInsertRequest implements Serializable {
     /**
      * 路由路径(目录/菜单必填，按钮无需填写)
      */
-    @Size(max = AppConst.PATH_MAX_LENGTH, message = "路由路径长度不能超过" + AppConst.PATH_MAX_LENGTH)
+    @Size(max = AppConst.MAX_LENGTH_256, message = "路由路径长度不能超过" + AppConst.MAX_LENGTH_256)
     private String path;
 
     /**
      * 组件路径
      */
-    @Size(max = 256, message = "组件路径长度不能超过256")
+    @Size(max = AppConst.MAX_LENGTH_256, message = "组件路径长度不能超过" + AppConst.MAX_LENGTH_256)
     private String component;
 
     /**
@@ -63,13 +63,13 @@ public class MenuInsertRequest implements Serializable {
     /**
      * 菜单图标
      */
-    @Size(max = 256, message = "菜单图标长度不能超过256")
+    @Size(max = AppConst.MAX_LENGTH_256, message = "菜单图标长度不能超过" + AppConst.MAX_LENGTH_256)
     private String icon;
 
     /**
      * 权限编码(按钮类型必填)
      */
-    @Size(max = 64, message = "权限编码长度不能超过64")
+    @Size(max = AppConst.MAX_LENGTH_64, message = "权限编码长度不能超过" + AppConst.MAX_LENGTH_64)
     private String perms;
 
     /**
@@ -85,7 +85,7 @@ public class MenuInsertRequest implements Serializable {
     /**
      * 备注
      */
-    @Size(max = AppConst.REMARK_MAX_LENGTH, message = "备注长度不能超过" + AppConst.REMARK_MAX_LENGTH)
+    @Size(max = AppConst.MAX_LENGTH_512, message = "备注长度不能超过" + AppConst.MAX_LENGTH_512)
     private String remark;
 
 }

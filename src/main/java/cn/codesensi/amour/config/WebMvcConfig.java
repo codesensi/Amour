@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -35,6 +37,24 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebMvcConfig implements WebMvcConfigurer {
 
     private final DemoModeInterceptor demoModeInterceptor;
+
+    /**
+     * 注册全局 String→String 转换器：URL 查询参数与表单参数（@RequestParam、@PathVariable、@ModelAttribute 绑定的 String 类型）在绑定前统一剥除首尾空白。
+     * <p>
+     * {@code @RequestBody} 的 JSON 字段不走此链路，由 Jackson 全局反序列化器
+     * （{@code TrimStringDeserializer}）处理。
+     */
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        // 必须使用显式匿名内部类:lambda/方法引用的合成类不含泛型签名,
+        // GenericConversionService 解析 Converter<S,T> 时报 Unable to determine source/target type
+        registry.addConverter(new Converter<String, String>() {
+            @Override
+            public String convert(String source) {
+                return source == null ? null : source.trim();
+            }
+        });
+    }
 
     /**
      * 注册应用级拦截器链：未登录请求在鉴权拦截器即被拒绝，

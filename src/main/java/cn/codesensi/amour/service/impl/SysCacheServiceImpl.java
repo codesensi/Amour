@@ -5,7 +5,7 @@ import cn.codesensi.amour.model.dto.CacheDTO;
 import cn.codesensi.amour.model.dto.CacheEntryDTO;
 import cn.codesensi.amour.model.dto.CacheStatsDTO;
 import cn.hutool.core.util.ObjUtil;
-import cn.codesensi.amour.service.CacheService;
+import cn.codesensi.amour.service.SysCacheService;
 import com.github.benmanes.caffeine.cache.Policy;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class CacheServiceImpl implements CacheService {
+public class SysCacheServiceImpl implements SysCacheService {
 
     private final CacheManager cacheManager;
 
@@ -46,7 +46,7 @@ public class CacheServiceImpl implements CacheService {
      * @return 各缓存的名称、过期策略与条目列表；无缓存时返回空列表
      */
     @Override
-    public List<CacheDTO> listAll() {
+    public List<CacheDTO> list() {
         List<CacheDTO> result = new ArrayList<>();
         for (String cacheName : cacheManager.getCacheNames()) {
             Cache cache = cacheManager.getCache(cacheName);

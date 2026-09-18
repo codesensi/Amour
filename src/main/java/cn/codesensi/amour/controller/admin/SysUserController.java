@@ -1,4 +1,4 @@
-package cn.codesensi.amour.controller;
+package cn.codesensi.amour.controller.admin;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.common.annotation.Log;
@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 
 /**
  * 用户信息表 控制层。

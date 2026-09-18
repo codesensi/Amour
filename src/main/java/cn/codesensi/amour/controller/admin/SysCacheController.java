@@ -1,9 +1,10 @@
-package cn.codesensi.amour.controller;
+package cn.codesensi.amour.controller.admin;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.model.converter.CacheConverter;
+import cn.codesensi.amour.model.dto.CacheDTO;
 import cn.codesensi.amour.model.response.CacheResponse;
-import cn.codesensi.amour.service.CacheService;
+import cn.codesensi.amour.service.SysCacheService;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,18 +22,19 @@ import java.util.List;
 @RestController
 @ApiResponseBody
 @RequiredArgsConstructor
-@RequestMapping("/cache")
-public class CacheController {
+@RequestMapping("/sys/cache")
+public class SysCacheController {
 
-    private final CacheService cacheService;
+    private final SysCacheService sysCacheService;
     private final CacheConverter cacheConverter;
 
     /**
      * 查询全部缓存内容
      */
     @SaCheckPermission("system:cache:list")
-    @GetMapping("/list-all")
-    public List<CacheResponse> listAll() {
-        return cacheConverter.toResponseList(cacheService.listAll());
+    @GetMapping("/list")
+    public List<CacheResponse> list() {
+        List<CacheDTO> cacheList = sysCacheService.list();
+        return cacheConverter.toResponseList(cacheList);
     }
 }

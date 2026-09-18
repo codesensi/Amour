@@ -1,7 +1,5 @@
 package cn.codesensi.amour.model.response;
 
-import cn.hutool.core.date.DatePattern;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import tools.jackson.databind.annotation.JsonSerialize;
 import tools.jackson.databind.ser.std.ToStringSerializer;
@@ -61,7 +59,6 @@ public class RolePageResponse implements Serializable {
     /**
      * 创建时间
      */
-    @JsonFormat(pattern = DatePattern.NORM_DATETIME_PATTERN)
     private LocalDateTime createTime;
 
 }

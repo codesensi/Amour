@@ -1,5 +1,6 @@
 package cn.codesensi.amour.model.request;
 
+import cn.codesensi.amour.common.consts.AppConst;
 import cn.codesensi.amour.common.core.BasePage;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -26,19 +27,19 @@ public class DictDataPageRequest extends BasePage implements Serializable {
     /**
      * 字典编码(模糊匹配)
      */
-    @Size(max = 64, message = "字典编码长度不能超过64")
+    @Size(max = AppConst.MAX_LENGTH_64, message = "字典编码长度不能超过" + AppConst.MAX_LENGTH_64)
     private String dictCode;
 
     /**
      * 字典名称(模糊匹配)
      */
-    @Size(max = 64, message = "字典名称长度不能超过64")
+    @Size(max = AppConst.MAX_LENGTH_64, message = "字典名称长度不能超过" + AppConst.MAX_LENGTH_64)
     private String dictName;
 
     /**
      * 字典值(模糊匹配)
      */
-    @Size(max = 128, message = "字典值长度不能超过128")
+    @Size(max = AppConst.MAX_LENGTH_128, message = "字典值长度不能超过" + AppConst.MAX_LENGTH_128)
     private String dictValue;
 
     /**

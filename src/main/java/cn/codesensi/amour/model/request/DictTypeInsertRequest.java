@@ -26,21 +26,21 @@ public class DictTypeInsertRequest implements Serializable {
      * 字典编码（kebab-case，如 gender、menu-type）
      */
     @NotBlank(message = "字典编码不能为空")
-    @Size(max = 64, message = "字典编码长度不能超过64")
-    @Pattern(regexp = RegexConst.DICT_CODE, message = RegexConst.DICT_CODE_MESSAGE)
+    @Size(max = AppConst.MAX_LENGTH_64, message = "字典编码长度不能超过" + AppConst.MAX_LENGTH_64)
+    @Pattern(regexp = RegexConst.KEBAB_CASE, message = "字典编码仅允许小写字母、数字与中划线")
     private String dictCode;
 
     /**
      * 字典名称
      */
     @NotBlank(message = "字典名称不能为空")
-    @Size(max = 64, message = "字典名称长度不能超过64")
+    @Size(max = AppConst.MAX_LENGTH_64, message = "字典名称长度不能超过" + AppConst.MAX_LENGTH_64)
     private String dictName;
 
     /**
      * 备注
      */
-    @Size(max = AppConst.REMARK_MAX_LENGTH, message = "备注长度不能超过" + AppConst.REMARK_MAX_LENGTH)
+    @Size(max = AppConst.MAX_LENGTH_512, message = "备注长度不能超过" + AppConst.MAX_LENGTH_512)
     private String remark;
 
 }

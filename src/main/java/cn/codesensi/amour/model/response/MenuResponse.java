@@ -1,7 +1,5 @@
 package cn.codesensi.amour.model.response;
 
-import cn.hutool.core.date.DatePattern;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import tools.jackson.databind.annotation.JsonSerialize;
@@ -95,7 +93,6 @@ public class MenuResponse implements Serializable {
     /**
      * 创建时间(yyyy-MM-dd HH:mm:ss)
      */
-    @JsonFormat(pattern = DatePattern.NORM_DATETIME_PATTERN)
     private LocalDateTime createTime;
 
 }

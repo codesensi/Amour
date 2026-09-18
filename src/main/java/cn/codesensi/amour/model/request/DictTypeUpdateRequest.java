@@ -33,13 +33,13 @@ public class DictTypeUpdateRequest implements Serializable {
      * 字典名称
      */
     @NotBlank(message = "字典名称不能为空")
-    @Size(max = 64, message = "字典名称长度不能超过64")
+    @Size(max = AppConst.MAX_LENGTH_64, message = "字典名称长度不能超过" + AppConst.MAX_LENGTH_64)
     private String dictName;
 
     /**
      * 备注
      */
-    @Size(max = AppConst.REMARK_MAX_LENGTH, message = "备注长度不能超过" + AppConst.REMARK_MAX_LENGTH)
+    @Size(max = AppConst.MAX_LENGTH_512, message = "备注长度不能超过" + AppConst.MAX_LENGTH_512)
     private String remark;
 
 }

@@ -1,4 +1,4 @@
-package cn.codesensi.amour.controller;
+package cn.codesensi.amour.controller.portal;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.model.converter.ConfigConverter;
@@ -25,7 +25,7 @@ import java.util.List;
 @RestController
 @ApiResponseBody
 @RequiredArgsConstructor
-@RequestMapping("/portal")
+@RequestMapping("/portal/config")
 public class PortalConfigController {
 
     private final SysConfigService sysConfigService;
@@ -38,7 +38,7 @@ public class PortalConfigController {
      * @param keys 配置键集合（逗号分隔，如 keys=name,captcha.enabled）；为空时返回空列表
      * @return 配置键值列表
      */
-    @GetMapping("/config/list-by-keys")
+    @GetMapping("/list-by-keys")
     public List<ConfigResponse> listByKeys(@RequestParam(value = "keys", required = false) List<String> keys) {
         List<ConfigDTO> configDTOs = sysConfigService.listByKeysPublic(keys);
         return configConverter.toListResponse(configDTOs);

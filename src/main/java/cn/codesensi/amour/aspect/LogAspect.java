@@ -174,7 +174,7 @@ public class LogAspect {
 
             if (ObjUtil.isNotNull(e)) {
                 sysLog.setStatus(SuccessEnum.FAIL.getCode());
-                sysLog.setMsg(StrUtil.subPre(e.getMessage(), AppConst.MSG_MAX_LENGTH));
+                sysLog.setMsg(StrUtil.subPre(e.getMessage(), AppConst.MAX_LENGTH_512));
                 if (log.saveResult()) {
                     // 失败响应与全局异常处理器口径一致:按异常类型构造失败 Result 记录,详情可完整回放响应体
                     sysLog.setResult(fitJson(mask(toJson(buildFailResult(e))), maxTextLength));
@@ -183,7 +183,7 @@ public class LogAspect {
                 // 响应结果与真实响应体保持一致：@ApiResponseBody 会把原始返回值包装为 Result.success(...)
                 sysLog.setStatus(SuccessEnum.SUCCESS.getCode());
                 if (result instanceof Result<?> r) {
-                    sysLog.setMsg(StrUtil.subPre(r.getMsg(), AppConst.MSG_MAX_LENGTH));
+                    sysLog.setMsg(StrUtil.subPre(r.getMsg(), AppConst.MAX_LENGTH_512));
                 }
                 if (log.saveResult()) {
                     Object body = (result instanceof Result<?> r) ? r : Result.success(result);

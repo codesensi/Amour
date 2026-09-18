@@ -19,6 +19,7 @@ import cn.hutool.core.util.StrUtil;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.logicdelete.LogicDeleteManager;
 import com.mybatisflex.core.query.QueryChain;
+import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -112,7 +113,8 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     /**
      * 修改角色信息。
      * <p>
-     * 角色编码创建后不可修改，仅更新名称/排序/备注等资料字段。
+     * 角色编码创建后不可修改，经 UpdateChain 显式逐列赋值，备注置空时写入 null
+     * （库中不落空串）。
      *
      * @param roleUpdateDTO 角色信息
      */
@@ -123,8 +125,12 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             throw new BusinessException("角色不存在");
         }
 
-        SysRole entity = roleConverter.toEntity(roleUpdateDTO);
-        updateById(entity);
+        UpdateChain.of(SysRole.class)
+                .set(SYS_ROLE.NAME, roleUpdateDTO.getName())
+                .set(SYS_ROLE.SORT, roleUpdateDTO.getSort())
+                .set(SYS_ROLE.REMARK, roleUpdateDTO.getRemark())
+                .where(SYS_ROLE.ID.eq(roleUpdateDTO.getId()))
+                .update();
     }
 
     /**

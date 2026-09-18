@@ -23,6 +23,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import com.mybatisflex.core.query.QueryChain;
+import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -139,7 +140,20 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         }
 
         SysMenu entity = menuConverter.toEntity(menuUpdateDTO);
-        updateById(entity);
+        // 经 UpdateChain 显式逐列赋值,可选字段置空时写入 null(库中不落空串)
+        UpdateChain.of(SysMenu.class)
+                .set(SYS_MENU.PID, entity.getPid())
+                .set(SYS_MENU.TITLE, entity.getTitle())
+                .set(SYS_MENU.PATH, entity.getPath())
+                .set(SYS_MENU.COMPONENT, entity.getComponent())
+                .set(SYS_MENU.SORT, entity.getSort())
+                .set(SYS_MENU.ICON, entity.getIcon())
+                .set(SYS_MENU.PERMS, entity.getPerms())
+                .set(SYS_MENU.STATUS, entity.getStatus())
+                .set(SYS_MENU.HIDDEN, entity.getHidden())
+                .set(SYS_MENU.REMARK, entity.getRemark())
+                .where(SYS_MENU.ID.eq(entity.getId()))
+                .update();
         evictAllCaches();
     }
 

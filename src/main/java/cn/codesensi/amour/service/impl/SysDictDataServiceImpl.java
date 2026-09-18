@@ -19,6 +19,7 @@ import cn.hutool.core.util.StrUtil;
 import com.mybatisflex.core.logicdelete.LogicDeleteManager;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
+import com.mybatisflex.core.update.UpdateChain;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
@@ -207,7 +208,7 @@ public class SysDictDataServiceImpl implements SysDictDataService {
                 return new Page<>(List.of(), pageDTO.getPageNumber(), pageDTO.getPageSize(), 0);
             }
         }
-        var query = QueryChain.of(sysDictDataMapper)
+        QueryChain<SysDictData> query = QueryChain.of(sysDictDataMapper)
                 .select(SYS_DICT_DATA.ALL_COLUMNS)
                 .where(SYS_DICT_DATA.DICT_CODE.like(pageDTO.getDictCode(), StrUtil::isNotBlank))
                 .and(SYS_DICT_DATA.DICT_VALUE.like(pageDTO.getDictValue(), StrUtil::isNotBlank))
@@ -278,8 +279,14 @@ public class SysDictDataServiceImpl implements SysDictDataService {
             checkValueUnique(dictData.getDictCode(), updateDTO.getDictValue());
         }
 
-        SysDictData entity = dictConverter.toEntity(updateDTO);
-        sysDictDataMapper.update(entity);
+        // 经 UpdateChain 显式逐列赋值,备注置空时写入 null(库中不落空串)
+        UpdateChain.of(SysDictData.class)
+                .set(SYS_DICT_DATA.DICT_VALUE, updateDTO.getDictValue())
+                .set(SYS_DICT_DATA.DICT_LABEL, updateDTO.getDictLabel())
+                .set(SYS_DICT_DATA.SORT, updateDTO.getSort())
+                .set(SYS_DICT_DATA.REMARK, updateDTO.getRemark())
+                .where(SYS_DICT_DATA.ID.eq(updateDTO.getId()))
+                .update();
 
         CacheUtil.evictAfterCommit(() -> cacheEvictService.evictDictCache(List.of(dictData.getDictCode())));
     }

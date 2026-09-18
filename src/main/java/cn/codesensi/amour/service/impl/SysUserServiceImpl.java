@@ -6,6 +6,7 @@ import cn.codesensi.amour.common.enums.BuiltinEnum;
 import cn.codesensi.amour.common.enums.CacheNameEnum;
 import cn.codesensi.amour.common.enums.EnableEnum;
 import cn.codesensi.amour.common.enums.FileBizTypeEnum;
+import cn.codesensi.amour.common.enums.GenderEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.util.CacheUtil;
 import cn.codesensi.amour.mapper.SysRoleMapper;
@@ -25,6 +26,7 @@ import cn.hutool.crypto.digest.BCrypt;
 import com.mybatisflex.core.logicdelete.LogicDeleteManager;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
+import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -181,9 +183,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     /**
      * 修改用户信息。
      * <p>
-     * 仅更新请求中的资料字段（用户名、状态、密码不在可修改范围），
-     * MyBatis-Flex 按忽略 null 策略更新；更新成功后复用 {@link #updateById(SysUser)}
-     * 的缓存失效逻辑。
+     * 经 UpdateChain 显式逐列赋值，可选字段置空时写入 null（库中不落空串）；
+     * 用户名、状态、密码不在可修改范围；更新成功后失效该用户的 userInfo 缓存。
      *
      * @param userUpdateDTO 用户信息
      */
@@ -194,22 +195,37 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         if (ObjUtil.isNull(sysUser)) {
             throw new BusinessException("用户不存在");
         }
-        SysUser entity = userConverter.toEntity(userUpdateDTO);
         // 校验QQ号未被其他用户占用
         checkQqAvailable(userUpdateDTO.getQq(), userUpdateDTO.getId());
-        updateById(entity);
+        boolean success = UpdateChain.of(SysUser.class)
+                .set(SYS_USER.NICKNAME, userUpdateDTO.getNickname())
+                .set(SYS_USER.ID_CARD, userUpdateDTO.getIdCard())
+                .set(SYS_USER.EMAIL, userUpdateDTO.getEmail())
+                .set(SYS_USER.PHONE, userUpdateDTO.getPhone())
+                .set(SYS_USER.QQ, userUpdateDTO.getQq())
+                // gender 为 NOT NULL DEFAULT 'U',置空回退默认值而非写 null
+                .set(SYS_USER.GENDER, StrUtil.blankToDefault(userUpdateDTO.getGender(), GenderEnum.UNKNOWN.getCode()))
+                .set(SYS_USER.AVATAR, userUpdateDTO.getAvatar())
+                .set(SYS_USER.REMARK, userUpdateDTO.getRemark())
+                .where(SYS_USER.ID.eq(userUpdateDTO.getId()))
+                .update();
+        if (success) {
+            CacheUtil.evictAfterCommit(() -> cacheEvictService.evictUserCache(List.of(userUpdateDTO.getId())));
+        }
 
-        // 头像采纳:回填文件业务归属并标记被替换的旧头像失效(外链等非本系统地址自动跳过)
-        if (StrUtil.isNotBlank(entity.getAvatar())) {
-            fileService.bindBizFiles(FileBizTypeEnum.AVATAR, entity.getId(), List.of(entity.getAvatar()));
+        // 头像采纳:回填文件业务归属并标记被替换的旧头像失效(外链等非本系统地址自动跳过);置空则解除旧头像文件的业务引用
+        if (StrUtil.isNotBlank(userUpdateDTO.getAvatar())) {
+            fileService.bindBizFiles(FileBizTypeEnum.AVATAR, userUpdateDTO.getId(), List.of(userUpdateDTO.getAvatar()));
+        } else {
+            fileService.unbindBizFiles(FileBizTypeEnum.AVATAR, userUpdateDTO.getId());
         }
     }
 
     /**
      * 更新当前登录用户资料。
      * <p>
-     * 仅更新白名单内的资料字段（MyBatis-Flex 按忽略 null 策略更新），用户名、密码、
-     * 状态不在可修改范围；更新成功后复用 {@link #updateById(SysUser)} 的缓存失效逻辑。
+     * 仅更新白名单内的资料字段（用户名、密码、状态不在可修改范围），可选字段置空时
+     * 写入 null（库中不落空串）；更新成功后失效该用户的 userInfo 缓存。
      *
      * @param userProfileUpdateDTO 资料信息
      */
@@ -221,15 +237,27 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         if (ObjUtil.isNull(sysUser)) {
             throw new BusinessException("用户不存在");
         }
-        SysUser entity = userConverter.toEntity(userProfileUpdateDTO);
-        entity.setId(userId);
         // 校验QQ号未被其他用户占用
         checkQqAvailable(userProfileUpdateDTO.getQq(), userId);
-        updateById(entity);
+        boolean success = UpdateChain.of(SysUser.class)
+                .set(SYS_USER.NICKNAME, userProfileUpdateDTO.getNickname())
+                // gender 为 NOT NULL DEFAULT 'U',置空回退默认值而非写 null(对齐管理端 update 口径)
+                .set(SYS_USER.GENDER, StrUtil.blankToDefault(userProfileUpdateDTO.getGender(), GenderEnum.UNKNOWN.getCode()))
+                .set(SYS_USER.EMAIL, userProfileUpdateDTO.getEmail())
+                .set(SYS_USER.QQ, userProfileUpdateDTO.getQq())
+                .set(SYS_USER.AVATAR, userProfileUpdateDTO.getAvatar())
+                .set(SYS_USER.REMARK, userProfileUpdateDTO.getRemark())
+                .where(SYS_USER.ID.eq(userId))
+                .update();
+        if (success) {
+            CacheUtil.evictAfterCommit(() -> cacheEvictService.evictUserCache(List.of(userId)));
+        }
 
-        // 头像采纳:回填文件业务归属并标记被替换的旧头像失效(外链等非本系统地址自动跳过)
-        if (StrUtil.isNotBlank(entity.getAvatar())) {
-            fileService.bindBizFiles(FileBizTypeEnum.AVATAR, userId, List.of(entity.getAvatar()));
+        // 头像采纳:回填文件业务归属并标记被替换的旧头像失效(外链等非本系统地址自动跳过);置空则解除旧头像文件的业务引用
+        if (StrUtil.isNotBlank(userProfileUpdateDTO.getAvatar())) {
+            fileService.bindBizFiles(FileBizTypeEnum.AVATAR, userId, List.of(userProfileUpdateDTO.getAvatar()));
+        } else {
+            fileService.unbindBizFiles(FileBizTypeEnum.AVATAR, userId);
         }
     }
 

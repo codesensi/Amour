@@ -24,6 +24,7 @@ import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
+import com.mybatisflex.core.update.UpdateChain;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
@@ -65,7 +66,7 @@ public class SysConfigServiceImpl implements SysConfigService {
     /**
      * DATETIME 值类型的合法形态（yyyy-MM-dd HH:mm:ss），与门户展示契约一致
      */
-    private static final Pattern DATETIME_PATTERN = Pattern.compile(RegexConst.DATETIME_FORMAT);
+    private static final Pattern DATETIME_PATTERN = Pattern.compile(RegexConst.DIGITS_4_2_2_SPACE_2_2_2);
 
     private final SysConfigMapper sysConfigMapper;
     private final CacheManager cacheManager;
@@ -224,11 +225,12 @@ public class SysConfigServiceImpl implements SysConfigService {
 
         validateValueByType(config.getValueType(), updateDTO.getConfigValue());
 
-        // 仅更新配置值，config_key/value_type/config_group/status/remark 均不可变更
-        SysConfig entity = new SysConfig();
-        entity.setId(updateDTO.getId());
-        entity.setConfigValue(updateDTO.getConfigValue());
-        sysConfigMapper.update(entity);
+        // 仅更新配置值，config_key/value_type/config_group/status/remark 均不可变更；
+        // 经 UpdateChain 显式逐列赋值，配置值置空时写入 null（清空即回退消费端兜底值）
+        UpdateChain.of(SysConfig.class)
+                .set(SYS_CONFIG.CONFIG_VALUE, updateDTO.getConfigValue())
+                .where(SYS_CONFIG.ID.eq(updateDTO.getId()))
+                .update();
 
         CacheUtil.evictAfterCommit(() -> {
             log.debug("配置修改完成，失效缓存：configKey={}", config.getConfigKey());

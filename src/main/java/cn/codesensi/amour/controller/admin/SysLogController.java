@@ -1,8 +1,10 @@
-package cn.codesensi.amour.controller;
+package cn.codesensi.amour.controller.admin;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.common.enums.LogTypeEnum;
 import cn.codesensi.amour.model.converter.LogConverter;
+import cn.codesensi.amour.model.dto.LogPageDTO;
+import cn.codesensi.amour.model.entity.SysLog;
 import cn.codesensi.amour.model.request.LogPageRequest;
 import cn.codesensi.amour.model.response.LogPageResponse;
 import cn.codesensi.amour.service.SysLogService;
@@ -42,8 +44,10 @@ public class SysLogController {
     @SaCheckPermission("log:login:page")
     @GetMapping("/login/page")
     public Page<LogPageResponse> loginPage(@Valid LogPageRequest request) {
-        return logConverter.toPageResponse(sysLogService.page(logConverter.toPageDTO(request),
-                List.of(LogTypeEnum.LOGIN.getCode(), LogTypeEnum.LOGOUT.getCode())));
+        LogPageDTO pageDTO = logConverter.toPageDTO(request);
+        List<Integer> logTypes = List.of(LogTypeEnum.LOGIN.getCode(), LogTypeEnum.LOGOUT.getCode());
+        Page<SysLog> page = sysLogService.page(pageDTO, logTypes);
+        return logConverter.toPageResponse(page);
     }
 
     /**
@@ -55,10 +59,12 @@ public class SysLogController {
     @SaCheckPermission("log:operate:page")
     @GetMapping("/operate/page")
     public Page<LogPageResponse> operatePage(@Valid LogPageRequest request) {
-        return logConverter.toPageResponse(sysLogService.page(logConverter.toPageDTO(request),
-                List.of(LogTypeEnum.QUERY.getCode(), LogTypeEnum.INSERT.getCode(),
-                        LogTypeEnum.UPDATE.getCode(), LogTypeEnum.DELETE.getCode(),
-                        LogTypeEnum.GRANT.getCode(), LogTypeEnum.UPLOAD.getCode(),
-                        LogTypeEnum.DOWNLOAD.getCode())));
+        LogPageDTO pageDTO = logConverter.toPageDTO(request);
+        List<Integer> logTypes = List.of(LogTypeEnum.QUERY.getCode(), LogTypeEnum.INSERT.getCode(),
+                LogTypeEnum.UPDATE.getCode(), LogTypeEnum.DELETE.getCode(),
+                LogTypeEnum.GRANT.getCode(), LogTypeEnum.UPLOAD.getCode(),
+                LogTypeEnum.DOWNLOAD.getCode());
+        Page<SysLog> page = sysLogService.page(pageDTO, logTypes);
+        return logConverter.toPageResponse(page);
     }
 }

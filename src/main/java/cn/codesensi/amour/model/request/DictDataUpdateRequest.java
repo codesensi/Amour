@@ -34,25 +34,26 @@ public class DictDataUpdateRequest implements Serializable {
      * 字典值（统一字符串存储；内置条目不允许修改）
      */
     @NotBlank(message = "字典值不能为空")
-    @Size(max = 128, message = "字典值长度不能超过128")
+    @Size(max = AppConst.MAX_LENGTH_128, message = "字典值长度不能超过" + AppConst.MAX_LENGTH_128)
     private String dictValue;
 
     /**
      * 字典标签
      */
     @NotBlank(message = "字典标签不能为空")
-    @Size(max = 128, message = "字典标签长度不能超过128")
+    @Size(max = AppConst.MAX_LENGTH_128, message = "字典标签长度不能超过" + AppConst.MAX_LENGTH_128)
     private String dictLabel;
 
     /**
      * 排序（数字越小越靠前）
      */
+    @NotNull(message = "排序不能为空")
     private Integer sort;
 
     /**
      * 备注
      */
-    @Size(max = AppConst.REMARK_MAX_LENGTH, message = "备注长度不能超过" + AppConst.REMARK_MAX_LENGTH)
+    @Size(max = AppConst.MAX_LENGTH_512, message = "备注长度不能超过" + AppConst.MAX_LENGTH_512)
     private String remark;
 
 }

@@ -197,6 +197,11 @@ FROM (
              (1800, 1000, '文件管理', 'M', '/admin/system/file', 'system/file/index', 8, 'ep:folder-opened', NULL, 1),
              (1801, 1800, '文件分页查询', 'B', NULL, NULL, 1, NULL, 'system:file:page', 1),
              (1802, 1800, '删除文件', 'B', NULL, NULL, 2, NULL, 'system:file:delete', 1),
+             (2000, 0, '恋爱画册', 'M', '/admin/love-photo', 'system/love-photo/index', 2, 'ep:camera', NULL, 1),
+             (2001, 2000, '分页查询', 'B', NULL, NULL, 1, NULL, 'portal:love-photo:page', 1),
+             (2002, 2000, '增加', 'B', NULL, NULL, 2, NULL, 'portal:love-photo:insert', 1),
+             (2003, 2000, '修改', 'B', NULL, NULL, 3, NULL, 'portal:love-photo:update', 1),
+             (2004, 2000, '删除', 'B', NULL, NULL, 4, NULL, 'portal:love-photo:delete', 1),
              (3000, 0, '个人中心', 'M', '/admin/profile', 'profile/index', 3, 'ep:avatar', NULL, 1)
      ) AS t(id, pid, title, type, path, component, sort, icon, perms, builtin)
 WHERE NOT EXISTS (
@@ -231,7 +236,8 @@ FROM (
              (99009, 'config-value-type', '配置值类型', 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN/DATETIME) 对齐'),
              (99010, 'file-storage-type', '存储类型', 1, '与 StorageTypeEnum(local/oss) 对齐'),
              (99011, 'biz-type', '文件业务类型', 1, '与 FileBizTypeEnum(infra/avatar/photo/markdown) 对齐'),
-             (99012, 'log-type', '日志类型', 1, '与 LogTypeEnum 对齐')
+             (99012, 'log-type', '日志类型', 1, '与 LogTypeEnum 对齐'),
+             (99013, 'hidden', '显隐状态', 1, '与 HiddenEnum(0/1) 对齐')
      ) AS t(id, dict_code, dict_name, builtin, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_dict_type` WHERE `sys_dict_type`.`id` = t.id
@@ -313,10 +319,36 @@ FROM (
              (11107, 'log-type', '6', '删除', 7, 0, 1, '与 LogTypeEnum 对齐'),
              (11108, 'log-type', '7', '授权', 8, 0, 1, '与 LogTypeEnum 对齐'),
              (11109, 'log-type', '8', '上传', 9, 0, 1, '与 LogTypeEnum 对齐'),
-             (11110, 'log-type', '9', '下载', 10, 0, 1, '与 LogTypeEnum 对齐')
+             (11110, 'log-type', '9', '下载', 10, 0, 1, '与 LogTypeEnum 对齐'),
+             -- hidden（照片显隐，对应 HiddenEnum：0-显示,1-隐藏；11200 段）
+             (11201, 'hidden', '0', '显示', 1, 0, 1, '与 HiddenEnum(0/1) 对齐'),
+             (11202, 'hidden', '1', '隐藏', 2, 0, 1, '与 HiddenEnum(0/1) 对齐')
      ) AS t(id, dict_code, dict_value, dict_label, sort, status, builtin, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_dict_data` WHERE `sys_dict_data`.`id` = t.id
+);
+
+-- ----------------------------
+-- 数据填充：portal_love_photo（幂等插入）
+-- 恋爱画册门户展示的示例照片（hidden=0 门户可见）；id 使用独立的 30000 段顺序预留
+-- ----------------------------
+INSERT INTO `portal_love_photo` (
+    `id`, `url`, `caption`, `date_text`, `tags`, `sort`, `hidden`
+)
+SELECT
+    t.id,
+    t.url,
+    t.caption,
+    t.date_text,
+    t.tags,
+    t.sort,
+    t.hidden
+FROM (
+         VALUES
+             (30001, 'https://t.alcy.cc/fj', '我们的第一张合照', '2018-07-15', '日常', 1, 0)
+     ) AS t(id, url, caption, date_text, tags, sort, hidden)
+WHERE NOT EXISTS (
+    SELECT 1 FROM `portal_love_photo` WHERE `portal_love_photo`.`id` = t.id
 );
 
 SET REFERENTIAL_INTEGRITY TRUE;

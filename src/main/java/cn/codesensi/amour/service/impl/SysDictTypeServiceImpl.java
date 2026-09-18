@@ -15,6 +15,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import com.mybatisflex.core.logicdelete.LogicDeleteManager;
 import com.mybatisflex.core.query.QueryChain;
+import com.mybatisflex.core.update.UpdateChain;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -112,8 +113,12 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
         if (ObjUtil.isNull(type)) {
             throw new BusinessException("字典类型不存在");
         }
-        SysDictType entity = dictConverter.toEntity(updateDTO);
-        sysDictTypeMapper.update(entity);
+        // 经 UpdateChain 显式逐列赋值,备注置空时写入 null(库中不落空串)
+        UpdateChain.of(SysDictType.class)
+                .set(SYS_DICT_TYPE.DICT_NAME, updateDTO.getDictName())
+                .set(SYS_DICT_TYPE.REMARK, updateDTO.getRemark())
+                .where(SYS_DICT_TYPE.ID.eq(updateDTO.getId()))
+                .update();
     }
 
     /**

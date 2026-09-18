@@ -31,7 +31,7 @@ public class UserProfileUpdateRequest implements Serializable {
      * 用户昵称
      */
     @NotBlank(message = "用户昵称不能为空")
-    @Size(max = 50, message = "用户昵称长度不能超过50")
+    @Size(max = AppConst.MAX_LENGTH_64, message = "用户昵称长度不能超过" + AppConst.MAX_LENGTH_64)
     private String nickname;
 
     /**
@@ -44,25 +44,25 @@ public class UserProfileUpdateRequest implements Serializable {
      * 用户邮箱
      */
     @Email(message = "邮箱格式不正确")
-    @Size(max = 64, message = "用户邮箱长度不能超过64")
+    @Size(max = AppConst.MAX_LENGTH_64, message = "用户邮箱长度不能超过" + AppConst.MAX_LENGTH_64)
     private String email;
 
     /**
      * 用户QQ号码
      */
-    @Pattern(regexp = RegexConst.QQ_OPTIONAL, message = RegexConst.QQ_MESSAGE)
+    @Pattern(regexp = RegexConst.EMPTY_OR_6_12_DIGITS, message = "QQ号码格式错误，请输入6-12位数字")
     private String qq;
 
     /**
      * 用户头像地址
      */
-    @Size(max = AppConst.AVATAR_MAX_LENGTH, message = "用户头像地址长度不能超过" + AppConst.AVATAR_MAX_LENGTH)
+    @Size(max = AppConst.MAX_LENGTH_512, message = "用户头像地址长度不能超过" + AppConst.MAX_LENGTH_512)
     private String avatar;
 
     /**
      * 备注
      */
-    @Size(max = AppConst.REMARK_MAX_LENGTH, message = "备注长度不能超过" + AppConst.REMARK_MAX_LENGTH)
+    @Size(max = AppConst.MAX_LENGTH_512, message = "备注长度不能超过" + AppConst.MAX_LENGTH_512)
     private String remark;
 
 }

@@ -1,4 +1,4 @@
-package cn.codesensi.amour.controller;
+package cn.codesensi.amour.controller.admin;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.common.annotation.Log;
@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 系统配置管理相关接口 前端控制器（免登录的公共配置下发已迁至 {@link PortalConfigController}）
+ * 系统配置管理相关接口 前端控制器
  *
  * @author codesensi
  * @since 1.0

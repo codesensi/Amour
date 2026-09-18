@@ -1,5 +1,6 @@
 package cn.codesensi.amour.model.request;
 
+import cn.codesensi.amour.common.consts.AppConst;
 import cn.codesensi.amour.common.core.BasePage;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -26,13 +27,13 @@ public class ConfigPageRequest extends BasePage implements Serializable {
     /**
      * 配置键(模糊匹配)
      */
-    @Size(max = 128, message = "配置键长度不能超过128")
+    @Size(max = AppConst.MAX_LENGTH_64, message = "配置键长度不能超过" + AppConst.MAX_LENGTH_64)
     private String configKey;
 
     /**
      * 分组
      */
-    @Size(max = 64, message = "分组长度不能超过64")
+    @Size(max = AppConst.MAX_LENGTH_16, message = "分组长度不能超过" + AppConst.MAX_LENGTH_16)
     private String configGroup;
 
 }

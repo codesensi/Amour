@@ -39,34 +39,35 @@ public class AppConst {
     public static final String ONE_STR = "1";
 
     /**
-     * 消息字段（msg）统一最大长度 —— 项目内所有表的 msg 列与代码截断均对齐此值
+     * 字符串列长度档位 —— 与 init_ddl.sql 各 VARCHAR 列宽一一对应，
+     * 校验注解按所在列宽引用对应档位，DDL 调整列宽时仅需修改对应档位数值。
+     * <p>
+     * 档位对应关系：16 → phone/qq/config_group；64 → username/password/nickname/email/
+     * role.name 与 code/menu.title/perms/dict_code/dict_name/config_key/photo.tags；
+     * 128 → dict_value/dict_label；256 → menu.path/component/icon/file.original_name；
+     * 512 → msg/remark/avatar/config_value/photo.url 与 caption
      */
-    public static final int MSG_MAX_LENGTH = 512;
+    public static final int MAX_LENGTH_16 = 16;
 
     /**
-     * 备注列宽 —— 各表 remark 列均为 VARCHAR(512)，校验注解对齐此值
+     * 字符串列长度档位 64
      */
-    public static final int REMARK_MAX_LENGTH = 512;
+    public static final int MAX_LENGTH_64 = 64;
 
     /**
-     * 用户头像地址列宽 —— avatar 列为 VARCHAR(512)，校验注解对齐此值
+     * 字符串列长度档位 128
      */
-    public static final int AVATAR_MAX_LENGTH = 512;
+    public static final int MAX_LENGTH_128 = 128;
 
     /**
-     * 路由路径列宽 —— sys_menu 的 path 列为 VARCHAR(512)，校验注解对齐此值
+     * 字符串列长度档位 256
      */
-    public static final int PATH_MAX_LENGTH = 512;
+    public static final int MAX_LENGTH_256 = 256;
 
     /**
-     * 用户账号列宽 —— sys_user 的 username 列为 VARCHAR(128)，登录与改名等校验注解对齐此值
+     * 字符串列长度档位 512
      */
-    public static final int USERNAME_MAX_LENGTH = 128;
-
-    /**
-     * 明文密码长度上限 —— 入库为加密值（sys_user.password VARCHAR(512)），登录与修改密码校验口径一致
-     */
-    public static final int PASSWORD_MAX_LENGTH = 64;
+    public static final int MAX_LENGTH_512 = 512;
 
     /**
      * 链路追踪 ID 在 MDC 中的键名

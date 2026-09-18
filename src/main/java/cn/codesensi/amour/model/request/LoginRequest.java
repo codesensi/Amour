@@ -24,14 +24,14 @@ public class LoginRequest implements Serializable {
      * 用户账号
      */
     @NotBlank(message = "账号不能为空")
-    @Size(max = AppConst.USERNAME_MAX_LENGTH, message = "账号长度不能超过" + AppConst.USERNAME_MAX_LENGTH)
+    @Size(max = AppConst.MAX_LENGTH_64, message = "账号长度不能超过" + AppConst.MAX_LENGTH_64)
     private String username;
 
     /**
      * 用户密码
      */
     @NotBlank(message = "密码不能为空")
-    @Size(max = AppConst.PASSWORD_MAX_LENGTH, message = "密码长度不能超过" + AppConst.PASSWORD_MAX_LENGTH)
+    @Size(max = AppConst.MAX_LENGTH_64, message = "密码长度不能超过" + AppConst.MAX_LENGTH_64)
     private String password;
 
     /**

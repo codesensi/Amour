@@ -39,52 +39,55 @@ public class MenuUpdateRequest implements Serializable {
      * 菜单名称
      */
     @NotBlank(message = "菜单名称不能为空")
-    @Size(max = 256, message = "菜单名称长度不能超过256")
+    @Size(max = AppConst.MAX_LENGTH_64, message = "菜单名称长度不能超过" + AppConst.MAX_LENGTH_64)
     private String title;
 
     /**
      * 路由路径(目录/菜单必填，按钮无需填写)
      */
-    @Size(max = AppConst.PATH_MAX_LENGTH, message = "路由路径长度不能超过" + AppConst.PATH_MAX_LENGTH)
+    @Size(max = AppConst.MAX_LENGTH_256, message = "路由路径长度不能超过" + AppConst.MAX_LENGTH_256)
     private String path;
 
     /**
      * 组件路径
      */
-    @Size(max = 256, message = "组件路径长度不能超过256")
+    @Size(max = AppConst.MAX_LENGTH_256, message = "组件路径长度不能超过" + AppConst.MAX_LENGTH_256)
     private String component;
 
     /**
      * 菜单排序:数字越小越靠前
      */
+    @NotNull(message = "排序不能为空")
     private Integer sort;
 
     /**
      * 菜单图标
      */
-    @Size(max = 256, message = "菜单图标长度不能超过256")
+    @Size(max = AppConst.MAX_LENGTH_256, message = "菜单图标长度不能超过" + AppConst.MAX_LENGTH_256)
     private String icon;
 
     /**
      * 权限编码(按钮类型必填)
      */
-    @Size(max = 64, message = "权限编码长度不能超过64")
+    @Size(max = AppConst.MAX_LENGTH_64, message = "权限编码长度不能超过" + AppConst.MAX_LENGTH_64)
     private String perms;
 
     /**
      * 菜单状态:0-启用，1-禁用
      */
+    @NotNull(message = "菜单状态不能为空")
     private Integer status;
 
     /**
      * 显隐标识:0-显示，1-隐藏
      */
+    @NotNull(message = "显隐标识不能为空")
     private Integer hidden;
 
     /**
      * 备注
      */
-    @Size(max = AppConst.REMARK_MAX_LENGTH, message = "备注长度不能超过" + AppConst.REMARK_MAX_LENGTH)
+    @Size(max = AppConst.MAX_LENGTH_512, message = "备注长度不能超过" + AppConst.MAX_LENGTH_512)
     private String remark;
 
 }

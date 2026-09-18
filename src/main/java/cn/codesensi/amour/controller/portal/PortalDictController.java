@@ -1,4 +1,4 @@
-package cn.codesensi.amour.controller;
+package cn.codesensi.amour.controller.portal;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.model.converter.DictConverter;
@@ -24,7 +24,7 @@ import java.util.List;
 @RestController
 @ApiResponseBody
 @RequiredArgsConstructor
-@RequestMapping("/portal")
+@RequestMapping("/portal/dict")
 public class PortalDictController {
 
     private final SysDictDataService sysDictDataService;
@@ -37,7 +37,7 @@ public class PortalDictController {
      * @param codes 字典编码集合（如 gender、enable）；为空时返回空分组
      * @return 字典分组列表（每组含 dictCode 与组内条目，条目按 sort 升序）；无命中时返回空列表
      */
-    @GetMapping("/dict/list-by-codes")
+    @GetMapping("/list-by-codes")
     public List<DictGroupResponse> listByCodes(@RequestParam(value = "codes", required = false) List<String> codes) {
         List<DictGroupDTO> dictGroups = sysDictDataService.listByCodes(codes);
         return dictConverter.toListGroupResponse(dictGroups);

@@ -26,7 +26,7 @@ public class QqInfoRequest implements Serializable {
      * QQ 号（6~12 位数字）
      */
     @NotBlank(message = "QQ号码不能为空")
-    @Pattern(regexp = RegexConst.QQ_OPTIONAL, message = RegexConst.QQ_MESSAGE)
+    @Pattern(regexp = RegexConst.EMPTY_OR_6_12_DIGITS, message = "QQ号码格式错误，请输入6-12位数字")
     private String qq;
 
 }

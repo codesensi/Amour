@@ -2,6 +2,7 @@ package cn.codesensi.amour.model.request;
 
 import cn.codesensi.amour.common.consts.AppConst;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -24,25 +25,26 @@ public class RoleInsertRequest implements Serializable {
      * 角色名称
      */
     @NotBlank(message = "角色名称不能为空")
-    @Size(max = 20, message = "角色名称长度不能超过20")
+    @Size(max = AppConst.MAX_LENGTH_64, message = "角色名称长度不能超过" + AppConst.MAX_LENGTH_64)
     private String name;
 
     /**
      * 角色编码
      */
     @NotBlank(message = "角色编码不能为空")
-    @Size(max = 20, message = "角色编码长度不能超过20")
+    @Size(max = AppConst.MAX_LENGTH_64, message = "角色编码长度不能超过" + AppConst.MAX_LENGTH_64)
     private String code;
 
     /**
      * 角色排序
      */
+    @NotNull(message = "排序不能为空")
     private Integer sort;
 
     /**
      * 备注
      */
-    @Size(max = AppConst.REMARK_MAX_LENGTH, message = "备注长度不能超过" + AppConst.REMARK_MAX_LENGTH)
+    @Size(max = AppConst.MAX_LENGTH_512, message = "备注长度不能超过" + AppConst.MAX_LENGTH_512)
     private String remark;
 
 }

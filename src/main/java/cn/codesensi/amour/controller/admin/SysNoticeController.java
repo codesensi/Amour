@@ -1,9 +1,10 @@
-package cn.codesensi.amour.controller;
+package cn.codesensi.amour.controller.admin;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.common.annotation.Log;
 import cn.codesensi.amour.common.enums.LogTypeEnum;
 import cn.codesensi.amour.model.converter.NoticeConverter;
+import cn.codesensi.amour.model.dto.NoticeDTO;
 import cn.codesensi.amour.model.response.NoticeResponse;
 import cn.codesensi.amour.service.SysNoticeService;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,8 @@ public class SysNoticeController {
      */
     @GetMapping("/list")
     public List<NoticeResponse> list(@RequestParam(required = false, defaultValue = "20") Integer limit) {
-        return noticeConverter.toResponseList(sysNoticeService.list(limit));
+        List<NoticeDTO> noticeList = sysNoticeService.list(limit);
+        return noticeConverter.toResponseList(noticeList);
     }
 
     /**

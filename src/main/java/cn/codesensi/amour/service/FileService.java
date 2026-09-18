@@ -94,4 +94,15 @@ public interface FileService {
      * @param urls    业务对象当前引用的全部文件 URL
      */
     void bindBizFiles(FileBizTypeEnum bizType, Long bizId, Collection<String> urls);
+
+    /**
+     * 将业务对象当前绑定的文件全部解除引用（替换语义的空集形态）。
+     * <p>
+     * 同业务类型与业务ID下未删除的文件标记逻辑删除（进回收站），用于业务字段被置空的场景
+     * （如清空头像）；物理文件保留，待回收站“彻底删除”时统一清理；方法幂等可重入。
+     *
+     * @param bizType 业务类型
+     * @param bizId   业务对象ID
+     */
+    void unbindBizFiles(FileBizTypeEnum bizType, Long bizId);
 }
