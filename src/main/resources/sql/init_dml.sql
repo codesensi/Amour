@@ -20,7 +20,6 @@ FROM (
              (1001, 'name', '爱慕情侣小站', 'STRING', 'base', 0, '项目/站点名称'),
              (1002, 'icp', '京ICP备2026010001号', 'STRING', 'base', 0, 'ICP备案文案'),
              (1003, 'copyright-year', '2026', 'STRING', 'base', 0, '版权年份'),
-             (1004, 'uapi-key', NULL, 'STRING', 'base', 1, 'UApiPro接口密钥(https://uapis.cn)'),
              (1005, 'trust-proxy-headers', 'true', 'BOOLEAN', 'base', 0, '是否信任X-Real-IP等代理头(仅部署于可信反向代理后开启)'),
              (1006, 'logo', NULL, 'STRING', 'base', 0, '项目/站点logo图片(登录页/管理端/门户端统一)'),
              (1007, 'favicon', NULL, 'STRING', 'base', 0, '项目/站点favicon图标(登录页/管理端/门户端统一)'),
@@ -37,7 +36,13 @@ FROM (
              (5003, 'rate-limit.captcha.limit', '10', 'INTEGER', 'rate-limit', 0, '验证码接口-窗口内最大请求数(0 表示拒绝全部请求)'),
              (5004, 'rate-limit.captcha.window', '60', 'INTEGER', 'rate-limit', 0, '验证码接口-时间窗口(秒)'),
              (5005, 'rate-limit.qq.limit', '10', 'INTEGER', 'rate-limit', 0, 'QQ信息接口-窗口内最大请求数(0 表示拒绝全部请求)'),
-             (5006, 'rate-limit.qq.window', '60', 'INTEGER', 'rate-limit', 0, 'QQ信息接口-时间窗口(秒)')
+             (5006, 'rate-limit.qq.window', '60', 'INTEGER', 'rate-limit', 0, 'QQ信息接口-时间窗口(秒)'),
+             (5007, 'rate-limit.amap-proxy.limit', '30', 'INTEGER', 'rate-limit', 0, '高德服务代理接口-窗口内最大请求数(0 表示拒绝全部请求)'),
+             (5008, 'rate-limit.amap-proxy.window', '60', 'INTEGER', 'rate-limit', 0, '高德服务代理接口-时间窗口(秒)'),
+             -- security（6000 段）
+             (6001, 'security.uapi-key', NULL, 'STRING', 'security', 1, 'UApiPro接口密钥(https://uapis.cn)'),
+             (6002, 'security.amap-key', NULL, 'STRING', 'security', 0, '高德地图Web端JS API Key(足迹地图选点/门户足迹地图展示;配域名白名单防滥用)'),
+             (6003, 'security.amap-code', NULL, 'STRING', 'security', 1, '高德地图安全密钥(与Web端JS API Key配套,空表示未启用)')
      ) AS t(id, config_key, config_value, value_type, config_group, sensitive, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_config` WHERE `sys_config`.`id` = t.id
@@ -202,6 +207,11 @@ FROM (
              (2002, 2000, '增加', 'B', NULL, NULL, 2, NULL, 'portal:love-photo:insert', 1),
              (2003, 2000, '修改', 'B', NULL, NULL, 3, NULL, 'portal:love-photo:update', 1),
              (2004, 2000, '删除', 'B', NULL, NULL, 4, NULL, 'portal:love-photo:delete', 1),
+             (2100, 0, '足迹管理', 'M', '/admin/footprint', 'system/footprint/index', 3, 'ep:location', NULL, 1),
+             (2101, 2100, '分页查询', 'B', NULL, NULL, 1, NULL, 'system:footprint:page', 1),
+             (2102, 2100, '增加', 'B', NULL, NULL, 2, NULL, 'system:footprint:insert', 1),
+             (2103, 2100, '修改', 'B', NULL, NULL, 3, NULL, 'system:footprint:update', 1),
+             (2104, 2100, '删除', 'B', NULL, NULL, 4, NULL, 'system:footprint:delete', 1),
              (3000, 0, '个人中心', 'M', '/admin/profile', 'profile/index', 3, 'ep:avatar', NULL, 1)
      ) AS t(id, pid, title, type, path, component, sort, icon, perms, builtin)
 WHERE NOT EXISTS (
@@ -232,7 +242,7 @@ FROM (
              (99005, 'menu-type', '菜单类型', 1, '与 MenuType(D/M/B) 对齐'),
              (99006, 'image-type', '图形验证码类型', 1, '与 ImageType(spec/gif/chinese/chinese-gif/arithmetic) 对齐'),
              (99007, 'success', '成功状态', 1, '与 SuccessEnum(1/0) 对齐'),
-             (99008, 'config-group', '配置分组', 1, '与 sys_config.config_group(base/site/captcha/file/rate-limit) 对齐'),
+             (99008, 'config-group', '配置分组', 1, '与 sys_config.config_group(base/site/captcha/file/rate-limit/security) 对齐'),
              (99009, 'config-value-type', '配置值类型', 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN/DATETIME) 对齐'),
              (99010, 'file-storage-type', '存储类型', 1, '与 StorageTypeEnum(local/oss) 对齐'),
              (99011, 'biz-type', '文件业务类型', 1, '与 FileBizTypeEnum(infra/avatar/photo/markdown) 对齐'),
@@ -295,6 +305,7 @@ FROM (
              (10703, 'config-group', 'captcha', '验证码配置', 3, 0, 1, '与 sys_config.config_group(base/site/captcha) 对齐'),
              (10704, 'config-group', 'file', '文件配置', 4, 0, 1, '与 sys_config.config_group(base/site/captcha/file) 对齐'),
              (10705, 'config-group', 'rate-limit', '接口限流', 5, 0, 1, '与 sys_config.config_group(base/site/captcha/file/rate-limit) 对齐'),
+             (10706, 'config-group', 'security', '安全配置', 6, 0, 1, '与 sys_config.config_group 对齐(密钥类配置:security.uapi-key/security.amap-key/security.amap-code)'),
              -- config-value-type（配置值类型，与 sys_config.value_type 对齐：STRING/INTEGER/LONG/BOOLEAN/DATETIME；10800 段）
              (10801, 'config-value-type', 'STRING', '字符串', 1, 0, 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN) 对齐'),
              (10802, 'config-value-type', 'INTEGER', '整数', 2, 0, 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN) 对齐'),

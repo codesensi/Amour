@@ -47,7 +47,7 @@ public interface SysConfigService {
      * <p>
      * 在 {@link #listByKeys(List)} 结果基础上剔除敏感配置（{@code sensitive=1}），
      * 敏感键在响应中的表现与"键不存在"一致，不暴露其存在性；
-     * 服务端内部消费敏感配置（如 uapi-key）请走 {@link #listByKeys(List)} / {@link #oneByKey(String)}。
+     * 服务端内部消费敏感配置（如 security.uapi-key）请走 {@link #listByKeys(List)} / {@link #oneByKey(String)}。
      *
      * @param keys 待查询的配置键集合（app 之下的点分路径）；为空时返回空列表
      * @return 可公开下发的配置 DTO 列表；无命中时返回空列表

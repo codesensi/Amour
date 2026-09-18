@@ -80,9 +80,14 @@ public class AppConst {
     public static final String DEFAULT_PASSWORD = "123456";
 
     /**
-     * UApiPro 密钥请求头名（sys_config {@code uapi-key} 的值非空时携带）
+     * UApiPro 密钥请求头名（sys_config {@code security.uapi-key} 的值非空时携带）
      */
     public static final String UAPI_KEY_HEADER = "X-API-KEY";
+
+    /**
+     * Referer 请求头名（高德服务代理转发时透传，供高德校验 JS API key 的来源域名）
+     */
+    public static final String REFERER_HEADER = "Referer";
 
     /**
      * 点号分隔符 —— sys_config 配置键分段（rate-limit.login.limit）、对象存储 key 扩展名等连接

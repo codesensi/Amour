@@ -23,7 +23,6 @@ public enum ConfigKeyEnum implements BaseEnum<String> {
     FAVICON("favicon", "项目/站点favicon图标"),
     ICP("icp", "ICP备案文案"),
     COPYRIGHT_YEAR("copyright-year", "版权年份"),
-    UAPI_KEY("uapi-key", "UApiPro接口密钥"),
     TRUST_PROXY_HEADERS("trust-proxy-headers", "是否信任代理头(X-Real-IP等)"),
 
     // ---------- 门户站点配置（site 分组：2000 段） ----------
@@ -42,7 +41,14 @@ public enum ConfigKeyEnum implements BaseEnum<String> {
     RATE_LIMIT_CAPTCHA_LIMIT(key(RateLimitKey.CAPTCHA, RateLimitField.LIMIT), "验证码接口-窗口内最大请求数"),
     RATE_LIMIT_CAPTCHA_WINDOW(key(RateLimitKey.CAPTCHA, RateLimitField.WINDOW), "验证码接口-时间窗口(秒)"),
     RATE_LIMIT_QQ_INFO_LIMIT(key(RateLimitKey.QQ_INFO, RateLimitField.LIMIT), "QQ信息接口-窗口内最大请求数"),
-    RATE_LIMIT_QQ_INFO_WINDOW(key(RateLimitKey.QQ_INFO, RateLimitField.WINDOW), "QQ信息接口-时间窗口(秒)");
+    RATE_LIMIT_QQ_INFO_WINDOW(key(RateLimitKey.QQ_INFO, RateLimitField.WINDOW), "QQ信息接口-时间窗口(秒)"),
+    RATE_LIMIT_AMAP_PROXY_LIMIT(key(RateLimitKey.AMAP_PROXY, RateLimitField.LIMIT), "高德服务代理接口-窗口内最大请求数"),
+    RATE_LIMIT_AMAP_PROXY_WINDOW(key(RateLimitKey.AMAP_PROXY, RateLimitField.WINDOW), "高德服务代理接口-时间窗口(秒)"),
+
+    // ---------- 安全配置（security 分组：6000 段） ----------
+    SECURITY_UAPI_KEY("security.uapi-key", "UApiPro接口密钥"),
+    SECURITY_AMAP_KEY("security.amap-key", "高德地图Web端JS API Key"),
+    SECURITY_AMAP_CODE("security.amap-code", "高德地图安全密钥");
 
     /**
      * 编码

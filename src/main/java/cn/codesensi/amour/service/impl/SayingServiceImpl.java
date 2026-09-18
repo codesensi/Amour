@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
  * 一言查询服务实现。
  * <p>
  * 通过 Hutool 以服务端身份调用上游接口（不携带浏览器特征请求头，规避上游对浏览器跨域调用的 403 拦截）：
- * 优先调用随机一言接口（{@code app.uapi-saying-random}，sys_config 配置了 {@code uapi-key}
+ * 优先调用随机一言接口（{@code app.uapi-saying-random}，sys_config 配置了 {@code security.uapi-key}
  * 时携带 {@code X-API-KEY} 请求头）；调用失败降级为一言接口（{@code app.uapi-saying}，不携带
  * 请求密钥，响应仅含 text 字段，映射为文案、出处与作者为空）；两级上游均未配置或均失败时返回
  * 空 DTO。地址类配置取自 yml（改动需重启），密钥取自 sys_config（管理端修改热更新）。
@@ -54,7 +54,7 @@ public class SayingServiceImpl implements SayingService {
         String sayingResponse;
         try {
             // 密钥实时读取 sys_config（管理端修改后事务提交即失效缓存，下次请求即生效），空时不携带请求头
-            SysConfig apiKeyConfig = sysConfigService.oneByKey(ConfigKeyEnum.UAPI_KEY.getCode());
+            SysConfig apiKeyConfig = sysConfigService.oneByKey(ConfigKeyEnum.SECURITY_UAPI_KEY.getCode());
             String apiKey = ObjUtil.isNull(apiKeyConfig) ? null : apiKeyConfig.getConfigValue();
             HttpRequest request = HttpRequest.get(sayingUrl);
             if (StrUtil.isNotBlank(apiKey)) {

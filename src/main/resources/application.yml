@@ -99,4 +99,8 @@ app:
   uapi-saying-random: https://uapis.cn/api/v1/saying/random?source=caoxingyu sentence,sentences bundle
   # UApiPro 获取一言(普通版,降级来源)接口地址:响应仅含 text 字段
   uapi-saying: https://uapis.cn/api/v1/saying
+  # 高德服务代理转发超时(毫秒)
+  amap-timeout: 5000
+  # 高德 Web 服务 API 转发目标地址(/_AMapService 代理的固定目标;不带尾部斜杠);配置文件改动需重启生效
+  amap-restapi-url: https://restapi.amap.com
 

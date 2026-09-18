@@ -27,7 +27,12 @@ public enum RateLimitKey implements BaseEnum<String> {
     /**
      * QQ信息查询接口
      */
-    QQ_INFO("qq-info", "QQ信息查询接口");
+    QQ_INFO("qq-info", "QQ信息查询接口"),
+
+    /**
+     * 高德服务代理接口
+     */
+    AMAP_PROXY("amap-proxy", "高德服务代理接口");
 
     /**
      * 编码

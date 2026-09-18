@@ -74,8 +74,22 @@ public class RbacConst {
     public static final String QQ_INFO_PATH = "/qq-info";
 
     /**
+     * 高德服务代理接口前缀（免登录；JS API 安全密钥的官方推荐代理方式）。
+     * <p>
+     * {@code _AMapService} 为高德 JS SDK 硬编码的固定前缀，不可自定义；
+     * SDK 的 Web 服务请求由浏览器自动发起，无法附带 Authorization 头，
+     * 故不纳入登录拦截，防滥用依赖 @RateLimit 按 IP 限流。
+     */
+    public static final String AMAP_PROXY_PREFIX = "/_AMapService";
+
+    /**
+     * 高德服务代理接口路径（免登录放行口径；由前缀常量派生，保持单一来源）
+     */
+    public static final String AMAP_PROXY_PATH = AMAP_PROXY_PREFIX + "/**";
+
+    /**
      * 公开路径清单 —— 免登录接口的唯一放行口径：验证码、登录、门户 /portal/**、
-     * 文件预览、QQ 信息查询。
+     * 文件预览、QQ 信息查询、高德服务代理。
      * <p>
      * 鉴权与演示模式两个拦截器共用本清单统一放行；
      * 登出不在此列——登出属登录态操作，未登录调用由鉴权拦截器返回 401，
@@ -90,7 +104,8 @@ public class RbacConst {
             LOGIN_PATH,
             PORTAL_PATH,
             FILE_VIEW_PATH,
-            QQ_INFO_PATH
+            QQ_INFO_PATH,
+            AMAP_PROXY_PATH
     };
 
 }

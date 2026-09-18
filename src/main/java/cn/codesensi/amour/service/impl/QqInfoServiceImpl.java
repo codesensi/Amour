@@ -28,7 +28,7 @@ import java.nio.charset.StandardCharsets;
  * QQ 信息查询服务实现。
  * <p>
  * 通过 Hutool 以服务端身份调用上游接口（不携带浏览器特征请求头，规避上游对浏览器跨域调用的 403 拦截）：
- * 优先调用 qq-api（{@code app.uapi-qq}，sys_config 配置了 {@code uapi-key} 时携带
+ * 优先调用 qq-api（{@code app.uapi-qq}，sys_config 配置了 {@code security.uapi-key} 时携带
  * {@code X-API-KEY} 请求头）解析真实头像与昵称；任一环节失败（未配置/网络异常/响应空/解析失败/缺头像字段）
  * 降级为 qq-avatar（{@code app.qq-avatar}，QQ 官方头像）按 QQ 号拼接；qq-avatar 也未配置时返回
  * 空 DTO，由前端本地兜底图兜底。地址类配置取自 yml（改动需重启），密钥取自 sys_config（管理端修改热更新）。
@@ -88,7 +88,7 @@ public class QqInfoServiceImpl implements QqInfoService {
         String qqApiResponse;
         try {
             // 密钥实时读取 sys_config（管理端修改后事务提交即失效缓存，下次请求即生效），空时不携带请求头
-            SysConfig apiKeyConfig = sysConfigService.oneByKey(ConfigKeyEnum.UAPI_KEY.getCode());
+            SysConfig apiKeyConfig = sysConfigService.oneByKey(ConfigKeyEnum.SECURITY_UAPI_KEY.getCode());
             String apiKey = ObjUtil.isNull(apiKeyConfig) ? null : apiKeyConfig.getConfigValue();
             HttpRequest request = HttpRequest.get(
                     String.format(qqApiUrl, URLEncoder.encode(qq, StandardCharsets.UTF_8)));

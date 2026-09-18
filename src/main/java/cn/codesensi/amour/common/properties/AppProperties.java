@@ -54,4 +54,17 @@ public class AppProperties {
      */
     private String uapiSaying;
 
+    /**
+     * 高德 Web 服务 API 转发目标地址（/_AMapService 代理的固定目标；不带尾部斜杠）。
+     * 默认值：官方 restapi 地址。
+     * 配置文件改动需重启应用生效。
+     */
+    private String amapRestapiUrl = "https://restapi.amap.com";
+
+    /**
+     * 高德服务代理转发超时时间（毫秒）。
+     * 默认值：{@code 5000}。
+     */
+    private Integer amapTimeout = 5000;
+
 }
