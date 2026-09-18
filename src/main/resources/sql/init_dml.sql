@@ -345,7 +345,7 @@ SELECT
     t.hidden
 FROM (
          VALUES
-             (30001, 'https://t.alcy.cc/fj', '我们的第一张合照', '2018-07-15', '日常', 1, 0)
+             (30001, 'https://t.alcy.cc/pic/fj/130.webp', '我们的第一张合照', '2018-07-15', '日常', 1, 0)
      ) AS t(id, url, caption, date_text, tags, sort, hidden)
 WHERE NOT EXISTS (
     SELECT 1 FROM `portal_love_photo` WHERE `portal_love_photo`.`id` = t.id
