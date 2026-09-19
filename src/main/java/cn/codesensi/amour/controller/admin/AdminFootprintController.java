@@ -27,8 +27,8 @@ import java.util.List;
 @RestController
 @ApiResponseBody
 @RequiredArgsConstructor
-@RequestMapping("/sys/footprint")
-public class SysFootprintController {
+@RequestMapping("/admin/footprint")
+public class AdminFootprintController {
 
     private final FootprintService footprintService;
     private final FootprintConverter footprintConverter;
@@ -42,7 +42,7 @@ public class SysFootprintController {
      * @param pageRequest 分页查询参数
      * @return 足迹分页结果
      */
-    @SaCheckPermission("system:footprint:page")
+    @SaCheckPermission("admin:footprint:page")
     @GetMapping("/page")
     public Page<FootprintPageResponse> page(@Valid FootprintPageRequest pageRequest) {
         Page<FootprintDTO> itemPage = footprintService.pageAdmin(footprintConverter.toPageDTO(pageRequest));
@@ -54,7 +54,7 @@ public class SysFootprintController {
      *
      * @param insertRequest 新增请求参数
      */
-    @SaCheckPermission("system:footprint:insert")
+    @SaCheckPermission("admin:footprint:insert")
     @Log(module = "足迹地图", operation = "新增足迹", type = LogTypeEnum.INSERT)
     @PostMapping("/insert")
     public void insert(@Valid @RequestBody FootprintInsertRequest insertRequest) {
@@ -66,7 +66,7 @@ public class SysFootprintController {
      *
      * @param updateRequest 修改请求参数
      */
-    @SaCheckPermission("system:footprint:update")
+    @SaCheckPermission("admin:footprint:update")
     @Log(module = "足迹地图", operation = "修改足迹", type = LogTypeEnum.UPDATE)
     @PutMapping("/update")
     public void update(@Valid @RequestBody FootprintUpdateRequest updateRequest) {
@@ -78,7 +78,7 @@ public class SysFootprintController {
      *
      * @param ids 足迹ID集合(雪花ID字符串化传输)
      */
-    @SaCheckPermission("system:footprint:delete")
+    @SaCheckPermission("admin:footprint:delete")
     @Log(module = "足迹地图", operation = "删除足迹", type = LogTypeEnum.DELETE)
     @DeleteMapping("/delete/{ids}")
     public void delete(@PathVariable Long[] ids) {

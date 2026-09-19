@@ -15,7 +15,7 @@ import java.util.List;
  * @author codesensi
  * @since 1.0
  */
-public interface PortalLovePhotoService {
+public interface LovePhotoService {
 
     /**
      * 门户恋爱画册分页（免登录）。

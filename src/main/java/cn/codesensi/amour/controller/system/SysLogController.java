@@ -1,4 +1,4 @@
-package cn.codesensi.amour.controller.admin;
+package cn.codesensi.amour.controller.system;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.common.enums.LogTypeEnum;

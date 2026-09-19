@@ -202,16 +202,16 @@ FROM (
              (1800, 1000, '文件管理', 'M', '/admin/system/file', 'system/file/index', 8, 'ep:folder-opened', NULL, 1),
              (1801, 1800, '文件分页查询', 'B', NULL, NULL, 1, NULL, 'system:file:page', 1),
              (1802, 1800, '删除文件', 'B', NULL, NULL, 2, NULL, 'system:file:delete', 1),
-             (2000, 0, '恋爱画册', 'M', '/admin/love-photo', 'system/love-photo/index', 2, 'ep:camera', NULL, 1),
-             (2001, 2000, '分页查询', 'B', NULL, NULL, 1, NULL, 'portal:love-photo:page', 1),
-             (2002, 2000, '增加', 'B', NULL, NULL, 2, NULL, 'portal:love-photo:insert', 1),
-             (2003, 2000, '修改', 'B', NULL, NULL, 3, NULL, 'portal:love-photo:update', 1),
-             (2004, 2000, '删除', 'B', NULL, NULL, 4, NULL, 'portal:love-photo:delete', 1),
-             (2100, 0, '足迹管理', 'M', '/admin/footprint', 'system/footprint/index', 3, 'ep:location', NULL, 1),
-             (2101, 2100, '分页查询', 'B', NULL, NULL, 1, NULL, 'system:footprint:page', 1),
-             (2102, 2100, '增加', 'B', NULL, NULL, 2, NULL, 'system:footprint:insert', 1),
-             (2103, 2100, '修改', 'B', NULL, NULL, 3, NULL, 'system:footprint:update', 1),
-             (2104, 2100, '删除', 'B', NULL, NULL, 4, NULL, 'system:footprint:delete', 1),
+             (2000, 0, '恋爱画册', 'M', '/admin/love-photo', 'admin/love-photo/index', 2, 'ep:camera', NULL, 1),
+             (2001, 2000, '分页查询', 'B', NULL, NULL, 1, NULL, 'admin:love-photo:page', 1),
+             (2002, 2000, '增加', 'B', NULL, NULL, 2, NULL, 'admin:love-photo:insert', 1),
+             (2003, 2000, '修改', 'B', NULL, NULL, 3, NULL, 'admin:love-photo:update', 1),
+             (2004, 2000, '删除', 'B', NULL, NULL, 4, NULL, 'admin:love-photo:delete', 1),
+             (2100, 0, '足迹管理', 'M', '/admin/footprint', 'admin/footprint/index', 3, 'ep:location', NULL, 1),
+             (2101, 2100, '分页查询', 'B', NULL, NULL, 1, NULL, 'admin:footprint:page', 1),
+             (2102, 2100, '增加', 'B', NULL, NULL, 2, NULL, 'admin:footprint:insert', 1),
+             (2103, 2100, '修改', 'B', NULL, NULL, 3, NULL, 'admin:footprint:update', 1),
+             (2104, 2100, '删除', 'B', NULL, NULL, 4, NULL, 'admin:footprint:delete', 1),
              (3000, 0, '个人中心', 'M', '/admin/profile', 'profile/index', 3, 'ep:avatar', NULL, 1)
      ) AS t(id, pid, title, type, path, component, sort, icon, perms, builtin)
 WHERE NOT EXISTS (
@@ -360,6 +360,30 @@ FROM (
      ) AS t(id, url, caption, date_text, tags, sort, hidden)
 WHERE NOT EXISTS (
     SELECT 1 FROM `portal_love_photo` WHERE `portal_love_photo`.`id` = t.id
+);
+
+-- ----------------------------
+-- 数据填充：portal_footprint（幂等插入）
+-- 足迹地图门户展示的示例足迹（photo_url 可空,为空时门户按无照片渲染）；id 使用独立的 31000 段顺序预留
+-- ----------------------------
+INSERT INTO `portal_footprint` (
+    `id`, `city`, `place_name`, `longitude`, `latitude`, `arrival_date`, `photo_url`, `remark`
+)
+SELECT
+    t.id,
+    t.city,
+    t.place_name,
+    t.longitude,
+    t.latitude,
+    t.arrival_date,
+    t.photo_url,
+    t.remark
+FROM (
+         VALUES
+             (31001, '成都', '宽窄巷子', 104.053600, 30.669800, '2024-10-02', NULL, '第一次一起逛巷子,看了变脸吃了三大炮')
+     ) AS t(id, city, place_name, longitude, latitude, arrival_date, photo_url, remark)
+WHERE NOT EXISTS (
+    SELECT 1 FROM `portal_footprint` WHERE `portal_footprint`.`id` = t.id
 );
 
 SET REFERENTIAL_INTEGRITY TRUE;

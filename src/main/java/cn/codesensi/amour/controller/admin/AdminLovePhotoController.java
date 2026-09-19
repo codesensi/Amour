@@ -10,7 +10,7 @@ import cn.codesensi.amour.model.request.LovePhotoInsertRequest;
 import cn.codesensi.amour.model.request.LovePhotoPageRequest;
 import cn.codesensi.amour.model.request.LovePhotoUpdateRequest;
 import cn.codesensi.amour.model.response.LovePhotoPageResponse;
-import cn.codesensi.amour.service.PortalLovePhotoService;
+import cn.codesensi.amour.service.LovePhotoService;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.mybatisflex.core.paginate.Page;
 import jakarta.validation.Valid;
@@ -28,10 +28,10 @@ import java.util.List;
 @RestController
 @ApiResponseBody
 @RequiredArgsConstructor
-@RequestMapping("/sys/love-photo")
-public class SysLovePhotoController {
+@RequestMapping("/admin/love-photo")
+public class AdminLovePhotoController {
 
-    private final PortalLovePhotoService portalLovePhotoService;
+    private final LovePhotoService lovePhotoService;
     private final LovePhotoConverter lovePhotoConverter;
 
     /**
@@ -43,10 +43,10 @@ public class SysLovePhotoController {
      * @param pageRequest 分页查询参数
      * @return 照片分页结果
      */
-    @SaCheckPermission("portal:love-photo:page")
+    @SaCheckPermission("admin:love-photo:page")
     @GetMapping("/page")
     public Page<LovePhotoPageResponse> page(@Valid LovePhotoPageRequest pageRequest) {
-        Page<LovePhotoDTO> itemPage = portalLovePhotoService.pageAdmin(lovePhotoConverter.toPageDTO(pageRequest));
+        Page<LovePhotoDTO> itemPage = lovePhotoService.pageAdmin(lovePhotoConverter.toPageDTO(pageRequest));
         return lovePhotoConverter.toPageResponse(itemPage);
     }
 
@@ -55,11 +55,11 @@ public class SysLovePhotoController {
      *
      * @param insertRequest 新增请求参数
      */
-    @SaCheckPermission("portal:love-photo:insert")
+    @SaCheckPermission("admin:love-photo:insert")
     @Log(module = "恋爱画册", operation = "新增照片", type = LogTypeEnum.INSERT)
     @PostMapping("/insert")
     public void insert(@Valid @RequestBody LovePhotoInsertRequest insertRequest) {
-        portalLovePhotoService.insert(lovePhotoConverter.toInsertDTO(insertRequest));
+        lovePhotoService.insert(lovePhotoConverter.toInsertDTO(insertRequest));
     }
 
     /**
@@ -67,11 +67,11 @@ public class SysLovePhotoController {
      *
      * @param updateRequest 修改请求参数
      */
-    @SaCheckPermission("portal:love-photo:update")
+    @SaCheckPermission("admin:love-photo:update")
     @Log(module = "恋爱画册", operation = "修改照片", type = LogTypeEnum.UPDATE)
     @PutMapping("/update")
     public void update(@Valid @RequestBody LovePhotoUpdateRequest updateRequest) {
-        portalLovePhotoService.update(lovePhotoConverter.toUpdateDTO(updateRequest));
+        lovePhotoService.update(lovePhotoConverter.toUpdateDTO(updateRequest));
     }
 
     /**
@@ -79,11 +79,11 @@ public class SysLovePhotoController {
      *
      * @param request 照片显隐请求参数
      */
-    @SaCheckPermission("portal:love-photo:update")
+    @SaCheckPermission("admin:love-photo:update")
     @Log(module = "恋爱画册", operation = "修改照片显隐", type = LogTypeEnum.UPDATE)
     @PutMapping("/change-hidden")
     public void changeHidden(@Valid @RequestBody LovePhotoChangeHiddenRequest request) {
-        portalLovePhotoService.changeHidden(lovePhotoConverter.toChangeHiddenDTO(request));
+        lovePhotoService.changeHidden(lovePhotoConverter.toChangeHiddenDTO(request));
     }
 
     /**
@@ -91,10 +91,10 @@ public class SysLovePhotoController {
      *
      * @param ids 照片ID集合(雪花ID字符串化传输)
      */
-    @SaCheckPermission("portal:love-photo:delete")
+    @SaCheckPermission("admin:love-photo:delete")
     @Log(module = "恋爱画册", operation = "删除照片", type = LogTypeEnum.DELETE)
     @DeleteMapping("/delete/{ids}")
     public void delete(@PathVariable Long[] ids) {
-        portalLovePhotoService.delete(List.of(ids));
+        lovePhotoService.delete(List.of(ids));
     }
 }

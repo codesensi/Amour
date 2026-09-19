@@ -5,7 +5,7 @@ import cn.codesensi.amour.common.core.BasePage;
 import cn.codesensi.amour.model.converter.LovePhotoConverter;
 import cn.codesensi.amour.model.dto.LovePhotoDTO;
 import cn.codesensi.amour.model.response.PortalLovePhotoResponse;
-import cn.codesensi.amour.service.PortalLovePhotoService;
+import cn.codesensi.amour.service.LovePhotoService;
 import com.mybatisflex.core.paginate.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/portal/love-photo")
 public class PortalLovePhotoController {
 
-    private final PortalLovePhotoService portalLovePhotoService;
+    private final LovePhotoService lovePhotoService;
     private final LovePhotoConverter lovePhotoConverter;
 
     /**
@@ -38,7 +38,7 @@ public class PortalLovePhotoController {
      */
     @GetMapping("/page")
     public Page<PortalLovePhotoResponse> page(BasePage page) {
-        Page<LovePhotoDTO> itemPage = portalLovePhotoService.pagePortal(page);
+        Page<LovePhotoDTO> itemPage = lovePhotoService.pagePortal(page);
         return lovePhotoConverter.toPortalPage(itemPage);
     }
 }

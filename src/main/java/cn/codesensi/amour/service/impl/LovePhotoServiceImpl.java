@@ -1,5 +1,6 @@
 package cn.codesensi.amour.service.impl;
 
+import cn.codesensi.amour.common.consts.AppConst;
 import cn.codesensi.amour.common.core.BasePage;
 import cn.codesensi.amour.common.enums.HiddenEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
@@ -7,7 +8,7 @@ import cn.codesensi.amour.mapper.PortalLovePhotoMapper;
 import cn.codesensi.amour.model.converter.LovePhotoConverter;
 import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.PortalLovePhoto;
-import cn.codesensi.amour.service.PortalLovePhotoService;
+import cn.codesensi.amour.service.LovePhotoService;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
@@ -32,12 +33,7 @@ import static cn.codesensi.amour.model.entity.table.PortalLovePhotoTableDef.PORT
  */
 @Service
 @RequiredArgsConstructor
-public class PortalLovePhotoServiceImpl implements PortalLovePhotoService {
-
-    /**
-     * 标签逗号分隔存储的总长上限（对齐 portal_love_photo.tags 列定义）
-     */
-    private static final int TAGS_MAX_LENGTH = 64;
+public class LovePhotoServiceImpl implements LovePhotoService {
 
     /**
      * 标签精确匹配条件：tags 以逗号分隔存储，FIND_IN_SET 逐值比对（私人相册数据量级，无需索引）
@@ -206,8 +202,8 @@ public class PortalLovePhotoServiceImpl implements PortalLovePhotoService {
                 .distinct()
                 .reduce((a, b) -> a + "," + b)
                 .orElse("");
-        if (joined.length() > TAGS_MAX_LENGTH) {
-            throw new BusinessException("照片标签拼接后长度不能超过" + TAGS_MAX_LENGTH + "字符");
+        if (joined.length() > AppConst.MAX_LENGTH_64) {
+            throw new BusinessException("照片标签拼接后长度不能超过" + AppConst.MAX_LENGTH_64 + "字符");
         }
         return joined;
     }
