@@ -52,7 +52,7 @@ public interface SysConfigService {
      * @param keys 待查询的配置键集合（app 之下的点分路径）；为空时返回空列表
      * @return 可公开下发的配置 DTO 列表；无命中时返回空列表
      */
-    List<ConfigDTO> listByKeysPublic(List<String> keys);
+    List<ConfigDTO> listByKeysPortal(List<String> keys);
 
     /**
      * 分页查询配置（管理端，含禁用条目与完整字段）。

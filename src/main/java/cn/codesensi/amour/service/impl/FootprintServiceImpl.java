@@ -4,8 +4,8 @@ import cn.codesensi.amour.common.core.BasePage;
 import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.mapper.PortalFootprintMapper;
 import cn.codesensi.amour.model.converter.FootprintConverter;
-import cn.codesensi.amour.model.dto.FootprintInsertDTO;
 import cn.codesensi.amour.model.dto.FootprintDTO;
+import cn.codesensi.amour.model.dto.FootprintInsertDTO;
 import cn.codesensi.amour.model.dto.FootprintPageDTO;
 import cn.codesensi.amour.model.dto.FootprintUpdateDTO;
 import cn.codesensi.amour.model.entity.PortalFootprint;
@@ -80,11 +80,10 @@ public class FootprintServiceImpl implements FootprintService {
      * @return 足迹条目 DTO 分页结果
      */
     private Page<FootprintDTO> doPage(BasePage page, String city, LocalDate arrivalDateBegin, LocalDate arrivalDateEnd) {
-        QueryChain<PortalFootprint> chain = QueryChain.of(portalFootprintMapper)
+        Page<PortalFootprint> entityPage = QueryChain.of(portalFootprintMapper)
                 .where(PORTAL_FOOTPRINT.CITY.like(city, StrUtil::isNotBlank))
                 .and(PORTAL_FOOTPRINT.ARRIVAL_DATE.ge(arrivalDateBegin, ObjUtil::isNotNull))
-                .and(PORTAL_FOOTPRINT.ARRIVAL_DATE.le(arrivalDateEnd, ObjUtil::isNotNull));
-        Page<PortalFootprint> entityPage = chain
+                .and(PORTAL_FOOTPRINT.ARRIVAL_DATE.le(arrivalDateEnd, ObjUtil::isNotNull))
                 .orderBy(PORTAL_FOOTPRINT.ARRIVAL_DATE, true)
                 .orderBy(PORTAL_FOOTPRINT.ID, true)
                 .page(Page.of(page.getPageNumber(), page.getPageSize()));

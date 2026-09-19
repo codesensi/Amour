@@ -40,7 +40,7 @@ public class PortalConfigController {
      */
     @GetMapping("/list-by-keys")
     public List<ConfigResponse> listByKeys(@RequestParam(value = "keys", required = false) List<String> keys) {
-        List<ConfigDTO> configDTOs = sysConfigService.listByKeysPublic(keys);
+        List<ConfigDTO> configDTOs = sysConfigService.listByKeysPortal(keys);
         return configConverter.toListResponse(configDTOs);
     }
 }

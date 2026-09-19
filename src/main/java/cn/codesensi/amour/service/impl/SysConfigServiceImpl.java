@@ -173,7 +173,7 @@ public class SysConfigServiceImpl implements SysConfigService {
      * @return 可公开下发的配置 DTO 列表；无命中时返回空列表
      */
     @Override
-    public List<ConfigDTO> listByKeysPublic(List<String> keys) {
+    public List<ConfigDTO> listByKeysPortal(List<String> keys) {
         return listByKeys(keys).stream()
                 .filter(config -> YesEnum.NO.getCode().equals(config.getSensitive()))
                 .toList();
