@@ -24,6 +24,7 @@ import java.util.List;
  * 登录日志与操作日志同表存储（sys_log.log_type 区分），按两个端点分别下发，
  * 权限码与菜单按钮一一对应。
  *
+ * @author codesensi
  * @since 1.0
  */
 @RestController

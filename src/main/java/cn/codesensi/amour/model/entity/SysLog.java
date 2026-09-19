@@ -17,6 +17,7 @@ import java.io.Serializable;
  * 对应 {@code sys_log} 表，存储标注了 {@code @Log} 注解的接口操作日志：
  * 登录人、请求地址、IP 归属地、请求参数（脱敏）、响应结果、耗时与成败状态等。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Data

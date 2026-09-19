@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 日志类型枚举
+ * 日志类型枚举。
  * <p>
  * 取值与 {@code sys_log.log_type} 列的字典注释一一对应。
  *

@@ -17,6 +17,7 @@ import java.io.Serializable;
  * 一个字典编码一行，承载类型名与类型级元数据（备注等）；字典条目见 {@link SysDictData}。
  * 内置类型（builtin=1）为系统功能依赖，禁删且编码不可改，名称/备注可维护。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Data

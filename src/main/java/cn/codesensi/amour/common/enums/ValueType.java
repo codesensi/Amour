@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
  * 与 sys_config.value_type 及数据字典 config-value-type 的字面量一一对应，
  * 用于运行时配置值的格式校验分派，避免散落的字符串魔法值与库中字面量隐式耦合。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Getter

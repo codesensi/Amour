@@ -15,6 +15,7 @@ import java.lang.annotation.Target;
  * 阈值优先从 sys_config（rate-limit.{key}.{limit|window}，INTEGER）读取实现热更新，
  * 未配置时回退本注解的兜底值。超限抛出业务异常，返回 HTTP 429。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Documented

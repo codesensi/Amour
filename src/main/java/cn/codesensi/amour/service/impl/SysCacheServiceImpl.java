@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
  * 获取原生 Caffeine 缓存后，通过 {@code asMap()} 视图读取全部条目，通过 {@code policy()}
  * 读取过期策略与每条目的剩余过期时间，通过 {@code stats()} 读取命中统计，用于运行期查看缓存内容。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Slf4j

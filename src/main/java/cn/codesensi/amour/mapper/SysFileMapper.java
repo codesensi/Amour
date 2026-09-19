@@ -6,6 +6,7 @@ import com.mybatisflex.core.BaseMapper;
 /**
  * 文件记录 Mapper。
  *
+ * @author codesensi
  * @since 1.0
  */
 public interface SysFileMapper extends BaseMapper<SysFile> {

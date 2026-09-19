@@ -10,7 +10,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 /**
- * 用户相关对象转换
+ * 用户相关对象转换。
  *
  * @author codesensi
  * @since 1.0

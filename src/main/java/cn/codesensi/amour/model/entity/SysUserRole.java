@@ -16,6 +16,7 @@ import java.io.Serializable;
  * <p>
  * 对应 {@code sys_user_role} 表，维护用户与角色的绑定关系。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Data

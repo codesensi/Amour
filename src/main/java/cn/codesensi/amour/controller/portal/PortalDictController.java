@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * 门户数据字典相关接口 前端控制器
+ * 门户数据字典相关接口 前端控制器。
  * <p>
  * 面向门户免登录场景，按需批量下发启用中的字典项，供前端下拉框与枚举展示统一消费。
  *

@@ -4,8 +4,9 @@ package cn.codesensi.amour.service;
 import cn.codesensi.amour.model.dto.CaptchaResultDTO;
 
 /**
- * 验证码接口
+ * 验证码接口。
  *
+ * @author codesensi
  * @since 1.0
  */
 public interface CaptchaService {

@@ -61,6 +61,7 @@ import static cn.codesensi.amour.model.entity.table.SysUserTableDef.SYS_USER;
  * （实时读取支持系统配置页热更新），读取则按文件自身记录的 storage_type 分发，
  * 切换存储只影响新上传，历史文件不受影响。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Slf4j

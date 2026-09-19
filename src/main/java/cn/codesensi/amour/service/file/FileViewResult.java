@@ -8,6 +8,7 @@ import org.springframework.core.io.Resource;
  *
  * @param sysFile  文件记录
  * @param resource 存储资源
+ * @author codesensi
  * @since 1.0
  */
 public record FileViewResult(SysFile sysFile, Resource resource) {

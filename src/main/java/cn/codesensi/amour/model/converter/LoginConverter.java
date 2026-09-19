@@ -7,7 +7,7 @@ import cn.codesensi.amour.model.response.LoginResponse;
 import org.mapstruct.Mapper;
 
 /**
- * 登录相关对象转换
+ * 登录相关对象转换。
  *
  * @author codesensi
  * @since 1.0

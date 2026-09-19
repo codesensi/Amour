@@ -33,6 +33,7 @@ import static cn.codesensi.amour.model.entity.table.SysDictTypeTableDef.SYS_DICT
  * 类型为字典编码的归属行，承载类型名与类型级元数据；条目计数、重名等聚合视图
  * 均由本服务组装。类型不参与缓存（仅条目按编码整组缓存），读频率远低于条目下发。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Slf4j

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * 缓存相关接口 前端控制器
+ * 缓存相关接口 前端控制器。
  *
  * @author codesensi
  * @since 1.0

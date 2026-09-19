@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
- * 门户足迹地图响应结果
+ * 门户足迹地图响应结果。
  * <p>
  * 字段名对齐前端契约（FootprintItem），照片地址为免登录分发地址。
  *

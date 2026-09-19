@@ -28,6 +28,7 @@ import static cn.codesensi.amour.model.entity.table.SysLogTableDef.SYS_LOG;
  * 日志实体由切面在请求线程内组装完成（traceId、用户、IP 等均取自请求上下文），
  * 本服务仅负责异步写入：入库与业务完全隔离，任何失败只降级为告警日志。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Slf4j

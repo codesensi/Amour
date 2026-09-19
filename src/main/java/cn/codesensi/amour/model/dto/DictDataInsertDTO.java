@@ -6,7 +6,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 新增字典条目业务数据
+ * 新增字典条目业务数据。
  *
  * @author codesensi
  * @since 1.0

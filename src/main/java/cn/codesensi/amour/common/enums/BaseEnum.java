@@ -8,6 +8,7 @@ import cn.hutool.core.util.ObjUtil;
  *
  * @param <T> code 的类型（如 {@link Integer}、{@link String}）
  *
+ * @author codesensi
  * @since 1.0
  */
 public interface BaseEnum<T> {

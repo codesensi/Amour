@@ -10,7 +10,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 修改字典条目请求参数
+ * 修改字典条目请求参数。
  * <p>
  * 字典编码、字典名称与内置标识均不可修改（字典名称即类型名，组内共享）；
  * 状态经启停接口（change-status）单独维护，均不在可提交字段之列。

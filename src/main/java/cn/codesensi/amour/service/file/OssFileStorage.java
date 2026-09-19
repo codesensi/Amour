@@ -9,12 +9,13 @@ import org.springframework.stereotype.Component;
 import java.io.InputStream;
 
 /**
- * 对象存储（OSS）实现
+ * 对象存储（OSS）实现。
  * <p>
  * 仅作为存储方式的扩展口子：系统配置 file.storage 切换为 oss 后，
  * 上传与读取会走到此处并给出明确的未接入提示；正式接入时补充
  * endpoint/bucket/ak/sk 配置与 SDK 调用，业务层与接口层零改动。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Component

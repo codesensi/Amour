@@ -11,7 +11,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 文件分页查询请求参数
+ * 文件分页查询请求参数。
  *
  * @author codesensi
  * @since 1.0

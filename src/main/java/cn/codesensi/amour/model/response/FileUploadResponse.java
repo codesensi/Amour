@@ -11,6 +11,7 @@ import java.io.Serializable;
 /**
  * 文件上传响应。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Data

@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
- * 修改足迹请求参数 DTO
+ * 修改足迹请求参数 DTO。
  *
  * @author codesensi
  * @since 1.0

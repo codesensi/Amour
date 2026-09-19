@@ -5,7 +5,7 @@ import cn.codesensi.amour.model.response.QqInfoResponse;
 import org.mapstruct.Mapper;
 
 /**
- * QQ 信息相关对象转换
+ * QQ 信息相关对象转换。
  *
  * @author codesensi
  * @since 1.0

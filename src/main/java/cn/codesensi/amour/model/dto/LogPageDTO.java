@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * 系统日志分页查询参数
+ * 系统日志分页查询参数。
  *
  * @author codesensi
  * @since 1.0

@@ -17,6 +17,7 @@ import java.io.Serializable;
  * 对应 {@code sys_file} 表，登记上传文件的存储路径、指纹与业务归属；
  * path 为相对存储 key（本地相对 base-path，OSS 为 object key），完整访问 URL 由运行期构造。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Data

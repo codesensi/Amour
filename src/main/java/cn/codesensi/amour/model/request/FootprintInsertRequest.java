@@ -14,7 +14,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
- * 新增足迹请求参数
+ * 新增足迹请求参数。
  *
  * @author codesensi
  * @since 1.0

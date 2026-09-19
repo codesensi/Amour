@@ -25,6 +25,7 @@ import java.util.function.Function;
  * 本类为纯静态工具类（不标 {@code @Component}），依赖 {@link AppEnvContext} 在应用启动阶段完成
  * 装配；请在 {@link AppEnvContext} 就绪后调用 {@link #withAppEnv(String)}。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Slf4j

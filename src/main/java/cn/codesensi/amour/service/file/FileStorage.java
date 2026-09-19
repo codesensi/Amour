@@ -12,6 +12,7 @@ import java.io.InputStream;
  * 实现类均注册为 Spring Bean，{@code FileService} 按存储类型路由；
  * 新增存储实现时实现本接口即可，业务层与接口层零改动。
  *
+ * @author codesensi
  * @since 1.0
  */
 public interface FileStorage {

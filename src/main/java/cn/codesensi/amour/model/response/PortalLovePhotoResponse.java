@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * 门户恋爱画册照片响应结果
+ * 门户恋爱画册照片响应结果。
  * <p>
  * 字段名对齐前端契约（img/text/date），由转换器从表字段语义重命名而来。
  *

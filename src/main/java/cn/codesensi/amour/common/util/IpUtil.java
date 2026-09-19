@@ -16,6 +16,7 @@ import java.net.UnknownHostException;
  * 解析时按优先级依次读取常见代理转发头（X-Forwarded-For 等），
  * 均未命中时回退到 {@code RemoteAddr}。
  *
+ * @author codesensi
  * @since 1.0
  */
 public class IpUtil {

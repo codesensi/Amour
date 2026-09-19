@@ -9,7 +9,7 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 /**
- * 通知相关对象转换
+ * 通知相关对象转换。
  *
  * @author codesensi
  * @since 1.0

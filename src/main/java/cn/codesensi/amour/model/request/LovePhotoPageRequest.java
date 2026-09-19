@@ -11,7 +11,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 恋爱相册照片分页查询请求参数（管理端）
+ * 恋爱相册照片分页查询请求参数（管理端）。
  *
  * @author codesensi
  * @since 1.0

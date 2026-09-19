@@ -36,6 +36,7 @@ import static cn.codesensi.amour.model.entity.table.SysUserTableDef.SYS_USER;
  * 校验账号封禁状态 → 执行登录并返回令牌信息。
  * 验证码开关实时读取 sys_config 的 {@code captcha.enabled} 配置，支持热更新。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Slf4j

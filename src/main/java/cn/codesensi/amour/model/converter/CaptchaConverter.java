@@ -5,7 +5,7 @@ import cn.codesensi.amour.model.response.CaptchaResponse;
 import org.mapstruct.Mapper;
 
 /**
- * 验证码相关对象转换
+ * 验证码相关对象转换。
  *
  * @author codesensi
  * @since 1.0

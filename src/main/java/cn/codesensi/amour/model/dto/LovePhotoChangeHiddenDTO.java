@@ -6,7 +6,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 修改照片显隐业务数据
+ * 修改照片显隐业务数据。
  *
  * @author codesensi
  * @since 1.0

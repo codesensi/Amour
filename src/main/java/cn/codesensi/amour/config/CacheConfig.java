@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
  * 达到 {@code app.cache.expire-jitter-min-seconds} 阈值的长 TTL 缓存参与），
  * 避免多个缓存（如同批预热的条目）在同一时点集中过期导致回源洪峰。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Configuration

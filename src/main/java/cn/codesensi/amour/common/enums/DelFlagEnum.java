@@ -5,10 +5,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 删除标识枚举
+ * 删除标识枚举。
+ *
  * 1-已删除
  * 0-未删除
  *
+ * @author codesensi
  * @since 1.0
  */
 @Getter

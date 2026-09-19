@@ -9,7 +9,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 个人中心-修改当前用户名请求参数
+ * 个人中心-修改当前用户名请求参数。
  *
  * @author codesensi
  * @since 1.0

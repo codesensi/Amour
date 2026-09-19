@@ -10,7 +10,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 新增角色请求参数
+ * 新增角色请求参数。
  *
  * @author codesensi
  * @since 1.0

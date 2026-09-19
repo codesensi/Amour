@@ -14,7 +14,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 修改用户请求参数
+ * 修改用户请求参数。
  * <p>
  * 用户名称、状态与密码不在可修改范围，分别由新增、状态管理与重置密码入口维护。
  *

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 门户主角相关接口 前端控制器
+ * 门户主角相关接口 前端控制器。
  * <p>
  * 面向门户免登录场景，提供首屏男女主展示信息。
  *

@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 恋爱相册照片分页查询行数据响应结果（管理端，完整字段）
+ * 恋爱相册照片分页查询行数据响应结果（管理端，完整字段）。
  *
  * @author codesensi
  * @since 1.0

@@ -11,7 +11,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 足迹地图分页查询请求参数（管理端）
+ * 足迹地图分页查询请求参数（管理端）。
  *
  * @author codesensi
  * @since 1.0

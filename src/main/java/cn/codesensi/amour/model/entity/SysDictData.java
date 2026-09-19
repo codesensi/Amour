@@ -19,6 +19,7 @@ import java.io.Serializable;
  * {@code dict_value}/{@code dict_label} 为字典项的值与展示标签。内置条目（builtin=1）
  * 仅承载展示层（标签、排序、启停），对应编码的业务校验仍由枚举类负责。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Data

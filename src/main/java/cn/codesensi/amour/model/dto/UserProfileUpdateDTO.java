@@ -6,7 +6,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 个人中心-更新当前用户资料参数
+ * 个人中心-更新当前用户资料参数。
  *
  * @author codesensi
  * @since 1.0

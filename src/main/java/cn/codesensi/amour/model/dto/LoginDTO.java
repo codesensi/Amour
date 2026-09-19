@@ -6,7 +6,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 登录请求参数
+ * 登录请求参数。
  *
  * @author codesensi
  * @since 1.0

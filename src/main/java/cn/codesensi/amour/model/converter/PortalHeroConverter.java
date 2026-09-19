@@ -8,7 +8,7 @@ import cn.codesensi.amour.model.response.PortalHeroUserResponse;
 import org.mapstruct.Mapper;
 
 /**
- * 门户主角相关对象转换
+ * 门户主角相关对象转换。
  *
  * @author codesensi
  * @since 1.0

@@ -4,11 +4,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 性别枚举
+ * 性别枚举。
+ *
  * U-未知
  * M-男
  * F-女
  *
+ * @author codesensi
  * @since 1.0
  */
 @Getter

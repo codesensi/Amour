@@ -14,6 +14,7 @@ import java.io.Serializable;
  * 本类的 storage 仅作为配置缺失时的兜底默认值；OSS 相关参数为对象存储接入时启用，
  * 接入前仅作预留。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Data

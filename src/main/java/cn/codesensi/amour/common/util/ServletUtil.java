@@ -12,6 +12,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  * 注意：仅在 Web 请求线程内调用；非 Web 线程（如异步任务）中无绑定的请求上下文，
  * {@link #getRequest()} 返回 {@code null}，调用方需自行判空。
  *
+ * @author codesensi
  * @since 1.0
  */
 public class ServletUtil {

@@ -27,7 +27,7 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
- * 全局异常处理器
+ * 全局异常处理器。
  * <p>
  * 将各类异常统一转换为 {@link Result} 响应，避免异常堆栈直接暴露给前端；
  * 处理顺序为「具体异常优先，兜底 Exception 收尾」。

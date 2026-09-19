@@ -8,7 +8,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 角色全量列表行数据响应结果
+ * 角色全量列表行数据响应结果。
  * <p>
  * 用作分配角色等场景的选项数据源，仅保留选项所需字段。
  *

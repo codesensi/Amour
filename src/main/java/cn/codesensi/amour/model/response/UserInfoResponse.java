@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * 获取当前用户信息响应结果
+ * 获取当前用户信息响应结果。
  *
  * @author codesensi
  * @since 1.0

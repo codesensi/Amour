@@ -4,13 +4,15 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 图形验证码类型枚举
+ * 图形验证码类型枚举。
+ *
  * spec-PNG字符验证码
  * gif-GIF字符验证码
  * chinese-中文字符验证码
  * chinese-gif-中文GIF字符验证码
  * arithmetic-算术验证码
  *
+ * @author codesensi
  * @since 1.0
  */
 @Getter

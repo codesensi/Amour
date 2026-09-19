@@ -56,6 +56,7 @@ import static cn.codesensi.amour.model.entity.table.SysConfigTableDef.SYS_CONFIG
  * 同时承载管理端能力：分页查询（直查库）与修改配置
  * （仅配置值，修改后失效对应配置键的缓存，实现热更新）。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Slf4j

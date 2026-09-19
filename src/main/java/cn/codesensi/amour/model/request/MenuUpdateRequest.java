@@ -10,7 +10,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 修改菜单请求参数
+ * 修改菜单请求参数。
  * <p>
  * 不接收 builtin/type 字段:二者均为结构性标识，创建后不允许通过修改接口变更。
  *

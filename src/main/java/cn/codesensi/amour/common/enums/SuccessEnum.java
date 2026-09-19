@@ -5,10 +5,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 成功/失败状态枚举
+ * 成功/失败状态枚举。
+ *
  * 1-成功
  * 0-失败
  *
+ * @author codesensi
  * @since 1.0
  */
 @Getter

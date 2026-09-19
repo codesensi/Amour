@@ -17,6 +17,7 @@ import java.io.Serializable;
  * 对应 {@code sys_menu} 表，存储后台导航菜单、路由信息与按钮权限点，
  * 通过 {@code pid} 构建树形结构。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Data

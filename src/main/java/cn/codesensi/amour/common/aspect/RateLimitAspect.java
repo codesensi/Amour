@@ -36,6 +36,7 @@ import java.util.Map;
  * 阈值解析顺序：sys_config（rate-limit.{key}.{limit|window}，INTEGER）优先，
  * 未配置、已停用或值非法时回退注解兜底值；超限抛出业务异常（HTTP 429）。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Slf4j

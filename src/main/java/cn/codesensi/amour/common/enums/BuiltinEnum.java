@@ -5,10 +5,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 是否内置枚举
+ * 是否内置枚举。
+ *
  * 1-是
  * 0-否
  *
+ * @author codesensi
  * @since 1.0
  */
 @Getter

@@ -9,6 +9,7 @@ import java.io.Serializable;
 /**
  * 文件上传结果 DTO（服务层承载，控制层经转换器映射为 FileUploadResponse）。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Data

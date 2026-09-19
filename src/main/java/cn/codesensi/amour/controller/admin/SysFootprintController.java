@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 足迹地图管理相关接口 前端控制器
+ * 足迹地图管理相关接口 前端控制器。
  *
  * @author codesensi
  * @since 1.0

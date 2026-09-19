@@ -16,6 +16,7 @@ import java.io.Serializable;
  * <p>
  * 对应 {@code sys_user} 表，存储系统用户的账号凭据与基本资料。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Data

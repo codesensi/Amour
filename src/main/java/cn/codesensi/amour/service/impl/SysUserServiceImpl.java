@@ -49,6 +49,7 @@ import static cn.codesensi.amour.model.entity.table.SysUserTableDef.SYS_USER;
  * <p>
  * CRUD 能力由 MyBatis-Flex 的 {@link ServiceImpl} 统一提供。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Slf4j

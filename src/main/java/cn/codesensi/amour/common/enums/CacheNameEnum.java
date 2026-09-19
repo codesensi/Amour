@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
  * 新增缓存时仅需在本枚举追加常量并同步补充 yml（{@code app.cache.caches}），
  * 漏配将由 CacheConfig 启动期校验拦截，避免配置错误在运行期静默失效。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Getter

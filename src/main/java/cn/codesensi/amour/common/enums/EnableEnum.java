@@ -5,10 +5,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 启用/禁用状态枚举
+ * 启用/禁用状态枚举。
+ *
  * 0-启用
  * 1-禁用
  *
+ * @author codesensi
  * @since 1.0
  */
 @Getter

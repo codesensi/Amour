@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * QQ 信息查询相关接口 前端控制器
+ * QQ 信息查询相关接口 前端控制器。
  * <p>
  * 面向全站免登录场景（门户留言、资料展示等），供各端按 QQ 号查询头像与昵称。
  *

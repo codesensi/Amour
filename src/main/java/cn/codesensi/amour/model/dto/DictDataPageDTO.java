@@ -9,7 +9,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 字典分页查询参数
+ * 字典分页查询参数。
  *
  * @author codesensi
  * @since 1.0

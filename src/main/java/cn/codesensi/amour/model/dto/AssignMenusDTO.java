@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * 角色分配菜单请求参数
+ * 角色分配菜单请求参数。
  *
  * @author codesensi
  * @since 1.0

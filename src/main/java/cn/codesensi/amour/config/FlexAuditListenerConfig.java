@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
  * 注册键与实体类满足 {@code isAssignableFrom} 即命中，覆盖所有继承 BaseEntity 的业务实体，
  * 插入/更新时自动填充 {@code creator}/{@code updater} 审计字段。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Configuration

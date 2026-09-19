@@ -5,10 +5,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 照片显隐枚举
+ * 照片显隐枚举。
+ *
  * 0-显示
  * 1-隐藏
  *
+ * @author codesensi
  * @since 1.0
  */
 @Getter

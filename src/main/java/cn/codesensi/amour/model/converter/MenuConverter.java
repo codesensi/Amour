@@ -15,7 +15,7 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 /**
- * 菜单相关对象转换
+ * 菜单相关对象转换。
  *
  * @author codesensi
  * @since 1.0

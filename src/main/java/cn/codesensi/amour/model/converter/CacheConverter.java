@@ -17,6 +17,7 @@ import java.util.List;
  * 以 Spring Bean 方式注入使用（生成的 {@code CacheConverterImpl} 为 Spring 组件）；
  * 同名字段由 MapStruct 自动映射。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)

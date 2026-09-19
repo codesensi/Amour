@@ -16,6 +16,7 @@ import java.util.Collection;
  * 存储实现按 sys_config 的 {@code file.storage} 运行时路由（本地/对象存储），
  * 文件记录统一落 {@code sys_file} 表管理。
  *
+ * @author codesensi
  * @since 1.0
  */
 public interface FileService {

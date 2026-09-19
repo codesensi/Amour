@@ -13,6 +13,7 @@ import java.util.List;
  * 继承 MyBatis-Flex 的 {@link IService}，开箱即得 {@code sys_user} 表的增删改查能力；
  * 业务方法覆盖分页查询、资料维护、状态与角色管理及密码重置。
  *
+ * @author codesensi
  * @since 1.0
  */
 public interface SysUserService extends IService<SysUser> {

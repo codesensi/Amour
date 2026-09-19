@@ -6,6 +6,7 @@ import com.mybatisflex.core.BaseMapper;
 /**
  * 用户角色关联 Mapper。
  *
+ * @author codesensi
  * @since 1.0
  */
 public interface SysUserRoleMapper extends BaseMapper<SysUserRole> {

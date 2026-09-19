@@ -5,6 +5,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * 线程池配置：通用池与日志池共用同一套规格结构，两池均在代码内带缺省值，yml 可覆盖。
+ *
+ * @author codesensi
+ * @since 1.0
  */
 @Data
 @ConfigurationProperties(prefix = "thread.pool")

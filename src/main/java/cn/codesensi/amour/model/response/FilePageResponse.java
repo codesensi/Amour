@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 文件分页查询行数据响应结果
+ * 文件分页查询行数据响应结果。
  *
  * @author codesensi
  * @since 1.0

@@ -16,6 +16,7 @@ import java.io.Serializable;
  * <p>
  * 存储 {@code app.*} 业务可调配置，运行期由 {@code SysConfigService} 实时查库读取（热更新）。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Data

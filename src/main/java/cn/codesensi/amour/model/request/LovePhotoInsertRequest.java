@@ -13,7 +13,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * 新增恋爱相册照片请求参数
+ * 新增恋爱相册照片请求参数。
  *
  * @author codesensi
  * @since 1.0

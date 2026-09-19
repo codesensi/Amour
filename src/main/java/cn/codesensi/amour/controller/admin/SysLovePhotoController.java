@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 恋爱画册管理相关接口 前端控制器
+ * 恋爱画册管理相关接口 前端控制器。
  *
  * @author codesensi
  * @since 1.0

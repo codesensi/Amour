@@ -7,7 +7,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 生成验证码响应结果
+ * 生成验证码响应结果。
  *
  * @author codesensi
  * @since 1.0

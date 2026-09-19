@@ -16,6 +16,7 @@ import org.mapstruct.MappingConstants;
  * 两侧字段同名，由 MapStruct 自动映射，无需显式 {@code @Mapping}；
  * 请求参数（param）与响应结果（result）为脱敏截断后的大体量文本，随行下发供列表截断展示与详情查看。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)

@@ -16,6 +16,7 @@ import java.io.Serializable;
  * <p>
  * 对应 {@code sys_role} 表，存储后台角色定义及其启停状态。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Data

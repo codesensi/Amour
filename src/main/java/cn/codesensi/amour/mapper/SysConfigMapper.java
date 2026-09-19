@@ -6,6 +6,7 @@ import com.mybatisflex.core.BaseMapper;
 /**
  * 系统配置 Mapper。
  *
+ * @author codesensi
  * @since 1.0
  */
 public interface SysConfigMapper extends BaseMapper<SysConfig> {

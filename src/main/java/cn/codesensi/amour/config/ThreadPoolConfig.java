@@ -32,6 +32,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  * </ul>
  * 两池均通过 {@link ContextTaskDecorator} 沿用提交线程的 MDC 上下文（链路追踪 ID）与登录用户ID。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Slf4j

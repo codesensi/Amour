@@ -7,7 +7,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 登录响应结果
+ * 登录响应结果。
  *
  * @author codesensi
  * @since 1.0

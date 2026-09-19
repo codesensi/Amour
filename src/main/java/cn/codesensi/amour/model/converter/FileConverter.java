@@ -18,6 +18,7 @@ import org.mapstruct.MappingConstants;
  * 以 Spring Bean 方式注入使用（生成的 {@code FileConverterImpl} 为 Spring 组件）；
  * 同名字段（id/size/bizType 等）由 MapStruct 自动映射，上传人用户名由服务层批量回填。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)

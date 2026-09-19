@@ -9,7 +9,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 修改系统配置请求参数
+ * 修改系统配置请求参数。
  * <p>
  * 仅允许修改配置值；配置键、值类型、分组与状态由代码侧（{@code ConfigKeyEnum}）
  * 与初始化脚本约定，不接受修改。

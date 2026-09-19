@@ -9,7 +9,7 @@ import java.io.Serial;
 import java.time.LocalDate;
 
 /**
- * 足迹地图分页查询参数 DTO（管理端）
+ * 足迹地图分页查询参数 DTO（管理端）。
  *
  * @author codesensi
  * @since 1.0

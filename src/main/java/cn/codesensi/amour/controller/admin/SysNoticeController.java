@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 通知中心相关接口 前端控制器（登录态;通知由业务事件触发写入,不提供人工发布入口）
+ * 通知中心相关接口 前端控制器（登录态;通知由业务事件触发写入,不提供人工发布入口）。
  *
  * @author codesensi
  * @since 1.0

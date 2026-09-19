@@ -9,7 +9,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 恋爱相册照片分页查询参数 DTO（管理端）
+ * 恋爱相册照片分页查询参数 DTO（管理端）。
  *
  * @author codesensi
  * @since 1.0

@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 通知条目响应结果（当前用户视角）
+ * 通知条目响应结果（当前用户视角）。
  *
  * @author codesensi
  * @since 1.0

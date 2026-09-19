@@ -12,6 +12,7 @@ import java.util.List;
  * 说明：biz_type 是代码级路由与校验键，校验规则承载于本枚举，
  * 暂不维护进 sys_dict（待文件管理页需要标签展示时再补 file-biz-type 字典）。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Getter

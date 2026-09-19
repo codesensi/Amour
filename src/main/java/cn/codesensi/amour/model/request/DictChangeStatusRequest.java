@@ -7,7 +7,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 修改字典状态请求参数
+ * 修改字典状态请求参数。
  *
  * @author codesensi
  * @since 1.0

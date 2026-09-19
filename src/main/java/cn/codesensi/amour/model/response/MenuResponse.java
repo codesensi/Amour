@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 菜单响应结果
+ * 菜单响应结果。
  *
  * @author codesensi
  * @since 1.0

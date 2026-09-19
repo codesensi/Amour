@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 门户足迹地图相关接口 前端控制器
+ * 门户足迹地图相关接口 前端控制器。
  * <p>
  * 面向门户免登录场景，提供「足迹地图」到访记录的分页下发
  * （/portal/** 已在 RbacConst 公开清单整体放行）。

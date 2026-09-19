@@ -12,7 +12,7 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 /**
- * 角色相关对象转换
+ * 角色相关对象转换。
  *
  * @author codesensi
  * @since 1.0

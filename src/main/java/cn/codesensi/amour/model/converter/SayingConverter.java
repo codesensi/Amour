@@ -5,7 +5,7 @@ import cn.codesensi.amour.model.response.SayingResponse;
 import org.mapstruct.Mapper;
 
 /**
- * 一言相关对象转换
+ * 一言相关对象转换。
  *
  * @author codesensi
  * @since 1.0

@@ -3,12 +3,13 @@ package cn.codesensi.amour.common.core;
 import lombok.Getter;
 
 /**
- * 统一响应状态码（码值借用 HTTP 语义）
+ * 统一响应状态码（码值借用 HTTP 语义）。
  * <p>
  * 错误语义由本枚举的 code 在响应体内表达；HTTP 传输层状态码由全局异常处理器按异常类别
  * 映射真实语义（4xx/5xx，见 {@code GlobalExceptionHandler#toHttpStatus}），
  * 响应体结构与既有契约保持一致，前端统一按 success/code 判定业务结果。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Getter

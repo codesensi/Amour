@@ -6,7 +6,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 修改角色状态业务数据
+ * 修改角色状态业务数据。
  *
  * @author codesensi
  * @since 1.0

@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 系统配置管理相关接口 前端控制器
+ * 系统配置管理相关接口 前端控制器。
  *
  * @author codesensi
  * @since 1.0

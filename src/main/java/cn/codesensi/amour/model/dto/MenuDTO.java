@@ -6,8 +6,9 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 路由菜单
+ * 路由菜单。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Data

@@ -4,10 +4,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 文件存储类型枚举
+ * 文件存储类型枚举。
+ *
  * local-本地磁盘
  * oss-对象存储
  *
+ * @author codesensi
  * @since 1.0
  */
 @Getter

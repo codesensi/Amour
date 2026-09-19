@@ -23,6 +23,7 @@ import java.util.List;
  * 过期时间作为基准值，实际生效时按 {@code expireJitterPercent} 幅度随机抖动，
  * 避免多个缓存（如同批预热的条目）在同一时点集中过期导致回源洪峰。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Data

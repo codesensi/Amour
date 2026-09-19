@@ -13,6 +13,9 @@ import java.util.Map;
  * 执行时恢复到任务线程，结束后还原线程既有状态：既保证异步日志沿用主线程的
  * 链路追踪 ID，也使审计字段填充在异步线程中仍能取到提交者身份（见 {@link LoginUserUtil}），
  * 并防止线程池复用导致上下文串扰。
+ *
+ * @author codesensi
+ * @since 1.0
  */
 public class ContextTaskDecorator implements TaskDecorator {
 

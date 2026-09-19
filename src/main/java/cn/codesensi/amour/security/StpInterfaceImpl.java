@@ -10,8 +10,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * 自定义权限验证接口扩展
+ * 自定义权限验证接口扩展。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Slf4j

@@ -10,10 +10,11 @@ import java.io.Serializable;
 import java.time.Instant;
 
 /**
- * 统一接口响应对象
+ * 统一接口响应对象。
  *
  * @param <T> 响应数据的类型
  *
+ * @author codesensi
  * @since 1.0
  */
 @Data

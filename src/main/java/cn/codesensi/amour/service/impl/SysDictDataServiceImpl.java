@@ -49,6 +49,7 @@ import static cn.codesensi.amour.model.entity.table.SysDictTypeTableDef.SYS_DICT
  * <p>
  * 查询结果仅含启用（status=启用）条目并按 {@code sort} 升序排列，以 {@link DictDTO} 返回。
  *
+ * @author codesensi
  * @since 1.0
  */
 @Slf4j

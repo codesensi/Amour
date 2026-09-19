@@ -4,11 +4,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 菜单类型枚举
+ * 菜单类型枚举。
+ *
  * D-目录
  * M-菜单
  * B-按钮
  *
+ * @author codesensi
  * @since 1.0
  */
 @Getter

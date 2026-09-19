@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
- * 足迹地图行响应结果（管理端分页）
+ * 足迹地图行响应结果（管理端分页）。
  *
  * @author codesensi
  * @since 1.0

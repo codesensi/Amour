@@ -9,6 +9,7 @@ import java.util.List;
 /**
  * 系统日志服务。
  *
+ * @author codesensi
  * @since 1.0
  */
 public interface SysLogService {

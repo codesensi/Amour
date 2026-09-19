@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 验证码相关接口 前端控制器
+ * 验证码相关接口 前端控制器。
  *
  * @author codesensi
  * @since 1.0

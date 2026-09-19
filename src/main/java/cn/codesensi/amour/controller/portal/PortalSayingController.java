@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 门户一言相关接口 前端控制器
+ * 门户一言相关接口 前端控制器。
  * <p>
  * 面向门户免登录场景，提供顶栏一言文案（随机优先，失败降级）。
  *

@@ -6,7 +6,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 新增菜单请求参数
+ * 新增菜单请求参数。
  *
  * @author codesensi
  * @since 1.0

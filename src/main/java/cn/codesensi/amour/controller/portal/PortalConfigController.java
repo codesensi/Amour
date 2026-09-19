@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * 门户站点公共配置相关接口 前端控制器
+ * 门户站点公共配置相关接口 前端控制器。
  * <p>
  * 面向门户免登录场景，按需下发站点展示类配置（站点名称、备案文案、验证码开关等）；
  * 敏感配置（{@code sensitive=1}，如 security.uapi-key）在服务层被剔除，不经过该接口。
