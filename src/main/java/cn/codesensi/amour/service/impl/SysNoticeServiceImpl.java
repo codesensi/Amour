@@ -4,11 +4,13 @@ import cn.codesensi.amour.mapper.SysNoticeMapper;
 import cn.codesensi.amour.mapper.SysNoticeReadMapper;
 import cn.codesensi.amour.model.converter.NoticeConverter;
 import cn.codesensi.amour.model.dto.NoticeDTO;
+import cn.codesensi.amour.model.dto.NoticeReadDTO;
 import cn.codesensi.amour.model.entity.SysNotice;
 import cn.codesensi.amour.model.entity.SysNoticeRead;
 import cn.codesensi.amour.service.SysNoticeService;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
 import com.mybatisflex.core.query.QueryChain;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -77,11 +79,13 @@ public class SysNoticeServiceImpl implements SysNoticeService {
      * 仅写入当前用户尚无已读记录的通知：先查已存在的记录，再批量插入缺失部分，
      * 唯一键 (user_id, notice_id) 兜底保证并发下不产生重复行。
      *
-     * @param noticeIds 通知ID集合（可空，空=全部未读）
+     * @param noticeReadDTO 标记已读业务数据（请求体缺省时为 null，空=全部未读）
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void read(List<Long> noticeIds) {
+    public void read(NoticeReadDTO noticeReadDTO) {
+        // 请求体缺省时 DTO 为 null，视为标记全部未读
+        List<Long> noticeIds = ObjUtil.isNull(noticeReadDTO) ? null : noticeReadDTO.getNoticeIds();
         // 解析待标记的通知ID：仅接受真实存在的通知，防御伪造ID
         List<Long> targetIds = QueryChain.of(sysNoticeMapper)
                 .select(SYS_NOTICE.ID)

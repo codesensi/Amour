@@ -1,6 +1,7 @@
 package cn.codesensi.amour.service;
 
 import cn.codesensi.amour.model.dto.NoticeDTO;
+import cn.codesensi.amour.model.dto.NoticeReadDTO;
 
 import java.util.List;
 
@@ -26,11 +27,11 @@ public interface SysNoticeService {
     /**
      * 标记通知已读（按唯一键幂等写入，重复标记不报错）。
      * <p>
-     * {@code noticeIds} 为空或缺失时标记当前用户的全部未读通知；
+     * {@code noticeReadDTO} 缺失或其 {@code noticeIds} 为空时标记当前用户的全部未读通知；
      * 传入的ID仅在通知存在且未读时生效，已读与不存在的ID自动忽略。
      *
-     * @param noticeIds 通知ID集合（可空，空=全部未读）
+     * @param noticeReadDTO 标记已读业务数据（可空，空=全部未读）
      */
-    void read(List<Long> noticeIds);
+    void read(NoticeReadDTO noticeReadDTO);
 
 }

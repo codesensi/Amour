@@ -5,6 +5,8 @@ import cn.codesensi.amour.common.annotation.Log;
 import cn.codesensi.amour.common.enums.LogTypeEnum;
 import cn.codesensi.amour.model.converter.NoticeConverter;
 import cn.codesensi.amour.model.dto.NoticeDTO;
+import cn.codesensi.amour.model.dto.NoticeReadDTO;
+import cn.codesensi.amour.model.request.NoticeReadRequest;
 import cn.codesensi.amour.model.response.NoticeResponse;
 import cn.codesensi.amour.service.SysNoticeService;
 import lombok.RequiredArgsConstructor;
@@ -43,12 +45,13 @@ public class SysNoticeController {
     /**
      * 标记通知已读（noticeIds 为空或缺失时标记全部未读；按唯一键幂等，重复提交不报错）。
      *
-     * @param noticeIds 通知ID集合（雪花ID字符串化传输；可空）
+     * @param request 标记已读请求参数（noticeIds 雪花ID字符串化传输；请求体可缺省）
      */
     @Log(module = "通知中心", operation = "标记通知已读", type = LogTypeEnum.UPDATE)
     @PostMapping("/read")
-    public void read(@RequestBody(required = false) List<Long> noticeIds) {
-        sysNoticeService.read(noticeIds);
+    public void read(@RequestBody(required = false) NoticeReadRequest request) {
+        NoticeReadDTO noticeReadDTO = noticeConverter.toReadDTO(request);
+        sysNoticeService.read(noticeReadDTO);
     }
 
 }
