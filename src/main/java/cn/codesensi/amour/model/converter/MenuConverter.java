@@ -11,6 +11,7 @@ import cn.codesensi.amour.model.request.MenuUpdateRequest;
 import cn.codesensi.amour.model.response.MenuResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ import java.util.List;
  * @author codesensi
  * @since 1.0
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface MenuConverter {
 
     /**

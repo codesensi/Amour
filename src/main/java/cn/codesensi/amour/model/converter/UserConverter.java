@@ -8,6 +8,7 @@ import cn.codesensi.amour.model.response.UserPageResponse;
 import com.mybatisflex.core.paginate.Page;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants;
 
 /**
  * 用户相关对象转换。
@@ -15,7 +16,7 @@ import org.mapstruct.Mapping;
  * @author codesensi
  * @since 1.0
  */
-@Mapper(componentModel = "spring", uses = MenuConverter.class)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = MenuConverter.class)
 public interface UserConverter {
 
     /**

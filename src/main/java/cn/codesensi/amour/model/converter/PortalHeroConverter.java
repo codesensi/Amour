@@ -6,6 +6,7 @@ import cn.codesensi.amour.model.entity.SysUser;
 import cn.codesensi.amour.model.response.PortalHeroResponse;
 import cn.codesensi.amour.model.response.PortalHeroUserResponse;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingConstants;
 
 /**
  * 门户主角相关对象转换。
@@ -13,7 +14,7 @@ import org.mapstruct.Mapper;
  * @author codesensi
  * @since 1.0
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface PortalHeroConverter {
 
     /**

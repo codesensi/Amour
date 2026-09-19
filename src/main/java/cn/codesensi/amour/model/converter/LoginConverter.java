@@ -5,6 +5,7 @@ import cn.codesensi.amour.model.dto.LoginResultDTO;
 import cn.codesensi.amour.model.request.LoginRequest;
 import cn.codesensi.amour.model.response.LoginResponse;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingConstants;
 
 /**
  * 登录相关对象转换。
@@ -12,7 +13,7 @@ import org.mapstruct.Mapper;
  * @author codesensi
  * @since 1.0
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface LoginConverter {
 
     /**
