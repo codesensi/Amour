@@ -2,7 +2,7 @@ package cn.codesensi.amour.service;
 
 import cn.codesensi.amour.common.core.BasePage;
 import cn.codesensi.amour.model.dto.FootprintInsertDTO;
-import cn.codesensi.amour.model.dto.FootprintItemDTO;
+import cn.codesensi.amour.model.dto.FootprintDTO;
 import cn.codesensi.amour.model.dto.FootprintPageDTO;
 import cn.codesensi.amour.model.dto.FootprintUpdateDTO;
 import com.mybatisflex.core.paginate.Page;
@@ -29,7 +29,7 @@ public interface FootprintService {
      * @param page 分页参数（pageNumber/pageSize）
      * @return 足迹条目 DTO 分页
      */
-    Page<FootprintItemDTO> pagePortal(BasePage page);
+    Page<FootprintDTO> pagePortal(BasePage page);
 
     /**
      * 管理端足迹分页（全量）。
@@ -40,7 +40,7 @@ public interface FootprintService {
      * @param pageDTO 分页查询参数 DTO
      * @return 足迹条目 DTO 分页
      */
-    Page<FootprintItemDTO> pageAdmin(FootprintPageDTO pageDTO);
+    Page<FootprintDTO> pageAdmin(FootprintPageDTO pageDTO);
 
     /**
      * 新增足迹（主键由全局雪花配置生成）。

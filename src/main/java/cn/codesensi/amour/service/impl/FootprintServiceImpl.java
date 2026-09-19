@@ -5,7 +5,7 @@ import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.mapper.PortalFootprintMapper;
 import cn.codesensi.amour.model.converter.FootprintConverter;
 import cn.codesensi.amour.model.dto.FootprintInsertDTO;
-import cn.codesensi.amour.model.dto.FootprintItemDTO;
+import cn.codesensi.amour.model.dto.FootprintDTO;
 import cn.codesensi.amour.model.dto.FootprintPageDTO;
 import cn.codesensi.amour.model.dto.FootprintUpdateDTO;
 import cn.codesensi.amour.model.entity.PortalFootprint;
@@ -49,7 +49,7 @@ public class FootprintServiceImpl implements FootprintService {
      * @return 足迹条目 DTO 分页结果
      */
     @Override
-    public Page<FootprintItemDTO> pagePortal(BasePage page) {
+    public Page<FootprintDTO> pagePortal(BasePage page) {
         return doPage(page, null, null, null);
     }
 
@@ -62,7 +62,7 @@ public class FootprintServiceImpl implements FootprintService {
      * @return 足迹条目 DTO 分页结果
      */
     @Override
-    public Page<FootprintItemDTO> pageAdmin(FootprintPageDTO pageDTO) {
+    public Page<FootprintDTO> pageAdmin(FootprintPageDTO pageDTO) {
         return doPage(pageDTO, pageDTO.getCity(), pageDTO.getArrivalDateBegin(), pageDTO.getArrivalDateEnd());
     }
 
@@ -79,7 +79,7 @@ public class FootprintServiceImpl implements FootprintService {
      * @param arrivalDateEnd   到访日期终点(含,可空)
      * @return 足迹条目 DTO 分页结果
      */
-    private Page<FootprintItemDTO> doPage(BasePage page, String city, LocalDate arrivalDateBegin, LocalDate arrivalDateEnd) {
+    private Page<FootprintDTO> doPage(BasePage page, String city, LocalDate arrivalDateBegin, LocalDate arrivalDateEnd) {
         QueryChain<PortalFootprint> chain = QueryChain.of(portalFootprintMapper)
                 .where(PORTAL_FOOTPRINT.CITY.like(city, StrUtil::isNotBlank))
                 .and(PORTAL_FOOTPRINT.ARRIVAL_DATE.ge(arrivalDateBegin, ObjUtil::isNotNull))
@@ -121,6 +121,7 @@ public class FootprintServiceImpl implements FootprintService {
         }
         UpdateChain.of(PortalFootprint.class)
                 .set(PORTAL_FOOTPRINT.CITY, updateDTO.getCity())
+                .set(PORTAL_FOOTPRINT.PLACE_NAME, updateDTO.getPlaceName())
                 .set(PORTAL_FOOTPRINT.LONGITUDE, updateDTO.getLongitude())
                 .set(PORTAL_FOOTPRINT.LATITUDE, updateDTO.getLatitude())
                 .set(PORTAL_FOOTPRINT.ARRIVAL_DATE, updateDTO.getArrivalDate())

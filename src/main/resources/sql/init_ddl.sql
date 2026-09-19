@@ -502,6 +502,7 @@ CREATE TABLE IF NOT EXISTS `portal_diary` (
 CREATE TABLE IF NOT EXISTS `portal_footprint` (
     `id`           BIGINT         NOT NULL                COMMENT '主键ID',
     `city`         VARCHAR(128)   NOT NULL                COMMENT '城市/地点名称',
+    `place_name`   VARCHAR(128)   NULL DEFAULT NULL       COMMENT '精确地点名称（地图选点搜索选中的地点，或手动录入）',
     `longitude`    DECIMAL(10,6)  NULL DEFAULT NULL       COMMENT '经度',
     `latitude`     DECIMAL(10,6)  NULL DEFAULT NULL       COMMENT '纬度',
     `arrival_date` DATE           NOT NULL                COMMENT '到访日期',

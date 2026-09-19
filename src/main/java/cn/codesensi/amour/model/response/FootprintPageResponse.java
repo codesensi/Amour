@@ -32,6 +32,11 @@ public class FootprintPageResponse implements Serializable {
     private String city;
 
     /**
+     * 精确地点名称(可空)
+     */
+    private String placeName;
+
+    /**
      * 经度(可空)
      */
     private BigDecimal longitude;

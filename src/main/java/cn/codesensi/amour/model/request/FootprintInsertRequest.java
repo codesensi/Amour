@@ -33,6 +33,12 @@ public class FootprintInsertRequest implements Serializable {
     private String city;
 
     /**
+     * 精确地点名称(地图选点搜索选中的地点,或手动录入;可空)
+     */
+    @Size(max = AppConst.MAX_LENGTH_128, message = "精确地点长度不能超过" + AppConst.MAX_LENGTH_128)
+    private String placeName;
+
+    /**
      * 经度(GCJ-02 坐标系,由地图选点或手动录入;-180~180)
      */
     @DecimalMin(value = "-180", message = "经度范围为-180~180")

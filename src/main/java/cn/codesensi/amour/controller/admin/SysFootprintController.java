@@ -4,7 +4,7 @@ import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.common.annotation.Log;
 import cn.codesensi.amour.common.enums.LogTypeEnum;
 import cn.codesensi.amour.model.converter.FootprintConverter;
-import cn.codesensi.amour.model.dto.FootprintItemDTO;
+import cn.codesensi.amour.model.dto.FootprintDTO;
 import cn.codesensi.amour.model.request.FootprintInsertRequest;
 import cn.codesensi.amour.model.request.FootprintPageRequest;
 import cn.codesensi.amour.model.request.FootprintUpdateRequest;
@@ -45,7 +45,7 @@ public class SysFootprintController {
     @SaCheckPermission("system:footprint:page")
     @GetMapping("/page")
     public Page<FootprintPageResponse> page(@Valid FootprintPageRequest pageRequest) {
-        Page<FootprintItemDTO> itemPage = footprintService.pageAdmin(footprintConverter.toPageDTO(pageRequest));
+        Page<FootprintDTO> itemPage = footprintService.pageAdmin(footprintConverter.toPageDTO(pageRequest));
         return footprintConverter.toPageResponse(itemPage);
     }
 

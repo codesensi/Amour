@@ -3,7 +3,7 @@ package cn.codesensi.amour.controller.portal;
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.common.core.BasePage;
 import cn.codesensi.amour.model.converter.FootprintConverter;
-import cn.codesensi.amour.model.dto.FootprintItemDTO;
+import cn.codesensi.amour.model.dto.FootprintDTO;
 import cn.codesensi.amour.model.response.PortalFootprintResponse;
 import cn.codesensi.amour.service.FootprintService;
 import com.mybatisflex.core.paginate.Page;
@@ -38,7 +38,7 @@ public class PortalFootprintController {
      */
     @GetMapping
     public Page<PortalFootprintResponse> page(BasePage page) {
-        Page<FootprintItemDTO> itemPage = footprintService.pagePortal(page);
+        Page<FootprintDTO> itemPage = footprintService.pagePortal(page);
         return footprintConverter.toPortalPage(itemPage);
     }
 }

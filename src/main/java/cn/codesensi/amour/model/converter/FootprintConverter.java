@@ -1,9 +1,6 @@
 package cn.codesensi.amour.model.converter;
 
-import cn.codesensi.amour.model.dto.FootprintInsertDTO;
-import cn.codesensi.amour.model.dto.FootprintItemDTO;
-import cn.codesensi.amour.model.dto.FootprintPageDTO;
-import cn.codesensi.amour.model.dto.FootprintUpdateDTO;
+import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.PortalFootprint;
 import cn.codesensi.amour.model.request.FootprintInsertRequest;
 import cn.codesensi.amour.model.request.FootprintPageRequest;
@@ -84,7 +81,7 @@ public interface FootprintConverter {
      * @return 足迹条目 DTO
      */
     @Mapping(target = "arrivalDate", dateFormat = "yyyy-MM-dd")
-    FootprintItemDTO toDTO(PortalFootprint entity);
+    FootprintDTO toDTO(PortalFootprint entity);
 
     /**
      * Page&lt;PortalFootprint&gt; → Page&lt;FootprintItemDTO&gt;
@@ -94,7 +91,7 @@ public interface FootprintConverter {
      * @return 足迹条目 DTO 分页
      */
     @Mapping(target = "optimizeCountQuery", ignore = true)
-    Page<FootprintItemDTO> toPageDTO(Page<PortalFootprint> page);
+    Page<FootprintDTO> toPageDTO(Page<PortalFootprint> page);
 
     /**
      * 条目 DTO → 管理端分页行响应。
@@ -102,7 +99,7 @@ public interface FootprintConverter {
      * @param itemDTO 足迹条目 DTO
      * @return 管理端行响应对象
      */
-    FootprintPageResponse toResponse(FootprintItemDTO itemDTO);
+    FootprintPageResponse toResponse(FootprintDTO itemDTO);
 
     /**
      * Page&lt;FootprintItemDTO&gt; → Page&lt;FootprintPageResponse&gt;
@@ -112,7 +109,7 @@ public interface FootprintConverter {
      * @return 管理端行响应对象分页
      */
     @Mapping(target = "optimizeCountQuery", ignore = true)
-    Page<FootprintPageResponse> toPageResponse(Page<FootprintItemDTO> page);
+    Page<FootprintPageResponse> toPageResponse(Page<FootprintDTO> page);
 
     /**
      * 条目 DTO → 门户足迹响应（字段同名自动映射）。
@@ -120,17 +117,17 @@ public interface FootprintConverter {
      * @param itemDTO 足迹条目 DTO
      * @return 门户足迹响应对象
      */
-    PortalFootprintResponse toPortalResponse(FootprintItemDTO itemDTO);
+    PortalFootprintResponse toPortalResponse(FootprintDTO itemDTO);
 
     /**
      * Page&lt;FootprintItemDTO&gt; → Page&lt;PortalFootprintResponse&gt;
-     * （records 逐元素复用 {@link #toPortalResponse(FootprintItemDTO)} 的映射规则）。
+     * （records 逐元素复用 {@link #toPortalResponse(FootprintDTO)} 的映射规则）。
      *
      * @param page 足迹条目 DTO 分页
      * @return 门户足迹响应分页
      */
     @Mapping(target = "optimizeCountQuery", ignore = true)
-    Page<PortalFootprintResponse> toPortalPage(Page<FootprintItemDTO> page);
+    Page<PortalFootprintResponse> toPortalPage(Page<FootprintDTO> page);
 
     /**
      * yyyy-MM-dd 字符串 → 日期(空值安全;分页范围/入库日期的统一转换口)。

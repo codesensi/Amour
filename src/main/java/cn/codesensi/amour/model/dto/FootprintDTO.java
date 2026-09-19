@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
  * @since 1.0
  */
 @Data
-public class FootprintItemDTO implements Serializable {
+public class FootprintDTO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -32,6 +32,11 @@ public class FootprintItemDTO implements Serializable {
      * 城市/地点名称
      */
     private String city;
+
+    /**
+     * 精确地点名称(可空)
+     */
+    private String placeName;
 
     /**
      * 经度(可空;地图展示用)

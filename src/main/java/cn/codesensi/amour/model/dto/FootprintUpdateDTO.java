@@ -30,6 +30,11 @@ public class FootprintUpdateDTO implements Serializable {
     private String city;
 
     /**
+     * 精确地点名称(地图选点搜索选中的地点,或手动录入;可空)
+     */
+    private String placeName;
+
+    /**
      * 经度(可空)
      */
     private BigDecimal longitude;
