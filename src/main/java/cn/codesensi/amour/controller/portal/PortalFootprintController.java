@@ -4,7 +4,7 @@ import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.common.core.BasePage;
 import cn.codesensi.amour.model.converter.FootprintConverter;
 import cn.codesensi.amour.model.dto.FootprintDTO;
-import cn.codesensi.amour.model.response.PortalFootprintResponse;
+import cn.codesensi.amour.model.response.FootprintResponse;
 import cn.codesensi.amour.service.FootprintService;
 import com.mybatisflex.core.paginate.Page;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class PortalFootprintController {
      * @return 全部未删除足迹，按到访日期升序;photoUrl 为免登录分发地址或 null
      */
     @GetMapping("/page")
-    public Page<PortalFootprintResponse> page(BasePage page) {
+    public Page<FootprintResponse> page(BasePage page) {
         Page<FootprintDTO> itemPage = footprintService.pagePortal(page);
         return footprintConverter.toPortalPage(itemPage);
     }

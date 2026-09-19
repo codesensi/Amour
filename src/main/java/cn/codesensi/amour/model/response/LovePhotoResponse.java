@@ -17,7 +17,7 @@ import java.util.List;
  * @since 1.0
  */
 @Data
-public class PortalLovePhotoResponse implements Serializable {
+public class LovePhotoResponse implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

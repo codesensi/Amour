@@ -6,11 +6,11 @@ import cn.codesensi.amour.common.enums.GenderEnum;
 import cn.codesensi.amour.mapper.SysRoleMapper;
 import cn.codesensi.amour.mapper.SysUserMapper;
 import cn.codesensi.amour.mapper.SysUserRoleMapper;
-import cn.codesensi.amour.model.converter.PortalHeroConverter;
-import cn.codesensi.amour.model.dto.PortalHeroResultDTO;
+import cn.codesensi.amour.model.converter.HeroConverter;
+import cn.codesensi.amour.model.dto.HeroResultDTO;
 import cn.codesensi.amour.model.entity.SysRole;
 import cn.codesensi.amour.model.entity.SysUser;
-import cn.codesensi.amour.service.PortalHeroService;
+import cn.codesensi.amour.service.HeroService;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import com.mybatisflex.core.query.QueryChain;
@@ -36,7 +36,7 @@ import static cn.codesensi.amour.model.entity.table.SysUserTableDef.SYS_USER;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PortalHeroServiceImpl implements PortalHeroService {
+public class HeroServiceImpl implements HeroService {
 
     private final SysRoleMapper sysRoleMapper;
 
@@ -44,13 +44,13 @@ public class PortalHeroServiceImpl implements PortalHeroService {
 
     private final SysUserMapper sysUserMapper;
 
-    private final PortalHeroConverter portalHeroConverter;
+    private final HeroConverter heroConverter;
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public PortalHeroResultDTO getPortalHero() {
+    public HeroResultDTO getPortalHero() {
         // 1. 启用中的主角角色
         SysRole heroRole = QueryChain.of(sysRoleMapper)
                 .select(SYS_ROLE.ID)
@@ -59,7 +59,7 @@ public class PortalHeroServiceImpl implements PortalHeroService {
                 .one();
         if (ObjUtil.isNull(heroRole)) {
             log.debug("门户主角角色未配置，返回空数据");
-            return new PortalHeroResultDTO();
+            return new HeroResultDTO();
         }
 
         // 2. 角色绑定的候选用户ID
@@ -69,7 +69,7 @@ public class PortalHeroServiceImpl implements PortalHeroService {
                 .listAs(Long.class);
         if (CollUtil.isEmpty(userIds)) {
             log.debug("门户主角角色未绑定候选用户，返回空数据");
-            return new PortalHeroResultDTO();
+            return new HeroResultDTO();
         }
 
         // 3. 启用中的候选用户按ID倒序：男女主各取最晚注册的一个
@@ -86,9 +86,9 @@ public class PortalHeroServiceImpl implements PortalHeroService {
                 .filter(user -> GenderEnum.FEMALE.getCode().equals(user.getGender()))
                 .findFirst()
                 .orElse(null);
-        return new PortalHeroResultDTO()
-                .setMale(portalHeroConverter.toUserDTO(male))
-                .setFemale(portalHeroConverter.toUserDTO(female));
+        return new HeroResultDTO()
+                .setMale(heroConverter.toUserDTO(male))
+                .setFemale(heroConverter.toUserDTO(female));
     }
 
 }

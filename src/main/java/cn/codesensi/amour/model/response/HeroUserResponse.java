@@ -17,7 +17,7 @@ import java.io.Serializable;
  */
 @Data
 @Accessors(chain = true)
-public class PortalHeroUserResponse implements Serializable {
+public class HeroUserResponse implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

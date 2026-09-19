@@ -1,6 +1,6 @@
 package cn.codesensi.amour.service;
 
-import cn.codesensi.amour.model.dto.PortalHeroResultDTO;
+import cn.codesensi.amour.model.dto.HeroResultDTO;
 
 /**
  * 门户主角服务。
@@ -8,7 +8,7 @@ import cn.codesensi.amour.model.dto.PortalHeroResultDTO;
  * @author codesensi
  * @since 1.0
  */
-public interface PortalHeroService {
+public interface HeroService {
 
     /**
      * 查询门户男女主展示信息。
@@ -18,6 +18,6 @@ public interface PortalHeroService {
      *
      * @return 男主与女主信息
      */
-    PortalHeroResultDTO getPortalHero();
+    HeroResultDTO getPortalHero();
 
 }

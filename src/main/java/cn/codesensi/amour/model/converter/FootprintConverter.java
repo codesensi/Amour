@@ -6,7 +6,7 @@ import cn.codesensi.amour.model.request.FootprintInsertRequest;
 import cn.codesensi.amour.model.request.FootprintPageRequest;
 import cn.codesensi.amour.model.request.FootprintUpdateRequest;
 import cn.codesensi.amour.model.response.FootprintPageResponse;
-import cn.codesensi.amour.model.response.PortalFootprintResponse;
+import cn.codesensi.amour.model.response.FootprintResponse;
 import cn.hutool.core.util.StrUtil;
 import com.mybatisflex.core.paginate.Page;
 import org.mapstruct.Mapper;
@@ -117,17 +117,17 @@ public interface FootprintConverter {
      * @param itemDTO 足迹条目 DTO
      * @return 门户足迹响应对象
      */
-    PortalFootprintResponse toPortalResponse(FootprintDTO itemDTO);
+    FootprintResponse toPortalResponse(FootprintDTO itemDTO);
 
     /**
-     * Page&lt;FootprintItemDTO&gt; → Page&lt;PortalFootprintResponse&gt;
+     * Page&lt;FootprintItemDTO&gt; → Page&lt;FootprintResponse&gt;
      * （records 逐元素复用 {@link #toPortalResponse(FootprintDTO)} 的映射规则）。
      *
      * @param page 足迹条目 DTO 分页
      * @return 门户足迹响应分页
      */
     @Mapping(target = "optimizeCountQuery", ignore = true)
-    Page<PortalFootprintResponse> toPortalPage(Page<FootprintDTO> page);
+    Page<FootprintResponse> toPortalPage(Page<FootprintDTO> page);
 
     /**
      * yyyy-MM-dd 字符串 → 日期（空值安全;分页范围/入库日期的统一转换口）。

@@ -4,7 +4,7 @@ import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.PortalLovePhoto;
 import cn.codesensi.amour.model.request.*;
 import cn.codesensi.amour.model.response.LovePhotoPageResponse;
-import cn.codesensi.amour.model.response.PortalLovePhotoResponse;
+import cn.codesensi.amour.model.response.LovePhotoResponse;
 import cn.hutool.core.util.StrUtil;
 import com.mybatisflex.core.paginate.Page;
 import org.mapstruct.Mapper;
@@ -120,17 +120,17 @@ public interface LovePhotoConverter {
     @Mapping(source = "url", target = "img")
     @Mapping(source = "caption", target = "text")
     @Mapping(source = "dateText", target = "date")
-    PortalLovePhotoResponse toPortalResponse(LovePhotoDTO itemDTO);
+    LovePhotoResponse toPortalResponse(LovePhotoDTO itemDTO);
 
     /**
-     * Page&lt;LovePhotoDTO&gt; → Page&lt;PortalLovePhotoResponse&gt;
+     * Page&lt;LovePhotoDTO&gt; → Page&lt;LovePhotoResponse&gt;
      * （records 逐元素复用 {@link #toPortalResponse(LovePhotoDTO)} 的映射规则）。
      *
      * @param page 照片条目 DTO 分页
      * @return 门户照片响应分页
      */
     @Mapping(target = "optimizeCountQuery", ignore = true)
-    Page<PortalLovePhotoResponse> toPortalPage(Page<LovePhotoDTO> page);
+    Page<LovePhotoResponse> toPortalPage(Page<LovePhotoDTO> page);
 
     /**
      * 逗号分隔标签串 → 标签集合（null 安全；空白项剔除）。

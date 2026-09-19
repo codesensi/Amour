@@ -4,7 +4,7 @@ import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.common.core.BasePage;
 import cn.codesensi.amour.model.converter.LovePhotoConverter;
 import cn.codesensi.amour.model.dto.LovePhotoDTO;
-import cn.codesensi.amour.model.response.PortalLovePhotoResponse;
+import cn.codesensi.amour.model.response.LovePhotoResponse;
 import cn.codesensi.amour.service.LovePhotoService;
 import com.mybatisflex.core.paginate.Page;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class PortalLovePhotoController {
      * @return 仅含显隐为「显示」的照片，按 sort 升序;tags 为标签数组，可能为空
      */
     @GetMapping("/page")
-    public Page<PortalLovePhotoResponse> page(BasePage page) {
+    public Page<LovePhotoResponse> page(BasePage page) {
         Page<LovePhotoDTO> itemPage = lovePhotoService.pagePortal(page);
         return lovePhotoConverter.toPortalPage(itemPage);
     }

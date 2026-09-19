@@ -1,10 +1,10 @@
 package cn.codesensi.amour.model.converter;
 
-import cn.codesensi.amour.model.dto.PortalHeroResultDTO;
-import cn.codesensi.amour.model.dto.PortalHeroUserDTO;
+import cn.codesensi.amour.model.dto.HeroResultDTO;
+import cn.codesensi.amour.model.dto.HeroUserDTO;
 import cn.codesensi.amour.model.entity.SysUser;
-import cn.codesensi.amour.model.response.PortalHeroResponse;
-import cn.codesensi.amour.model.response.PortalHeroUserResponse;
+import cn.codesensi.amour.model.response.HeroResponse;
+import cn.codesensi.amour.model.response.HeroUserResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 
@@ -15,21 +15,21 @@ import org.mapstruct.MappingConstants;
  * @since 1.0
  */
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
-public interface PortalHeroConverter {
+public interface HeroConverter {
 
     /**
      * SysUser → HeroUserDTO（入参为 null 时返回 null）
      */
-    PortalHeroUserDTO toUserDTO(SysUser sysUser);
+    HeroUserDTO toUserDTO(SysUser sysUser);
 
     /**
      * HeroResultDTO → HeroResponse（male/female 嵌套复用 HeroUserDTO → HeroUserResponse）
      */
-    PortalHeroResponse toResponse(PortalHeroResultDTO portalHeroResultDTO);
+    HeroResponse toResponse(HeroResultDTO heroResultDTO);
 
     /**
      * HeroUserDTO → HeroUserResponse
      */
-    PortalHeroUserResponse toUserResponse(PortalHeroUserDTO portalHeroUserDTO);
+    HeroUserResponse toUserResponse(HeroUserDTO heroUserDTO);
 
 }

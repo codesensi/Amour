@@ -17,7 +17,7 @@ import java.math.BigDecimal;
  * @since 1.0
  */
 @Data
-public class PortalFootprintResponse implements Serializable {
+public class FootprintResponse implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
