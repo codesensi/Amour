@@ -37,22 +37,22 @@ public class LovePhotoPageResponse implements Serializable {
     private String caption;
 
     /**
-     * 照片日期(格式:yyyy-MM-dd)
+     * 照片日期（格式:yyyy-MM-dd）
      */
     private String dateText;
 
     /**
-     * 照片标签(多值以逗号分隔;null 表示无标签)
+     * 照片标签（多值以逗号分隔;null 表示无标签）
      */
     private String tags;
 
     /**
-     * 排序(数字越小越靠前)
+     * 排序（数字越小越靠前）
      */
     private Integer sort;
 
     /**
-     * 显隐标识: 0-显示, 1-隐藏
+     * 显隐标识: 0-显示， 1-隐藏
      */
     private Integer hidden;
 

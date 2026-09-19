@@ -53,13 +53,13 @@ public interface SysDictDataService {
     void dataDelete(List<Long> ids);
 
     /**
-     * 分页查询字典条目(管理端右侧数据表格的数据源，含禁用条目与完整字段)。
+     * 分页查询字典条目（管理端右侧数据表格的数据源，含禁用条目与完整字段）。
      * <p>
      * 编码、名称、值为模糊匹配，状态为精确匹配，条件缺省时自动忽略；
      * 名称条件经类型表解析为编码集合后下推。
      *
      * @param pageDTO 分页查询参数
-     * @return 字典条目分页结果(dictName 为自类型表回填的展示字段)
+     * @return 字典条目分页结果（dictName 为自类型表回填的展示字段）
      */
     Page<SysDictData> dataPage(DictDataPageDTO pageDTO);
 

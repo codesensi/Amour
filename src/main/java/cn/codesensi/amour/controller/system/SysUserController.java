@@ -141,7 +141,7 @@ public class SysUserController {
     }
 
     /**
-     * 删除用户信息(支持单个或批量，ID 以英文逗号分隔)
+     * 删除用户信息（支持单个或批量，ID 以英文逗号分隔）
      *
      * @param ids 用户ID列表
      */

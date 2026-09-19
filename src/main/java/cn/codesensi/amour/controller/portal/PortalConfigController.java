@@ -35,7 +35,7 @@ public class PortalConfigController {
      * 获取站点公共配置（免登录；按 keys 指定的配置键下发，keys 为空时返回空列表）。
      * <p>仅下发非敏感配置（{@code sensitive=0}），敏感配置的表现与"键不存在"一致。
      *
-     * @param keys 配置键集合（逗号分隔，如 keys=name,captcha.enabled）；为空时返回空列表
+     * @param keys 配置键集合（逗号分隔，如 keys=name，captcha.enabled）；为空时返回空列表
      * @return 配置键值列表
      */
     @GetMapping("/list-by-keys")

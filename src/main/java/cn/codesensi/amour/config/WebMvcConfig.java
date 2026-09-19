@@ -46,8 +46,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
      */
     @Override
     public void addFormatters(FormatterRegistry registry) {
-        // 必须使用显式匿名内部类:lambda/方法引用的合成类不含泛型签名,
-        // GenericConversionService 解析 Converter<S,T> 时报 Unable to determine source/target type
+        // 必须使用显式匿名内部类:lambda/方法引用的合成类不含泛型签名，
+        // GenericConversionService 解析 Converter<S，T> 时报 Unable to determine source/target type
         registry.addConverter(new Converter<String, String>() {
             @Override
             public String convert(String source) {
@@ -62,11 +62,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        // 1. SaToken 鉴权拦截器:初始化 SaTokenContext + 登录校验 + 封禁校验 + 注解鉴权(@SaCheckPermission)
+        // 1. SaToken 鉴权拦截器:初始化 SaTokenContext + 登录校验 + 封禁校验 + 注解鉴权（@SaCheckPermission）
         registry.addInterceptor(new SaInterceptor(handler -> {
                     // 仅对 Controller 方法做登录/封禁校验;
-                    // 静态资源(favicon 等)与未命中路径的 404 兜底由 ResourceHttpRequestHandler 接管,
-                    // 属于浏览器自动发起的附带请求,不校验登录,避免产生授权异常日志噪音
+                    // 静态资源（favicon 等）与未命中路径的 404 兜底由 ResourceHttpRequestHandler 接管，
+                    // 属于浏览器自动发起的附带请求，不校验登录，避免产生授权异常日志噪音
                     if (!(handler instanceof HandlerMethod)) {
                         return;
                     }
@@ -74,14 +74,14 @@ public class WebMvcConfig implements WebMvcConfigurer {
                     StpUtil.checkDisable(StpUtil.getLoginIdAsLong());
                 })).addPathPatterns(RbacConst.ROOT_PATH)
                 // 公开路径见 RbacConst.PUBLIC_PATHS;
-                // H2 控制台仅 dev 启用且自带 JDBC 账密页,免登录放行(演示模式拦截器不豁免,其写操作仍受限)
+                // H2 控制台仅 dev 启用且自带 JDBC 账密页，免登录放行（演示模式拦截器不豁免，其写操作仍受限）
                 .excludePathPatterns(RbacConst.PUBLIC_PATHS)
                 .excludePathPatterns(RbacConst.H2_CONSOLE_PATH)
                 .order(1);
 
-        // 2. 演示模式拦截器：演示开关(app.demo-mode)开启时仅放行 GET/HEAD 等只读请求,
-        //    拒绝 POST/PUT/DELETE 等写操作;公开路径(PUBLIC_PATHS)豁免;
-        //    登出虽为 POST,但非数据写操作,注册处单独豁免,保证演示用户可正常退出
+        // 2. 演示模式拦截器：演示开关（app.demo-mode）开启时仅放行 GET/HEAD 等只读请求，
+        //    拒绝 POST/PUT/DELETE 等写操作;公开路径（PUBLIC_PATHS）豁免;
+        //    登出虽为 POST，但非数据写操作，注册处单独豁免，保证演示用户可正常退出
         registry.addInterceptor(demoModeInterceptor)
                 .addPathPatterns(RbacConst.ROOT_PATH)
                 .excludePathPatterns(RbacConst.PUBLIC_PATHS)
@@ -90,7 +90,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 
     /**
-     * Sa-Token 整合 JWT(Simple 简单模式)。
+     * Sa-Token 整合 JWT（Simple 简单模式）。
      * <p>
      * 保留 sa-token 原生会话与注解鉴权能力，仅将令牌替换为 JWT 风格签名串，
      * 使会话信息可被无状态校验，便于后续水平扩展。

@@ -41,42 +41,42 @@ public interface SysUserService extends IService<SysUser> {
     void insert(UserInsertDTO userInsertDTO);
 
     /**
-     * 修改用户信息(仅资料字段，用户名、状态与密码不在可修改范围)
+     * 修改用户信息（仅资料字段，用户名、状态与密码不在可修改范围）
      *
      * @param userUpdateDTO 用户信息
      */
     void update(UserUpdateDTO userUpdateDTO);
 
     /**
-     * 更新当前登录用户资料(仅白名单资料字段，变更后失效 userInfo 缓存)
+     * 更新当前登录用户资料（仅白名单资料字段，变更后失效 userInfo 缓存）
      *
      * @param userProfileUpdateDTO 资料信息
      */
     void updateProfile(UserProfileUpdateDTO userProfileUpdateDTO);
 
     /**
-     * 修改当前登录用户名(用户名为登录凭证，修改成功后踢出会话要求重新登录)
+     * 修改当前登录用户名（用户名为登录凭证，修改成功后踢出会话要求重新登录）
      *
      * @param username 新用户名
      */
     void rename(String username);
 
     /**
-     * 修改当前登录用户密码(校验原密码，修改成功后踢出会话要求重新登录)
+     * 修改当前登录用户密码（校验原密码，修改成功后踢出会话要求重新登录）
      *
      * @param userPasswordUpdateDTO 密码信息
      */
     void updatePassword(UserPasswordUpdateDTO userPasswordUpdateDTO);
 
     /**
-     * 修改用户状态(系统内置用户不允许停用)
+     * 修改用户状态（系统内置用户不允许停用）
      *
      * @param userChangeStatusDTO 状态信息
      */
     void changeStatus(UserChangeStatusDTO userChangeStatusDTO);
 
     /**
-     * 删除用户信息(逻辑删除，并清理角色关联与缓存)
+     * 删除用户信息（逻辑删除，并清理角色关联与缓存）
      *
      * @param ids 用户ID列表
      */

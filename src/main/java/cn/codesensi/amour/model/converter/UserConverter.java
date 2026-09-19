@@ -82,8 +82,8 @@ public interface UserConverter {
     SysUser toEntity(UserInsertDTO userInsertDTO);
 
     /**
-     * UserUpdateDTO → SysUser(仅资料字段，id 用于定位更新；管理端允许修改身份证/手机号，
-     * 二者参与映射；用户名/密码/状态不在映射范围，审计字段由实体监听器维护)
+     * UserUpdateDTO → SysUser（仅资料字段，id 用于定位更新；管理端允许修改身份证/手机号，
+     * 二者参与映射；用户名/密码/状态不在映射范围，审计字段由实体监听器维护）
      */
     @Mapping(target = "creator", ignore = true)
     @Mapping(target = "createTime", ignore = true)
@@ -97,8 +97,8 @@ public interface UserConverter {
     SysUser toEntity(UserUpdateDTO userUpdateDTO);
 
     /**
-     * UserProfileUpdateDTO → SysUser(仅资料字段，id 由调用方回填；
-     * 用户名/密码/状态/身份证/手机号不在映射范围，审计字段由实体监听器维护)
+     * UserProfileUpdateDTO → SysUser（仅资料字段，id 由调用方回填；
+     * 用户名/密码/状态/身份证/手机号不在映射范围，审计字段由实体监听器维护）
      */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "creator", ignore = true)

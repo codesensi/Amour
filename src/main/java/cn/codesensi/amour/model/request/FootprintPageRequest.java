@@ -25,19 +25,19 @@ public class FootprintPageRequest extends BasePage implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 城市/地点名称(模糊匹配)
+     * 城市/地点名称（模糊匹配）
      */
     @Size(max = AppConst.MAX_LENGTH_128, message = "城市名称长度不能超过" + AppConst.MAX_LENGTH_128)
     private String city;
 
     /**
-     * 到访日期范围起点(含;yyyy-MM-dd)
+     * 到访日期范围起点（含;yyyy-MM-dd）
      */
     @Size(max = 10, message = "到访日期格式须为yyyy-MM-dd")
     private String arrivalDateBegin;
 
     /**
-     * 到访日期范围终点(含;yyyy-MM-dd)
+     * 到访日期范围终点（含;yyyy-MM-dd）
      */
     @Size(max = 10, message = "到访日期格式须为yyyy-MM-dd")
     private String arrivalDateEnd;

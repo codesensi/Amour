@@ -25,19 +25,19 @@ public class LovePhotoPageRequest extends BasePage implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 照片文案(模糊匹配)
+     * 照片文案（模糊匹配）
      */
     @Size(max = AppConst.MAX_LENGTH_512, message = "照片文案长度不能超过" + AppConst.MAX_LENGTH_512)
     private String caption;
 
     /**
-     * 照片标签(在逗号分隔集合中精确匹配)
+     * 照片标签（在逗号分隔集合中精确匹配）
      */
     @Size(max = AppConst.MAX_LENGTH_64, message = "照片标签长度不能超过" + AppConst.MAX_LENGTH_64)
     private String tag;
 
     /**
-     * 显隐标识: 0-显示, 1-隐藏
+     * 显隐标识: 0-显示， 1-隐藏
      */
     private Integer hidden;
 

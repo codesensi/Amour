@@ -58,13 +58,13 @@ public class LocalFileStorage implements FileStorage {
      */
     @Override
     public String upload(SysFile file, InputStream in) {
-        // 相对 key:{bizType}/{yyyyMM}/{fileId}.{ext},分月目录防单目录文件膨胀
+        // 相对 key:{bizType}/{yyyyMM}/{fileId}.{ext}，分月目录防单目录文件膨胀
         String month = DateUtil.format(new Date(), DatePattern.SIMPLE_MONTH_PATTERN);
         String key = file.getBizType() + AppConst.SLASH + month + AppConst.SLASH + file.getId() + AppConst.DOT + file.getExtension();
         Path target = resolve(key);
         try {
             Files.createDirectories(target.getParent());
-            // 主键唯一,正常不会同名;REPLACE_EXISTING 仅作防御,清理重试等极端场景下覆盖旧文件
+            // 主键唯一，正常不会同名;REPLACE_EXISTING 仅作防御，清理重试等极端场景下覆盖旧文件
             Files.copy(in, target, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             log.error("本地文件写入失败：key={}", key, e);
@@ -115,7 +115,7 @@ public class LocalFileStorage implements FileStorage {
     }
 
     /**
-     * 解析相对 key 为绝对路径,并校验其未越出根目录（防路径穿越）。
+     * 解析相对 key 为绝对路径，并校验其未越出根目录（防路径穿越）。
      *
      * @param key 相对存储 key
      * @return 绝对路径

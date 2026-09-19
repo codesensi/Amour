@@ -52,8 +52,8 @@ public class LoginServiceImpl implements LoginService {
      * 登录。
      * <p>
      * 账号条件（用户名/QQ号）的 OR 组合以括号包裹：与全局逻辑删除列自动追加的 del_flag=0
-     * 条件组合时避免 AND/OR 优先级歧义（否则可能生成 username=? OR (qq=? AND del_flag=0)），
-     * 确保生成 SQL 为 (username=? OR qq=?) AND del_flag=0。
+     * 条件组合时避免 AND/OR 优先级歧义（否则可能生成 username=? OR （qq=? AND del_flag=0）），
+     * 确保生成 SQL 为 （username=? OR qq=?） AND del_flag=0。
      *
      * @param loginDTO 登录用户信息
      * @return 登录成功后信息
@@ -72,7 +72,7 @@ public class LoginServiceImpl implements LoginService {
         }
 
         // 校验用户及密码（用户名/QQ号任一匹配即可登录）
-        // OR 组合必须括号包裹,避免与全局逻辑删除 del_flag=0 组合时产生 AND/OR 优先级歧义
+        // OR 组合必须括号包裹，避免与全局逻辑删除 del_flag=0 组合时产生 AND/OR 优先级歧义
         List<SysUser> candidates = sysUserService.queryChain()
                 .select(SYS_USER.ID, SYS_USER.USERNAME, SYS_USER.PASSWORD, SYS_USER.STATUS)
                 .where(SYS_USER.USERNAME.eq(username).or(SYS_USER.QQ.eq(username)))
@@ -144,7 +144,7 @@ public class LoginServiceImpl implements LoginService {
         if (ObjUtil.isNull(cache)) {
             throw new BusinessException("验证码缓存未注册，请检查缓存配置");
         }
-        // 原子取删：asMap().remove 一次调用同时完成「读答案 + 失效」，并发提交无法复用同一 captchaKey
+        // 原子取删：asMap（）.remove 一次调用同时完成「读答案 + 失效」，并发提交无法复用同一 captchaKey
         // （Spring Cache 抽象无 getAndDelete，借原生 Caffeine 的原子 remove 实现）
         com.github.benmanes.caffeine.cache.Cache<Object, Object> nativeCache = ((CaffeineCache) cache).getNativeCache();
         String cachedAnswer = (String) nativeCache.asMap().remove(loginDTO.getCaptchaKey());

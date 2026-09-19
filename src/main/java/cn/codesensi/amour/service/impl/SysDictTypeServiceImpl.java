@@ -46,7 +46,7 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
     private final DictConverter dictConverter;
 
     /**
-     * 查询全部字典类型(含组内条目数；管理端左侧类型列表的数据源)。
+     * 查询全部字典类型（含组内条目数；管理端左侧类型列表的数据源）。
      * <p>类型表全量按 id 升序加载，条目计数经数据表按编码分组内存聚合，
      * 计数包含禁用条目（对齐历史口径）；逻辑删除（del_flag）由全局配置自动过滤。
      *
@@ -114,7 +114,7 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
         if (ObjUtil.isNull(type)) {
             throw new BusinessException("字典类型不存在");
         }
-        // 经 UpdateChain 显式逐列赋值,备注置空时写入 null(库中不落空串)
+        // 经 UpdateChain 显式逐列赋值，备注置空时写入 null（库中不落空串）
         UpdateChain.of(SysDictType.class)
                 .set(SYS_DICT_TYPE.DICT_NAME, updateDTO.getDictName())
                 .set(SYS_DICT_TYPE.REMARK, updateDTO.getRemark())
@@ -139,7 +139,7 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
             throw new BusinessException("字典类型不存在");
         }
 
-        // 内置类型不允许删除(整批失败)
+        // 内置类型不允许删除（整批失败）
         boolean containsBuiltin = types.stream()
                 .anyMatch(type -> BuiltinEnum.YES.getCode().equals(type.getBuiltin()));
         if (containsBuiltin) {

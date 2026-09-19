@@ -83,12 +83,12 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     public void insert(MenuInsertDTO menuInsertDTO) {
         validatePid(menuInsertDTO.getPid());
         validateTypeRequired(menuInsertDTO.getType(), menuInsertDTO.getPath(), menuInsertDTO.getPerms());
-        // 同级下菜单名称唯一,避免树展示与定位歧义;权限标识全局唯一,避免前端 hasPerms 按钮门控错乱
+        // 同级下菜单名称唯一，避免树展示与定位歧义;权限标识全局唯一，避免前端 hasPerms 按钮门控错乱
         validateSiblingTitleUnique(menuInsertDTO.getPid(), menuInsertDTO.getTitle(), null);
         validatePermsUnique(menuInsertDTO.getPerms(), null);
 
         SysMenu sysMenu = menuConverter.toEntity(menuInsertDTO);
-        // 内置标识仅随种子数据下发,新增数据一律为非内置
+        // 内置标识仅随种子数据下发，新增数据一律为非内置
         sysMenu.setBuiltin(BuiltinEnum.NO.getCode());
         if (ObjUtil.isNull(sysMenu.getSort())) {
             sysMenu.setSort(AppConst.ZERO_INT);
@@ -105,8 +105,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     /**
      * 修改菜单。
      * <p>
-     * 菜单类型不在修改入参中(结构性标识，创建后不可变)；系统内置菜单的结构字段(上级/路由路径/组件路径/权限编码)
-     * 不允许修改；上级菜单不允许选择自身或其下级(否则树成环)；
+     * 菜单类型不在修改入参中（结构性标识，创建后不可变）；系统内置菜单的结构字段（上级/路由路径/组件路径/权限编码）
+     * 不允许修改；上级菜单不允许选择自身或其下级（否则树成环）；
      * 变更影响权限码与路由装配，失效全部用户的 perm/menu 缓存。
      *
      * @param menuUpdateDTO 菜单信息
@@ -118,19 +118,19 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
             throw new BusinessException("菜单不存在");
         }
 
-        // 系统内置菜单的结构字段与源码路由/前后端权限契约绑定,不允许修改
+        // 系统内置菜单的结构字段与源码路由/前后端权限契约绑定，不允许修改
         if (BuiltinEnum.YES.getCode().equals(sysMenu.getBuiltin())) {
             validateBuiltinUnchanged(sysMenu, menuUpdateDTO);
         }
 
-        // 类型取库中现值(创建后不可变),此处仅校验按类型的必填项
+        // 类型取库中现值（创建后不可变），此处仅校验按类型的必填项
         validateTypeRequired(sysMenu.getType(), menuUpdateDTO.getPath(), menuUpdateDTO.getPerms());
         validatePid(menuUpdateDTO.getPid());
-        // 同级下菜单名称唯一,避免树展示与定位歧义;权限标识全局唯一,避免前端 hasPerms 按钮门控错乱
+        // 同级下菜单名称唯一，避免树展示与定位歧义;权限标识全局唯一，避免前端 hasPerms 按钮门控错乱
         validateSiblingTitleUnique(menuUpdateDTO.getPid(), menuUpdateDTO.getTitle(), menuUpdateDTO.getId());
         validatePermsUnique(menuUpdateDTO.getPerms(), menuUpdateDTO.getId());
 
-        // 上级菜单不能选择自身或其下级菜单,否则树成环
+        // 上级菜单不能选择自身或其下级菜单，否则树成环
         if (menuUpdateDTO.getId().equals(menuUpdateDTO.getPid())) {
             throw new BusinessException("上级菜单不能选择自身");
         }
@@ -140,7 +140,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         }
 
         SysMenu entity = menuConverter.toEntity(menuUpdateDTO);
-        // 经 UpdateChain 显式逐列赋值,可选字段置空时写入 null(库中不落空串)
+        // 经 UpdateChain 显式逐列赋值，可选字段置空时写入 null（库中不落空串）
         UpdateChain.of(SysMenu.class)
                 .set(SYS_MENU.PID, entity.getPid())
                 .set(SYS_MENU.TITLE, entity.getTitle())
@@ -160,7 +160,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     /**
      * 修改菜单状态。
      * <p>
-     * 系统内置菜单不允许禁用(启用请求不受限)；同状态幂等返回；
+     * 系统内置菜单不允许禁用（启用请求不受限）；同状态幂等返回；
      * 菜单状态影响权限码与路由装配，失效全部用户的 perm/menu 缓存。
      *
      * @param menuChangeStatusDTO 菜单状态信息
@@ -172,7 +172,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
             throw new BusinessException("菜单不存在");
         }
 
-        // 系统内置菜单不允许禁用(启用请求不受限)
+        // 系统内置菜单不允许禁用（启用请求不受限）
         if (BuiltinEnum.YES.getCode().equals(sysMenu.getBuiltin())
                 && EnableEnum.DISABLE.getCode().equals(menuChangeStatusDTO.getStatus())) {
             throw new BusinessException("系统内置菜单不允许禁用");
@@ -275,7 +275,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     }
 
     /**
-     * 校验权限标识全局唯一(空标识跳过，仅按钮类型填写)。
+     * 校验权限标识全局唯一（空标识跳过，仅按钮类型填写）。
      *
      * @param perms     权限编码
      * @param excludeId 修改时排除自身，新增时传 null
@@ -318,7 +318,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     }
 
     /**
-     * 收集指定菜单的全部下级菜单ID(不含自身)。
+     * 收集指定菜单的全部下级菜单ID（不含自身）。
      * <p>
      * 菜单表数据量小，一次性加载后按 pid 建立子级索引向下遍历，
      * 避免逐层全量扫描；visited 兼作防环终止条件，规避 pid 环脏数据导致的死循环。
@@ -340,11 +340,11 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     }
 
     /**
-     * 沿子级索引递归收集 menuId 的全部下级菜单ID(不含自身)。
+     * 沿子级索引递归收集 menuId 的全部下级菜单ID（不含自身）。
      *
      * @param menuId        菜单ID
      * @param childrenMap   pid -> 子菜单列表 索引
-     * @param descendantIds 已收集的下级ID集合(防环:同一 ID 仅收集一次)
+     * @param descendantIds 已收集的下级ID集合（防环:同一 ID 仅收集一次）
      */
     private void collectDescendantIds(Long menuId, Map<Long, List<SysMenu>> childrenMap, Set<Long> descendantIds) {
         List<SysMenu> children = childrenMap.get(menuId);

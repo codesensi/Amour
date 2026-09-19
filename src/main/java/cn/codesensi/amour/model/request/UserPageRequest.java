@@ -25,19 +25,19 @@ public class UserPageRequest extends BasePage implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 用户名称(模糊匹配)
+     * 用户名称（模糊匹配）
      */
     @Size(max = AppConst.MAX_LENGTH_64, message = "用户名称长度不能超过" + AppConst.MAX_LENGTH_64)
     private String username;
 
     /**
-     * 用户昵称(模糊匹配)
+     * 用户昵称（模糊匹配）
      */
     @Size(max = AppConst.MAX_LENGTH_64, message = "用户昵称长度不能超过" + AppConst.MAX_LENGTH_64)
     private String nickname;
 
     /**
-     * 用户身份证号码(模糊匹配)
+     * 用户身份证号码（模糊匹配）
      */
     @Size(max = AppConst.MAX_LENGTH_64, message = "用户身份证号码长度不能超过" + AppConst.MAX_LENGTH_64)
     private String idCard;
@@ -49,13 +49,13 @@ public class UserPageRequest extends BasePage implements Serializable {
     private String phone;
 
     /**
-     * 用户QQ号码(模糊匹配)
+     * 用户QQ号码（模糊匹配）
      */
     @Size(max = AppConst.MAX_LENGTH_16, message = "QQ号码长度不能超过" + AppConst.MAX_LENGTH_16)
     private String qq;
 
     /**
-     * 用户邮箱(模糊匹配)
+     * 用户邮箱（模糊匹配）
      */
     @Size(max = AppConst.MAX_LENGTH_64, message = "用户邮箱长度不能超过" + AppConst.MAX_LENGTH_64)
     private String email;

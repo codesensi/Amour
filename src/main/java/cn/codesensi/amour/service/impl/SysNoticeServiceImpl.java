@@ -27,7 +27,7 @@ import static cn.codesensi.amour.model.entity.table.SysNoticeTableDef.SYS_NOTICE
  * 通知 服务层实现。
  * <p>
  * 列表与已读判定采用两次单表查询（通知 + 当前用户已读记录），在内存中组装
- * read 标记，避免关联查询；标记已读按 (user_id, notice_id) 唯一键幂等写入。
+ * read 标记，避免关联查询；标记已读按 （user_id， notice_id） 唯一键幂等写入。
  * <p>
  * 逻辑删除（del_flag）由 MyBatis-Flex 全局配置自动追加过滤，查询无需显式条件。
  *
@@ -77,7 +77,7 @@ public class SysNoticeServiceImpl implements SysNoticeService {
      * 标记通知已读（幂等）。
      * <p>
      * 仅写入当前用户尚无已读记录的通知：先查已存在的记录，再批量插入缺失部分，
-     * 唯一键 (user_id, notice_id) 兜底保证并发下不产生重复行。
+     * 唯一键 （user_id， notice_id） 兜底保证并发下不产生重复行。
      *
      * @param noticeReadDTO 标记已读业务数据（请求体缺省时为 null，空=全部未读）
      */

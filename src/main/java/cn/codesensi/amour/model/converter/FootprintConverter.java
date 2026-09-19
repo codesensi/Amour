@@ -28,7 +28,7 @@ import java.time.format.DateTimeFormatter;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface FootprintConverter {
 
-    /** 到访日期格式(与 arrival_date DATE 列及前端契约一致) */
+    /** 到访日期格式（与 arrival_date DATE 列及前端契约一致） */
     DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     /**
@@ -130,7 +130,7 @@ public interface FootprintConverter {
     Page<PortalFootprintResponse> toPortalPage(Page<FootprintDTO> page);
 
     /**
-     * yyyy-MM-dd 字符串 → 日期(空值安全;分页范围/入库日期的统一转换口)。
+     * yyyy-MM-dd 字符串 → 日期（空值安全;分页范围/入库日期的统一转换口）。
      *
      * @param value 日期字符串
      * @return 日期;空白返回 null

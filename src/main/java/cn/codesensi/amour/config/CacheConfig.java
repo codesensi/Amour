@@ -122,14 +122,14 @@ public class CacheConfig {
      *
      * @param seconds 基准过期时间（秒），调用方保证为正
      * @param props   缓存配置属性（提供抖动幅度与生效阈值）
-     * @return 抖动后的过期时间（秒），恒为正且不低于基准的 (100 - jitterPercent)%
+     * @return 抖动后的过期时间（秒），恒为正且不低于基准的 （100 - jitterPercent）%
      */
     private long applyJitter(long seconds, AppCacheProperties props) {
         long spread = seconds * props.getExpireJitterPercent() / 100;
         if (spread <= 0 || seconds < props.getExpireJitterMinSeconds()) {
             return seconds;
         }
-        // 在 [seconds - spread, seconds + spread] 闭区间内均匀随机
+        // 在 [seconds - spread， seconds + spread] 闭区间内均匀随机
         return seconds - spread + (long) (ThreadLocalRandom.current().nextDouble() * (2 * spread + 1));
     }
 }

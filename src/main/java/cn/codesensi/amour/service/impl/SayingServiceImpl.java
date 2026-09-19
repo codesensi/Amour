@@ -65,7 +65,7 @@ public class SayingServiceImpl implements SayingService {
                 sayingResponse = response.body();
             }
         } catch (Exception e) {
-            // 上游网络异常(超时/连接失败)降级，不阻断门户调用
+            // 上游网络异常（超时/连接失败）降级，不阻断门户调用
             log.warn("uapi-saying-random 调用失败，降级 uapi-saying", e);
             return fallbackByUapiSaying();
         }

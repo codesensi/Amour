@@ -23,17 +23,17 @@ public class LovePhotoPageDTO extends BasePage implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 照片文案(模糊匹配)
+     * 照片文案（模糊匹配）
      */
     private String caption;
 
     /**
-     * 照片标签(在逗号分隔集合中精确匹配)
+     * 照片标签（在逗号分隔集合中精确匹配）
      */
     private String tag;
 
     /**
-     * 显隐标识: 0-显示, 1-隐藏
+     * 显隐标识: 0-显示， 1-隐藏
      */
     private Integer hidden;
 

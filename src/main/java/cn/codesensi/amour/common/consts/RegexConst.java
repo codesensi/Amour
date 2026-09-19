@@ -11,7 +11,7 @@ package cn.codesensi.amour.common.consts;
 public class RegexConst {
 
     /**
-     * 空串或 15 位数字、17 位数字+校验位(数字或 X)共 18 位
+     * 空串或 15 位数字、17 位数字+校验位（数字或 X）共 18 位
      */
     public static final String EMPTY_OR_15_18_DIGITS = "^$|^\\d{15}$|^\\d{17}[\\dXx]$";
 
@@ -31,12 +31,12 @@ public class RegexConst {
     public static final String KEBAB_CASE = "^[a-z0-9]+(?:-[a-z0-9]+)*$";
 
     /**
-     * 4-2-2 数字段、中划线连接(yyyy-MM-dd)
+     * 4-2-2 数字段、中划线连接（yyyy-MM-dd）
      */
     public static final String DIGITS_4_2_2 = "^\\d{4}-\\d{2}-\\d{2}$";
 
     /**
-     * 4-2-2 数字段、空格连接、2-2-2 数字段(yyyy-MM-dd HH:mm:ss)
+     * 4-2-2 数字段、空格连接、2-2-2 数字段（yyyy-MM-dd HH:mm:ss）
      */
     public static final String DIGITS_4_2_2_SPACE_2_2_2 = "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$";
 

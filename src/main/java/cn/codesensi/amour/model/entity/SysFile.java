@@ -57,7 +57,7 @@ public class SysFile extends BaseEntity implements Serializable {
     private String md5;
 
     /**
-     * 存储类型: local-本地, oss-对象存储
+     * 存储类型: local-本地， oss-对象存储
      */
     private String storageType;
 
@@ -72,7 +72,7 @@ public class SysFile extends BaseEntity implements Serializable {
     private String contentType;
 
     /**
-     * 业务来源: infra-基础设施, avatar-用户头像, photo-相册照片, markdown-点滴配图
+     * 业务来源: infra-基础设施， avatar-用户头像， photo-相册照片， markdown-点滴配图
      */
     private String bizType;
 

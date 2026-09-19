@@ -23,7 +23,7 @@ public class MenuUpdateDTO implements Serializable {
     private Long id;
 
     /**
-     * 父级菜单ID(0 表示根节点)
+     * 父级菜单ID（0 表示根节点）
      */
     private Long pid;
 

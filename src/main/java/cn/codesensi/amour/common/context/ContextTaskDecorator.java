@@ -20,13 +20,13 @@ import java.util.Map;
 public class ContextTaskDecorator implements TaskDecorator {
 
     /**
-     * 包装异步任务:提交时快照主线程的 MDC 与登录用户ID,执行时恢复,结束后还原线程既有状态,
+     * 包装异步任务:提交时快照主线程的 MDC 与登录用户ID，执行时恢复，结束后还原线程既有状态，
      * 防止线程池复用导致上下文串扰。
      */
     @Override
     public Runnable decorate(@NonNull Runnable runnable) {
         Map<String, String> context = MDC.getCopyOfContextMap();
-        // 快照提交者身份（嵌套提交时此处取到的即是外层任务绑定的值,天然级联）
+        // 快照提交者身份（嵌套提交时此处取到的即是外层任务绑定的值，天然级联）
         Long loginId = LoginUserUtil.getLoginIdOrNull();
         return () -> {
             Map<String, String> previousMdc = MDC.getCopyOfContextMap();

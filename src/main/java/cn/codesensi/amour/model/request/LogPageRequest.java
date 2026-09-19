@@ -26,18 +26,18 @@ public class LogPageRequest extends BasePage implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 用户名称(模糊匹配)
+     * 用户名称（模糊匹配）
      */
     @Size(max = AppConst.MAX_LENGTH_64, message = "用户名称长度不能超过" + AppConst.MAX_LENGTH_64)
     private String username;
 
     /**
-     * 操作状态: 0-失败, 1-成功
+     * 操作状态: 0-失败， 1-成功
      */
     private Integer status;
 
     /**
-     * 日志类型集合(多选过滤;前端逗号分隔下发,空则不过滤)
+     * 日志类型集合（多选过滤;前端逗号分隔下发，空则不过滤）
      */
     private List<Integer> logTypes;
 

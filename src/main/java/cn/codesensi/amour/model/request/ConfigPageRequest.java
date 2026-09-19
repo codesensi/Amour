@@ -25,7 +25,7 @@ public class ConfigPageRequest extends BasePage implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 配置键(模糊匹配)
+     * 配置键（模糊匹配）
      */
     @Size(max = AppConst.MAX_LENGTH_64, message = "配置键长度不能超过" + AppConst.MAX_LENGTH_64)
     private String configKey;

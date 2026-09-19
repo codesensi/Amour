@@ -32,7 +32,7 @@ public class OssFileStorage implements FileStorage {
     }
 
     /**
-     * 存储文件内容到对象存储（预留,未接入）。
+     * 存储文件内容到对象存储（预留，未接入）。
      *
      * @param file 文件记录
      * @param in   文件内容输入流（由调用方打开并关闭）
@@ -55,7 +55,7 @@ public class OssFileStorage implements FileStorage {
     }
 
     /**
-     * 删除对象存储文件（预留,未接入）。
+     * 删除对象存储文件（预留，未接入）。
      *
      * @param key 相对存储 key（object key）
      */

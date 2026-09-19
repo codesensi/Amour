@@ -23,17 +23,17 @@ public class UserPageDTO extends BasePage implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 用户名称(模糊匹配)
+     * 用户名称（模糊匹配）
      */
     private String username;
 
     /**
-     * 用户昵称(模糊匹配)
+     * 用户昵称（模糊匹配）
      */
     private String nickname;
 
     /**
-     * 用户身份证号码(模糊匹配)
+     * 用户身份证号码（模糊匹配）
      */
     private String idCard;
 
@@ -43,12 +43,12 @@ public class UserPageDTO extends BasePage implements Serializable {
     private String phone;
 
     /**
-     * 用户QQ号码(模糊匹配)
+     * 用户QQ号码（模糊匹配）
      */
     private String qq;
 
     /**
-     * 用户邮箱(模糊匹配)
+     * 用户邮箱（模糊匹配）
      */
     private String email;
 

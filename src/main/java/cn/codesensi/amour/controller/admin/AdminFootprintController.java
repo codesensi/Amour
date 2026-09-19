@@ -76,7 +76,7 @@ public class AdminFootprintController {
     /**
      * 批量逻辑删除足迹。
      *
-     * @param ids 足迹ID集合(雪花ID字符串化传输)
+     * @param ids 足迹ID集合（雪花ID字符串化传输）
      */
     @SaCheckPermission("admin:footprint:delete")
     @Log(module = "足迹地图", operation = "删除足迹", type = LogTypeEnum.DELETE)

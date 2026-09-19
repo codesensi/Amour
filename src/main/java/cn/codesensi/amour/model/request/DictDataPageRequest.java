@@ -25,19 +25,19 @@ public class DictDataPageRequest extends BasePage implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 字典编码(模糊匹配)
+     * 字典编码（模糊匹配）
      */
     @Size(max = AppConst.MAX_LENGTH_64, message = "字典编码长度不能超过" + AppConst.MAX_LENGTH_64)
     private String dictCode;
 
     /**
-     * 字典名称(模糊匹配)
+     * 字典名称（模糊匹配）
      */
     @Size(max = AppConst.MAX_LENGTH_64, message = "字典名称长度不能超过" + AppConst.MAX_LENGTH_64)
     private String dictName;
 
     /**
-     * 字典值(模糊匹配)
+     * 字典值（模糊匹配）
      */
     @Size(max = AppConst.MAX_LENGTH_128, message = "字典值长度不能超过" + AppConst.MAX_LENGTH_128)
     private String dictValue;

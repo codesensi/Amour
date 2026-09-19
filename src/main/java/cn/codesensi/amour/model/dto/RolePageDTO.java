@@ -23,12 +23,12 @@ public class RolePageDTO extends BasePage implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 角色名称(模糊匹配)
+     * 角色名称（模糊匹配）
      */
     private String name;
 
     /**
-     * 角色编码(模糊匹配)
+     * 角色编码（模糊匹配）
      */
     private String code;
 

@@ -37,17 +37,17 @@ public class LovePhotoUpdateDTO implements Serializable {
     private String caption;
 
     /**
-     * 照片日期(格式:yyyy-MM-dd)
+     * 照片日期（格式:yyyy-MM-dd）
      */
     private String dateText;
 
     /**
-     * 照片标签集合(服务端规范化为逗号分隔存储,拼接后总长 ≤ 64)
+     * 照片标签集合（服务端规范化为逗号分隔存储，拼接后总长 ≤ 64）
      */
     private List<String> tags;
 
     /**
-     * 排序(数字越小越靠前)
+     * 排序（数字越小越靠前）
      */
     private Integer sort;
 

@@ -18,7 +18,7 @@ public class MenuInsertDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 父级菜单ID(0 表示根节点)
+     * 父级菜单ID（0 表示根节点）
      */
     private Long pid;
 

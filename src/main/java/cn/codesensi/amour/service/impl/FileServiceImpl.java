@@ -133,8 +133,8 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
             throw new BusinessException("上传文件不能为空");
         }
 
-        // 2. 清洗客户端文件名:去路径部分 + 移除换行符,防响应头 CRLF 注入;
-        //    随后做扩展名/大小校验(规则由 FileBizTypeEnum 承载)
+        // 2. 清洗客户端文件名:去路径部分 + 移除换行符，防响应头 CRLF 注入;
+        //    随后做扩展名/大小校验（规则由 FileBizTypeEnum 承载）
         String originalName = StrUtil.removeAllLineBreaks(
                 FileNameUtil.getName(StrUtil.blankToDefault(file.getOriginalFilename(), "file")));
         String extension = FileNameUtil.extName(originalName).toLowerCase();
@@ -146,8 +146,8 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
             throw new BusinessException("文件大小超过限制,最大 " + bizTypeEnum.getMaxMb() + "MB");
         }
 
-        // 3. 解析存储方式并路由实现:实时读取 sys_config 的 file.storage(系统配置页修改即时生效),
-        //    缺失时回退 yml 兜底值;无法识别的取值直接报错,避免静默落到错误存储
+        // 3. 解析存储方式并路由实现:实时读取 sys_config 的 file.storage（系统配置页修改即时生效），
+        //    缺失时回退 yml 兜底值;无法识别的取值直接报错，避免静默落到错误存储
         String storageCode = sysConfigService.listByKeys(List.of(ConfigKeyEnum.FILE_STORAGE.getCode()))
                 .stream().findFirst().map(ConfigDTO::getConfigValue)
                 .orElse(props.getStorage());
@@ -157,8 +157,8 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         }
         FileStorage storage = requireStorage(storageType);
 
-        // 4. 预生成主键并组装记录:存储 key 由主键参与拼装,先行生成可使入库合并为单条 SQL
-        // Content-Type 由扩展名查 Spring 内置 mime.types 强推导,不采信客户端声明值(防伪装类型的存储型 XSS)
+        // 4. 预生成主键并组装记录:存储 key 由主键参与拼装，先行生成可使入库合并为单条 SQL
+        // Content-Type 由扩展名查 Spring 内置 mime.types 强推导，不采信客户端声明值（防伪装类型的存储型 XSS）
         String contentType = MediaTypeFactory.getMediaType("file." + extension)
                 .map(MediaType::toString)
                 .orElse(MediaType.APPLICATION_OCTET_STREAM_VALUE);
@@ -171,7 +171,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
                 .setContentType(contentType)
                 .setBizType(bizTypeEnum.getCode());
 
-        // 5. 流式写盘:不将文件整包读入内存,避免并发上传大文件时的内存尖峰
+        // 5. 流式写盘:不将文件整包读入内存，避免并发上传大文件时的内存尖峰
         String key;
         try (InputStream in = file.getInputStream()) {
             key = storage.upload(sysFile, in);
@@ -179,7 +179,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
             throw new SystemException("读取上传文件失败");
         }
 
-        // 6. 注册回滚清理:注册须先于 MD5 计算与入库,写盘之后任一环节失败回滚时同样清理已写盘的物理文件,避免残留孤儿文件
+        // 6. 注册回滚清理:注册须先于 MD5 计算与入库，写盘之后任一环节失败回滚时同样清理已写盘的物理文件，避免残留孤儿文件
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
@@ -193,8 +193,8 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
             });
         }
 
-        // 7. 对上传源二次读取计算 MD5(Hutool 一次性消费流,返回小写十六进制);
-        //    MultipartFile 底层为磁盘临时文件,可重复打开流,与存储实现解耦(本地/OSS 均适用)
+        // 7. 对上传源二次读取计算 MD5（Hutool 一次性消费流，返回小写十六进制）;
+        //    MultipartFile 底层为磁盘临时文件，可重复打开流，与存储实现解耦（本地/OSS 均适用）
         String md5;
         try (InputStream in = file.getInputStream()) {
             md5 = DigestUtil.md5Hex(in);
@@ -202,10 +202,10 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
             throw new SystemException("读取上传文件失败");
         }
         sysFile.setMd5(md5);
-        // 回填存储 key:预览/下载均按该 key 定位物理文件,缺失会导致 NPE
+        // 回填存储 key:预览/下载均按该 key 定位物理文件，缺失会导致 NPE
         sysFile.setPath(key);
 
-        // 8. 单条 SQL 入库(主键/MD5/存储 key 均已就绪;主键已有值时框架自动跳过再生成)
+        // 8. 单条 SQL 入库（主键/MD5/存储 key 均已就绪;主键已有值时框架自动跳过再生成）
         sysFileMapper.insert(sysFile, true);
 
         FileUploadResultDTO response = new FileUploadResultDTO()
@@ -228,17 +228,17 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
      */
     @Override
     public FileViewResult load(Long id) {
-        // 绕过全局逻辑删除:预览需覆盖回收站内的已删除文件,删除标识不作为过滤条件
+        // 绕过全局逻辑删除:预览需覆盖回收站内的已删除文件，删除标识不作为过滤条件
         SysFile sysFile = LogicDeleteManager.execWithoutLogicDelete(() ->
                 sysFileMapper.selectOneById(id));
         if (ObjUtil.isNull(sysFile)) {
             throw new BusinessException("文件不存在");
         }
-        // 防御:存储 key 缺失的历史记录直接判不可用,避免物理定位时空指针
+        // 防御:存储 key 缺失的历史记录直接判不可用，避免物理定位时空指针
         if (StrUtil.isBlank(sysFile.getPath())) {
             throw new BusinessException("文件不存在或已被清理");
         }
-        // 按文件自身记录的 storage_type 分发(与当前配置无关,切换存储不影响历史文件)
+        // 按文件自身记录的 storage_type 分发（与当前配置无关，切换存储不影响历史文件）
         StorageTypeEnum storageType = BaseEnum.fromCode(StorageTypeEnum.class, sysFile.getStorageType());
         if (ObjUtil.isNull(storageType)) {
             throw new SystemException("不支持的存储类型：" + sysFile.getStorageType());
@@ -268,8 +268,8 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
     @Override
     public Page<FileInfoDTO> page(FilePageDTO pageDTO) {
         boolean recycled = DelFlagEnum.DELETED.getCode().equals(pageDTO.getDelFlag());
-        // 上传人按用户名模糊匹配:先解析用户ID集合再 IN,避免联表分页(对齐用户模块的既有惯例);
-        // 与主查询同处绕过逻辑删除的作用域,已删除用户的文件仍可按用户名命中(与原 IN 子查询行为一致)
+        // 上传人按用户名模糊匹配:先解析用户ID集合再 IN，避免联表分页（对齐用户模块的既有惯例）;
+        // 与主查询同处绕过逻辑删除的作用域，已删除用户的文件仍可按用户名命中（与原 IN 子查询行为一致）
         List<Long> creatorIds;
         if (StrUtil.isNotBlank(pageDTO.getCreatorName())) {
             List<Long> resolved = LogicDeleteManager.execWithoutLogicDelete(() ->
@@ -278,15 +278,15 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
                             .where(SYS_USER.USERNAME.like(pageDTO.getCreatorName()))
                             .listAs(Long.class));
             if (CollUtil.isEmpty(resolved)) {
-                // 上传人条件无匹配用户,直接返回空页,避免空 IN 查询
+                // 上传人条件无匹配用户，直接返回空页，避免空 IN 查询
                 return Page.of(pageDTO.getPageNumber(), pageDTO.getPageSize(), 0);
             }
             creatorIds = resolved;
         } else {
             creatorIds = List.of();
         }
-        // 绕过全局逻辑删除:回收站需按 del_flag=1 命中已删除记录,
-        // 数据域由本方法显式的 DEL_FLAG 条件圈定(0-文件列表,1-回收站)
+        // 绕过全局逻辑删除:回收站需按 del_flag=1 命中已删除记录，
+        // 数据域由本方法显式的 DEL_FLAG 条件圈定（0-文件列表，1-回收站）
         Page<SysFile> page = LogicDeleteManager.execWithoutLogicDelete(() ->
                 QueryChain.of(sysFileMapper)
                         .where(SYS_FILE.DEL_FLAG.eq(recycled
@@ -310,7 +310,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         Map<Long, String> usernameMap = Map.of();
         if (CollUtil.isNotEmpty(pageCreatorIds)) {
             List<SysUser> sysUsers = sysUserMapper.selectListByIds(pageCreatorIds);
-            // username 理论非空(登录账号),防御 toMap 对 null value 抛 NPE
+            // username 理论非空（登录账号），防御 toMap 对 null value 抛 NPE
             if (CollUtil.isNotEmpty(sysUsers)) {
                 usernameMap = sysUsers.stream()
                         .filter(row -> ObjUtil.isNotNull(row.getUsername()))
@@ -320,7 +320,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         final Map<Long, String> finalUsernameMap = usernameMap;
         Page<FileInfoDTO> result = fileConverter.toItemDTOPage(page);
         result.getRecords().forEach(row -> {
-            // creator 可能为空(未登录来源记录),不可变 Map 拒绝 null key 查询,须先行判空
+            // creator 可能为空（未登录来源记录），不可变 Map 拒绝 null key 查询，须先行判空
             if (ObjUtil.isNotNull(row.getCreator()) && CollUtil.isNotEmpty(finalUsernameMap)) {
                 row.setCreatorName(finalUsernameMap.get(row.getCreator()));
             }
@@ -344,19 +344,19 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
      */
     @Override
     public void delete(Long id) {
-        // 绕过全局逻辑删除,才能识别已在回收站的记录并给出准确的重复删除提示
+        // 绕过全局逻辑删除，才能识别已在回收站的记录并给出准确的重复删除提示
         SysFile sysFile = LogicDeleteManager.execWithoutLogicDelete(() ->
                 sysFileMapper.selectOneById(id));
         if (ObjUtil.isNull(sysFile)) {
             throw new BusinessException("文件不存在");
         }
-        // 归属校验:上传人本人(creator 可能为空的历史记录不匹配)或具备文件删除权限
+        // 归属校验:上传人本人（creator 可能为空的历史记录不匹配）或具备文件删除权限
         boolean ownFile = ObjUtil.equals(StpUtil.getLoginIdAsLong(), sysFile.getCreator());
         if (!ownFile && !StpUtil.hasPermission("system:file:delete")) {
             throw new BusinessException("仅可删除自己上传的文件");
         }
-        // 已在回收站时幂等成功:业务侧"清除图片"未保存前可重复触发,
-        // 且逻辑删除改写自动携带 del_flag=0 条件,重复执行本就无副作用
+        // 已在回收站时幂等成功:业务侧"清除图片"未保存前可重复触发，
+        // 且逻辑删除改写自动携带 del_flag=0 条件，重复执行本就无副作用
         if (DelFlagEnum.DELETED.getCode().equals(sysFile.getDelFlag())) {
             return;
         }
@@ -374,7 +374,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
      */
     @Override
     public void restore(Long id) {
-        // 绕过全局逻辑删除:恢复的目标是已删除记录,查询与回置 del_flag 均需触达 del_flag=1 的行
+        // 绕过全局逻辑删除:恢复的目标是已删除记录，查询与回置 del_flag 均需触达 del_flag=1 的行
         SysFile sysFile = LogicDeleteManager.execWithoutLogicDelete(() ->
                 sysFileMapper.selectOneById(id));
         if (ObjUtil.isNull(sysFile)) {
@@ -403,8 +403,8 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
      */
     @Override
     public void physicalDelete(Long id) {
-        // 绕过全局逻辑删除:彻底删除的目标是已删除记录,且须执行真正的物理 DELETE
-        //(默认 deleteById 会被框架改写为逻辑删除并对 del_flag=0 过滤,对已删除行是空操作)
+        // 绕过全局逻辑删除:彻底删除的目标是已删除记录，且须执行真正的物理 DELETE
+        //（默认 deleteById 会被框架改写为逻辑删除并对 del_flag=0 过滤，对已删除行是空操作）
         SysFile sysFile = LogicDeleteManager.execWithoutLogicDelete(() -> sysFileMapper.selectOneById(id));
         if (ObjUtil.isNull(sysFile)) {
             throw new BusinessException("文件不存在");
@@ -416,7 +416,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         if (ObjUtil.isNull(storageType)) {
             throw new SystemException("不支持的存储类型：" + sysFile.getStorageType());
         }
-        // 先物理删除记录（保持绕过全局逻辑删除的真正 DELETE）,成功后再清理物理文件,
+        // 先物理删除记录（保持绕过全局逻辑删除的真正 DELETE），成功后再清理物理文件，
         // 避免先删文件而删行失败时留下"记录仍在、文件已丢"的悬空记录
         LogicDeleteManager.execWithoutLogicDelete(() -> sysFileMapper.deleteById(id));
 
@@ -443,7 +443,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
             return;
         }
 
-        // 1. 解析文件ID:仅识别本系统分发的 /file/view/{id} 形态,外链等静默跳过
+        // 1. 解析文件ID:仅识别本系统分发的 /file/view/{id} 形态，外链等静默跳过
         List<Long> fileIds = urls.stream()
                 .filter(StrUtil::isNotBlank)
                 .map(url -> {
@@ -453,7 +453,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
                 .filter(Objects::nonNull)
                 .distinct()
                 .toList();
-        // 跳过的 URL 记录 debug,便于排查业务引用未采纳的问题
+        // 跳过的 URL 记录 debug，便于排查业务引用未采纳的问题
         long skippedCount = urls.stream()
                 .filter(StrUtil::isNotBlank)
                 .filter(url -> !VIEW_URL_PATTERN.matcher(url).matches())
@@ -466,7 +466,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
             return;
         }
 
-        // 2. 绑定:回填业务关联ID(仅更新业务类型匹配且未删除的记录,幂等)
+        // 2. 绑定:回填业务关联ID（仅更新业务类型匹配且未删除的记录，幂等）
         UpdateChain.of(SysFile.class)
                 .set(SYS_FILE.BIZ_ID, bizId)
                 .where(SYS_FILE.ID.in(fileIds))
@@ -474,8 +474,8 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
                 .and(SYS_FILE.DEL_FLAG.eq(DelFlagEnum.NOT_DELETED.getCode()))
                 .update();
 
-        // 3. 替换:同业务下本次未引用的旧文件标记逻辑删除(如更换头像后的旧文件);
-        // deleteByQuery 走全局逻辑删除,自动携带 del_flag=0 条件保证幂等
+        // 3. 替换:同业务下本次未引用的旧文件标记逻辑删除（如更换头像后的旧文件）;
+        // deleteByQuery 走全局逻辑删除，自动携带 del_flag=0 条件保证幂等
         sysFileMapper.deleteByQuery(QueryChain.of(sysFileMapper)
                 .where(SYS_FILE.BIZ_TYPE.eq(bizType.getCode()))
                 .and(SYS_FILE.BIZ_ID.eq(bizId))

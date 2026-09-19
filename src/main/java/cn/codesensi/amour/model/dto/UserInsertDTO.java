@@ -58,7 +58,7 @@ public class UserInsertDTO implements Serializable {
     private String avatar;
 
     /**
-     * 用户状态:0-启用，1-禁用(缺省视为启用)
+     * 用户状态:0-启用，1-禁用（缺省视为启用）
      */
     private Integer status;
 

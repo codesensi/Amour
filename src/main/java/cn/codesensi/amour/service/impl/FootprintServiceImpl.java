@@ -74,9 +74,9 @@ public class FootprintServiceImpl implements FootprintService {
      * 排序为到访日期升序 → id 升序（无日期的记录按 NULL 值排序规则置于最前/最后由数据库决定）。
      *
      * @param page             分页参数
-     * @param city             城市(模糊匹配,可空)
-     * @param arrivalDateBegin 到访日期起点(含,可空)
-     * @param arrivalDateEnd   到访日期终点(含,可空)
+     * @param city             城市（模糊匹配，可空）
+     * @param arrivalDateBegin 到访日期起点（含，可空）
+     * @param arrivalDateEnd   到访日期终点（含，可空）
      * @return 足迹条目 DTO 分页结果
      */
     private Page<FootprintDTO> doPage(BasePage page, String city, LocalDate arrivalDateBegin, LocalDate arrivalDateEnd) {

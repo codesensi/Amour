@@ -15,7 +15,7 @@ import java.io.Serializable;
  * 通知已读记录实体。
  * <p>
  * 对应 {@code sys_notice_read} 表，维护用户与通知的已读绑定关系；
- * (user_id, notice_id) 全生命周期唯一，标记已读按唯一键幂等写入。
+ * （user_id， notice_id） 全生命周期唯一，标记已读按唯一键幂等写入。
  *
  * @author codesensi
  * @since 1.0

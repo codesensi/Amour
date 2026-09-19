@@ -89,7 +89,7 @@ public class AdminLovePhotoController {
     /**
      * 批量逻辑删除照片。
      *
-     * @param ids 照片ID集合(雪花ID字符串化传输)
+     * @param ids 照片ID集合（雪花ID字符串化传输）
      */
     @SaCheckPermission("admin:love-photo:delete")
     @Log(module = "恋爱画册", operation = "删除照片", type = LogTypeEnum.DELETE)

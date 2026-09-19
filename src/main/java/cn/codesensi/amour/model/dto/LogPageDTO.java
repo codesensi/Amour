@@ -24,17 +24,17 @@ public class LogPageDTO extends BasePage implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 用户名称(模糊匹配)
+     * 用户名称（模糊匹配）
      */
     private String username;
 
     /**
-     * 操作状态: 0-失败, 1-成功
+     * 操作状态: 0-失败， 1-成功
      */
     private Integer status;
 
     /**
-     * 日志类型集合(多选过滤;空则不过滤,取值范围见 LogTypeEnum)
+     * 日志类型集合（多选过滤;空则不过滤，取值范围见 LogTypeEnum）
      */
     private List<Integer> logTypes;
 

@@ -70,7 +70,7 @@ public class IpUtil {
             return UNKNOWN;
         }
 
-        // 直连部署:代理转发头可被客户端伪造,不参与解析,直接取连接对端地址
+        // 直连部署:代理转发头可被客户端伪造，不参与解析，直接取连接对端地址
         if (!trustProxyHeaders) {
             return normalizeLoopback(request.getRemoteAddr());
         }

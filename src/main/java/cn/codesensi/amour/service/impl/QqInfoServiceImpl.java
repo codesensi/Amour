@@ -95,12 +95,12 @@ public class QqInfoServiceImpl implements QqInfoService {
             if (StrUtil.isNotBlank(apiKey)) {
                 request.header(AppConst.UAPI_KEY_HEADER, apiKey);
             }
-            // try-with-resources 及时释放 HttpResponse 底层连接,避免资源泄漏
+            // try-with-resources 及时释放 HttpResponse 底层连接，避免资源泄漏
             try (HttpResponse response = request.timeout(appProperties.getUapiTimeout()).execute()) {
                 qqApiResponse = response.body();
             }
         } catch (Exception e) {
-            // 上游网络异常(超时/连接失败)降级,不阻断门户调用
+            // 上游网络异常（超时/连接失败）降级，不阻断门户调用
             log.warn("qq-api 调用失败，降级 qq-avatar：qq={}", qq, e);
             return fallbackByQqAvatar(qq);
         }
@@ -116,7 +116,7 @@ public class QqInfoServiceImpl implements QqInfoService {
             log.warn("qq-api 响应解析失败，降级 qq-avatar：{}", qqApiResponse, e);
             return fallbackByQqAvatar(qq);
         }
-        // 上游异常载荷(限流/配额耗尽/无效 QQ 等)可能缺少头像字段,判空兜底避免 NPE
+        // 上游异常载荷（限流/配额耗尽/无效 QQ 等）可能缺少头像字段，判空兜底避免 NPE
         if (StrUtil.isBlank(qqInfoResultDTO.getAvatarUrl())) {
             log.warn("qq-api 响应缺少头像地址，降级 qq-avatar：{}", qqApiResponse);
             return fallbackByQqAvatar(qq);

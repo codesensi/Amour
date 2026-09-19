@@ -23,7 +23,7 @@ public class ConfigPageDTO extends BasePage implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 配置键(模糊匹配)
+     * 配置键（模糊匹配）
      */
     private String configKey;
 

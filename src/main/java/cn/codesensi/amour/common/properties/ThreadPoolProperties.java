@@ -71,7 +71,7 @@ public class ThreadPoolProperties {
         private String rejectedExecutionHandler;
 
         /**
-         * 是否启用虚拟线程(Java 21)：启用后本池其余平台线程参数被忽略，仅 max-pool-size 生效（复用为并发上限）。
+         * 是否启用虚拟线程（Java 21）：启用后本池其余平台线程参数被忽略，仅 max-pool-size 生效（复用为并发上限）。
          * 仅通用池支持；日志池固定平台线程池——虚拟线程永不拒绝任务，会使日志池的丢弃语义失效。
          */
         private Boolean virtualThreads;

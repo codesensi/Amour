@@ -23,17 +23,17 @@ public class FootprintPageDTO extends BasePage {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 城市/地点名称(模糊匹配)
+     * 城市/地点名称（模糊匹配）
      */
     private String city;
 
     /**
-     * 到访日期范围起点(含;yyyy-MM-dd)
+     * 到访日期范围起点（含;yyyy-MM-dd）
      */
     private LocalDate arrivalDateBegin;
 
     /**
-     * 到访日期范围终点(含;yyyy-MM-dd)
+     * 到访日期范围终点（含;yyyy-MM-dd）
      */
     private LocalDate arrivalDateEnd;
 

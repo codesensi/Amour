@@ -158,7 +158,7 @@ public class LogAspect {
                 fillUsernameFromArgs(joinPoint, sysLog);
             }
 
-            // 非 Web 线程触发时无请求上下文,请求维度字段(url/ip/region/param)整体跳过
+            // 非 Web 线程触发时无请求上下文，请求维度字段（url/ip/region/param）整体跳过
             HttpServletRequest request = ServletUtil.getRequest();
             if (ObjUtil.isNotNull(request)) {
                 sysLog.setUrl(request.getRequestURI());
@@ -177,11 +177,11 @@ public class LogAspect {
                 sysLog.setStatus(SuccessEnum.FAIL.getCode());
                 sysLog.setMsg(StrUtil.subPre(e.getMessage(), AppConst.MAX_LENGTH_512));
                 if (log.saveResult()) {
-                    // 失败响应与全局异常处理器口径一致:按异常类型构造失败 Result 记录,详情可完整回放响应体
+                    // 失败响应与全局异常处理器口径一致:按异常类型构造失败 Result 记录，详情可完整回放响应体
                     sysLog.setResult(fitJson(mask(toJson(buildFailResult(e))), maxTextLength));
                 }
             } else {
-                // 响应结果与真实响应体保持一致：@ApiResponseBody 会把原始返回值包装为 Result.success(...)
+                // 响应结果与真实响应体保持一致：@ApiResponseBody 会把原始返回值包装为 Result.success（...）
                 sysLog.setStatus(SuccessEnum.SUCCESS.getCode());
                 if (result instanceof Result<?> r) {
                     sysLog.setMsg(StrUtil.subPre(r.getMsg(), AppConst.MAX_LENGTH_512));
@@ -249,7 +249,7 @@ public class LogAspect {
         if (StrUtil.isBlank(queryString) && CollUtil.isEmpty(params)) {
             return null;
         }
-        // 组件为 null 时 Hutool 默认忽略该键,输出 JSON 结构与键序(query → params)保持不变
+        // 组件为 null 时 Hutool 默认忽略该键，输出 JSON 结构与键序（query → params）保持不变
         return mask(toJson(new ParamLog(StrUtil.blankToDefault(queryString, null),
                 CollUtil.isEmpty(params) ? null : params)));
     }

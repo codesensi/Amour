@@ -25,27 +25,27 @@ public class FootprintInsertDTO implements Serializable {
     private String city;
 
     /**
-     * 精确地点名称(地图选点搜索选中的地点,或手动录入;可空)
+     * 精确地点名称（地图选点搜索选中的地点，或手动录入;可空）
      */
     private String placeName;
 
     /**
-     * 经度(可空)
+     * 经度（可空）
      */
     private BigDecimal longitude;
 
     /**
-     * 纬度(可空)
+     * 纬度（可空）
      */
     private BigDecimal latitude;
 
     /**
-     * 到访日期(可空)
+     * 到访日期（可空）
      */
     private LocalDate arrivalDate;
 
     /**
-     * 照片地址(可空)
+     * 照片地址（可空）
      */
     private String photoUrl;
 

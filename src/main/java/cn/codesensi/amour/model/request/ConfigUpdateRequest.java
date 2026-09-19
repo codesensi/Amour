@@ -30,7 +30,7 @@ public class ConfigUpdateRequest implements Serializable {
     private Long id;
 
     /**
-     * 配置值(统一字符串存储；格式由服务端按值类型校验)。
+     * 配置值（统一字符串存储；格式由服务端按值类型校验）。
      * <p>
      * 允许为空：图片型配置（站点 logo 等）清空即回退消费端兜底图；
      * 空值的格式约束由服务端按值类型校验兜底（布尔/整数类型不接受空值）

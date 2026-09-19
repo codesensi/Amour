@@ -79,9 +79,9 @@ public class LovePhotoServiceImpl implements LovePhotoService {
      * 排序为 sort 升序 → id 升序；逻辑删除（del_flag）由全局配置自动追加过滤。
      *
      * @param page    分页参数
-     * @param caption 文案(模糊匹配,可空)
-     * @param tag     标签(逗号集合内精确匹配,可空)
-     * @param hidden  显隐过滤(可空;门户固定传 0,管理端传筛选值或 null 查全量)
+     * @param caption 文案（模糊匹配，可空）
+     * @param tag     标签（逗号集合内精确匹配，可空）
+     * @param hidden  显隐过滤（可空;门户固定传 0，管理端传筛选值或 null 查全量）
      * @return 照片条目 DTO 分页结果
      */
     private Page<LovePhotoDTO> doPage(BasePage page, String caption, String tag, Integer hidden) {

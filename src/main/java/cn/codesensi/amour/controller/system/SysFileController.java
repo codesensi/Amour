@@ -146,7 +146,7 @@ public class SysFileController {
         FileViewResult result = fileService.load(id);
         SysFile sysFile = result.sysFile();
         String fallbackName = StrUtil.blankToDefault(sysFile.getOriginalName(), "file-" + sysFile.getId());
-        // RFC 5987 编码文件名以支持中文,axios 场景下空格会被编码为 +,需还原为 %20
+        // RFC 5987 编码文件名以支持中文，axios 场景下空格会被编码为 +，需还原为 %20
         String encoded = URLEncoder.encode(fallbackName, StandardCharsets.UTF_8).replace("+", "%20");
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)

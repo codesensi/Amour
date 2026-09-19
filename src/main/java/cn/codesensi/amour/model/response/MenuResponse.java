@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
  *
  * @author codesensi
  * @since 1.0
- * 配置@JsonInclude(Include.NON_NULL)的注解，解决传null值给Vue动态路由渲染时出错
+ * 配置@JsonInclude（Include.NON_NULL）的注解，解决传null值给Vue动态路由渲染时出错
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
@@ -91,7 +91,7 @@ public class MenuResponse implements Serializable {
     private String remark;
 
     /**
-     * 创建时间(yyyy-MM-dd HH:mm:ss)
+     * 创建时间（yyyy-MM-dd HH:mm:ss）
      */
     private LocalDateTime createTime;
 

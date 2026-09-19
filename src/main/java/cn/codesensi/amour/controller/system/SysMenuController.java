@@ -90,7 +90,7 @@ public class SysMenuController {
     }
 
     /**
-     * 删除菜单(级联删除其全部下级菜单)
+     * 删除菜单（级联删除其全部下级菜单）
      *
      * @param id 菜单ID
      */

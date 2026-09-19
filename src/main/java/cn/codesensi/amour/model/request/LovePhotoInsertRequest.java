@@ -39,25 +39,25 @@ public class LovePhotoInsertRequest implements Serializable {
     private String caption;
 
     /**
-     * 照片日期(格式:yyyy-MM-dd)
+     * 照片日期（格式:yyyy-MM-dd）
      */
     @NotBlank(message = "照片日期不能为空")
     @Pattern(regexp = RegexConst.DIGITS_4_2_2, message = "照片日期格式须为yyyy-MM-dd")
     private String dateText;
 
     /**
-     * 照片标签集合(服务端规范化为逗号分隔存储,拼接后总长 ≤ 64)
+     * 照片标签集合（服务端规范化为逗号分隔存储，拼接后总长 ≤ 64）
      */
     private List<String> tags;
 
     /**
-     * 排序(数字越小越靠前)
+     * 排序（数字越小越靠前）
      */
     @NotNull(message = "排序不能为空")
     private Integer sort;
 
     /**
-     * 显隐标识: 0-显示, 1-隐藏
+     * 显隐标识: 0-显示， 1-隐藏
      */
     @NotNull(message = "显隐标识不能为空")
     private Integer hidden;

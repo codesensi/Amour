@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author codesensi
  * @since 1.0
- * 配置@JsonInclude(Include.NON_NULL)的注解，解决传null值给Vue动态路由渲染时出错
+ * 配置@JsonInclude（Include.NON_NULL）的注解，解决传null值给Vue动态路由渲染时出错
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data

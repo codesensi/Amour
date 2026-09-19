@@ -44,27 +44,27 @@ public class PortalFootprint extends BaseEntity implements Serializable {
     private String city;
 
     /**
-     * 精确地点名称(地图选点搜索选中的地点,或手动录入;可空)
+     * 精确地点名称（地图选点搜索选中的地点，或手动录入;可空）
      */
     private String placeName;
 
     /**
-     * 经度(GCJ-02 坐标系,与高德地图一致;选点或手动录入)
+     * 经度（GCJ-02 坐标系，与高德地图一致;选点或手动录入）
      */
     private BigDecimal longitude;
 
     /**
-     * 纬度(GCJ-02 坐标系,与高德地图一致)
+     * 纬度（GCJ-02 坐标系，与高德地图一致）
      */
     private BigDecimal latitude;
 
     /**
-     * 到访日期(yyyy-MM-dd)
+     * 到访日期（yyyy-MM-dd）
      */
     private LocalDate arrivalDate;
 
     /**
-     * 照片地址(站内 /file/view/{id} 或外链;空表示无照片)
+     * 照片地址（站内 /file/view/{id} 或外链;空表示无照片）
      */
     private String photoUrl;
 

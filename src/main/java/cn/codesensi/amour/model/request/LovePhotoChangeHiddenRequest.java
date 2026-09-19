@@ -25,7 +25,7 @@ public class LovePhotoChangeHiddenRequest implements Serializable {
     private Long id;
 
     /**
-     * 显隐标识: 0-显示, 1-隐藏
+     * 显隐标识: 0-显示， 1-隐藏
      */
     @NotNull(message = "显隐标识不能为空")
     private Integer hidden;

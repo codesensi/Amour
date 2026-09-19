@@ -58,7 +58,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
      * 分页查询角色信息。
      * <p>
      * 角色名称、角色编码为模糊匹配，状态为精确匹配，条件缺省时自动忽略；
-     * 页码与每页条数的缺省值由 {@link BasePage} 提供(1 与 20)，与前端默认值保持一致。
+     * 页码与每页条数的缺省值由 {@link BasePage} 提供（1 与 20），与前端默认值保持一致。
      *
      * @param rolePageDTO 分页查询参数
      * @return 角色信息分页结果
@@ -136,7 +136,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     /**
      * 修改角色状态。
      * <p>
-     * 系统内置角色不允许禁用(启用请求不受限)；同状态幂等返回；
+     * 系统内置角色不允许禁用（启用请求不受限）；同状态幂等返回；
      * 状态变化影响该角色下用户的权限，失效其权限/路由菜单/用户信息缓存。
      *
      * @param roleChangeStatusDTO 角色状态信息
@@ -148,7 +148,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             throw new BusinessException("角色不存在");
         }
 
-        // 系统内置角色不允许禁用(启用请求不受限)
+        // 系统内置角色不允许禁用（启用请求不受限）
         if (BuiltinEnum.YES.getCode().equals(sysRole.getBuiltin())
                 && EnableEnum.DISABLE.getCode().equals(roleChangeStatusDTO.getStatus())) {
             throw new BusinessException("系统内置角色不允许禁用");
@@ -196,14 +196,14 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             throw new BusinessException("角色不存在：" + missingIds);
         }
 
-        // 2. 系统内置角色不允许删除(整批失败)
+        // 2. 系统内置角色不允许删除（整批失败）
         boolean containsBuiltin = sysRoles.stream()
                 .anyMatch(sysRole -> BuiltinEnum.YES.getCode().equals(sysRole.getBuiltin()));
         if (containsBuiltin) {
             throw new BusinessException("系统内置角色不允许删除");
         }
 
-        // 3. 查询这些角色下关联的用户ID,用于删除后失效其缓存
+        // 3. 查询这些角色下关联的用户ID，用于删除后失效其缓存
         List<Long> userIds = listUserIdsByRoleIds(ids);
 
         // 4. 删除角色与角色-菜单、用户-角色关联
@@ -211,13 +211,13 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         sysRoleMenuService.remove(SYS_ROLE_MENU.ROLE_ID.in(ids));
         sysUserRoleService.remove(SYS_USER_ROLE.ROLE_ID.in(ids));
 
-        // 5. 失效受影响用户的权限/路由菜单/用户信息缓存,并踢出其会话(注册到事务提交后执行)
+        // 5. 失效受影响用户的权限/路由菜单/用户信息缓存，并踢出其会话（注册到事务提交后执行）
         CacheUtil.evictAfterCommit(() -> {
             log.debug("角色删除完成：roleIds={}，失效缓存，受影响用户数={}", ids, userIds.size());
             cacheEvictService.evictPermCache(userIds);
             cacheEvictService.evictMenuCache(userIds);
             cacheEvictService.evictUserCache(userIds);
-            // 角色被删除后其关联用户的权限已变化,踢出使其重新登录
+            // 角色被删除后其关联用户的权限已变化，踢出使其重新登录
             userIds.forEach(StpUtil::logout);
         });
     }

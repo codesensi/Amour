@@ -28,7 +28,7 @@ public class DictTypeResponse implements Serializable {
     private Long id;
 
     /**
-     * 字典编码(如 gender、enable)
+     * 字典编码（如 gender、enable）
      */
     private String dictCode;
 
@@ -43,7 +43,7 @@ public class DictTypeResponse implements Serializable {
     private Integer builtin;
 
     /**
-     * 该编码下的条目数(含禁用条目)
+     * 该编码下的条目数（含禁用条目）
      */
     private Integer count;
 

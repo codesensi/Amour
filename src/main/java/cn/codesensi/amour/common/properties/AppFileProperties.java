@@ -25,7 +25,7 @@ public class AppFileProperties implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 存储方式: local-本地, oss-对象存储（运行时以 sys_config 的 file.storage 为准，此处为兜底值）
+     * 存储方式: local-本地， oss-对象存储（运行时以 sys_config 的 file.storage 为准，此处为兜底值）
      */
     private String storage = StorageTypeEnum.LOCAL.getCode();
 

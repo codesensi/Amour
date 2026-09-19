@@ -63,8 +63,8 @@ public class RateLimitAspect {
      */
     @Before("@annotation(rateLimit)")
     public void check(RateLimit rateLimit) {
-        // 代理头可信开关:sys_config 基础分组(trust-proxy-headers)热更新,仅部署于可信反向代理之后时开启;
-        // 直连形态取连接对端地址,避免客户端伪造 X-Real-IP 等代理头绕过限流
+        // 代理头可信开关:sys_config 基础分组（trust-proxy-headers）热更新，仅部署于可信反向代理之后时开启;
+        // 直连形态取连接对端地址，避免客户端伪造 X-Real-IP 等代理头绕过限流
         SysConfig trustSwitch = sysConfigService.oneByKey(ConfigKeyEnum.TRUST_PROXY_HEADERS.getCode());
         boolean trustProxyHeaders = ObjUtil.isNotNull(trustSwitch) && Boolean.parseBoolean(trustSwitch.getConfigValue());
         String ip = IpUtil.getIpAddr(ServletUtil.getRequest(), trustProxyHeaders);
@@ -80,7 +80,7 @@ public class RateLimitAspect {
             return;
         }
         long now = System.currentTimeMillis();
-        // get(key, callable) 原子创建计数器；窗口判断与重置在计数器内部同步完成
+        // get（key， callable） 原子创建计数器；窗口判断与重置在计数器内部同步完成
         WindowCounter counter = cache.get(rateLimit.key().getCode() + AppConst.COLON + ip, () -> new WindowCounter(now));
         if (ObjUtil.isNull(counter)) {
             // 理论不可达：该重载契约是未命中时执行 callable 并返回其结果，callable 恒非 null；

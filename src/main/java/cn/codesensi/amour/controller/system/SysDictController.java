@@ -77,7 +77,7 @@ public class SysDictController {
 
     /**
      * 批量删除字典类型（内置类型禁删、类型下存在条目时禁删，整批失败）。
-     * <p>路径参数支持英文逗号分隔的多个ID，如 /sys/dict/type/delete/1,2,3。
+     * <p>路径参数支持英文逗号分隔的多个ID，如 /sys/dict/type/delete/1，2，3。
      *
      * @param ids 字典类型ID列表
      */
@@ -93,7 +93,7 @@ public class SysDictController {
      * <p>编码、名称、值为模糊匹配，状态为精确匹配，条件缺省时自动忽略。
      *
      * @param dictDataPageRequest 分页查询参数
-     * @return 字典条目分页结果(按编码升序 → 组内 sort 升序；dictName 为类型名展示字段)
+     * @return 字典条目分页结果（按编码升序 → 组内 sort 升序；dictName 为类型名展示字段）
      */
     @SaCheckPermission("system:dict:page")
     @GetMapping("/data/page")
@@ -148,7 +148,7 @@ public class SysDictController {
 
     /**
      * 批量删除字典条目（内置条目禁删，整批失败）。
-     * <p>路径参数支持英文逗号分隔的多个ID，如 /sys/dict/data/delete/1,2,3。
+     * <p>路径参数支持英文逗号分隔的多个ID，如 /sys/dict/data/delete/1，2，3。
      *
      * @param ids 字典条目ID列表
      */

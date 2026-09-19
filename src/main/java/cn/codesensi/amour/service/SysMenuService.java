@@ -39,7 +39,7 @@ public interface SysMenuService extends IService<SysMenu> {
     void changeStatus(MenuChangeStatusDTO menuChangeStatusDTO);
 
     /**
-     * 删除菜单(级联删除其全部下级菜单，并清理角色-菜单关联)
+     * 删除菜单（级联删除其全部下级菜单，并清理角色-菜单关联）
      *
      * @param id 菜单ID
      */

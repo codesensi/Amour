@@ -25,13 +25,13 @@ public class RolePageRequest extends BasePage implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 角色名称(模糊匹配)
+     * 角色名称（模糊匹配）
      */
     @Size(max = AppConst.MAX_LENGTH_64, message = "角色名称长度不能超过" + AppConst.MAX_LENGTH_64)
     private String name;
 
     /**
-     * 角色编码(模糊匹配)
+     * 角色编码（模糊匹配）
      */
     @Size(max = AppConst.MAX_LENGTH_64, message = "角色编码长度不能超过" + AppConst.MAX_LENGTH_64)
     private String code;

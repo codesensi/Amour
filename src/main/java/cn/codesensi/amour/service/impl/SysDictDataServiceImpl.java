@@ -183,15 +183,15 @@ public class SysDictDataServiceImpl implements SysDictDataService {
     }
 
     /**
-     * 分页查询字典条目(管理端，含禁用条目与完整字段)。
+     * 分页查询字典条目（管理端，含禁用条目与完整字段）。
      * <p>
      * 编码、值为模糊匹配，状态为精确匹配，条件缺省时自动忽略；名称条件已归类型表，
      * 先经类型表解析为编码集合再下推（无命中编码时直接返回空页）；
-     * 排序为编码升序 → 组内 sort 升序 → id 升序；页码与每页条数的缺省值由 {@code BasePage} 提供(1 与 20)。
+     * 排序为编码升序 → 组内 sort 升序 → id 升序；页码与每页条数的缺省值由 {@code BasePage} 提供（1 与 20）。
      * <p>逻辑删除（del_flag）由 MyBatis-Flex 全局配置自动追加过滤。
      *
      * @param pageDTO 分页查询参数
-     * @return 字典条目分页结果(dictName 为自类型表回填的展示字段)
+     * @return 字典条目分页结果（dictName 为自类型表回填的展示字段）
      */
     @Override
     public Page<SysDictData> dataPage(DictDataPageDTO pageDTO) {
@@ -222,7 +222,7 @@ public class SysDictDataServiceImpl implements SysDictDataService {
                 .orderBy(SYS_DICT_DATA.ID, true)
                 .page(Page.of(pageDTO.getPageNumber(), pageDTO.getPageSize()));
 
-        // 页内编码批量回填类型名(两次轻量查询，避免 join 映射复杂度)
+        // 页内编码批量回填类型名（两次轻量查询，避免 join 映射复杂度）
         fillDictNames(page);
         return page;
     }
@@ -280,7 +280,7 @@ public class SysDictDataServiceImpl implements SysDictDataService {
             checkValueUnique(dictData.getDictCode(), updateDTO.getDictValue());
         }
 
-        // 经 UpdateChain 显式逐列赋值,备注置空时写入 null(库中不落空串)
+        // 经 UpdateChain 显式逐列赋值，备注置空时写入 null（库中不落空串）
         UpdateChain.of(SysDictData.class)
                 .set(SYS_DICT_DATA.DICT_VALUE, updateDTO.getDictValue())
                 .set(SYS_DICT_DATA.DICT_LABEL, updateDTO.getDictLabel())
@@ -345,7 +345,7 @@ public class SysDictDataServiceImpl implements SysDictDataService {
             throw new BusinessException("字典条目不存在");
         }
 
-        // 内置条目不允许删除(整批失败)
+        // 内置条目不允许删除（整批失败）
         boolean containsBuiltin = dictList.stream()
                 .anyMatch(dict -> BuiltinEnum.YES.getCode().equals(dict.getBuiltin()));
         if (containsBuiltin) {

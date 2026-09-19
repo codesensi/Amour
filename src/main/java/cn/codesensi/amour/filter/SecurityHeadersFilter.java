@@ -67,11 +67,11 @@ public class SecurityHeadersFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        // 防浏览器 MIME 嗅探(配合 /file/view 的服务端类型推导,双保险)
+        // 防浏览器 MIME 嗅探（配合 /file/view 的服务端类型推导，双保险）
         response.setHeader(HEADER_CONTENT_TYPE_OPTIONS, "nosniff");
-        // 禁止被第三方页面 iframe 嵌套(同源 iframe 不受影响)
+        // 禁止被第三方页面 iframe 嵌套（同源 iframe 不受影响）
         response.setHeader(HEADER_FRAME_OPTIONS, "SAMEORIGIN");
-        // 外链跳转仅携带 origin,不泄露本站路径与查询参数
+        // 外链跳转仅携带 origin，不泄露本站路径与查询参数
         response.setHeader(HEADER_REFERRER_POLICY, "strict-origin-when-cross-origin");
         filterChain.doFilter(request, response);
     }

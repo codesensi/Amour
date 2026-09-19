@@ -33,8 +33,8 @@ public class PortalFootprintController {
     /**
      * 查询足迹分页（免登录）
      *
-     * @param page 分页参数(pageNumber/pageSize)
-     * @return 全部未删除足迹,按到访日期升序;photoUrl 为免登录分发地址或 null
+     * @param page 分页参数（pageNumber/pageSize）
+     * @return 全部未删除足迹，按到访日期升序;photoUrl 为免登录分发地址或 null
      */
     @GetMapping
     public Page<PortalFootprintResponse> page(BasePage page) {

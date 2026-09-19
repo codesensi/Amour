@@ -81,7 +81,7 @@ public class AmapProxyServiceImpl implements AmapProxyService {
     /**
      * 构造高德错误语义的响应体（status=0），保持 JSON/JSONP 形态自适应。
      * <p>
-     * JSONP 请求的错误响应须包装为 callback(...) 并以 JS 类型返回——
+     * JSONP 请求的错误响应须包装为 callback（...） 并以 JS 类型返回——
      * 正常响应由高德完成包装，代理自造的错误体必须自行包装，否则回调无法触发。
      *
      * @param query 原始查询串（解析 JSONP 回调名）

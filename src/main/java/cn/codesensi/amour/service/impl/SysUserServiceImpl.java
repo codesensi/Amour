@@ -71,7 +71,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      * 分页查询用户信息。
      * <p>
      * 用户名称、手机号为模糊匹配，状态为精确匹配，条件缺省时自动忽略；
-     * 页码与每页条数的缺省值由 {@link BasePage} 提供(1 与 20)，与前端默认值保持一致。
+     * 页码与每页条数的缺省值由 {@link BasePage} 提供（1 与 20），与前端默认值保持一致。
      *
      * @param userPageDTO 分页查询参数
      * @return 用户信息分页结果
@@ -157,7 +157,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         // 校验QQ号未被其他用户占用
         checkQqAvailable(userInsertDTO.getQq(), null);
 
-        // 状态缺省视为启用(0,与 EnableEnum 对齐)
+        // 状态缺省视为启用（0，与 EnableEnum 对齐）
         if (ObjUtil.isNull(userInsertDTO.getStatus())) {
             userInsertDTO.setStatus(EnableEnum.ENABLE.getCode());
         }
@@ -175,7 +175,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         sysUser.setPassword(password);
         sysUserMapper.insert(sysUser, true);
 
-        // 头像采纳:回填文件业务归属并标记被替换的旧头像失效(外链等非本系统地址自动跳过)
+        // 头像采纳:回填文件业务归属并标记被替换的旧头像失效（外链等非本系统地址自动跳过）
         if (StrUtil.isNotBlank(sysUser.getAvatar())) {
             fileService.bindBizFiles(FileBizTypeEnum.AVATAR, sysUser.getId(), List.of(sysUser.getAvatar()));
         }
@@ -204,7 +204,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 .set(SYS_USER.EMAIL, userUpdateDTO.getEmail())
                 .set(SYS_USER.PHONE, userUpdateDTO.getPhone())
                 .set(SYS_USER.QQ, userUpdateDTO.getQq())
-                // gender 为 NOT NULL DEFAULT 'U',置空回退默认值而非写 null
+                // gender 为 NOT NULL DEFAULT 'U'，置空回退默认值而非写 null
                 .set(SYS_USER.GENDER, StrUtil.blankToDefault(userUpdateDTO.getGender(), GenderEnum.UNKNOWN.getCode()))
                 .set(SYS_USER.AVATAR, userUpdateDTO.getAvatar())
                 .set(SYS_USER.REMARK, userUpdateDTO.getRemark())
@@ -214,7 +214,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             CacheUtil.evictAfterCommit(() -> cacheEvictService.evictUserCache(List.of(userUpdateDTO.getId())));
         }
 
-        // 头像采纳:回填文件业务归属并标记被替换的旧头像失效(外链等非本系统地址自动跳过);置空则解除旧头像文件的业务引用
+        // 头像采纳:回填文件业务归属并标记被替换的旧头像失效（外链等非本系统地址自动跳过）;置空则解除旧头像文件的业务引用
         if (StrUtil.isNotBlank(userUpdateDTO.getAvatar())) {
             fileService.bindBizFiles(FileBizTypeEnum.AVATAR, userUpdateDTO.getId(), List.of(userUpdateDTO.getAvatar()));
         } else {
@@ -242,7 +242,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         checkQqAvailable(userProfileUpdateDTO.getQq(), userId);
         boolean success = UpdateChain.of(SysUser.class)
                 .set(SYS_USER.NICKNAME, userProfileUpdateDTO.getNickname())
-                // gender 为 NOT NULL DEFAULT 'U',置空回退默认值而非写 null(对齐管理端 update 口径)
+                // gender 为 NOT NULL DEFAULT 'U'，置空回退默认值而非写 null（对齐管理端 update 口径）
                 .set(SYS_USER.GENDER, StrUtil.blankToDefault(userProfileUpdateDTO.getGender(), GenderEnum.UNKNOWN.getCode()))
                 .set(SYS_USER.EMAIL, userProfileUpdateDTO.getEmail())
                 .set(SYS_USER.QQ, userProfileUpdateDTO.getQq())
@@ -254,7 +254,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             CacheUtil.evictAfterCommit(() -> cacheEvictService.evictUserCache(List.of(userId)));
         }
 
-        // 头像采纳:回填文件业务归属并标记被替换的旧头像失效(外链等非本系统地址自动跳过);置空则解除旧头像文件的业务引用
+        // 头像采纳:回填文件业务归属并标记被替换的旧头像失效（外链等非本系统地址自动跳过）;置空则解除旧头像文件的业务引用
         if (StrUtil.isNotBlank(userProfileUpdateDTO.getAvatar())) {
             fileService.bindBizFiles(FileBizTypeEnum.AVATAR, userId, List.of(userProfileUpdateDTO.getAvatar()));
         } else {
@@ -277,7 +277,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             throw new BusinessException("用户不存在");
         }
 
-        // 系统内置用户不允许禁用(启用请求不受限)
+        // 系统内置用户不允许禁用（启用请求不受限）
         if (BuiltinEnum.YES.getCode().equals(sysUser.getBuiltin())
                 && EnableEnum.DISABLE.getCode().equals(userChangeStatusDTO.getStatus())) {
             throw new BusinessException("系统内置用户不允许禁用");
@@ -293,7 +293,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         entity.setStatus(userChangeStatusDTO.getStatus());
         updateById(entity);
 
-        // 禁用即踢出该用户当前会话,避免已签发令牌继续有效(启用无需处理)
+        // 禁用即踢出该用户当前会话，避免已签发令牌继续有效（启用无需处理）
         if (EnableEnum.DISABLE.getCode().equals(userChangeStatusDTO.getStatus())) {
             StpUtil.logout(userChangeStatusDTO.getId());
         }
@@ -349,13 +349,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             cacheEvictService.evictPermCache(ids);
             cacheEvictService.evictMenuCache(ids);
             cacheEvictService.evictUserCache(ids);
-            // 已删除用户立即下线,避免已签发会话继续有效
+            // 已删除用户立即下线，避免已签发会话继续有效
             ids.forEach(StpUtil::logout);
         });
     }
 
     /**
-     * 重置用户密码为系统默认密码({@link AppConst#DEFAULT_PASSWORD})。
+     * 重置用户密码为系统默认密码（{@link AppConst#DEFAULT_PASSWORD}）。
      * <p>
      * BCrypt 加密后仅更新 password 字段，更新成功后复用
      * {@link #updateById(SysUser)} 的缓存失效逻辑；同时踢出该用户当前会话，
@@ -414,7 +414,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         entity.setUsername(username);
         updateById(entity);
 
-        // 用户名是登录凭证,修改后踢出当前会话,要求使用新用户名重新登录
+        // 用户名是登录凭证，修改后踢出当前会话，要求使用新用户名重新登录
         StpUtil.logout(userId);
     }
 
@@ -444,7 +444,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         entity.setPassword(BCrypt.hashpw(userPasswordUpdateDTO.getNewPassword(), BCrypt.gensalt()));
         updateById(entity);
 
-        // 密码变更后踢出当前会话,要求使用新密码重新登录
+        // 密码变更后踢出当前会话，要求使用新密码重新登录
         StpUtil.logout(userId);
     }
 

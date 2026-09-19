@@ -21,7 +21,7 @@ public class UserRenameRequest implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 新用户名(登录账号)
+     * 新用户名（登录账号）
      */
     @NotBlank(message = "用户名不能为空")
     @Size(max = AppConst.MAX_LENGTH_64, message = "用户名长度不能超过" + AppConst.MAX_LENGTH_64)

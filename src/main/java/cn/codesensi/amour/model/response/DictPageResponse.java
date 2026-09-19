@@ -37,7 +37,7 @@ public class DictPageResponse implements Serializable {
     private String dictName;
 
     /**
-     * 字典值(统一字符串存储)
+     * 字典值（统一字符串存储）
      */
     private String dictValue;
 
@@ -47,7 +47,7 @@ public class DictPageResponse implements Serializable {
     private String dictLabel;
 
     /**
-     * 排序(升序)
+     * 排序（升序）
      */
     private Integer sort;
 

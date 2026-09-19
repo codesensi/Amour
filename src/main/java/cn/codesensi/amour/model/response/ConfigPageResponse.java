@@ -32,12 +32,12 @@ public class ConfigPageResponse implements Serializable {
     private String configKey;
 
     /**
-     * 配置值(统一字符串存储)
+     * 配置值（统一字符串存储）
      */
     private String configValue;
 
     /**
-     * 值类型:STRING,INTEGER,LONG,BOOLEAN
+     * 值类型:STRING，INTEGER，LONG，BOOLEAN
      */
     private String valueType;
 
@@ -47,7 +47,7 @@ public class ConfigPageResponse implements Serializable {
     private String configGroup;
 
     /**
-     * 是否敏感: 0-否, 1-是（敏感配置不经过免登录配置下发接口）
+     * 是否敏感: 0-否， 1-是（敏感配置不经过免登录配置下发接口）
      */
     private Integer sensitive;
 

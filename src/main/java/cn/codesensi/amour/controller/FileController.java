@@ -40,9 +40,9 @@ public class FileController {
     /**
      * 预览文件（内联）。
      * <p>
-     * 免登录接口,按文件自身记录的 storage_type 分发读取；
-     * Content-Type 由扩展名强推导,不采信记录中的历史声明值,杜绝伪装类型内联渲染；
-     * 文件路径与内容一一对应,设置长期强缓存,二次访问直接命中浏览器缓存。
+     * 免登录接口，按文件自身记录的 storage_type 分发读取；
+     * Content-Type 由扩展名强推导，不采信记录中的历史声明值，杜绝伪装类型内联渲染；
+     * 文件路径与内容一一对应，设置长期强缓存，二次访问直接命中浏览器缓存。
      *
      * @param id 文件ID
      * @return 文件流
@@ -50,8 +50,8 @@ public class FileController {
     @GetMapping("/view/{id}")
     public ResponseEntity<Resource> view(@PathVariable("id") Long id) {
         FileViewResult result = fileService.load(id);
-        // Content-Type 由扩展名查 Spring 内置 mime.types 强推导,不采信库中历史声明值(防伪装 text/html 的存储型 XSS);
-        // 与上传侧 FileServiceImpl#resolveContentType 同口径,未识别的扩展名一律以二进制流回显(浏览器不内联渲染)
+        // Content-Type 由扩展名查 Spring 内置 mime.types 强推导，不采信库中历史声明值（防伪装 text/html 的存储型 XSS）;
+        // 与上传侧 FileServiceImpl#resolveContentType 同口径，未识别的扩展名一律以二进制流回显（浏览器不内联渲染）
         String extension = StrUtil.blankToDefault(result.sysFile().getExtension(), "").toLowerCase();
         MediaType mediaType = MediaTypeFactory.getMediaType("file." + extension)
                 .orElse(MediaType.APPLICATION_OCTET_STREAM);

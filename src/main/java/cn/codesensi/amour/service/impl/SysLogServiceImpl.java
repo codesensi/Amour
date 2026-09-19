@@ -81,7 +81,7 @@ public class SysLogServiceImpl implements SysLogService {
                 ? logTypes
                 : logTypes.stream().filter(pageDTO.getLogTypes()::contains).toList();
         if (CollUtil.isEmpty(scope)) {
-            // 所选类型均不在本端点范围内,交集为空直接返回空页,避免空 IN 查询
+            // 所选类型均不在本端点范围内，交集为空直接返回空页，避免空 IN 查询
             return Page.of(pageDTO.getPageNumber(), pageDTO.getPageSize(), 0);
         }
         return QueryChain.of(sysLogMapper)

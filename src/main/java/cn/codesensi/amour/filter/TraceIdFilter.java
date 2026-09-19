@@ -61,8 +61,8 @@ public class TraceIdFilter extends OncePerRequestFilter {
             MDC.put(AppConst.TRACE_ID, traceId);
             filterChain.doFilter(request, response);
         } finally {
-            // MDC 清理前将 traceId 回写响应头,前端报障时凭此头关联服务端日志;
-            // 响应已提交(如异步/异常中断)后不再回写,避免对已定型响应设置头导致异常
+            // MDC 清理前将 traceId 回写响应头，前端报障时凭此头关联服务端日志;
+            // 响应已提交（如异步/异常中断）后不再回写，避免对已定型响应设置头导致异常
             if (!response.isCommitted()) {
                 response.setHeader(HEADER_TRACE_ID, traceId);
             }

@@ -30,7 +30,7 @@ public class MenuUpdateRequest implements Serializable {
     private Long id;
 
     /**
-     * 父级菜单ID(0 表示根节点)
+     * 父级菜单ID（0 表示根节点）
      */
     @NotNull(message = "父级菜单ID不能为空")
     private Long pid;
@@ -43,7 +43,7 @@ public class MenuUpdateRequest implements Serializable {
     private String title;
 
     /**
-     * 路由路径(目录/菜单必填，按钮无需填写)
+     * 路由路径（目录/菜单必填，按钮无需填写）
      */
     @Size(max = AppConst.MAX_LENGTH_256, message = "路由路径长度不能超过" + AppConst.MAX_LENGTH_256)
     private String path;
@@ -67,7 +67,7 @@ public class MenuUpdateRequest implements Serializable {
     private String icon;
 
     /**
-     * 权限编码(按钮类型必填)
+     * 权限编码（按钮类型必填）
      */
     @Size(max = AppConst.MAX_LENGTH_64, message = "权限编码长度不能超过" + AppConst.MAX_LENGTH_64)
     private String perms;

@@ -25,39 +25,39 @@ public class FilePageRequest extends BasePage implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 原始文件名(模糊匹配)
+     * 原始文件名（模糊匹配）
      */
     @Size(max = AppConst.MAX_LENGTH_256, message = "文件名长度不能超过" + AppConst.MAX_LENGTH_256)
     private String originalName;
 
     /**
-     * 业务类型编码: infra-基础设施, avatar-用户头像, photo-相册照片, markdown-点滴配图
+     * 业务类型编码: infra-基础设施， avatar-用户头像， photo-相册照片， markdown-点滴配图
      */
     private String bizType;
 
     /**
-     * 存储类型: local-本地, oss-对象存储
+     * 存储类型: local-本地， oss-对象存储
      */
     private String storageType;
 
     /**
-     * 上传人用户名(模糊匹配)
+     * 上传人用户名（模糊匹配）
      */
     @Size(max = AppConst.MAX_LENGTH_64, message = "上传人长度不能超过" + AppConst.MAX_LENGTH_64)
     private String creatorName;
 
     /**
-     * 上传时间范围-起(yyyy-MM-dd,含当日)
+     * 上传时间范围-起（yyyy-MM-dd，含当日）
      */
     private String beginTime;
 
     /**
-     * 上传时间范围-止(yyyy-MM-dd,含当日)
+     * 上传时间范围-止（yyyy-MM-dd，含当日）
      */
     private String endTime;
 
     /**
-     * 删除标识: 0-未删除(缺省), 1-已删除(回收站)
+     * 删除标识: 0-未删除（缺省）， 1-已删除（回收站）
      */
     private Integer delFlag;
 

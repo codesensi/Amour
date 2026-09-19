@@ -42,7 +42,7 @@ public class SysLog extends BaseEntity implements Serializable {
     private String traceId;
 
     /**
-     * 日志类型: 0-未知, 1-登录, 2-登出, 3-查询, 4-新增, 5-修改, 6-删除, 7-授权, 8-上传, 9-下载
+     * 日志类型: 0-未知， 1-登录， 2-登出， 3-查询， 4-新增， 5-修改， 6-删除， 7-授权， 8-上传， 9-下载
      */
     private Integer logType;
 
@@ -77,12 +77,12 @@ public class SysLog extends BaseEntity implements Serializable {
     private String url;
 
     /**
-     * 请求参数(JSON,脱敏后截断存储)
+     * 请求参数（JSON，脱敏后截断存储）
      */
     private String param;
 
     /**
-     * 响应结果(JSON,截断存储)
+     * 响应结果（JSON，截断存储）
      */
     private String result;
 
@@ -102,7 +102,7 @@ public class SysLog extends BaseEntity implements Serializable {
     private Long elapsed;
 
     /**
-     * 操作状态: 0-失败, 1-成功
+     * 操作状态: 0-失败， 1-成功
      */
     private Integer status;
 

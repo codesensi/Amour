@@ -30,7 +30,7 @@ public class ConfigResponse implements Serializable {
     private String configValue;
 
     /**
-     * 值类型:STRING,INTEGER,LONG,BOOLEAN
+     * 值类型:STRING，INTEGER，LONG，BOOLEAN
      */
     private String valueType;
 

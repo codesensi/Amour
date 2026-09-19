@@ -106,7 +106,7 @@ public class SysRoleController {
     /**
      * 批量删除角色信息
      * <p>
-     * 路径参数支持英文逗号分隔的多个ID，如 /sys/role/delete/1,2,3。
+     * 路径参数支持英文逗号分隔的多个ID，如 /sys/role/delete/1，2，3。
      *
      * @param ids 角色ID列表
      */

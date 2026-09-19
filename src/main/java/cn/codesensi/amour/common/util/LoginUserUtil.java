@@ -12,7 +12,7 @@ import cn.hutool.core.util.ObjUtil;
 public final class LoginUserUtil {
 
     /**
-     * 线程级登录用户ID持有器:由 ContextTaskDecorator 在任务执行前绑定提交者身份,
+     * 线程级登录用户ID持有器:由 ContextTaskDecorator 在任务执行前绑定提交者身份，
      * 使审计字段填充等场景在异步线程中仍能取到登录用户。
      */
     private static final ThreadLocal<Long> LOGIN_ID_HOLDER = new ThreadLocal<>();

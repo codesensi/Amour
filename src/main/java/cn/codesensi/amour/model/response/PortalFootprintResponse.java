@@ -34,27 +34,27 @@ public class PortalFootprintResponse implements Serializable {
     private String city;
 
     /**
-     * 精确地点名称(可空)
+     * 精确地点名称（可空）
      */
     private String placeName;
 
     /**
-     * 经度(可空)
+     * 经度（可空）
      */
     private BigDecimal longitude;
 
     /**
-     * 纬度(可空)
+     * 纬度（可空）
      */
     private BigDecimal latitude;
 
     /**
-     * 到访日期(yyyy-MM-dd)
+     * 到访日期（yyyy-MM-dd）
      */
     private String arrivalDate;
 
     /**
-     * 关联照片地址(无照片为 null)
+     * 关联照片地址（无照片为 null）
      */
     private String photoUrl;
 

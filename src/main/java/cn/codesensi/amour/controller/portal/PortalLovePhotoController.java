@@ -33,8 +33,8 @@ public class PortalLovePhotoController {
     /**
      * 查询恋爱画册照片分页（免登录）
      *
-     * @param page 分页参数(pageNumber/pageSize)
-     * @return 仅含显隐为「显示」的照片,按 sort 升序;tags 为标签数组,可能为空
+     * @param page 分页参数（pageNumber/pageSize）
+     * @return 仅含显隐为「显示」的照片，按 sort 升序;tags 为标签数组，可能为空
      */
     @GetMapping("/page")
     public Page<PortalLovePhotoResponse> page(BasePage page) {

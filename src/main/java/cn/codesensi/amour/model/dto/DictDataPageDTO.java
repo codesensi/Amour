@@ -23,17 +23,17 @@ public class DictDataPageDTO extends BasePage implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 字典编码(模糊匹配)
+     * 字典编码（模糊匹配）
      */
     private String dictCode;
 
     /**
-     * 字典名称(模糊匹配)
+     * 字典名称（模糊匹配）
      */
     private String dictName;
 
     /**
-     * 字典值(模糊匹配)
+     * 字典值（模糊匹配）
      */
     private String dictValue;
 
