@@ -5,10 +5,10 @@ import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.mapper.SysDictDataMapper;
 import cn.codesensi.amour.mapper.SysDictTypeMapper;
 import cn.codesensi.amour.model.converter.DictConverter;
+import cn.codesensi.amour.model.dto.DictCodeCountDTO;
 import cn.codesensi.amour.model.dto.DictTypeDTO;
 import cn.codesensi.amour.model.dto.DictTypeInsertDTO;
 import cn.codesensi.amour.model.dto.DictTypeUpdateDTO;
-import cn.codesensi.amour.model.entity.SysDictData;
 import cn.codesensi.amour.model.entity.SysDictType;
 import cn.codesensi.amour.service.SysDictTypeService;
 import cn.hutool.core.collection.CollUtil;
@@ -47,7 +47,7 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
 
     /**
      * 查询全部字典类型（含组内条目数；管理端左侧类型列表的数据源）。
-     * <p>类型表全量按 id 升序加载，条目计数经数据表按编码分组内存聚合，
+     * <p>类型表全量按 id 升序加载，条目计数由数据表按编码 GROUP BY 聚合下推数据库，
      * 计数包含禁用条目（对齐历史口径）；逻辑删除（del_flag）由全局配置自动过滤。
      *
      * @return 字典类型列表
@@ -60,18 +60,16 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
         if (CollUtil.isEmpty(types)) {
             return List.of();
         }
-        Map<String, Long> counts = QueryChain.of(sysDictDataMapper)
-                .select(SYS_DICT_DATA.DICT_CODE)
-                .list()
+        Map<String, Long> countMap = sysDictDataMapper.selectCountByDictCode()
                 .stream()
-                .collect(Collectors.groupingBy(SysDictData::getDictCode, Collectors.counting()));
+                .collect(Collectors.toMap(DictCodeCountDTO::getDictCode, DictCodeCountDTO::getCount));
         return types.stream()
                 .map(type -> new DictTypeDTO()
                         .setId(type.getId())
                         .setDictCode(type.getDictCode())
                         .setDictName(type.getDictName())
                         .setBuiltin(type.getBuiltin())
-                        .setCount(counts.getOrDefault(type.getDictCode(), 0L).intValue())
+                        .setCount(countMap.getOrDefault(type.getDictCode(), 0L).intValue())
                         .setRemark(type.getRemark()))
                 .toList();
     }
