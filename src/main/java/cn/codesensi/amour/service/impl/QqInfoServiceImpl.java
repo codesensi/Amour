@@ -3,7 +3,6 @@ package cn.codesensi.amour.service.impl;
 import cn.codesensi.amour.common.consts.AppConst;
 import cn.codesensi.amour.common.enums.CacheNameEnum;
 import cn.codesensi.amour.common.enums.ConfigKeyEnum;
-import cn.codesensi.amour.common.exception.SystemException;
 import cn.codesensi.amour.common.properties.AppProperties;
 import cn.codesensi.amour.common.util.CacheUtil;
 import cn.codesensi.amour.model.dto.QqInfoResultDTO;
@@ -17,7 +16,6 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
@@ -50,27 +48,16 @@ public class QqInfoServiceImpl implements QqInfoService {
     /**
      * {@inheritDoc}
      * <p>
-     * 查询结果写入 qq-info 缓存（写后 15 分钟过期，见 application-dev.yml），
-     * 同一 QQ 号在过期前直接复用缓存，避免失焦/翻页的高频调用穿透上游。
+     * 查询经 CacheUtil.load 原子回源并写入 qq-info 缓存（写后 15 分钟过期，见 application-dev.yml）：
+     * 同一 QQ 号并发首次查询仅一次穿透上游，过期前直接复用缓存；
      * 降级结果（avatarUrl 非空）同样写入缓存：同一 QQ 号在过期前头像恒定，
      * 密钥修复/上游恢复后最迟一个缓存周期自动切换回真实信息。
+     * qq-avatar 未配置时的空 DTO 结果同样入缓存：该缺失属部署配置问题，修复需重启，
+     * 重启即清空内存缓存，不存在热修复被空结果遮蔽的窗口。
      */
     @Override
     public QqInfoResultDTO getQqInfo(String qq) {
-        Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheNameEnum.QQ_INFO.getCode()));
-        if (ObjUtil.isNull(cache)) {
-            throw new SystemException("QQ信息缓存未注册，请检查缓存配置");
-        }
-        QqInfoResultDTO cached = cache.get(qq, QqInfoResultDTO.class);
-        if (ObjUtil.isNotNull(cached)) {
-            return cached;
-        }
-        QqInfoResultDTO result = loadFromQqApi(qq);
-        // 降级尽头仍无头像的空结果不写缓存:避免配置补齐后 15 分钟内一直返回空信息
-        if (StrUtil.isNotBlank(result.getAvatarUrl())) {
-            cache.put(qq, result);
-        }
-        return result;
+        return CacheUtil.load(cacheManager, CacheNameEnum.QQ_INFO.getCode(), qq, this::loadFromQqApi);
     }
 
     /**
