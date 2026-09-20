@@ -42,4 +42,9 @@ public class FootprintPageRequest extends BasePage implements Serializable {
     @Size(max = 10, message = "到访日期格式须为yyyy-MM-dd")
     private String arrivalDateEnd;
 
+    /**
+     * 显隐标识: 0-显示， 1-隐藏
+     */
+    private Integer hidden;
+
 }

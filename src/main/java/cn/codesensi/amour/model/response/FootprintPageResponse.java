@@ -52,6 +52,11 @@ public class FootprintPageResponse implements Serializable {
     private String arrivalDate;
 
     /**
+     * 显隐标识: 0-显示, 1-隐藏
+     */
+    private Integer hidden;
+
+    /**
      * 照片地址（/file/view/{id};无照片为 null）
      */
     private String photoUrl;

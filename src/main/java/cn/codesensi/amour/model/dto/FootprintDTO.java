@@ -54,6 +54,11 @@ public class FootprintDTO implements Serializable {
     private String arrivalDate;
 
     /**
+     * 显隐标识: 0-显示, 1-隐藏
+     */
+    private Integer hidden;
+
+    /**
      * 关联照片地址（站内 /file/view/{id} 或外链;无照片为 null）
      */
     private String photoUrl;

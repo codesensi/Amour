@@ -60,6 +60,11 @@ public class FootprintInsertRequest implements Serializable {
     private String arrivalDate;
 
     /**
+     * 显隐标识: 0-显示， 1-隐藏（缺省为显示，后续调整走 change-hidden 端点）
+     */
+    private Integer hidden;
+
+    /**
      * 照片地址（站内 /file/view/{id} 或外链;可空，上传后由表单直接绑定）
      */
     @Size(max = AppConst.MAX_LENGTH_512, message = "照片地址长度不能超过" + AppConst.MAX_LENGTH_512)

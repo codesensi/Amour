@@ -1,6 +1,7 @@
 package cn.codesensi.amour.service;
 
 import cn.codesensi.amour.common.core.BasePage;
+import cn.codesensi.amour.model.dto.FootprintChangeHiddenDTO;
 import cn.codesensi.amour.model.dto.FootprintInsertDTO;
 import cn.codesensi.amour.model.dto.FootprintDTO;
 import cn.codesensi.amour.model.dto.FootprintPageDTO;
@@ -32,6 +33,15 @@ public interface FootprintService {
     Page<FootprintDTO> pagePortal(BasePage page);
 
     /**
+     * 门户足迹地图全量点集（免登录）。
+     * <p>
+     * 按到访日期升序 → id 升序（与门户分页排序一致），防御性上限 1000 条。
+     *
+     * @return 地图点集 DTO 列表
+     */
+    List<FootprintDTO> listMapPoints();
+
+    /**
      * 管理端足迹分页（全量）。
      * <p>
      * 城市为模糊匹配，到访日期为闭区间范围过滤，条件缺省时自动忽略；
@@ -55,6 +65,13 @@ public interface FootprintService {
      * @param updateDTO 修改参数（id 必填）
      */
     void update(FootprintUpdateDTO updateDTO);
+
+    /**
+     * 修改足迹显隐（仅覆盖 hidden 字段）。
+     *
+     * @param changeHiddenDTO 显隐状态信息（id 必填）
+     */
+    void changeHidden(FootprintChangeHiddenDTO changeHiddenDTO);
 
     /**
      * 批量逻辑删除足迹。

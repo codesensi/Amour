@@ -2,6 +2,7 @@ package cn.codesensi.amour.model.converter;
 
 import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.PortalFootprint;
+import cn.codesensi.amour.model.request.FootprintChangeHiddenRequest;
 import cn.codesensi.amour.model.request.FootprintInsertRequest;
 import cn.codesensi.amour.model.request.FootprintPageRequest;
 import cn.codesensi.amour.model.request.FootprintUpdateRequest;
@@ -12,8 +13,10 @@ import com.mybatisflex.core.paginate.Page;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
-import org.mapstruct.Named;import java.time.LocalDate;
+import org.mapstruct.Named;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 /**
  * 足迹地图转换器（管理端与门户共用，MapStruct 编译期生成实现类）。
@@ -58,6 +61,14 @@ public interface FootprintConverter {
      */
     @Mapping(target = "arrivalDate", source = "arrivalDate", qualifiedByName = "stringToDate")
     FootprintUpdateDTO toUpdateDTO(FootprintUpdateRequest request);
+
+    /**
+     * 修改显隐请求 → 修改显隐业务数据。
+     *
+     * @param request 修改显隐请求
+     * @return 修改显隐业务数据
+     */
+    FootprintChangeHiddenDTO toChangeHiddenDTO(FootprintChangeHiddenRequest request);
 
     /**
      * 新增参数 DTO → 实体（id 由雪花生成器填充；
@@ -118,6 +129,15 @@ public interface FootprintConverter {
      * @return 门户足迹响应对象
      */
     FootprintResponse toPortalResponse(FootprintDTO itemDTO);
+
+    /**
+     * 条目 DTO 列表 → 门户足迹响应列表
+     * （逐元素复用 {@link #toPortalResponse(FootprintDTO)} 的映射规则）。
+     *
+     * @param items 足迹条目 DTO 列表
+     * @return 门户足迹响应列表
+     */
+    List<FootprintResponse> toPortalResponseList(List<FootprintDTO> items);
 
     /**
      * Page&lt;FootprintItemDTO&gt; → Page&lt;FootprintResponse&gt;

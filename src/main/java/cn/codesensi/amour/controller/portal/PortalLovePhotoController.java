@@ -7,6 +7,7 @@ import cn.codesensi.amour.model.dto.LovePhotoDTO;
 import cn.codesensi.amour.model.response.LovePhotoResponse;
 import cn.codesensi.amour.service.LovePhotoService;
 import com.mybatisflex.core.paginate.Page;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,11 +34,11 @@ public class PortalLovePhotoController {
     /**
      * 查询恋爱画册照片分页（免登录）
      *
-     * @param page 分页参数（pageNumber/pageSize）
+     * @param page 分页参数（pageNumber/pageSize，页码 1 起且每页不超过 500）
      * @return 仅含显隐为「显示」的照片，按 sort 升序;tags 为标签数组，可能为空
      */
     @GetMapping("/page")
-    public Page<LovePhotoResponse> page(BasePage page) {
+    public Page<LovePhotoResponse> page(@Valid BasePage page) {
         Page<LovePhotoDTO> itemPage = lovePhotoService.pagePortal(page);
         return lovePhotoConverter.toPortalPage(itemPage);
     }

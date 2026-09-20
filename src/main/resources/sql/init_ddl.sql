@@ -506,6 +506,7 @@ CREATE TABLE IF NOT EXISTS `portal_footprint` (
     `longitude`    DECIMAL(10,6)  NULL DEFAULT NULL       COMMENT '经度',
     `latitude`     DECIMAL(10,6)  NULL DEFAULT NULL       COMMENT '纬度',
     `arrival_date` DATE           NOT NULL                COMMENT '到访日期',
+    `hidden`       TINYINT(1)     NOT NULL DEFAULT 0      COMMENT '显隐标识: 0-显示, 1-隐藏',
     `photo_url`    VARCHAR(512)   NULL DEFAULT NULL       COMMENT '照片地址（站内 /file/view/{id} 或外链）',
     `remark`       VARCHAR(512)   NULL DEFAULT NULL       COMMENT '备注',
     `creator`      BIGINT         NULL DEFAULT NULL       COMMENT '创建人',

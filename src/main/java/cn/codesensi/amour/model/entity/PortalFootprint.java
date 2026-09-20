@@ -64,6 +64,11 @@ public class PortalFootprint extends BaseEntity implements Serializable {
     private LocalDate arrivalDate;
 
     /**
+     * 显隐标识: 0-显示, 1-隐藏（门户侧仅消费显示的记录）
+     */
+    private Integer hidden;
+
+    /**
      * 照片地址（站内 /file/view/{id} 或外链;空表示无照片）
      */
     private String photoUrl;

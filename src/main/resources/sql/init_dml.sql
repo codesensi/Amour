@@ -346,7 +346,7 @@ WHERE NOT EXISTS (
 -- 恋爱画册门户展示的示例照片（hidden=0 门户可见）；id 使用独立的 30000 段顺序预留
 -- ----------------------------
 INSERT INTO `portal_love_photo` (
-    `id`, `url`, `caption`, `date_text`, `tags`, `sort`, `hidden`
+    `id`, `url`, `caption`, `date_text`, `tags`, `sort`
 )
 SELECT
     t.id,
@@ -354,12 +354,11 @@ SELECT
     t.caption,
     t.date_text,
     t.tags,
-    t.sort,
-    t.hidden
+    t.sort
 FROM (
          VALUES
-             (30001, 'https://t.alcy.cc/pic/fj/130.webp', '我们的第一张合照', '2018-07-15', '日常', 1, 0)
-     ) AS t(id, url, caption, date_text, tags, sort, hidden)
+             (30001, 'https://t.alcy.cc/pic/fj/130.webp', '我们的第一张合照', '2018-07-15', '日常', 1)
+     ) AS t(id, url, caption, date_text, tags, sort)
 WHERE NOT EXISTS (
     SELECT 1 FROM `portal_love_photo` WHERE `portal_love_photo`.`id` = t.id
 );

@@ -45,6 +45,11 @@ public class FootprintInsertDTO implements Serializable {
     private LocalDate arrivalDate;
 
     /**
+     * 显隐标识: 0-显示， 1-隐藏（缺省为显示，后续调整走 change-hidden 端点）
+     */
+    private Integer hidden;
+
+    /**
      * 照片地址（可空）
      */
     private String photoUrl;

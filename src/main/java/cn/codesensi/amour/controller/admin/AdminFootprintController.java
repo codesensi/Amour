@@ -5,6 +5,7 @@ import cn.codesensi.amour.common.annotation.Log;
 import cn.codesensi.amour.common.enums.LogTypeEnum;
 import cn.codesensi.amour.model.converter.FootprintConverter;
 import cn.codesensi.amour.model.dto.FootprintDTO;
+import cn.codesensi.amour.model.request.FootprintChangeHiddenRequest;
 import cn.codesensi.amour.model.request.FootprintInsertRequest;
 import cn.codesensi.amour.model.request.FootprintPageRequest;
 import cn.codesensi.amour.model.request.FootprintUpdateRequest;
@@ -71,6 +72,18 @@ public class AdminFootprintController {
     @PutMapping("/update")
     public void update(@Valid @RequestBody FootprintUpdateRequest updateRequest) {
         footprintService.update(footprintConverter.toUpdateDTO(updateRequest));
+    }
+
+    /**
+     * 修改足迹显隐
+     *
+     * @param request 足迹显隐请求参数
+     */
+    @SaCheckPermission("admin:footprint:update")
+    @Log(module = "足迹地图", operation = "修改足迹显隐", type = LogTypeEnum.UPDATE)
+    @PutMapping("/change-hidden")
+    public void changeHidden(@Valid @RequestBody FootprintChangeHiddenRequest request) {
+        footprintService.changeHidden(footprintConverter.toChangeHiddenDTO(request));
     }
 
     /**
