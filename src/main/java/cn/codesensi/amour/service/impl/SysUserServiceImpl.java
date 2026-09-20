@@ -2,11 +2,7 @@ package cn.codesensi.amour.service.impl;
 
 import cn.codesensi.amour.common.consts.AppConst;
 import cn.codesensi.amour.common.core.BasePage;
-import cn.codesensi.amour.common.enums.BuiltinEnum;
-import cn.codesensi.amour.common.enums.CacheNameEnum;
-import cn.codesensi.amour.common.enums.EnableEnum;
-import cn.codesensi.amour.common.enums.FileBizTypeEnum;
-import cn.codesensi.amour.common.enums.GenderEnum;
+import cn.codesensi.amour.common.enums.*;
 import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.util.CacheUtil;
 import cn.codesensi.amour.mapper.SysRoleMapper;
@@ -483,8 +479,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             checkRolesExist(distinctRoleIds);
         }
 
-        // 4. 删除旧关联
-        sysUserRoleService.remove(SYS_USER_ROLE.USER_ID.eq(userId));
+        // 4. 删除旧关联（物理删除：本表 uk_ur_user_role 唯一索引包含逻辑删除行，
+        //    若走全局逻辑删除，旧行仍占用索引，重插同组关联会触发唯一键冲突）
+        LogicDeleteManager.execWithoutLogicDelete(
+                () -> sysUserRoleService.remove(SYS_USER_ROLE.USER_ID.eq(userId))
+        );
 
         // 5. 插入新关联（如果角色列表为空，则仅删除）
         if (CollUtil.isNotEmpty(distinctRoleIds)) {

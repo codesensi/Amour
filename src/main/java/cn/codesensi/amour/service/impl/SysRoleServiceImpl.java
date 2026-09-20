@@ -16,8 +16,8 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
-import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.logicdelete.LogicDeleteManager;
+import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryChain;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
@@ -272,8 +272,11 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             checkMenusExist(menuIds);
         }
 
-        // 3. 删除旧关联
-        sysRoleMenuService.remove(SYS_ROLE_MENU.ROLE_ID.eq(roleId));
+        // 3. 删除旧关联（物理删除：本表 uk_rm_role_menu 唯一索引包含逻辑删除行，
+        //    若走全局逻辑删除，旧行仍占用索引，重插同组关联会触发唯一键冲突）
+        LogicDeleteManager.execWithoutLogicDelete(
+                () -> sysRoleMenuService.remove(SYS_ROLE_MENU.ROLE_ID.eq(roleId))
+        );
         // 查询角色下属所有用户ID，用于在关联变更后失效其权限缓存
         List<Long> userIds = sysUserRoleService.queryChain()
                 .select(SYS_USER_ROLE.USER_ID)
