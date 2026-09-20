@@ -4,7 +4,6 @@ import cn.codesensi.amour.common.enums.BaseEnum;
 import cn.codesensi.amour.common.enums.CacheNameEnum;
 import cn.codesensi.amour.common.enums.ConfigKeyEnum;
 import cn.codesensi.amour.common.enums.ImageType;
-import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.exception.SystemException;
 import cn.codesensi.amour.common.util.CacheUtil;
 import cn.codesensi.amour.model.dto.CaptchaResultDTO;
@@ -115,7 +114,7 @@ public class CaptchaServiceImpl implements CaptchaService {
     private Cache captchaCache() {
         Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheNameEnum.CAPTCHA.getCode()));
         if (ObjUtil.isNull(cache)) {
-            throw new BusinessException("验证码缓存未注册，请检查缓存配置");
+            throw new SystemException("验证码缓存未注册，请检查缓存配置");
         }
         return cache;
     }

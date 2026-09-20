@@ -4,6 +4,7 @@ import cn.codesensi.amour.common.enums.CacheNameEnum;
 import cn.codesensi.amour.common.enums.ConfigKeyEnum;
 import cn.codesensi.amour.common.enums.EnableEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
+import cn.codesensi.amour.common.exception.SystemException;
 import cn.codesensi.amour.common.exception.ValidationException;
 import cn.codesensi.amour.common.util.CacheUtil;
 import cn.codesensi.amour.model.dto.LoginDTO;
@@ -129,7 +130,7 @@ public class LoginServiceImpl implements LoginService {
      * 校验图形验证码。
      * <p>
      * 读取 captcha 缓存中 captchaKey 对应的答案并立即失效（保证一次性使用），再与提交内容比对
-     * （忽略大小写，避免英文字母验证码因大小写误输导致校验失败）；缓存未注册属于配置错误，直接抛出业务异常。
+     * （忽略大小写，避免英文字母验证码因大小写误输导致校验失败）；缓存未注册属于配置错误，直接抛出系统异常。
      *
      * @param loginDTO 登录用户信息
      */
@@ -142,7 +143,7 @@ public class LoginServiceImpl implements LoginService {
         }
         Cache cache = cacheManager.getCache(CacheUtil.withAppEnv(CacheNameEnum.CAPTCHA.getCode()));
         if (ObjUtil.isNull(cache)) {
-            throw new BusinessException("验证码缓存未注册，请检查缓存配置");
+            throw new SystemException("验证码缓存未注册，请检查缓存配置");
         }
         // 原子取删：asMap（）.remove 一次调用同时完成「读答案 + 失效」，并发提交无法复用同一 captchaKey
         // （Spring Cache 抽象无 getAndDelete，借原生 Caffeine 的原子 remove 实现）
