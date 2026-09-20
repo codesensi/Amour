@@ -160,13 +160,22 @@ public class ThreadPoolConfig implements AsyncConfigurer {
     /**
      * 构建虚拟线程执行器：每任务一虚拟线程，并发上限复用 {@code max-pool-size} 配置，
      * 并发达到上限时提交线程阻塞等待（反压，任务不丢）。
+     * 停机语义与平台线程分支对齐：wait-for-tasks/await-termination 配置同样生效，
+     * 停机时等待在途任务完成（最多 await-termination-seconds 秒），超时后中断剩余任务。
      *
      * @return 虚拟线程执行器
      */
     private SimpleAsyncTaskExecutor virtualExecutor() {
+        ThreadPoolProperties.Pool spec = threadPoolProperties.getGeneral();
         SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor("async-vt-");
         executor.setVirtualThreads(true);
-        executor.setConcurrencyLimit(threadPoolProperties.getGeneral().getMaxPoolSize());
+        executor.setConcurrencyLimit(spec.getMaxPoolSize());
+        // 接入与平台线程分支同一份优雅停机参数，使 yml 配置在虚拟线程模式下不再失效；
+        // 未配置等待时保持默认 0（立即关机），与历史行为兼容
+        if (Boolean.TRUE.equals(spec.getWaitForTasksToCompleteOnShutdown())
+                && spec.getAwaitTerminationSeconds() != null) {
+            executor.setTaskTerminationTimeout(spec.getAwaitTerminationSeconds() * 1000L);
+        }
         executor.setTaskDecorator(new ContextTaskDecorator());
         return executor;
     }

@@ -139,7 +139,8 @@ thread:
   pool:
     # ---- 通用池:承载操作日志之外的其他异步任务,饱和时反压,任务不丢 ----
     general:
-      # 是否启用虚拟线程(Java 21):启用后 core/queue/keepAlive 不生效,仅 max-pool-size 作为并发上限
+      # 是否启用虚拟线程(Java 21):启用后 core/queue/keepAlive 不生效,仅 max-pool-size 作为并发上限;
+      # 停机参数(wait-for-tasks/await-termination)照常生效,停机时等待在途任务完成
       virtual-threads: true
       # 设置核心线程数
       core-pool-size: 5
@@ -148,13 +149,13 @@ thread:
       # 设置缓冲队列大小
       queue-capacity: 100
       # 设置线程的最大空闲秒数
-      keep-alive-seconds: 30
+      keep-alive-seconds: 10
       # 是否允许核心线程超时
       allow-core-thread-timeout: true
       # 是否等待剩余任务完成后才关闭应用
       wait-for-tasks-to-complete-on-shutdown: true
       # 等待剩余任务完成的最大秒数
-      await-termination-seconds: 5
+      await-termination-seconds: 60
       # 拒绝策略
       rejected-execution-handler: CallerRunsWarnPolicy
     # ---- 日志池:操作日志落库专用,队列饱和即丢弃并告警,绝不反压业务线程 ----
@@ -162,8 +163,8 @@ thread:
       core-pool-size: 1
       max-pool-size: 2
       queue-capacity: 200
-      keep-alive-seconds: 60
+      keep-alive-seconds: 10
       allow-core-thread-timeout: false
       wait-for-tasks-to-complete-on-shutdown: true
-      await-termination-seconds: 5
+      await-termination-seconds: 60
       rejected-execution-handler: DiscardWarnPolicy
