@@ -41,4 +41,10 @@ public class LogPageRequest extends BasePage implements Serializable {
      */
     private List<Integer> logTypes;
 
+    /**
+     * 键集游标:上一页最后一条日志的 ID（连续翻下一页时下发，消除深 offset 扫描；
+     * 首页/跳页不下发，回退 offset 兜底）
+     */
+    private Long lastId;
+
 }
