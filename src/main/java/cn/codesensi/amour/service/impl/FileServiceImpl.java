@@ -38,8 +38,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.MediaTypeFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -114,14 +112,14 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
      * 上传文件。
      * <p>
      * 按业务类型完成扩展名与大小校验后，预生成主键并流式写盘，再对上传源二次读取计算 MD5，
-     * 最后以单条 SQL 落库（含存储 key 与 MD5），任一环节失败整体回滚并清理已写盘文件；
+     * 最后以单条 SQL 落库（含存储 key 与 MD5）。写盘与 MD5 属慢速 IO，不包裹事务，
+     * 避免长时间占用数据库连接；入库为单条 SQL 原子操作，失败时清理已写盘文件避免孤儿残留；
      * 返回的分发地址形如 {@code /file/view/{id}}。
      *
      * @param bizType 业务类型编码（infra/avatar/photo/markdown，详见 FileBizTypeEnum）
      * @param file    上传的文件
      * @return 文件ID、访问地址与原始文件名
      */
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public FileUploadResultDTO upload(String bizType, MultipartFile file) {
         // 1. 业务类型校验
@@ -179,21 +177,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
             throw new SystemException("读取上传文件失败");
         }
 
-        // 6. 注册回滚清理:注册须先于 MD5 计算与入库，写盘之后任一环节失败回滚时同样清理已写盘的物理文件，避免残留孤儿文件
-        if (TransactionSynchronizationManager.isSynchronizationActive()) {
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-                @Override
-                public void afterCompletion(int status) {
-                    // 提交成功才保留物理文件；回滚或提交阶段失败均清理，避免残留孤儿文件
-                    if (status != TransactionSynchronization.STATUS_COMMITTED) {
-                        log.warn("上传事务未成功提交(status={})，清理已写盘的物理文件：key={}", status, key);
-                        storage.delete(key);
-                    }
-                }
-            });
-        }
-
-        // 7. 对上传源二次读取计算 MD5（Hutool 一次性消费流，返回小写十六进制）;
+        // 6. 对上传源二次读取计算 MD5（Hutool 一次性消费流，返回小写十六进制）;
         //    MultipartFile 底层为磁盘临时文件，可重复打开流，与存储实现解耦（本地/OSS 均适用）
         String md5;
         try (InputStream in = file.getInputStream()) {
@@ -205,8 +189,12 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         // 回填存储 key:预览/下载均按该 key 定位物理文件，缺失会导致 NPE
         sysFile.setPath(key);
 
-        // 8. 单条 SQL 入库（主键/MD5/存储 key 均已就绪;主键已有值时框架自动跳过再生成）
-        sysFileMapper.insert(sysFile, true);
+        // 7. 入库:主键/MD5/存储 key 均已就绪（主键已有值时框架自动跳过再生成）。
+        //    守护器保证入库失败时兜底清理已写盘的物理文件，避免残留孤儿文件
+        try (var guard = new UploadedFileGuard(storage, key)) {
+            sysFileMapper.insert(sysFile, true);
+            guard.committed();
+        }
 
         FileUploadResultDTO response = new FileUploadResultDTO()
                 .setId(sysFile.getId())
@@ -536,5 +524,43 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
             throw new SystemException("文件存储实现未注册：" + type.getCode());
         }
         return storage;
+    }
+
+    /**
+     * 已写盘文件的守护器 —— 以 try-with-resources 包裹「写盘之后、入库提交之前」的失败窗口，
+     * 窗口内发生任何异常时兜底删除物理文件；入库成功后调用 {@link #committed()} 解除守护。
+     * <p>清理自身的异常在 {@code close()} 内消化并留痕，不会掩盖入库失败的主异常。
+     */
+    private static class UploadedFileGuard implements AutoCloseable {
+
+        private final FileStorage storage;
+
+        private final String key;
+
+        private boolean committed;
+
+        private UploadedFileGuard(FileStorage storage, String key) {
+            this.storage = storage;
+            this.key = key;
+        }
+
+        /**
+         * 入库成功，解除守护，物理文件得以保留。
+         */
+        private void committed() {
+            this.committed = true;
+        }
+
+        @Override
+        public void close() {
+            if (committed) {
+                return;
+            }
+            try {
+                storage.delete(key);
+            } catch (Exception e) {
+                log.error("孤儿文件清理失败，需人工处理：key={}", key, e);
+            }
+        }
     }
 }
