@@ -58,6 +58,26 @@ public class LovePhotoServiceImpl implements LovePhotoService {
     }
 
     /**
+     * 门户恋爱画册封面照片（免登录）。
+     * <p>
+     * 显隐口径固定为「仅显示」（与 {@link #pagePortal} 一致的安全边界），
+     * 排序为 sort 升序 → id 升序（与门户分页同序，首页封面卡单条下发）；
+     * {@code LIMIT 1} 单条查询，无分页 COUNT 开销。
+     *
+     * @return 封面照片条目 DTO；画册为空时为 null
+     */
+    @Override
+    public LovePhotoDTO getPortalCover() {
+        PortalLovePhoto entity = QueryChain.of(portalLovePhotoMapper)
+                .where(PORTAL_LOVE_PHOTO.HIDDEN.eq(HiddenEnum.SHOW.getCode()))
+                .orderBy(PORTAL_LOVE_PHOTO.SORT, true)
+                .orderBy(PORTAL_LOVE_PHOTO.ID, true)
+                .limit(1)
+                .one();
+        return lovePhotoConverter.toDTO(entity);
+    }
+
+    /**
      * 管理端恋爱画册分页（全量，含隐藏照片）。
      * <p>
      * 文案为模糊匹配，标签在逗号分隔集合中精确匹配（FIND_IN_SET，

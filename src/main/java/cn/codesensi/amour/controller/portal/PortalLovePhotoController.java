@@ -41,4 +41,15 @@ public class PortalLovePhotoController {
         Page<LovePhotoDTO> itemPage = lovePhotoService.pagePortal(page);
         return lovePhotoConverter.toPortalPage(itemPage);
     }
+
+    /**
+     * 查询恋爱画册封面照片（免登录）
+     *
+     * @return 显隐为「显示」的照片中 sort 首位;画册为空时 data 为 null
+     */
+    @GetMapping("/cover")
+    public LovePhotoResponse cover() {
+        LovePhotoDTO portalCover = lovePhotoService.getPortalCover();
+        return lovePhotoConverter.toPortalResponse(portalCover);
+    }
 }
