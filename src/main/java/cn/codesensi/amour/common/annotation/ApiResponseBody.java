@@ -1,6 +1,6 @@
 package cn.codesensi.amour.common.annotation;
 
-import cn.codesensi.amour.common.advice.ApiResponseBodyAdvice;
+import cn.codesensi.amour.advice.ApiResponseBodyAdvice;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.lang.annotation.*;

@@ -1,4 +1,4 @@
-package cn.codesensi.amour.common.advice;
+package cn.codesensi.amour.advice;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.common.core.Result;

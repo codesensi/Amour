@@ -1,4 +1,4 @@
-package cn.codesensi.amour.common.aspect;
+package cn.codesensi.amour.aspect;
 
 import cn.codesensi.amour.common.annotation.RateLimit;
 import cn.codesensi.amour.common.consts.AppConst;
