@@ -42,7 +42,7 @@ public class SysLogController {
      * @param request 分页查询参数
      * @return 登录日志分页结果
      */
-    @SaCheckPermission("log:login:page")
+    @SaCheckPermission("system:log-login:page")
     @GetMapping("/login/page")
     public Page<LogPageResponse> loginPage(@Valid LogPageRequest request) {
         LogPageDTO pageDTO = logConverter.toPageDTO(request);
@@ -57,7 +57,7 @@ public class SysLogController {
      * @param request 分页查询参数
      * @return 操作日志分页结果
      */
-    @SaCheckPermission("log:operate:page")
+    @SaCheckPermission("system:log-operate:page")
     @GetMapping("/operate/page")
     public Page<LogPageResponse> operatePage(@Valid LogPageRequest request) {
         LogPageDTO pageDTO = logConverter.toPageDTO(request);
