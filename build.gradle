@@ -70,7 +70,7 @@ dependencies {
     annotationProcessor libs.mapstruct.processor     // MapStruct 注解处理器（扫描 @Mapper 生成实现类）
 
     // ---------- runtimeOnly：仅运行时需要 ----------
-    runtimeOnly libs.h2                              // H2 内存数据库
+    runtimeOnly libs.h2                              // H2 文件数据库（jdbc:h2:./data/amour_dev，MODE=MySQL）
 
     // ---------- test*：仅测试场景使用 ----------
     testImplementation libs.spring.boot.starter.webmvc.test  // Web 测试 Starter

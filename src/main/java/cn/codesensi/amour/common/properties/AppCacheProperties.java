@@ -74,5 +74,12 @@ public class AppCacheProperties {
          */
         private long expireAfterAccess;
 
+        /**
+         * 单缓存最大容量（条数）；缺省时回退全局 {@code app.cache.max-size}。
+         * <p>rate-limit 等条目数随活跃来源数线性增长的缓存应单独调大，
+         * 避免计数器被容量上限静默驱逐导致限流重置。
+         */
+        private Long maxSize;
+
     }
 }

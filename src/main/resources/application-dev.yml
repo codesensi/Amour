@@ -112,6 +112,8 @@ app:
         # 本过期时间仅作条目内存回收,需大于可配置的最大窗口(秒)
         expire-after-write: 3600
         expire-after-access: 0
+        # 条目=限流键:IP,容量须覆盖单窗口活跃 IP 数;超容量会被静默驱逐导致该 IP 计数重置
+        max-size: 500000
   # 文件存储配置(存储方式运行时以 sys_config 的 file.storage 为准,此处为配置缺失时的兜底值)
   file:
     storage: local
