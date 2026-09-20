@@ -70,6 +70,8 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
                 .where(SYS_ROLE.NAME.like(rolePageDTO.getName(), StrUtil::isNotBlank))
                 .and(SYS_ROLE.CODE.like(rolePageDTO.getCode(), StrUtil::isNotBlank))
                 .and(SYS_ROLE.STATUS.eq(rolePageDTO.getStatus(), ObjUtil::isNotNull))
+                // 显式按 ID 倒序:InnoDB 无保证次序,缺省排序跨页可能重复/漏行
+                .orderBy(SYS_ROLE.ID, false)
                 .page(Page.of(rolePageDTO.getPageNumber(), rolePageDTO.getPageSize()));
     }
 

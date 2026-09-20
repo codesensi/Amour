@@ -84,6 +84,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 .and(SYS_USER.EMAIL.like(userPageDTO.getEmail(), StrUtil::isNotBlank))
                 .and(SYS_USER.GENDER.eq(userPageDTO.getGender(), StrUtil::isNotBlank))
                 .and(SYS_USER.STATUS.eq(userPageDTO.getStatus(), ObjUtil::isNotNull))
+                // 显式按 ID 倒序:InnoDB 无保证次序,缺省排序跨页可能重复/漏行
+                .orderBy(SYS_USER.ID, false)
                 .page(Page.of(userPageDTO.getPageNumber(), userPageDTO.getPageSize()));
     }
 
