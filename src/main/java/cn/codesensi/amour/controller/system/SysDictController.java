@@ -140,8 +140,8 @@ public class SysDictController {
      */
     @SaCheckPermission("system:dict:update")
     @Log(module = "字典管理", operation = "修改字典状态", type = LogTypeEnum.UPDATE)
-    @PutMapping("/change-status")
-    public void changeStatus(@Valid @RequestBody DictChangeStatusRequest request) {
+    @PutMapping("/data/change-status")
+    public void dataChangeStatus(@Valid @RequestBody DictChangeStatusRequest request) {
         DictChangeStatusDTO changeStatusDTO = dictConverter.toChangeStatusDTO(request);
         sysDictDataService.changeStatus(changeStatusDTO);
     }
