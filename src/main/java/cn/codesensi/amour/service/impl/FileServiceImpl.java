@@ -34,8 +34,6 @@ import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
-import org.springframework.http.MediaType;
-import org.springframework.http.MediaTypeFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -54,7 +52,7 @@ import static cn.codesensi.amour.model.entity.table.SysUserTableDef.SYS_USER;
 /**
  * 文件服务实现。
  * <p>
- * 上传流程：业务类型校验 → 扩展名/大小校验 → 预生成主键 → 流式写盘 → 二次读取计算 MD5 → 单条 SQL 落库，
+ * 上传流程：业务类型校验 → 扩展名/大小/魔数校验 → 预生成主键 → 流式写盘 → 二次读取计算 MD5 → 单条 SQL 落库，
  * 任一环节失败整体回滚并清理已写盘文件。存储实现按 sys_config 的 {@code file.storage} 运行时路由
  * （实时读取支持系统配置页热更新），读取则按文件自身记录的 storage_type 分发，
  * 切换存储只影响新上传，历史文件不受影响。
@@ -75,6 +73,12 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
      * 文件分发 URL 解析器：仅识别本系统 /file/view/{id} 形态
      */
     private static final Pattern VIEW_URL_PATTERN = Pattern.compile(RegexConst.LITERALS_FILE_VIEW_DIGITS);
+
+    /**
+     * 魔数识别读入的文件头长度:覆盖枚举中最长的 WEBP 魔数判定(偏移 0~11),
+     * 新增需要更长文件头的格式时按需调大
+     */
+    private static final int MAGIC_HEAD_BYTES = 12;
 
     private final SysFileMapper sysFileMapper;
     private final SysUserMapper sysUserMapper;
@@ -114,6 +118,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
      * 按业务类型完成扩展名与大小校验后，预生成主键并流式写盘，再对上传源二次读取计算 MD5，
      * 最后以单条 SQL 落库（含存储 key 与 MD5）。写盘与 MD5 属慢速 IO，不包裹事务，
      * 避免长时间占用数据库连接；入库为单条 SQL 原子操作，失败时清理已写盘文件避免孤儿残留；
+     * 上传内容经文件头魔数校验真实类型，防改后缀伪装；
      * 返回的分发地址形如 {@code /file/view/{id}}。
      *
      * @param bizType 业务类型编码（infra/avatar/photo/markdown，详见 FileBizTypeEnum）
@@ -136,15 +141,19 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         String originalName = StrUtil.removeAllLineBreaks(
                 FileNameUtil.getName(StrUtil.blankToDefault(file.getOriginalFilename(), "file")));
         String extension = FileNameUtil.extName(originalName).toLowerCase();
-        if (StrUtil.isBlank(extension) || !bizTypeEnum.getExtensions().contains(extension)) {
-            throw new BusinessException("不支持的文件格式,仅支持：" + String.join(AppConst.SLASH, bizTypeEnum.getExtensions()));
+        if (StrUtil.isBlank(extension) || !bizTypeEnum.accepts(extension)) {
+            throw new BusinessException("不支持的文件格式,仅支持：" + bizTypeEnum.getFormats().stream()
+                    .map(FileTypeEnum::getCode).collect(Collectors.joining(AppConst.SLASH)));
         }
         long maxBytes = bizTypeEnum.getMaxMb() * 1024L * 1024L;
         if (file.getSize() > maxBytes) {
             throw new BusinessException("文件大小超过限制,最大 " + bizTypeEnum.getMaxMb() + "MB");
         }
 
-        // 3. 解析存储方式并路由实现:实时读取 sys_config 的 file.storage（系统配置页修改即时生效），
+        // 3. 魔数校验:读文件头比对真实类型,防改后缀伪装(扩展名仅是客户端声明)
+        FileTypeEnum magic = verifyMagicNumber(extension, file);
+
+        // 4. 解析存储方式并路由实现:实时读取 sys_config 的 file.storage（系统配置页修改即时生效），
         //    缺失时回退 yml 兜底值;无法识别的取值直接报错，避免静默落到错误存储
         String storageCode = sysConfigService.listByKeys(List.of(ConfigKeyEnum.FILE_STORAGE.getCode()))
                 .stream().findFirst().map(ConfigDTO::getConfigValue)
@@ -155,11 +164,9 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         }
         FileStorage storage = requireStorage(storageType);
 
-        // 4. 预生成主键并组装记录:存储 key 由主键参与拼装，先行生成可使入库合并为单条 SQL
-        // Content-Type 由扩展名查 Spring 内置 mime.types 强推导，不采信客户端声明值（防伪装类型的存储型 XSS）
-        String contentType = MediaTypeFactory.getMediaType("file." + extension)
-                .map(MediaType::toString)
-                .orElse(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        // 5. 预生成主键并组装记录:存储 key 由主键参与拼装，先行生成可使入库合并为单条 SQL
+        // Content-Type 取魔数枚举的权威 MIME（与魔数校验同源），不采信客户端声明值（防伪装类型的存储型 XSS）
+        String contentType = magic.getMimeType();
         SysFile sysFile = new SysFile()
                 .setId(IdUtil.getSnowflakeNextId())
                 .setOriginalName(originalName)
@@ -169,7 +176,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
                 .setContentType(contentType)
                 .setBizType(bizTypeEnum.getCode());
 
-        // 5. 流式写盘:不将文件整包读入内存，避免并发上传大文件时的内存尖峰
+        // 6. 流式写盘:不将文件整包读入内存，避免并发上传大文件时的内存尖峰
         String key;
         try (InputStream in = file.getInputStream()) {
             key = storage.upload(sysFile, in);
@@ -177,7 +184,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
             throw new SystemException("读取上传文件失败");
         }
 
-        // 6. 对上传源二次读取计算 MD5（Hutool 一次性消费流，返回小写十六进制）;
+        // 7. 对上传源二次读取计算 MD5（Hutool 一次性消费流，返回小写十六进制）;
         //    MultipartFile 底层为磁盘临时文件，可重复打开流，与存储实现解耦（本地/OSS 均适用）
         String md5;
         try (InputStream in = file.getInputStream()) {
@@ -189,7 +196,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         // 回填存储 key:预览/下载均按该 key 定位物理文件，缺失会导致 NPE
         sysFile.setPath(key);
 
-        // 7. 入库:主键/MD5/存储 key 均已就绪（主键已有值时框架自动跳过再生成）。
+        // 8. 入库:主键/MD5/存储 key 均已就绪（主键已有值时框架自动跳过再生成）。
         //    守护器保证入库失败时兜底清理已写盘的物理文件，避免残留孤儿文件
         try (var guard = new UploadedFileGuard(storage, key)) {
             sysFileMapper.insert(sysFile, true);
@@ -524,6 +531,32 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
             throw new SystemException("文件存储实现未注册：" + type.getCode());
         }
         return storage;
+    }
+
+    /**
+     * 校验上传内容的文件魔数与扩展名一致，防改后缀伪装（如把脚本/文本改名 .jpg 上传）。
+     * <p>读上传流头部字节，由 {@link FileTypeEnum#fromMagic} 按魔数识别真实格式，
+     * 与扩展名定位的期望类型比较；无法识别的伪造内容或空文件一律拒绝。
+     * 读流不消费上传源，MultipartFile 可重复开流，后续写盘与 MD5 计算不受影响。
+     *
+     * @param extension 全小写扩展名
+     * @param file      上传文件
+     * @return 扩展名映射的期望格式枚举（校验通过后用于推导落库 Content-Type）
+     */
+    private FileTypeEnum verifyMagicNumber(String extension, MultipartFile file) {
+        byte[] head;
+        try (InputStream in = file.getInputStream()) {
+            // 读头 12 字节:覆盖枚举中最长的 WEBP 魔数判定(偏移 0~11)
+            head = in.readNBytes(MAGIC_HEAD_BYTES);
+        } catch (IOException e) {
+            throw new SystemException("读取上传文件失败");
+        }
+        FileTypeEnum fileTypeEnum = FileTypeEnum.fromExtension(extension);
+        FileTypeEnum actual = head.length == 0 ? null : FileTypeEnum.fromMagic(head);
+        if (fileTypeEnum == null || actual != fileTypeEnum) {
+            throw new BusinessException("文件内容与扩展名不符，请上传真实的图片文件");
+        }
+        return fileTypeEnum;
     }
 
     /**
