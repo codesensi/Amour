@@ -1,6 +1,6 @@
 package cn.codesensi.amour.model.converter;
 
-import cn.codesensi.amour.model.dto.FileInfoDTO;
+import cn.codesensi.amour.model.dto.FileDTO;
 import cn.codesensi.amour.model.dto.FilePageDTO;
 import cn.codesensi.amour.model.dto.FileUploadResultDTO;
 import cn.codesensi.amour.model.entity.SysFile;
@@ -40,7 +40,7 @@ public interface FileConverter {
      * @return 文件行数据 DTO
      */
     @Mapping(target = "creatorName", ignore = true)
-    FileInfoDTO toItemDTO(SysFile file);
+    FileDTO toItemDTO(SysFile file);
 
     /**
      * Page&lt;SysFile&gt; → Page&lt;FileInfoDTO&gt;。
@@ -49,7 +49,7 @@ public interface FileConverter {
      * @return 文件行数据 DTO 分页
      */
     @Mapping(target = "optimizeCountQuery", ignore = true)
-    Page<FileInfoDTO> toItemDTOPage(Page<SysFile> page);
+    Page<FileDTO> toPageDTO(Page<SysFile> page);
 
     /**
      * FileInfoDTO → FilePageResponse 单条映射（Page 映射的 records 逐元素复用）。
@@ -57,7 +57,7 @@ public interface FileConverter {
      * @param dto 文件行数据 DTO
      * @return 文件行响应对象
      */
-    FilePageResponse toResponse(FileInfoDTO dto);
+    FilePageResponse toResponse(FileDTO dto);
 
     /**
      * Page&lt;FileInfoDTO&gt; → Page&lt;FilePageResponse&gt;。
@@ -66,7 +66,7 @@ public interface FileConverter {
      * @return 文件行响应对象分页
      */
     @Mapping(target = "optimizeCountQuery", ignore = true)
-    Page<FilePageResponse> toResponsePage(Page<FileInfoDTO> dtoPage);
+    Page<FilePageResponse> toPageResponse(Page<FileDTO> dtoPage);
 
     /**
      * FileUploadResultDTO → FileUploadResponse。

@@ -39,7 +39,7 @@ public interface NoticeConverter {
     /**
      * 将通知 DTO 列表转换为响应对象列表（逐元素复用 {@link #toResponse(NoticeDTO)} 的映射规则）。
      */
-    List<NoticeResponse> toResponseList(List<NoticeDTO> noticeList);
+    List<NoticeResponse> toListResponse(List<NoticeDTO> noticeList);
 
     /**
      * NoticeReadRequest → NoticeReadDTO

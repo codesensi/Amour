@@ -4,7 +4,7 @@ import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.common.annotation.Log;
 import cn.codesensi.amour.common.enums.LogTypeEnum;
 import cn.codesensi.amour.model.converter.FileConverter;
-import cn.codesensi.amour.model.dto.FileInfoDTO;
+import cn.codesensi.amour.model.dto.FileDTO;
 import cn.codesensi.amour.model.dto.FilePageDTO;
 import cn.codesensi.amour.model.dto.FileUploadResultDTO;
 import cn.codesensi.amour.model.entity.SysFile;
@@ -79,8 +79,8 @@ public class SysFileController {
     @GetMapping("/page")
     public Page<FilePageResponse> page(@Valid FilePageRequest request) {
         FilePageDTO filePageDTO = fileConverter.toPageDTO(request);
-        Page<FileInfoDTO> dtoPage = fileService.page(filePageDTO);
-        return fileConverter.toResponsePage(dtoPage);
+        Page<FileDTO> dtoPage = fileService.page(filePageDTO);
+        return fileConverter.toPageResponse(dtoPage);
     }
 
     /**

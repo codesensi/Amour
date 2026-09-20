@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  * @since 1.0
  */
 @Data
-public class FileInfoDTO implements Serializable {
+public class FileDTO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

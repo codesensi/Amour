@@ -39,7 +39,7 @@ public class SysNoticeController {
     @GetMapping("/list")
     public List<NoticeResponse> list(@RequestParam(required = false, defaultValue = "20") Integer limit) {
         List<NoticeDTO> noticeList = sysNoticeService.list(limit);
-        return noticeConverter.toResponseList(noticeList);
+        return noticeConverter.toListResponse(noticeList);
     }
 
     /**

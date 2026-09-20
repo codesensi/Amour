@@ -10,7 +10,7 @@ import cn.codesensi.amour.mapper.SysFileMapper;
 import cn.codesensi.amour.mapper.SysUserMapper;
 import cn.codesensi.amour.model.converter.FileConverter;
 import cn.codesensi.amour.model.dto.ConfigDTO;
-import cn.codesensi.amour.model.dto.FileInfoDTO;
+import cn.codesensi.amour.model.dto.FileDTO;
 import cn.codesensi.amour.model.dto.FilePageDTO;
 import cn.codesensi.amour.model.dto.FileUploadResultDTO;
 import cn.codesensi.amour.model.entity.SysFile;
@@ -266,7 +266,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
      * @return 文件分页结果
      */
     @Override
-    public Page<FileInfoDTO> page(FilePageDTO pageDTO) {
+    public Page<FileDTO> page(FilePageDTO pageDTO) {
         boolean recycled = DelFlagEnum.DELETED.getCode().equals(pageDTO.getDelFlag());
         // 上传人按用户名模糊匹配:先解析用户ID集合再 IN，避免联表分页（对齐用户模块的既有惯例）;
         // 与主查询同处绕过逻辑删除的作用域，已删除用户的文件仍可按用户名命中（与原 IN 子查询行为一致）
@@ -318,7 +318,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
             }
         }
         final Map<Long, String> finalUsernameMap = usernameMap;
-        Page<FileInfoDTO> result = fileConverter.toItemDTOPage(page);
+        Page<FileDTO> result = fileConverter.toPageDTO(page);
         result.getRecords().forEach(row -> {
             // creator 可能为空（未登录来源记录），不可变 Map 拒绝 null key 查询，须先行判空
             if (ObjUtil.isNotNull(row.getCreator()) && CollUtil.isNotEmpty(finalUsernameMap)) {

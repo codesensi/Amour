@@ -35,6 +35,6 @@ public class SysCacheController {
     @GetMapping("/list")
     public List<CacheResponse> list() {
         List<CacheDTO> cacheList = sysCacheService.list();
-        return cacheConverter.toResponseList(cacheList);
+        return cacheConverter.toListResponse(cacheList);
     }
 }

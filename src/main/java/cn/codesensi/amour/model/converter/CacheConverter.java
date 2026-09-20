@@ -53,6 +53,6 @@ public interface CacheConverter {
      * @param dtoList 缓存 DTO 列表
      * @return 缓存内容响应对象列表
      */
-    List<CacheResponse> toResponseList(List<CacheDTO> dtoList);
+    List<CacheResponse> toListResponse(List<CacheDTO> dtoList);
 
 }

@@ -1,7 +1,7 @@
 package cn.codesensi.amour.service;
 
 import cn.codesensi.amour.common.enums.FileBizTypeEnum;
-import cn.codesensi.amour.model.dto.FileInfoDTO;
+import cn.codesensi.amour.model.dto.FileDTO;
 import cn.codesensi.amour.model.dto.FilePageDTO;
 import cn.codesensi.amour.model.dto.FileUploadResultDTO;
 import cn.codesensi.amour.service.file.FileViewResult;
@@ -54,7 +54,7 @@ public interface FileService {
      * @param pageDTO 分页查询参数
      * @return 文件分页结果
      */
-    Page<FileInfoDTO> page(FilePageDTO pageDTO);
+    Page<FileDTO> page(FilePageDTO pageDTO);
 
     /**
      * 删除文件到回收站：仅逻辑删除记录，物理文件保留，
