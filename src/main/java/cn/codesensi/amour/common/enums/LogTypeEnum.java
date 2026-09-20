@@ -3,6 +3,9 @@ package cn.codesensi.amour.common.enums;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * 日志类型枚举。
  * <p>
@@ -36,4 +39,18 @@ public enum LogTypeEnum implements BaseEnum<Integer> {
      * 说明
      */
     private final String desc;
+
+    /**
+     * 操作日志类型清单：除登录/登出与未知兜底外的全部操作类型。
+     * <p>供操作日志分页端点下发查询范围，清单随枚举演进自动纳入新类型；
+     * 排除 {@link #UNKNOWN} 与历史硬编码口径保持一致。
+     *
+     * @return 操作日志类型编码列表
+     */
+    public static List<Integer> operateTypes() {
+        return Arrays.stream(values())
+                .filter(type -> type != UNKNOWN && type != LOGIN && type != LOGOUT)
+                .map(LogTypeEnum::getCode)
+                .toList();
+    }
 }

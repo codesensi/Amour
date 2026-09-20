@@ -194,7 +194,9 @@ public class LogAspect {
 
             sysLog.setElapsed(System.currentTimeMillis() - start);
             sysLogService.record(sysLog);
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
+            // 捕获 Throwable:日志采集是纯旁路,Error(如序列化栈溢出)也不能冒泡中断业务、
+            // 遮蔽已成功的业务结果;业务异常本身在 around 中原样上抛,不经过此处
             LogAspect.log.warn("操作日志采集失败：{}", ex.getMessage());
         }
     }

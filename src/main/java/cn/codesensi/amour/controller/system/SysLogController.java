@@ -61,11 +61,7 @@ public class SysLogController {
     @GetMapping("/operate/page")
     public Page<LogPageResponse> operatePage(@Valid LogPageRequest request) {
         LogPageDTO pageDTO = logConverter.toPageDTO(request);
-        List<Integer> logTypes = List.of(LogTypeEnum.QUERY.getCode(), LogTypeEnum.INSERT.getCode(),
-                LogTypeEnum.UPDATE.getCode(), LogTypeEnum.DELETE.getCode(),
-                LogTypeEnum.GRANT.getCode(), LogTypeEnum.UPLOAD.getCode(),
-                LogTypeEnum.DOWNLOAD.getCode());
-        Page<SysLog> page = sysLogService.page(pageDTO, logTypes);
+        Page<SysLog> page = sysLogService.page(pageDTO, LogTypeEnum.operateTypes());
         return logConverter.toPageResponse(page);
     }
 }
