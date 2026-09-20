@@ -32,7 +32,12 @@ public enum RateLimitKey implements BaseEnum<String> {
     /**
      * 高德服务代理接口
      */
-    AMAP_PROXY("amap-proxy", "高德服务代理接口");
+    AMAP_PROXY("amap-proxy", "高德服务代理接口"),
+
+    /**
+     * 一言接口（免登录直连上游，需防滥用）
+     */
+    SAYING("saying", "一言接口");
 
     /**
      * 编码

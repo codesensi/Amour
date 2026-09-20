@@ -1,6 +1,8 @@
 package cn.codesensi.amour.controller.portal;
 
 import cn.codesensi.amour.common.annotation.ApiResponseBody;
+import cn.codesensi.amour.common.annotation.RateLimit;
+import cn.codesensi.amour.common.enums.RateLimitKey;
 import cn.codesensi.amour.model.converter.SayingConverter;
 import cn.codesensi.amour.model.dto.SayingResultDTO;
 import cn.codesensi.amour.model.response.SayingResponse;
@@ -31,10 +33,12 @@ public class PortalSayingController {
     /**
      * 查询一言（免登录）
      * <p>
-     * 优先调用随机一言接口，失败降级一言接口；两级上游均不可用时返回空对象
+     * 优先调用随机一言接口，失败降级一言接口；两级上游均不可用时返回空对象。
+     * 按「接口键 + 来源 IP」限流，防止匿名高频调用耗尽上游 UApiPro 配额。
      *
      * @return 一言文案与出处、作者；字段可能为空，由前端判空决定是否展示
      */
+    @RateLimit(key = RateLimitKey.SAYING, fallbackLimit = 10, fallbackWindowSeconds = 60)
     @GetMapping("/saying")
     public SayingResponse portalSaying() {
         SayingResultDTO sayingResultDTO = sayingService.getSaying();
