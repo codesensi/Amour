@@ -552,7 +552,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     /**
-     * 校验 QQ 号未被其他用户占用（含已删除记录，全生命周期唯一；QQ 为可选字段，空值跳过校验）。
+     * 校验 QQ 号可用性：未被其他用户占用（含已删除记录，全生命周期唯一），
+     * 且不得与其他用户的用户名相同（登录支持用户名/QQ号任一匹配且用户名匹配优先，
+     * QQ 与他人用户名相同时会产生登录匹配歧义；QQ 为可选字段，空值跳过校验）。
+     * <p>
+     * 用户名冲突校验仅覆盖未删除用户：登录查询自动追加 del_flag=0，已删除用户的
+     * 用户名不参与匹配，无歧义风险。
      *
      * @param qq            QQ号
      * @param excludeUserId 需排除的用户ID（修改场景排除本人），可为 null
@@ -568,6 +573,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                         .count());
         if (count > 0) {
             throw new BusinessException("QQ号已被其他用户使用");
+        }
+        long usernameCount = QueryChain.of(sysUserMapper)
+                .where(SYS_USER.USERNAME.eq(qq))
+                .and(SYS_USER.ID.ne(excludeUserId, ObjUtil::isNotNull))
+                .count();
+        if (usernameCount > 0) {
+            throw new BusinessException("QQ号不能与其他用户的用户名相同");
         }
     }
 
