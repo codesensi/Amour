@@ -214,6 +214,11 @@ FROM (
              (2102, 2100, '增加', 'B', NULL, NULL, 2, NULL, 'admin:footprint:insert', 1),
              (2103, 2100, '修改', 'B', NULL, NULL, 3, NULL, 'admin:footprint:update', 1),
              (2104, 2100, '删除', 'B', NULL, NULL, 4, NULL, 'admin:footprint:delete', 1),
+             (2200, 0, '纪念日管理', 'M', '/admin/anniversary', 'admin/anniversary/index', 4, 'ep:calendar', NULL, 1),
+             (2201, 2200, '分页查询', 'B', NULL, NULL, 1, NULL, 'admin:anniversary:page', 1),
+             (2202, 2200, '增加', 'B', NULL, NULL, 2, NULL, 'admin:anniversary:insert', 1),
+             (2203, 2200, '修改', 'B', NULL, NULL, 3, NULL, 'admin:anniversary:update', 1),
+             (2204, 2200, '删除', 'B', NULL, NULL, 4, NULL, 'admin:anniversary:delete', 1),
              (3000, 0, '个人中心', 'M', '/admin/profile', 'profile/index', 3, 'ep:avatar', NULL, 1)
      ) AS t(id, pid, title, type, path, component, sort, icon, perms, builtin)
 WHERE NOT EXISTS (
@@ -249,7 +254,8 @@ FROM (
              (99010, 'file-storage-type', '存储类型', 1, '与 StorageTypeEnum(local/oss) 对齐'),
              (99011, 'biz-type', '文件业务类型', 1, '与 FileBizTypeEnum(infra/avatar/photo/markdown) 对齐'),
              (99012, 'log-type', '日志类型', 1, '与 LogTypeEnum 对齐'),
-             (99013, 'hidden', '显隐状态', 1, '与 HiddenEnum(0/1) 对齐')
+             (99013, 'hidden', '显隐状态', 1, '与 HiddenEnum(0/1) 对齐'),
+             (99014, 'anniversary-type', '纪念日类型', 1, '与 AnniversaryTypeEnum(birthday/anniversary/festival) 对齐')
      ) AS t(id, dict_code, dict_name, builtin, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_dict_type` WHERE `sys_dict_type`.`id` = t.id
@@ -335,7 +341,11 @@ FROM (
              (11110, 'log-type', '9', '下载', 10, 0, 1, '与 LogTypeEnum 对齐'),
              -- hidden（照片显隐，对应 HiddenEnum：0-显示,1-隐藏；11200 段）
              (11201, 'hidden', '0', '显示', 1, 0, 1, '与 HiddenEnum(0/1) 对齐'),
-             (11202, 'hidden', '1', '隐藏', 2, 0, 1, '与 HiddenEnum(0/1) 对齐')
+             (11202, 'hidden', '1', '隐藏', 2, 0, 1, '与 HiddenEnum(0/1) 对齐'),
+             -- anniversary-type（纪念日类型，对应 AnniversaryTypeEnum：birthday-生日,anniversary-纪念日,festival-节日；11300 段）
+             (11301, 'anniversary-type', 'birthday', '生日', 1, 0, 1, '与 AnniversaryTypeEnum 对齐'),
+             (11302, 'anniversary-type', 'anniversary', '纪念日', 2, 0, 1, '与 AnniversaryTypeEnum 对齐'),
+             (11303, 'anniversary-type', 'festival', '节日', 3, 0, 1, '与 AnniversaryTypeEnum 对齐')
      ) AS t(id, dict_code, dict_value, dict_label, sort, status, builtin, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_dict_data` WHERE `sys_dict_data`.`id` = t.id
@@ -385,6 +395,27 @@ FROM (
      ) AS t(id, city, place_name, longitude, latitude, arrival_date, photo_url, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `portal_footprint` WHERE `portal_footprint`.`id` = t.id
+);
+
+-- ----------------------------
+-- 数据填充：portal_anniversary（幂等插入）
+-- 门户纪念日展示的示例数据（type 对应字典 anniversary-type）；id 使用独立的 32000 段顺序预留
+-- ----------------------------
+INSERT INTO `portal_anniversary` (
+    `id`, `name`, `type`, `anniversary_date`, `repeat_yearly`
+)
+SELECT
+    t.id,
+    t.name,
+    t.type,
+    t.anniversary_date,
+    t.repeat_yearly
+FROM (
+         VALUES
+             (32001, '在一起纪念日', 'anniversary', '2022-05-21', 1)
+     ) AS t(id, name, type, anniversary_date, repeat_yearly)
+WHERE NOT EXISTS (
+    SELECT 1 FROM `portal_anniversary` WHERE `portal_anniversary`.`id` = t.id
 );
 
 SET REFERENTIAL_INTEGRITY TRUE;

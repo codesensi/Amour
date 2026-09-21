@@ -425,13 +425,13 @@ CREATE TABLE IF NOT EXISTS `portal_love_list` (
     COMMENT = '恋爱清单表';
 
 -- ----------------------------
--- 表结构：portal_anniversary（纪念日表）
+-- 表结构：portal_anniversary（门户纪念日表）
 -- 幂等建表：仅当表不存在时创建
 -- ----------------------------
 CREATE TABLE IF NOT EXISTS `portal_anniversary` (
     `id`                BIGINT        NOT NULL                COMMENT '主键ID',
     `name`              VARCHAR(128)  NOT NULL                COMMENT '纪念日名称',
-    `type`              TINYINT(1)    NULL DEFAULT NULL       COMMENT '纪念日类型: 1-生日, 2-纪念日, 3-节日',
+    `type`              VARCHAR(64)   NOT NULL                COMMENT '纪念日类型(字典 anniversary-type: birthday-生日/anniversary-纪念日/festival-节日)',
     `anniversary_date`  DATE          NOT NULL                COMMENT '纪念日日期（每年重复时仅取月/日）',
     `repeat_yearly`     TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '是否每年重复: 0-否, 1-是',
     `sort`              INT           NOT NULL DEFAULT 0      COMMENT '排序（数字越小越靠前）',
@@ -447,7 +447,7 @@ CREATE TABLE IF NOT EXISTS `portal_anniversary` (
     CHARACTER SET = utf8mb4
     COLLATE = utf8mb4_general_ci
     ROW_FORMAT = DYNAMIC
-    COMMENT = '纪念日表';
+    COMMENT = '门户纪念日表';
 
 -- ----------------------------
 -- 表结构：portal_time_capsule（时间胶囊表）

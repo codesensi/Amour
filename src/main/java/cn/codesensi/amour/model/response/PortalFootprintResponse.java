@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
- * 门户足迹地图响应结果。
+ * 门户足迹地图行响应结果（免登录分页行/地图点位）。
  * <p>
  * 字段名对齐前端契约（FootprintItem），照片地址为免登录分发地址。
  *
@@ -17,7 +17,7 @@ import java.math.BigDecimal;
  * @since 1.0
  */
 @Data
-public class FootprintResponse implements Serializable {
+public class PortalFootprintResponse implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

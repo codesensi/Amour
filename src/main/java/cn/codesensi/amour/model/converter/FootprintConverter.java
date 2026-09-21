@@ -7,7 +7,7 @@ import cn.codesensi.amour.model.request.FootprintInsertRequest;
 import cn.codesensi.amour.model.request.FootprintPageRequest;
 import cn.codesensi.amour.model.request.FootprintUpdateRequest;
 import cn.codesensi.amour.model.response.FootprintPageResponse;
-import cn.codesensi.amour.model.response.FootprintResponse;
+import cn.codesensi.amour.model.response.PortalFootprintResponse;
 import cn.hutool.core.util.StrUtil;
 import com.mybatisflex.core.paginate.Page;
 import org.mapstruct.Mapper;
@@ -128,7 +128,7 @@ public interface FootprintConverter {
      * @param itemDTO 足迹条目 DTO
      * @return 门户足迹响应对象
      */
-    FootprintResponse toPortalResponse(FootprintDTO itemDTO);
+    PortalFootprintResponse toPortalResponse(FootprintDTO itemDTO);
 
     /**
      * 条目 DTO 列表 → 门户足迹响应列表
@@ -137,17 +137,17 @@ public interface FootprintConverter {
      * @param items 足迹条目 DTO 列表
      * @return 门户足迹响应列表
      */
-    List<FootprintResponse> toPortalResponseList(List<FootprintDTO> items);
+    List<PortalFootprintResponse> toPortalResponseList(List<FootprintDTO> items);
 
     /**
-     * Page&lt;FootprintItemDTO&gt; → Page&lt;FootprintResponse&gt;
+     * Page&lt;FootprintItemDTO&gt; → Page&lt;PortalFootprintResponse&gt;
      * （records 逐元素复用 {@link #toPortalResponse(FootprintDTO)} 的映射规则）。
      *
      * @param page 足迹条目 DTO 分页
      * @return 门户足迹响应分页
      */
     @Mapping(target = "optimizeCountQuery", ignore = true)
-    Page<FootprintResponse> toPortalPage(Page<FootprintDTO> page);
+    Page<PortalFootprintResponse> toPortalPage(Page<FootprintDTO> page);
 
     /**
      * yyyy-MM-dd 字符串 → 日期（空值安全;分页范围/入库日期的统一转换口）。
