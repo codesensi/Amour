@@ -530,8 +530,8 @@ CREATE TABLE IF NOT EXISTS `portal_footprint` (
 CREATE TABLE IF NOT EXISTS `portal_visit` (
     `id`          BIGINT     NOT NULL                COMMENT '主键ID',
     `stat_date`   DATE       NOT NULL                COMMENT '统计日期',
-    `pv`          INT        NOT NULL DEFAULT 0      COMMENT '当日访问量（PV）',
-    `uv`          INT        NOT NULL DEFAULT 0      COMMENT '当日独立访客数（UV）',
+    `pv`          BIGINT     NOT NULL DEFAULT 0      COMMENT '当日访问量（PV）',
+    `uv`          BIGINT     NOT NULL DEFAULT 0      COMMENT '当日独立访客数（UV）',
     `creator`     BIGINT         NULL DEFAULT NULL       COMMENT '创建人',
     `create_time` DATETIME   NULL DEFAULT CURRENT_TIMESTAMP       COMMENT '创建时间',
     `updater`     BIGINT         NULL DEFAULT NULL       COMMENT '更新人',
