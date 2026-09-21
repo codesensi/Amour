@@ -381,7 +381,7 @@ SELECT
     t.remark
 FROM (
          VALUES
-             (31001, '成都', '宽窄巷子', 104.053600, 30.669800, '2024-10-02', NULL, '第一次一起逛巷子,看了变脸吃了三大炮')
+             (31001, '成都', '宽窄巷子', 104.053307, 30.663869, '2024-10-02', NULL, '第一次一起逛巷子,看了变脸吃了三大炮')
      ) AS t(id, city, place_name, longitude, latitude, arrival_date, photo_url, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `portal_footprint` WHERE `portal_footprint`.`id` = t.id
