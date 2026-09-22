@@ -37,7 +37,12 @@ public enum RateLimitKey implements BaseEnum<String> {
     /**
      * 一言接口（免登录直连上游，需防滥用）
      */
-    SAYING("saying", "一言接口");
+    SAYING("saying", "一言接口"),
+
+    /**
+     * 留言提交接口（门户免登录可写，需防刷屏）
+     */
+    MESSAGE("message", "留言提交接口");
 
     /**
      * 编码

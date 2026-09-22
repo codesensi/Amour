@@ -12,10 +12,10 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 通知实体。
+ * 留言实体。
  * <p>
- * 对应 {@code sys_notice} 表，承载通知中心的事件消息：由业务事件触发写入
- * （无人工管理入口），撤回走逻辑删除；通知的已读状态见 {@link SysNoticeRead}。
+ * 对应 {@code portal_message} 表，承载门户「留言簿」的访客留言数据；
+ * 访客提交后为待审核状态，仅审核通过的记录在门户下发，管理端全量维护，删除走逻辑删除。
  *
  * @author codesensi
  * @since 1.0
@@ -24,8 +24,8 @@ import java.io.Serializable;
 @Accessors(chain = true)
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@Table("sys_notice")
-public class SysNotice extends BaseEntity implements Serializable {
+@Table("portal_message")
+public class PortalMessage extends BaseEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -37,23 +37,33 @@ public class SysNotice extends BaseEntity implements Serializable {
     private Long id;
 
     /**
-     * 通知标题
+     * 访客昵称
      */
-    private String title;
+    private String nickname;
 
     /**
-     * 通知内容
+     * 留言头像
+     */
+    private String avatar;
+
+    /**
+     * 留言内容
      */
     private String content;
 
     /**
-     * 业务类型: message-audit-留言审核（触发本通知的业务事件，空表示无关联业务）
+     * 留言IP
      */
-    private String bizType;
+    private String ip;
 
     /**
-     * 业务ID（与 bizType 联合定位业务数据）
+     * IP归属地
      */
-    private Long bizId;
+    private String region;
+
+    /**
+     * 审核状态: pending-待审核， approved-通过， rejected-驳回
+     */
+    private String auditStatus;
 
 }

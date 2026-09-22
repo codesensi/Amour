@@ -46,6 +46,8 @@ public enum ConfigKeyEnum implements BaseEnum<String> {
     RATE_LIMIT_AMAP_PROXY_WINDOW(key(RateLimitKey.AMAP_PROXY, RateLimitField.WINDOW), "高德服务代理接口-时间窗口(秒)"),
     RATE_LIMIT_SAYING_LIMIT(key(RateLimitKey.SAYING, RateLimitField.LIMIT), "一言接口-窗口内最大请求数"),
     RATE_LIMIT_SAYING_WINDOW(key(RateLimitKey.SAYING, RateLimitField.WINDOW), "一言接口-时间窗口(秒)"),
+    RATE_LIMIT_MESSAGE_LIMIT(key(RateLimitKey.MESSAGE, RateLimitField.LIMIT), "留言提交接口-窗口内最大请求数"),
+    RATE_LIMIT_MESSAGE_WINDOW(key(RateLimitKey.MESSAGE, RateLimitField.WINDOW), "留言提交接口-时间窗口(秒)"),
 
     // ---------- 安全配置（security 分组：6000 段） ----------
     SECURITY_UAPI_KEY("security.uapi-key", "UApiPro接口密钥"),

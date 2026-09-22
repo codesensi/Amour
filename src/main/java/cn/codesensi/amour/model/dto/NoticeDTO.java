@@ -38,6 +38,16 @@ public class NoticeDTO implements Serializable {
     private String content;
 
     /**
+     * 业务类型: message-audit-留言审核（空表示无关联业务）
+     */
+    private String bizType;
+
+    /**
+     * 业务ID（与 bizType 联合定位业务数据）
+     */
+    private Long bizId;
+
+    /**
      * 创建时间
      */
     private LocalDateTime createTime;

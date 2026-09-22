@@ -45,7 +45,8 @@ public class AppConst {
      * 档位对应关系：16 → phone/qq/config_group；64 → username/password/nickname/email/
      * role.name 与 code/menu.title/perms/dict_code/dict_name/config_key/photo.tags；
      * 128 → dict_value/dict_label；256 → menu.path/component/icon/file.original_name；
-     * 512 → msg/remark/avatar/config_value/photo.url 与 caption
+     * 512 → msg/remark/avatar/config_value/photo.url 与 caption；
+    * 1024 → message.content
      */
     public static final int MAX_LENGTH_16 = 16;
 
@@ -68,6 +69,11 @@ public class AppConst {
      * 字符串列长度档位 512
      */
     public static final int MAX_LENGTH_512 = 512;
+
+    /**
+     * 字符串列长度档位 1024 —— portal_message.content
+     */
+    public static final int MAX_LENGTH_1024 = 1024;
 
     /**
      * 链路追踪 ID 在 MDC 中的键名

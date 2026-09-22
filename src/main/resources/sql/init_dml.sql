@@ -41,6 +41,8 @@ FROM (
              (5008, 'rate-limit.amap-proxy.window', '60', 'INTEGER', 'rate-limit', 0, '高德服务代理接口-时间窗口(秒)'),
              (5009, 'rate-limit.saying.limit', '10', 'INTEGER', 'rate-limit', 0, '一言接口-窗口内最大请求数(0 表示拒绝全部请求)'),
              (5010, 'rate-limit.saying.window', '60', 'INTEGER', 'rate-limit', 0, '一言接口-时间窗口(秒)'),
+             (5011, 'rate-limit.message.limit', '3', 'INTEGER', 'rate-limit', 0, '留言提交接口-窗口内最大请求数(0 表示拒绝全部请求)'),
+             (5012, 'rate-limit.message.window', '60', 'INTEGER', 'rate-limit', 0, '留言提交接口-时间窗口(秒)'),
              -- security（6000 段）
              (6001, 'security.uapi-key', NULL, 'STRING', 'security', 1, 'UApiPro接口密钥(https://uapis.cn)'),
              (6002, 'security.amap-key', NULL, 'STRING', 'security', 0, '高德地图Web端JS API Key(足迹地图选点/门户足迹地图展示;配域名白名单防滥用)'),
@@ -144,6 +146,76 @@ FROM (
      ) AS t(id, user_id, role_id)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_user_role` WHERE `sys_user_role`.`id` = t.id
+);
+
+-- ----------------------------
+-- 数据填充：sys_role_menu（幂等插入）
+-- 主角角色绑定除系统管理（1000 子树）之外的全部菜单（业务模块与个人中心）：
+-- 主角经管理端与通知中心参与留言审批等日常维护；超管角色持有 *:*:* 通配权限无需绑定；
+-- id 使用独立的 40000 段顺序预留（与菜单表 10000 段、种子数据 30000 段互相独立）
+-- ----------------------------
+INSERT INTO `sys_role_menu` (
+    `id`, `role_id`, `menu_id`
+)
+SELECT
+    t.id,
+    t.role_id,
+    t.menu_id
+FROM (
+         VALUES
+             -- 点点滴滴（2000 段）
+             (40001, 2, 2000),
+             (40002, 2, 2001),
+             (40003, 2, 2002),
+             (40004, 2, 2003),
+             (40005, 2, 2004),
+             -- 恋爱画册（2100 段）
+             (40006, 2, 2100),
+             (40007, 2, 2101),
+             (40008, 2, 2102),
+             (40009, 2, 2103),
+             (40010, 2, 2104),
+             -- 恋爱清单（2200 段）
+             (40011, 2, 2200),
+             (40012, 2, 2201),
+             (40013, 2, 2202),
+             (40014, 2, 2203),
+             (40015, 2, 2204),
+             -- 留言簿（2300 段）
+             (40016, 2, 2300),
+             (40017, 2, 2301),
+             (40018, 2, 2302),
+             (40019, 2, 2303),
+             (40020, 2, 2304),
+             -- 纪念日（2400 段）
+             (40021, 2, 2400),
+             (40022, 2, 2401),
+             (40023, 2, 2402),
+             (40024, 2, 2403),
+             (40025, 2, 2404),
+             -- 时间胶囊（2500 段）
+             (40026, 2, 2500),
+             (40027, 2, 2501),
+             (40028, 2, 2502),
+             (40029, 2, 2503),
+             (40030, 2, 2504),
+             -- 情侣日志（2600 段）
+             (40031, 2, 2600),
+             (40032, 2, 2601),
+             (40033, 2, 2602),
+             (40034, 2, 2603),
+             (40035, 2, 2604),
+             -- 足迹（2700 段）
+             (40036, 2, 2700),
+             (40037, 2, 2701),
+             (40038, 2, 2702),
+             (40039, 2, 2703),
+             (40040, 2, 2704),
+             -- 个人中心（3000 段）
+             (40041, 2, 3000)
+     ) AS t(id, role_id, menu_id)
+WHERE NOT EXISTS (
+    SELECT 1 FROM `sys_role_menu` WHERE `sys_role_menu`.`id` = t.id
 );
 
 -- ----------------------------
@@ -280,7 +352,8 @@ FROM (
              (99011, 'biz-type', '文件业务类型', 1, '与 FileBizTypeEnum(infra/avatar/photo/markdown) 对齐'),
              (99012, 'log-type', '日志类型', 1, '与 LogTypeEnum 对齐'),
              (99013, 'hidden', '显隐状态', 1, '与 HiddenEnum(0/1) 对齐'),
-             (99014, 'anniversary-type', '纪念日类型', 1, '与 AnniversaryTypeEnum(birthday/anniversary/festival) 对齐')
+             (99014, 'anniversary-type', '纪念日类型', 1, '与 AnniversaryTypeEnum(birthday/anniversary/festival) 对齐'),
+             (99015, 'message-audit-status', '留言审核状态', 1, '与 MessageAuditStatusEnum(pending/approved/rejected) 对齐')
      ) AS t(id, dict_code, dict_name, builtin, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_dict_type` WHERE `sys_dict_type`.`id` = t.id
@@ -370,7 +443,11 @@ FROM (
              -- anniversary-type（纪念日类型，对应 AnniversaryTypeEnum：birthday-生日,anniversary-纪念日,festival-节日；11300 段）
              (11301, 'anniversary-type', 'birthday', '生日', 1, 0, 1, '与 AnniversaryTypeEnum 对齐'),
              (11302, 'anniversary-type', 'anniversary', '纪念日', 2, 0, 1, '与 AnniversaryTypeEnum 对齐'),
-             (11303, 'anniversary-type', 'festival', '节日', 3, 0, 1, '与 AnniversaryTypeEnum 对齐')
+             (11303, 'anniversary-type', 'festival', '节日', 3, 0, 1, '与 AnniversaryTypeEnum 对齐'),
+             -- message-audit-status（留言审核状态，对应 MessageAuditStatusEnum：pending-待审核,approved-通过,rejected-驳回；11400 段）
+             (11401, 'message-audit-status', 'pending', '待审核', 1, 0, 1, '与 MessageAuditStatusEnum 对齐'),
+             (11402, 'message-audit-status', 'approved', '通过', 2, 0, 1, '与 MessageAuditStatusEnum 对齐'),
+             (11403, 'message-audit-status', 'rejected', '驳回', 3, 0, 1, '与 MessageAuditStatusEnum 对齐')
      ) AS t(id, dict_code, dict_value, dict_label, sort, status, builtin, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_dict_data` WHERE `sys_dict_data`.`id` = t.id
@@ -441,6 +518,29 @@ FROM (
      ) AS t(id, name, type, anniversary_date, repeat_yearly)
 WHERE NOT EXISTS (
     SELECT 1 FROM `portal_anniversary` WHERE `portal_anniversary`.`id` = t.id
+);
+
+-- ----------------------------
+-- 数据填充：portal_message（幂等插入）
+-- 留言簿门户展示的示例留言（audit_status='approved' 审核通过后门户可见）；id 使用独立的 33000 段顺序预留
+-- ----------------------------
+INSERT INTO `portal_message` (
+    `id`, `nickname`, `avatar`, `content`, `ip`, `region`, `audit_status`
+)
+SELECT
+    t.id,
+    t.nickname,
+    t.avatar,
+    t.content,
+    t.ip,
+    t.region,
+    t.audit_status
+FROM (
+         VALUES
+             (33001, '汏臉貓', 'https://q1.qlogo.cn/g?b=qq&nk=1324497787&s=100', '祝你们永远像热恋期一样甜！', '113.64.12.7', '广东', 'approved')
+     ) AS t(id, nickname, avatar, content, ip, region, audit_status)
+WHERE NOT EXISTS (
+    SELECT 1 FROM `portal_message` WHERE `portal_message`.`id` = t.id
 );
 
 SET REFERENTIAL_INTEGRITY TRUE;

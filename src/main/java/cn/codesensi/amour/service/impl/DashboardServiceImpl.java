@@ -4,10 +4,12 @@ import cn.codesensi.amour.common.enums.HiddenEnum;
 import cn.codesensi.amour.mapper.PortalAnniversaryMapper;
 import cn.codesensi.amour.mapper.PortalFootprintMapper;
 import cn.codesensi.amour.mapper.PortalLovePhotoMapper;
+import cn.codesensi.amour.mapper.PortalMessageMapper;
 import cn.codesensi.amour.model.dto.DashboardSummaryDTO;
 import cn.codesensi.amour.model.dto.DashboardTimelineDTO;
 import cn.codesensi.amour.model.dto.DashboardTimelineItemDTO;
 import cn.codesensi.amour.model.entity.PortalAnniversary;
+import cn.codesensi.amour.model.entity.PortalMessage;
 import cn.codesensi.amour.service.AnniversaryService;
 import cn.codesensi.amour.service.DashboardService;
 import cn.hutool.core.util.ObjUtil;
@@ -29,13 +31,14 @@ import java.util.Map;
 import static cn.codesensi.amour.model.entity.table.PortalAnniversaryTableDef.PORTAL_ANNIVERSARY;
 import static cn.codesensi.amour.model.entity.table.PortalFootprintTableDef.PORTAL_FOOTPRINT;
 import static cn.codesensi.amour.model.entity.table.PortalLovePhotoTableDef.PORTAL_LOVE_PHOTO;
+import static cn.codesensi.amour.model.entity.table.PortalMessageTableDef.PORTAL_MESSAGE;
 
 /**
  * 管理端首页数据聚合 Service 实现。
  * <p>
- * 取数策略按模块落地情况分层：已落地模块（画册/纪念日/足迹）复用实体 Mapper 走
+ * 取数策略按模块落地情况分层：已落地模块（画册/纪念日/足迹/留言簿）复用实体 Mapper 走
  * MyBatis-Flex 强类型查询（逻辑删除由 {@code logic-delete-column} 全局配置自动过滤）；
- * 模块后端尚未实现的表（点点滴滴/留言簿/情侣日志/恋爱清单/时间胶囊）暂以
+ * 模块后端尚未实现的表（点点滴滴/情侣日志/恋爱清单/时间胶囊）暂以
  * {@link JdbcTemplate} 原生 SQL 只读统计，待对应模块落地后迁移至实体查询。
  * <p>
  * 原生 SQL 中的表名为类内硬编码白名单，不存在注入面。
@@ -54,6 +57,7 @@ public class DashboardServiceImpl implements DashboardService {
     private final PortalAnniversaryMapper portalAnniversaryMapper;
     private final PortalLovePhotoMapper portalLovePhotoMapper;
     private final PortalFootprintMapper portalFootprintMapper;
+    private final PortalMessageMapper portalMessageMapper;
     private final AnniversaryService anniversaryService;
 
     /**
@@ -90,7 +94,7 @@ public class DashboardServiceImpl implements DashboardService {
         counts.setAnniversaries(Math.toIntExact(QueryChain.of(portalAnniversaryMapper).count()));
         counts.setMoments(countTable("portal_moments"));
         counts.setPhotos(Math.toIntExact(QueryChain.of(portalLovePhotoMapper).count()));
-        counts.setMessages(countTable("portal_message"));
+        counts.setMessages(Math.toIntExact(QueryChain.of(portalMessageMapper).count()));
         counts.setDiaries(countTable("portal_diary"));
         counts.setTimeCapsules(countTable("portal_time_capsule"));
         counts.setFootprints(Math.toIntExact(QueryChain.of(portalFootprintMapper).count()));
@@ -120,16 +124,17 @@ public class DashboardServiceImpl implements DashboardService {
             summary.setRecentPhotos(recentPhotos);
         }
 
-        // 最新一条留言
-        List<Map<String, Object>> latestRows = jdbcTemplate.queryForList(
-                "SELECT `nickname`, `content`, `create_time` FROM `portal_message` "
-                        + "WHERE `del_flag` = 0 ORDER BY `create_time` DESC LIMIT 1");
-        if (!latestRows.isEmpty()) {
-            Map<String, Object> row = latestRows.getFirst();
+        // 最新一条留言（迁移自原生 SQL，口径保持「未删除全部」：管理端首页需感知待审核留言）
+        PortalMessage latest = QueryChain.of(portalMessageMapper)
+                .select(PORTAL_MESSAGE.NICKNAME, PORTAL_MESSAGE.CONTENT, PORTAL_MESSAGE.CREATE_TIME)
+                .orderBy(PORTAL_MESSAGE.CREATE_TIME, false)
+                .limit(1)
+                .one();
+        if (ObjUtil.isNotNull(latest)) {
             DashboardSummaryDTO.LatestMessage latestMessage = new DashboardSummaryDTO.LatestMessage();
-            latestMessage.setNickname((String) row.get("nickname"));
-            latestMessage.setContent((String) row.get("content"));
-            latestMessage.setCreateTime(formatDateTime(row.get("create_time")));
+            latestMessage.setNickname(latest.getNickname());
+            latestMessage.setContent(latest.getContent());
+            latestMessage.setCreateTime(formatDateTime(latest.getCreateTime()));
             summary.setLatestMessage(latestMessage);
         }
 
