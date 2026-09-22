@@ -5,6 +5,7 @@ import cn.codesensi.amour.common.enums.AnniversaryTypeEnum;
 import cn.codesensi.amour.common.enums.BaseEnum;
 import cn.codesensi.amour.common.enums.HiddenEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
+import cn.codesensi.amour.common.support.AuditUserFiller;
 import cn.codesensi.amour.mapper.PortalAnniversaryMapper;
 import cn.codesensi.amour.model.converter.AnniversaryConverter;
 import cn.codesensi.amour.model.dto.*;
@@ -41,6 +42,7 @@ public class AnniversaryServiceImpl implements AnniversaryService {
 
     private final PortalAnniversaryMapper portalAnniversaryMapper;
     private final AnniversaryConverter anniversaryConverter;
+    private final AuditUserFiller auditUserFiller;
 
     /**
      * 门户纪念日分页（免登录）。
@@ -82,7 +84,9 @@ public class AnniversaryServiceImpl implements AnniversaryService {
      */
     @Override
     public Page<AnniversaryDTO> pageAdmin(AnniversaryPageDTO pageDTO) {
-        return doPage(pageDTO, pageDTO.getName(), pageDTO.getHidden());
+        Page<AnniversaryDTO> result = doPage(pageDTO, pageDTO.getName(), pageDTO.getHidden());
+        auditUserFiller.fill(result.getRecords());
+        return result;
     }
 
     /**

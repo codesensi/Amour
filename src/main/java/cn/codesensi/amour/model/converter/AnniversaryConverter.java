@@ -1,10 +1,6 @@
 package cn.codesensi.amour.model.converter;
 
-import cn.codesensi.amour.model.dto.AnniversaryChangeHiddenDTO;
-import cn.codesensi.amour.model.dto.AnniversaryDTO;
-import cn.codesensi.amour.model.dto.AnniversaryInsertDTO;
-import cn.codesensi.amour.model.dto.AnniversaryPageDTO;
-import cn.codesensi.amour.model.dto.AnniversaryUpdateDTO;
+import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.PortalAnniversary;
 import cn.codesensi.amour.model.request.AnniversaryChangeHiddenRequest;
 import cn.codesensi.amour.model.request.AnniversaryInsertRequest;
@@ -16,10 +12,6 @@ import com.mybatisflex.core.paginate.Page;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
-import org.mapstruct.Named;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 /**
  * 纪念日转换器（管理端与门户共用，MapStruct 编译期生成实现类）。
@@ -32,9 +24,6 @@ import java.time.format.DateTimeFormatter;
  */
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface AnniversaryConverter {
-
-    /** 纪念日日期格式（与 anniversary_date DATE 列及前端契约一致） */
-    DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     /**
      * 分页查询请求 → 分页查询参数 DTO。
@@ -99,11 +88,14 @@ public interface AnniversaryConverter {
     PortalAnniversary toEntity(AnniversaryUpdateDTO updateDTO);
 
     /**
-     * 实体 → 条目 DTO（字段同名自动映射）。
+     * 实体 → 条目 DTO（字段同名自动映射）；
+     * creatorName/updaterName 由服务层批量回填，实体无对应字段，显式忽略以消除 Unmapped 警告。
      *
      * @param entity 纪念日实体
      * @return 纪念日条目 DTO
      */
+    @Mapping(target = "creatorName", ignore = true)
+    @Mapping(target = "updaterName", ignore = true)
     AnniversaryDTO toDTO(PortalAnniversary entity);
 
     /**
@@ -143,16 +135,5 @@ public interface AnniversaryConverter {
      */
     @Mapping(target = "optimizeCountQuery", ignore = true)
     Page<PortalAnniversaryResponse> toPortalPage(Page<AnniversaryDTO> page);
-
-    /**
-     * yyyy-MM-dd 字符串 → 日期（空值安全;入库日期的统一转换口）。
-     *
-     * @param value 日期字符串
-     * @return 日期;空白返回 null
-     */
-    @Named("stringToDate")
-    default LocalDate parseAnniversaryDate(String value) {
-        return cn.hutool.core.util.StrUtil.isBlank(value) ? null : LocalDate.parse(value, DATE_FORMATTER);
-    }
 
 }

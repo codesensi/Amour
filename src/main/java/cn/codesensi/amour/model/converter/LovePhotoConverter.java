@@ -2,7 +2,10 @@ package cn.codesensi.amour.model.converter;
 
 import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.PortalLovePhoto;
-import cn.codesensi.amour.model.request.*;
+import cn.codesensi.amour.model.request.LovePhotoChangeHiddenRequest;
+import cn.codesensi.amour.model.request.LovePhotoInsertRequest;
+import cn.codesensi.amour.model.request.LovePhotoPageRequest;
+import cn.codesensi.amour.model.request.LovePhotoUpdateRequest;
 import cn.codesensi.amour.model.response.LovePhotoPageResponse;
 import cn.codesensi.amour.model.response.LovePhotoResponse;
 import cn.hutool.core.util.StrUtil;
@@ -76,11 +79,14 @@ public interface LovePhotoConverter {
     PortalLovePhoto toEntity(LovePhotoInsertDTO insertDTO);
 
     /**
-     * 实体 → Service 出参 DTO（字段同名自动映射）。
+     * 实体 → Service 出参 DTO（字段同名自动映射）；
+     * creatorName/updaterName 由服务层批量回填，实体无对应字段，显式忽略以消除 Unmapped 警告。
      *
      * @param entity 恋爱相册照片实体
      * @return 照片条目 DTO
      */
+    @Mapping(target = "creatorName", ignore = true)
+    @Mapping(target = "updaterName", ignore = true)
     LovePhotoDTO toDTO(PortalLovePhoto entity);
 
     /**

@@ -8,14 +8,15 @@ import cn.codesensi.amour.model.request.FootprintPageRequest;
 import cn.codesensi.amour.model.request.FootprintUpdateRequest;
 import cn.codesensi.amour.model.response.FootprintPageResponse;
 import cn.codesensi.amour.model.response.PortalFootprintResponse;
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.util.StrUtil;
 import com.mybatisflex.core.paginate.Page;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.Named;
+
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -30,9 +31,6 @@ import java.util.List;
  */
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface FootprintConverter {
-
-    /** 到访日期格式（与 arrival_date DATE 列及前端契约一致） */
-    DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     /**
      * 分页查询请求 → 分页查询参数 DTO。
@@ -86,12 +84,15 @@ public interface FootprintConverter {
     PortalFootprint toEntity(FootprintInsertDTO insertDTO);
 
     /**
-     * 实体 → Service 出参条目 DTO（字段同名自动映射，photoUrl 原值直传）。
+     * 实体 → Service 出参条目 DTO（字段同名自动映射，photoUrl 原值直传）；
+     * creatorName/updaterName 由服务层批量回填，实体无对应字段，显式忽略以消除 Unmapped 警告。
      *
      * @param entity 足迹地图实体
      * @return 足迹条目 DTO
      */
     @Mapping(target = "arrivalDate", dateFormat = "yyyy-MM-dd")
+    @Mapping(target = "creatorName", ignore = true)
+    @Mapping(target = "updaterName", ignore = true)
     FootprintDTO toDTO(PortalFootprint entity);
 
     /**
@@ -157,7 +158,7 @@ public interface FootprintConverter {
      */
     @Named("stringToDate")
     default LocalDate parseArrivalDate(String value) {
-        return StrUtil.isBlank(value) ? null : LocalDate.parse(value, DATE_FORMATTER);
+        return StrUtil.isBlank(value) ? null : LocalDate.parse(value, DatePattern.NORM_DATE_FORMATTER);
     }
 
 }

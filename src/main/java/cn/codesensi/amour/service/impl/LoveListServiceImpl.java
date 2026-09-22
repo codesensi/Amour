@@ -3,6 +3,7 @@ package cn.codesensi.amour.service.impl;
 import cn.codesensi.amour.common.core.BasePage;
 import cn.codesensi.amour.common.enums.HiddenEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
+import cn.codesensi.amour.common.support.AuditUserFiller;
 import cn.codesensi.amour.mapper.PortalLoveListMapper;
 import cn.codesensi.amour.model.converter.LoveListConverter;
 import cn.codesensi.amour.model.dto.*;
@@ -39,6 +40,8 @@ public class LoveListServiceImpl implements LoveListService {
 
     private final LoveListConverter loveListConverter;
 
+    private final AuditUserFiller auditUserFiller;
+
     /**
      * 门户恋爱清单分页（免登录）。
      * <p>
@@ -63,7 +66,9 @@ public class LoveListServiceImpl implements LoveListService {
      */
     @Override
     public Page<LoveListItemDTO> pageAdmin(LoveListPageDTO pageDTO) {
-        return doPage(pageDTO, pageDTO.getContent(), pageDTO.getDone(), pageDTO.getHidden());
+        Page<LoveListItemDTO> result = doPage(pageDTO, pageDTO.getContent(), pageDTO.getDone(), pageDTO.getHidden());
+        auditUserFiller.fill(result.getRecords());
+        return result;
     }
 
     /**

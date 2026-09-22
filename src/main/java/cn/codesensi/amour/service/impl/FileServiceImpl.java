@@ -6,6 +6,7 @@ import cn.codesensi.amour.common.enums.*;
 import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.exception.SystemException;
 import cn.codesensi.amour.common.properties.AppFileProperties;
+import cn.codesensi.amour.common.support.AuditUserFiller;
 import cn.codesensi.amour.mapper.SysFileMapper;
 import cn.codesensi.amour.mapper.SysUserMapper;
 import cn.codesensi.amour.model.converter.FileConverter;
@@ -14,7 +15,6 @@ import cn.codesensi.amour.model.dto.FileDTO;
 import cn.codesensi.amour.model.dto.FilePageDTO;
 import cn.codesensi.amour.model.dto.FileUploadResultDTO;
 import cn.codesensi.amour.model.entity.SysFile;
-import cn.codesensi.amour.model.entity.SysUser;
 import cn.codesensi.amour.service.FileService;
 import cn.codesensi.amour.service.SysConfigService;
 import cn.codesensi.amour.service.file.FileStorage;
@@ -85,16 +85,18 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
     private final AppFileProperties props;
     private final SysConfigService sysConfigService;
     private final FileConverter fileConverter;
+    private final AuditUserFiller auditUserFiller;
     private final Map<StorageTypeEnum, FileStorage> storageMap;
 
     /**
      * 构造时将全部存储实现按类型索引，运行时按配置路由。
      *
      * @param sysFileMapper    文件记录 Mapper
-     * @param sysUserMapper    用户 Mapper（分页结果回填上传人用户名）
+     * @param sysUserMapper    用户 Mapper（上传人用户名模糊匹配时解析用户ID集合）
      * @param props            文件存储配置
      * @param sysConfigService 系统配置服务（读取 file.storage）
      * @param fileConverter    文件转换器（实体 → 行响应对象）
+     * @param auditUserFiller  审计用户回填器（分页结果回填上传人用户名）
      * @param storages         全部存储实现（本地/对象存储等）
      */
     public FileServiceImpl(SysFileMapper sysFileMapper,
@@ -102,12 +104,14 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
                            AppFileProperties props,
                            SysConfigService sysConfigService,
                            FileConverter fileConverter,
+                           AuditUserFiller auditUserFiller,
                            List<FileStorage> storages) {
         this.sysFileMapper = sysFileMapper;
         this.sysUserMapper = sysUserMapper;
         this.props = props;
         this.sysConfigService = sysConfigService;
         this.fileConverter = fileConverter;
+        this.auditUserFiller = auditUserFiller;
         this.storageMap = storages.stream()
                 .collect(Collectors.toUnmodifiableMap(FileStorage::getStorageType, Function.identity()));
     }
@@ -296,30 +300,9 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
                         .orderBy(SYS_FILE.ID, false)
                         .page(Page.of(pageDTO.getPageNumber(), pageDTO.getPageSize())));
 
-        // 批量回填上传人用户名:仅对本页出现的 creator 查询一次
-        List<Long> pageCreatorIds = page.getRecords().stream()
-                .map(SysFile::getCreator)
-                .filter(Objects::nonNull)
-                .distinct()
-                .toList();
-        Map<Long, String> usernameMap = Map.of();
-        if (CollUtil.isNotEmpty(pageCreatorIds)) {
-            List<SysUser> sysUsers = sysUserMapper.selectListByIds(pageCreatorIds);
-            // username 理论非空（登录账号），防御 toMap 对 null value 抛 NPE
-            if (CollUtil.isNotEmpty(sysUsers)) {
-                usernameMap = sysUsers.stream()
-                        .filter(row -> ObjUtil.isNotNull(row.getUsername()))
-                        .collect(Collectors.toMap(SysUser::getId, SysUser::getUsername, (a, b) -> a));
-            }
-        }
-        final Map<Long, String> finalUsernameMap = usernameMap;
+        // 批量回填上传人用户名:统一走审计用户回填器（收集 creator/updater 主键单次查询）
         Page<FileDTO> result = fileConverter.toPageDTO(page);
-        result.getRecords().forEach(row -> {
-            // creator 可能为空（未登录来源记录），不可变 Map 拒绝 null key 查询，须先行判空
-            if (ObjUtil.isNotNull(row.getCreator()) && CollUtil.isNotEmpty(finalUsernameMap)) {
-                row.setCreatorName(finalUsernameMap.get(row.getCreator()));
-            }
-        });
+        auditUserFiller.fill(result.getRecords());
         return result;
     }
 

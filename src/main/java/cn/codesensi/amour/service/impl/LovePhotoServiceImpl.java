@@ -4,6 +4,7 @@ import cn.codesensi.amour.common.consts.AppConst;
 import cn.codesensi.amour.common.core.BasePage;
 import cn.codesensi.amour.common.enums.HiddenEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
+import cn.codesensi.amour.common.support.AuditUserFiller;
 import cn.codesensi.amour.mapper.PortalLovePhotoMapper;
 import cn.codesensi.amour.model.converter.LovePhotoConverter;
 import cn.codesensi.amour.model.dto.*;
@@ -42,6 +43,7 @@ public class LovePhotoServiceImpl implements LovePhotoService {
 
     private final PortalLovePhotoMapper portalLovePhotoMapper;
     private final LovePhotoConverter lovePhotoConverter;
+    private final AuditUserFiller auditUserFiller;
 
     /**
      * 门户恋爱画册分页（免登录）。
@@ -88,7 +90,9 @@ public class LovePhotoServiceImpl implements LovePhotoService {
      */
     @Override
     public Page<LovePhotoDTO> pageAdmin(LovePhotoPageDTO pageDTO) {
-        return doPage(pageDTO, pageDTO.getCaption(), pageDTO.getTag(), pageDTO.getHidden());
+        Page<LovePhotoDTO> result = doPage(pageDTO, pageDTO.getCaption(), pageDTO.getTag(), pageDTO.getHidden());
+        auditUserFiller.fill(result.getRecords());
+        return result;
     }
 
     /**

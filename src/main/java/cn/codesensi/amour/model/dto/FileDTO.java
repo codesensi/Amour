@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  * @since 1.0
  */
 @Data
-public class FileDTO implements Serializable {
+public class FileDTO implements AuditUserAware, Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -69,9 +69,19 @@ public class FileDTO implements Serializable {
     private Long creator;
 
     /**
-     * 上传人用户名（服务层按本页 creator 批量回填）
+     * 更新人用户ID（未发生过更新的记录为空）
+     */
+    private Long updater;
+
+    /**
+     * 上传人用户名（服务层按本页 creator/updater 批量回填）
      */
     private String creatorName;
+
+    /**
+     * 更新人用户名（服务层按本页 creator/updater 批量回填）
+     */
+    private String updaterName;
 
     /**
      * 上传时间

@@ -1,10 +1,6 @@
 package cn.codesensi.amour.model.converter;
 
-import cn.codesensi.amour.model.dto.LoveListItemDTO;
-import cn.codesensi.amour.model.dto.LoveListChangeHiddenDTO;
-import cn.codesensi.amour.model.dto.LoveListPageDTO;
-import cn.codesensi.amour.model.dto.LoveListInsertDTO;
-import cn.codesensi.amour.model.dto.LoveListUpdateDTO;
+import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.PortalLoveList;
 import cn.codesensi.amour.model.request.LoveListChangeHiddenRequest;
 import cn.codesensi.amour.model.request.LoveListInsertRequest;
@@ -79,11 +75,14 @@ public interface LoveListConverter {
     PortalLoveList toEntity(LoveListInsertDTO insertDTO);
 
     /**
-     * 实体 → Service 出参 DTO（字段同名自动映射）。
+     * 实体 → Service 出参 DTO（字段同名自动映射）；
+     * creatorName/updaterName 由服务层批量回填，实体无对应字段，显式忽略以消除 Unmapped 警告。
      *
      * @param entity 恋爱清单项实体
      * @return 清单项 DTO
      */
+    @Mapping(target = "creatorName", ignore = true)
+    @Mapping(target = "updaterName", ignore = true)
     LoveListItemDTO toDTO(PortalLoveList entity);
 
     /**

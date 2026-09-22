@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
  * @since 1.0
  */
 @Data
-public class FootprintDTO implements Serializable {
+public class FootprintDTO implements AuditUserAware, Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -72,5 +72,25 @@ public class FootprintDTO implements Serializable {
      * 创建时间
      */
     private LocalDateTime createTime;
+
+    /**
+     * 创建人用户ID（未登录来源的记录为空）
+     */
+    private Long creator;
+
+    /**
+     * 更新人用户ID（未发生过更新的记录为空）
+     */
+    private Long updater;
+
+    /**
+     * 创建人用户名（服务层按本页 creator/updater 批量回填）
+     */
+    private String creatorName;
+
+    /**
+     * 更新人用户名（服务层按本页 creator/updater 批量回填）
+     */
+    private String updaterName;
 
 }

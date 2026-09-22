@@ -3,6 +3,7 @@ package cn.codesensi.amour.service.impl;
 import cn.codesensi.amour.common.core.BasePage;
 import cn.codesensi.amour.common.enums.HiddenEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
+import cn.codesensi.amour.common.support.AuditUserFiller;
 import cn.codesensi.amour.mapper.PortalFootprintMapper;
 import cn.codesensi.amour.model.converter.FootprintConverter;
 import cn.codesensi.amour.model.dto.*;
@@ -37,6 +38,7 @@ public class FootprintServiceImpl implements FootprintService {
 
     private final PortalFootprintMapper portalFootprintMapper;
     private final FootprintConverter footprintConverter;
+    private final AuditUserFiller auditUserFiller;
 
     /**
      * 门户足迹分页（免登录）。
@@ -83,7 +85,9 @@ public class FootprintServiceImpl implements FootprintService {
      */
     @Override
     public Page<FootprintDTO> pageAdmin(FootprintPageDTO pageDTO) {
-        return doPage(pageDTO, pageDTO.getCity(), pageDTO.getArrivalDateBegin(), pageDTO.getArrivalDateEnd(), pageDTO.getHidden());
+        Page<FootprintDTO> result = doPage(pageDTO, pageDTO.getCity(), pageDTO.getArrivalDateBegin(), pageDTO.getArrivalDateEnd(), pageDTO.getHidden());
+        auditUserFiller.fill(result.getRecords());
+        return result;
     }
 
     /**

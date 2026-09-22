@@ -60,4 +60,14 @@ public class AnniversaryPageResponse implements Serializable {
      */
     private String createTime;
 
+    /**
+     * 创建人用户名（服务层批量回填;未登录来源记录为空）
+     */
+    private String creatorName;
+
+    /**
+     * 更新人用户名（服务层批量回填;未发生过更新的记录为空）
+     */
+    private String updaterName;
+
 }
