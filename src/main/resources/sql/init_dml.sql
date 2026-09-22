@@ -353,7 +353,8 @@ FROM (
              (99012, 'log-type', '日志类型', 1, '与 LogTypeEnum 对齐'),
              (99013, 'hidden', '显隐状态', 1, '与 HiddenEnum(0/1) 对齐'),
              (99014, 'anniversary-type', '纪念日类型', 1, '与 AnniversaryTypeEnum(birthday/anniversary/festival) 对齐'),
-             (99015, 'message-audit-status', '留言审核状态', 1, '与 MessageAuditStatusEnum(pending/approved/rejected) 对齐')
+             (99015, 'message-audit-status', '留言审核状态', 1, '与 MessageAuditStatusEnum(pending/approved/rejected) 对齐'),
+             (99016, 'done', '完成状态', 1, '与 DoneEnum(0/1) 对齐')
      ) AS t(id, dict_code, dict_name, builtin, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_dict_type` WHERE `sys_dict_type`.`id` = t.id
@@ -447,7 +448,10 @@ FROM (
              -- message-audit-status（留言审核状态，对应 MessageAuditStatusEnum：pending-待审核,approved-通过,rejected-驳回；11400 段）
              (11401, 'message-audit-status', 'pending', '待审核', 1, 0, 1, '与 MessageAuditStatusEnum 对齐'),
              (11402, 'message-audit-status', 'approved', '通过', 2, 0, 1, '与 MessageAuditStatusEnum 对齐'),
-             (11403, 'message-audit-status', 'rejected', '驳回', 3, 0, 1, '与 MessageAuditStatusEnum 对齐')
+             (11403, 'message-audit-status', 'rejected', '驳回', 3, 0, 1, '与 MessageAuditStatusEnum 对齐'),
+             -- done（通用完成状态，对应 DoneEnum：0-未完成,1-已完成；11500 段）
+             (11501, 'done', '0', '未完成', 1, 0, 1, '与 DoneEnum(0/1) 对齐'),
+             (11502, 'done', '1', '已完成', 2, 0, 1, '与 DoneEnum(0/1) 对齐')
      ) AS t(id, dict_code, dict_value, dict_label, sort, status, builtin, remark)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_dict_data` WHERE `sys_dict_data`.`id` = t.id
@@ -541,6 +545,47 @@ FROM (
      ) AS t(id, nickname, avatar, content, ip, region, audit_status)
 WHERE NOT EXISTS (
     SELECT 1 FROM `portal_message` WHERE `portal_message`.`id` = t.id
+);
+
+-- ----------------------------
+-- 数据填充：portal_love_list（幂等插入）
+-- 恋爱清单门户展示的示例愿望（覆盖旅行/日常/仪式/美食/成长/家庭等场景,已完成项带纪念照;hidden=0 门户可见）；
+-- id 使用独立的 34000 段顺序预留
+-- ----------------------------
+INSERT INTO `portal_love_list` (
+    `id`, `content`, `done`, `photo`, `sort`
+)
+SELECT
+    t.id,
+    t.content,
+    t.done,
+    t.photo,
+    t.sort
+FROM (
+         VALUES
+             (34001, '一起期待未来甜蜜小生活💑', 0, NULL, 1),
+             (34002, '一起为我们的小家添置东西🏠', 0, NULL, 2),
+             (34003, '一起挑选婚纱👗', 0, NULL, 3),
+             (34004, '一起去见双方父母🏡', 0, NULL, 4),
+             (34005, '一起听一次演唱会🎤', 1, 'https://t.alcy.cc/pic/fj/135.webp', 5),
+             (34006, '一起去看樱花🌸', 0, NULL, 6),
+             (34007, '一起存钱💰', 0, NULL, 7),
+             (34008, '一起去看一次日出🌅', 1, 'https://t.alcy.cc/pic/fj/132.webp', 8),
+             (34009, '一起去看一次大海🌊', 1, 'https://t.alcy.cc/pic/fj/133.webp', 9),
+             (34010, '一起做一顿烛光晚餐🕯️', 0, NULL, 10),
+             (34011, '一起养一只小猫咪🐱', 0, NULL, 11),
+             (34012, '一起去看一次极光🌌', 0, NULL, 12),
+             (34013, '一起露营看星星✨', 0, NULL, 13),
+             (34014, '一起坐一次热气球🎈', 0, NULL, 14),
+             (34015, '一起装饰一棵圣诞树🎄', 0, NULL, 15),
+             (34016, '一起跨年倒数🕛', 1, 'https://t.alcy.cc/pic/fj/134.webp', 16),
+             (34017, '一起逛遍这座城市的夜市🍢', 0, NULL, 17),
+             (34018, '一起学一门乐器🎹', 0, NULL, 18),
+             (34019, '一起拍一套情侣写真📷', 0, NULL, 19),
+             (34020, '一起攒够小家的第一桶金🏆', 0, NULL, 20)
+     ) AS t(id, content, done, photo, sort)
+WHERE NOT EXISTS (
+    SELECT 1 FROM `portal_love_list` WHERE `portal_love_list`.`id` = t.id
 );
 
 SET REFERENTIAL_INTEGRITY TRUE;
