@@ -76,7 +76,7 @@ public class AppConst {
     public static final int MAX_LENGTH_1024 = 1024;
 
     /**
-     * 字符串列长度档位 5000 —— portal_time_capsule.content
+     * 字符串列长度档位 5000 —— portal_time_capsule.content、portal_diary.content
      */
     public static final int MAX_LENGTH_5000 = 5000;
 

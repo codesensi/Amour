@@ -482,7 +482,7 @@ CREATE TABLE IF NOT EXISTS `portal_diary` (
     `id`          BIGINT        NOT NULL                COMMENT '主键ID',
     `user_id`     BIGINT        NOT NULL                COMMENT '记录人ID',
     `diary_date`  DATE          NOT NULL                COMMENT '记录日期',
-    `mood`        VARCHAR(16)   NULL DEFAULT NULL       COMMENT '心情标识',
+    `mood`        VARCHAR(16)   NOT NULL DEFAULT 'unknown' COMMENT '心情标识(unknown-不标记,与 DiaryMoodEnum 对齐)',
     `content`     TEXT          NULL                    COMMENT '日记内容',
     `creator`     BIGINT        NULL DEFAULT NULL       COMMENT '创建人',
     `create_time` DATETIME      NULL DEFAULT CURRENT_TIMESTAMP       COMMENT '创建时间',

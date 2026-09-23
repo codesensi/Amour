@@ -361,7 +361,8 @@ FROM (
              (99013, 'hidden', '显隐状态', 1, '与 HiddenEnum(0/1) 对齐', 1),
              (99014, 'anniversary-type', '纪念日类型', 1, '与 AnniversaryTypeEnum(birthday/anniversary/festival) 对齐', 1),
              (99015, 'message-audit-status', '留言审核状态', 1, '与 MessageAuditStatusEnum(pending/approved/rejected) 对齐', 1),
-             (99016, 'done', '完成状态', 1, '与 DoneEnum(0/1) 对齐', 1)
+             (99016, 'done', '完成状态', 1, '与 DoneEnum(0/1) 对齐', 1),
+             (99017, 'diary-mood', '日记心情', 1, '与 DiaryMoodEnum(sunny/cloudy/rainy/windy/snowy/starry/bloom/moon) 对齐', 1)
      ) AS t(id, dict_code, dict_name, builtin, remark, creator)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_dict_type` WHERE `sys_dict_type`.`id` = t.id
@@ -459,7 +460,28 @@ FROM (
              (11403, 'message-audit-status', 'rejected', '驳回', 3, 0, 1, '与 MessageAuditStatusEnum 对齐', 1),
              -- done（通用完成状态，对应 DoneEnum：0-未完成,1-已完成；11500 段）
              (11501, 'done', '0', '未完成', 1, 0, 1, '与 DoneEnum(0/1) 对齐', 1),
-             (11502, 'done', '1', '已完成', 2, 0, 1, '与 DoneEnum(0/1) 对齐', 1)
+             (11502, 'done', '1', '已完成', 2, 0, 1, '与 DoneEnum(0/1) 对齐', 1),
+             -- diary-mood（日记心情，对应 DiaryMoodEnum：unknown-不标记,sunny-晴天,cloudy-多云,overcast-阴天,rainy-雨天,drizzle-细雨,thunderstorm-雷阵雨,windy-起风,snowy-落雪,sleet-雨夹雪,hail-冰雹,starry-星夜,bloom-花开,moon-月色,rainbow-彩虹,fog-薄雾,leaf-落叶,sunset-日落,meteor-流星,aurora-极光；11600 段）
+             (11601, 'diary-mood', 'unknown', '不标记', 1, 0, 1, '与 DiaryMoodEnum 对齐(默认值)', 1),
+             (11602, 'diary-mood', 'sunny', '晴天', 2, 0, 1, '与 DiaryMoodEnum 对齐', 1),
+             (11603, 'diary-mood', 'cloudy', '多云', 3, 0, 1, '与 DiaryMoodEnum 对齐', 1),
+             (11604, 'diary-mood', 'overcast', '阴天', 4, 0, 1, '与 DiaryMoodEnum 对齐', 1),
+             (11605, 'diary-mood', 'rainy', '雨天', 5, 0, 1, '与 DiaryMoodEnum 对齐', 1),
+             (11606, 'diary-mood', 'drizzle', '细雨', 6, 0, 1, '与 DiaryMoodEnum 对齐', 1),
+             (11607, 'diary-mood', 'thunderstorm', '雷阵雨', 7, 0, 1, '与 DiaryMoodEnum 对齐', 1),
+             (11608, 'diary-mood', 'windy', '起风', 8, 0, 1, '与 DiaryMoodEnum 对齐', 1),
+             (11609, 'diary-mood', 'snowy', '落雪', 9, 0, 1, '与 DiaryMoodEnum 对齐', 1),
+             (11610, 'diary-mood', 'sleet', '雨夹雪', 10, 0, 1, '与 DiaryMoodEnum 对齐', 1),
+             (11611, 'diary-mood', 'hail', '冰雹', 11, 0, 1, '与 DiaryMoodEnum 对齐', 1),
+             (11612, 'diary-mood', 'starry', '星夜', 12, 0, 1, '与 DiaryMoodEnum 对齐', 1),
+             (11613, 'diary-mood', 'bloom', '花开', 13, 0, 1, '与 DiaryMoodEnum 对齐', 1),
+             (11614, 'diary-mood', 'moon', '月色', 14, 0, 1, '与 DiaryMoodEnum 对齐', 1),
+             (11615, 'diary-mood', 'rainbow', '彩虹', 15, 0, 1, '与 DiaryMoodEnum 对齐', 1),
+             (11616, 'diary-mood', 'fog', '薄雾', 16, 0, 1, '与 DiaryMoodEnum 对齐', 1),
+             (11617, 'diary-mood', 'leaf', '落叶', 17, 0, 1, '与 DiaryMoodEnum 对齐', 1),
+             (11618, 'diary-mood', 'sunset', '日落', 18, 0, 1, '与 DiaryMoodEnum 对齐', 1),
+             (11619, 'diary-mood', 'meteor', '流星', 19, 0, 1, '与 DiaryMoodEnum 对齐', 1),
+             (11620, 'diary-mood', 'aurora', '极光', 20, 0, 1, '与 DiaryMoodEnum 对齐', 1)
      ) AS t(id, dict_code, dict_value, dict_label, sort, status, builtin, remark, creator)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_dict_data` WHERE `sys_dict_data`.`id` = t.id
@@ -622,6 +644,45 @@ FROM (
      ) AS t(id, title, content, open_time, hidden, creator)
 WHERE NOT EXISTS (
     SELECT 1 FROM `portal_time_capsule` WHERE `portal_time_capsule`.`id` = t.id
+);
+
+-- ----------------------------
+-- 数据填充：portal_diary（幂等插入）
+-- 情侣日记门户展示的示例日记（两人交替记录,门户按记录人分栏展示）;id 使用独立的 36000 段顺序预留
+-- ----------------------------
+INSERT INTO `portal_diary` (
+    `id`, `user_id`, `diary_date`, `mood`, `content`, `creator`
+)
+SELECT
+    t.id,
+    t.user_id,
+    t.diary_date,
+    t.mood,
+    t.content,
+    t.creator
+FROM (
+         VALUES
+             (36001, 2, '2025-01-12', 'sunny', '今天一起去了菜市场,她挑西红柿的样子像在选宝石。晚饭做了番茄牛腩,汤底很浓,是家的味道。', 2),
+             (36002, 3, '2025-01-12', 'unknown', '加班到很晚,回家路上看见他在楼下等我,手里的奶茶还是热的。原来被人惦记是这种感觉。', 2),
+             (36003, 2, '2025-02-09', 'sunny', '周末把阳台收拾了出来,绿萝又发了新芽。我们约定每周日一起给它浇水。', 2),
+             (36004, 3, '2025-03-14', 'drizzle', '下雨了,我们窝在沙发里重看了一遍老电影。他说台词比记忆里的更甜。', 2),
+             (36005, 2, '2025-04-02', 'sunset', '一起规划了明年的旅行,第一站是海边。期待是一件让日子发光的事。', 2),
+             (36006, 3, '2025-04-02', 'overcast', '今天吵了一点点架,又和好了。原来磨合不是妥协,是学会把「我」变成「我们」。', 2),
+             (36007, 2, '2025-05-20', 'bloom', '他学会了做舒芙蕾,虽然塌了,但是很好吃。认真生活的样子真好看。', 2),
+             (36008, 3, '2025-06-01', 'starry', '晚饭后沿着河边走了很久,路灯把两个人的影子拉得很长。所谓幸福,大概就是这样不说话也不尴尬的散步。', 2),
+             (36009, 2, '2025-07-19', 'windy', '一起给绿萝换了盆,泥土的味道让人踏实。她说秋天要买个书架,把我们的书都摆在一起。', 2),
+             (36010, 3, '2025-08-23', 'thunderstorm', '台风天宅在家,煮了一锅姜茶,把毯子铺在地板上打牌。输了的人负责下一顿晚饭。', 2),
+             (36011, 2, '2025-09-30', 'moon', '中秋节回她家,阿姨做的菜好吃到犯规。临走时阿姨塞给我们一整盒月饼,说路上慢慢吃。', 2),
+             (36012, 3, '2025-10-25', 'starry', '今晚的月亮很圆。我们坐在阳台的懒人沙发上,一人一副耳机,把喜欢的歌单交换着听完。', 2),
+             (36013, 2, '2025-11-11', 'fog', '双十一没买东西,一起去了趟宜家。在样板间里畅想未来的客厅,越聊越起劲。', 2),
+             (36014, 3, '2025-12-14', 'snowy', '初雪比预报来得早。他站在楼下,围巾裹到鼻子,手里还是一杯热奶茶。', 2),
+             (36015, 2, '2025-12-31', 'starry', '跨年夜,我们对着烟花许了同一个愿望。新的一年,也请多多指教。', 2),
+             (36016, 3, '2026-01-03', 'sunny', '元旦一起大扫除,翻出去年一起买的第一件家具。原来我们已经攒了这么多共同记忆。', 2),
+             (36017, 2, '2026-01-05', 'sleet', '她开始学吉他了,每天晚上练二十分钟。跑调也没关系,反正好听的都是心意。', 2),
+             (36018, 3, '2026-01-07', 'unknown', '把这一年的照片洗了出来,做成本子。原来我们已经一起走过了这么多地方。', 2)
+     ) AS t(id, user_id, diary_date, mood, content, creator)
+WHERE NOT EXISTS (
+    SELECT 1 FROM `portal_diary` WHERE `portal_diary`.`id` = t.id
 );
 
 SET REFERENTIAL_INTEGRITY TRUE;
