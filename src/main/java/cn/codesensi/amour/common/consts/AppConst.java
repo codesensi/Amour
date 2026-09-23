@@ -76,6 +76,11 @@ public class AppConst {
     public static final int MAX_LENGTH_1024 = 1024;
 
     /**
+     * 字符串列长度档位 5000 —— portal_time_capsule.content
+     */
+    public static final int MAX_LENGTH_5000 = 5000;
+
+    /**
      * 链路追踪 ID 在 MDC 中的键名
      */
     public static final String TRACE_ID = "traceId";

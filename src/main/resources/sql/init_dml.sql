@@ -600,4 +600,28 @@ WHERE NOT EXISTS (
     SELECT 1 FROM `portal_love_list` WHERE `portal_love_list`.`id` = t.id
 );
 
+-- ----------------------------
+-- 数据填充：portal_time_capsule（幂等插入）
+-- 时间胶囊门户展示的示例信件（open_time 到点后门户可见全文,未到点仅展示封存卡）；id 使用独立的 35000 段顺序预留
+-- ----------------------------
+INSERT INTO `portal_time_capsule` (
+    `id`, `title`, `content`, `open_time`, `hidden`, `creator`
+)
+SELECT
+    t.id,
+    t.title,
+    t.content,
+    t.open_time,
+    t.hidden,
+    t.creator
+FROM (
+         VALUES
+             (35001, '写给恋爱三周年的信💌', '三年前的今天你答应了和我在一起，这三年的每一天都比昨天更幸福。希望未来的每一年，我们都像今天一样热爱生活、热爱彼此。', '2025-05-21 00:00:00', 0, 1),
+             (35002, '写给下一个五年的我们💌', '见字如面。五年后的我们，应该在为小家忙碌着吧？希望那时的我们依然会为一顿烛光晚餐而开心，依然愿意为对方学一道新菜。', '2026-12-31 00:00:00', 0, 1),
+             (35003, '三十年后打开🔮', '当你打开这封信的时候，我们已经一起走过了大半生。谢谢你没有放开我的手。余生很长，我们慢慢走。', '2048-05-21 00:00:00', 0, 1)
+     ) AS t(id, title, content, open_time, hidden, creator)
+WHERE NOT EXISTS (
+    SELECT 1 FROM `portal_time_capsule` WHERE `portal_time_capsule`.`id` = t.id
+);
+
 SET REFERENTIAL_INTEGRITY TRUE;
