@@ -90,36 +90,9 @@ Amour/src/main/java/cn/codesensi/amour
 - `security.uapi-key` 未配置时，一言 / QQ 信息查询自动降级（官方头像拼接、空数据），不影响页面访问
 - 接口地址与超时等非密钥项在 `application.yml` 的 `app` 段配置，改动需重启生效
 
-## 快速开始
-
-```bash
-# 本地启动（http://localhost:9666，H2 控制台 http://localhost:9666/h2-console）
-gradlew.bat bootRun
-
-# 编译与测试
-gradlew.bat compileJava test
-
-# 打包（build/libs/Amour-*.jar）
-gradlew.bat bootJar
-```
-
 ## Docker 部署
 
-镜像发布在 Docker Hub（`codesensi/amour`），提供 `latest` 与具体版本号双标签，部署机无需构建，直接 `docker run` 即可。支持两种部署形态：
-
-### 分离部署（前后端独立容器）
-
-后端只提供接口，页面由前端工程 [AmourWeb](https://github.com/codesensi/AmourWeb) 的 nginx 容器承载。
-
-1. 构建并推送后端镜像（末尾的 `.` 表示使用当前路径下的 `Dockerfile`，可根据实际情况指定路径；推送前需 `docker login`；每次发布替换版本号标签）
-
-```bash
-docker build -t codesensi/amour:latest -t codesensi/amour:1.0.0 .
-docker push codesensi/amour:latest
-docker push codesensi/amour:1.0.0
-```
-
-2. 启动后端容器（`9666` 为服务端口；`/app/data` 持久化 H2 数据库与上传文件，`/app/logs` 持久化应用日志）
+镜像发布在 Docker Hub（`codesensi/amour`），部署命令：
 
 ```bash
 docker run -dp 9666:9666 --name amour \
@@ -128,28 +101,14 @@ docker run -dp 9666:9666 --name amour \
   codesensi/amour:latest
 ```
 
-3. 启动前端容器：使用配套前端工程的镜像，与后端加入同一 `docker` 网络，以 `-e BACKEND_ORIGIN=http://amour:9666` 启动即可（详见前端工程 README）
+| 参数                              | 说明                                                                             |
+| --------------------------------- | -------------------------------------------------------------------------------- |
+| `-d`                              | 后台运行，容器在后台守护                                                         |
+| `-p 9666:9666`                    | 端口映射（宿主机端口:容器端口）；9666 为服务端口，单体部署时浏览器直接访问该端口 |
+| `--name amour`                    | 容器名，供 `docker ps`、`docker logs` 等后续操作引用                             |
+| `--restart unless-stopped`        | 重启策略：容器崩溃或 Docker 守护进程重启后自动拉起，手动停止后不复活             |
+| `-v /docker/amour/data:/app/data` | 持久化 H2 数据库与上传文件，不挂载则数据随容器删除而丢失                         |
+| `-v /docker/amour/logs:/app/logs` | 持久化应用日志与 GC 日志                                                         |
+| `codesensi/amour:latest`          | 镜像标签：`latest` 为最新版本，替换为具体版本号（如 `1.0.0`）可用于回滚          |
 
-### 单体部署（前后端一体）
-
-把前端构建产物并入后端镜像，单容器同时承载页面与接口，无需前端容器与 `BACKEND_ORIGIN` 反代。
-
-1. 前端构建：在配套前端工程执行 `pnpm build`，将产物 `dist/` 拷贝至本工程 `src/main/resources/static/`
-2. 构建并推送后端镜像（命令同上，dist 随 jar 打包）
-3. 启动容器（命令同分离部署）
-4. 浏览器直接访问 `http://<主机>:9666`
-
-说明：前后端同源请求，无需 `BACKEND_ORIGIN` 与反代；前端为 hash 路由，刷新与深链接无需 SPA 兜底配置；静态资源不参与登录拦截。
-
-更新版本：重新构建并推送镜像后，删除旧容器并以同名重新 `docker run`。
-
-回滚版本：将启动命令中的镜像标签由 `latest` 替换为对应历史版本号（如 `codesensi/amour:1.0.0`）重新创建容器即可。
-
-说明：
-
-- 容器内置 `HEALTHCHECK`（actuator `/actuator/health` 自检,真实探测数据源连通性），`docker ps` 可见健康状态；应用启动含建表与数据初始化，`--start-period` 已放宽到 60s
-- 镜像默认激活 `prod` profile（`SPRING_PROFILES_ACTIVE=prod`），本地联调其他环境时用 `-e SPRING_PROFILES_ACTIVE=dev` 覆盖
-- 数据库密码与 JWT 秘钥可用环境变量覆盖 `application-prod.yml` 默认值：`-e SPRING_DATASOURCE_PASSWORD=...`、`-e SA_TOKEN_JWTSECRETKEY=...`（注意后者为无下划线的 Spring Boot relaxed binding 写法，环境变量优先级高于 yml）
-- `TZ` 默认 `Asia/Shanghai`；镜像内置 JVM 基线参数 `JAVA_OPTS`（堆取容器内存 75%、OOM 自动转储、GC 日志均落 `/app/logs`），需要调整时用 `-e JAVA_OPTS=...` 整体覆盖
-- 以非 root 用户（`amour`，UID 1001）运行 JVM；容器以 root 启动并自动把挂载卷属主修正为 1001，（rootless Docker 下容器内 chown 无效，仍需在宿主机手动调整）
-- H2 文件库与上传文件统一落在容器 `/app/data`，日志落在 `/app/logs`，均已声明挂载点；不挂卷则数据随容器删除而丢失
+> 更新版本：先 `docker pull` 拉取新镜像，再删除旧容器并以同名重新 `docker run`。

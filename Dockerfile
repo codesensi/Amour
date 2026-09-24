@@ -26,7 +26,7 @@ ENV SPRING_PROFILES_ACTIVE=prod
 # - 堆上限取容器内存 75%,其余留给 Metaspace/虚拟线程栈/H2 页缓存等堆外开销
 # - OOM 自动转储 + GC 日志均落 /app/logs(日志卷),排障后可去掉 -Xlog 段
 # 运行时用 -e JAVA_OPTS=... 可整体覆盖基线(ENV 覆盖是整体替换,不是追加)
-ENV JAVA_OPTS="-XX:MaxRAMPercentage=75.0 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/app/logs -Xlog:gc*:file=/app/logs/gc.log:time,uptime,tags:filecount=5,filesize=10m"
+ENV JAVA_OPTS="-XX:MaxRAMPercentage=75.0 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/app/logs -Xlog:gc*:file=/app/logs/gc.log:time,uptime,tags:filecount=5,filesize=50m"
 
 COPY --from=build-stage /app/build/libs/*.jar app.jar
 
