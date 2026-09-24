@@ -80,6 +80,11 @@ public class UserInfoResponse implements Serializable {
     private Integer builtin;
 
     /**
+     * 是否更新密码:0-否，1-是
+     */
+    private Integer passwordUpdated;
+
+    /**
      * 角色
      */
     private List<String> roles;

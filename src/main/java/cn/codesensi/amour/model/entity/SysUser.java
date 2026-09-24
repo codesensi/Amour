@@ -91,6 +91,11 @@ public class SysUser extends BaseEntity implements Serializable {
     private Integer builtin;
 
     /**
+     * 是否更新密码:0-否，1-是
+     */
+    private Integer passwordUpdated;
+
+    /**
      * 备注
      */
     private String remark;

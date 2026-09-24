@@ -79,6 +79,7 @@ public interface UserConverter {
     @Mapping(target = "delFlag", ignore = true)
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "builtin", ignore = true)
+    @Mapping(target = "passwordUpdated", ignore = true)
     SysUser toEntity(UserInsertDTO userInsertDTO);
 
     /**
@@ -94,6 +95,7 @@ public interface UserConverter {
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "builtin", ignore = true)
+    @Mapping(target = "passwordUpdated", ignore = true)
     SysUser toEntity(UserUpdateDTO userUpdateDTO);
 
     /**
@@ -112,6 +114,7 @@ public interface UserConverter {
     @Mapping(target = "phone", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "builtin", ignore = true)
+    @Mapping(target = "passwordUpdated", ignore = true)
     SysUser toEntity(UserProfileUpdateDTO userProfileUpdateDTO);
 
     /**

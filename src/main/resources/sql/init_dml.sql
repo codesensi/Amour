@@ -57,7 +57,7 @@ WHERE NOT EXISTS (
 -- 数据填充：sys_user（幂等插入）
 -- ----------------------------
 INSERT INTO `sys_user` (
-    `id`, `username`, `password`, `nickname`, `email`, `gender`, `qq`, `avatar`, `builtin`, `remark`, `creator`
+    `id`, `username`, `password`, `nickname`, `email`, `gender`, `qq`, `avatar`, `builtin`, `password_updated`, `remark`, `creator`
 )
 SELECT
     t.id,
@@ -69,6 +69,7 @@ SELECT
     t.qq,
     t.avatar,
     t.builtin,
+    t.password_updated,
     t.remark,
     t.creator
 FROM (
@@ -82,6 +83,7 @@ FROM (
               '12345678',
               NULL,
               1,
+              0,
               '系统内置超级管理员', 1),
              (2,
               'li',
@@ -92,6 +94,7 @@ FROM (
               '2623669948',
               NULL,
               1,
+              0,
               '系统内置门户男主', 1),
              (3,
               'su',
@@ -102,8 +105,9 @@ FROM (
               '673822943',
               NULL,
               1,
+              0,
               '系统内置门户女主', 1)
-     ) AS t(id, username, password, nickname, email, gender, qq, avatar, builtin, remark, creator)
+     ) AS t(id, username, password, nickname, email, gender, qq, avatar, builtin, password_updated, remark, creator)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_user` WHERE `sys_user`.`id` = t.id
 );

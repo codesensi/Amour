@@ -171,6 +171,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         log.debug("使用系统默认密码初始化用户：username={}", username);
         String password = BCrypt.hashpw(AppConst.DEFAULT_PASSWORD, BCrypt.gensalt());
         sysUser.setPassword(password);
+        // 初始即使用默认密码，标记为未更新（管理端首页据此展示修改密码警告）
+        sysUser.setPasswordUpdated(YesEnum.NO.getCode());
         sysUserMapper.insert(sysUser, true);
 
         // 头像采纳:回填文件业务归属并标记被替换的旧头像失效（外链等非本系统地址自动跳过）
@@ -370,6 +372,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         SysUser entity = new SysUser();
         entity.setId(id);
         entity.setPassword(BCrypt.hashpw(AppConst.DEFAULT_PASSWORD, BCrypt.gensalt()));
+        // 重置回默认密码，重新标记为未更新
+        entity.setPasswordUpdated(YesEnum.NO.getCode());
         updateById(entity);
         // 重置密码即踢出该用户当前会话，迫使其以默认密码重新登录
         StpUtil.logout(id);
@@ -440,6 +444,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         SysUser entity = new SysUser();
         entity.setId(userId);
         entity.setPassword(BCrypt.hashpw(userPasswordUpdateDTO.getNewPassword(), BCrypt.gensalt()));
+        // 已更新密码，解除首页默认密码警告
+        entity.setPasswordUpdated(YesEnum.YES.getCode());
         updateById(entity);
 
         // 密码变更后踢出当前会话，要求使用新密码重新登录

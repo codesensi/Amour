@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS `sys_user` (
     `avatar`      VARCHAR(512)  NULL DEFAULT NULL       COMMENT '用户头像地址',
     `status`      TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '用户状态: 0-启用, 1-禁用',
     `builtin`     TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '是否内置: 0-否, 1-是',
+    `password_updated` TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '是否更新密码: 0-否, 1-是',
     `remark`      VARCHAR(512)  NULL DEFAULT NULL       COMMENT '备注',
     `creator`     BIGINT        NULL DEFAULT NULL       COMMENT '创建人',
     `create_time` DATETIME      NULL DEFAULT CURRENT_TIMESTAMP       COMMENT '创建时间',
