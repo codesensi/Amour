@@ -10,14 +10,15 @@ import java.time.LocalDateTime;
 /**
  * 情侣日记行数据 DTO —— Service 层出参，门户与管理端共用。
  * <p>
- * nickname/avatar 为记录人展示信息，由服务层按 {@code userId} 批量查用户表回填；
- * 审计用户名沿用 {@link AuditUserAware} 契约由 {@code AuditUserFiller} 回填。
+ * nickname/avatar 为记录人展示信息，由服务层按 {@code userId} 批量查用户表回填
+ * （{@link AuthorInfoAware} 契约）；审计用户名沿用 {@link AuditUserAware} 契约
+ * 由 {@code AuditUserFiller} 回填。
  *
  * @author codesensi
  * @since 1.0
  */
 @Data
-public class DiaryDTO implements AuditUserAware, Serializable {
+public class DiaryDTO implements AuditUserAware, AuthorInfoAware, Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

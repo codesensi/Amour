@@ -5,15 +5,14 @@ import cn.codesensi.amour.common.enums.BaseEnum;
 import cn.codesensi.amour.common.enums.DiaryMoodEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.support.AuditUserFiller;
+import cn.codesensi.amour.common.support.AuthorInfoFiller;
 import cn.codesensi.amour.mapper.PortalDiaryMapper;
-import cn.codesensi.amour.mapper.SysUserMapper;
 import cn.codesensi.amour.model.converter.DiaryConverter;
 import cn.codesensi.amour.model.dto.DiaryDTO;
 import cn.codesensi.amour.model.dto.DiaryInsertDTO;
 import cn.codesensi.amour.model.dto.DiaryPageDTO;
 import cn.codesensi.amour.model.dto.DiaryUpdateDTO;
 import cn.codesensi.amour.model.entity.PortalDiary;
-import cn.codesensi.amour.model.entity.SysUser;
 import cn.codesensi.amour.service.DiaryService;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.collection.CollUtil;
@@ -29,7 +28,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static cn.codesensi.amour.model.entity.table.PortalDiaryTableDef.PORTAL_DIARY;
@@ -51,7 +49,7 @@ public class DiaryServiceImpl implements DiaryService {
     private final PortalDiaryMapper portalDiaryMapper;
     private final DiaryConverter diaryConverter;
     private final AuditUserFiller auditUserFiller;
-    private final SysUserMapper sysUserMapper;
+    private final AuthorInfoFiller authorInfoFiller;
 
     /**
      * 门户情侣日记分页（免登录）。
@@ -65,7 +63,7 @@ public class DiaryServiceImpl implements DiaryService {
     @Override
     public Page<DiaryDTO> pagePortal(BasePage page) {
         Page<DiaryDTO> result = doPage(page, null, null, null);
-        fillWriterInfo(result.getRecords());
+        authorInfoFiller.fill(result.getRecords());
         return result;
     }
 
@@ -82,7 +80,7 @@ public class DiaryServiceImpl implements DiaryService {
     public Page<DiaryDTO> pageAdmin(DiaryPageDTO pageDTO) {
         Page<DiaryDTO> result = doPage(pageDTO, pageDTO.getUserId(), pageDTO.getDiaryDate(), pageDTO.getMood());
         auditUserFiller.fill(result.getRecords());
-        fillWriterInfo(result.getRecords());
+        authorInfoFiller.fill(result.getRecords());
         return result;
     }
 
@@ -185,38 +183,6 @@ public class DiaryServiceImpl implements DiaryService {
         return diaryConverter.toPageDTO(entityPage);
     }
 
-    /**
-     * 批量回填记录人展示信息（用户名/昵称/QQ/头像）：收集本页 userId 去重后
-     * 仅查询一次用户表（对齐 {@code AuditUserFiller} 的批量回填思想）。
-     *
-     * @param rows 日记 DTO 行集合
-     */
-    private void fillWriterInfo(List<DiaryDTO> rows) {
-        if (CollUtil.isEmpty(rows)) {
-            return;
-        }
-        Set<Long> userIds = rows.stream()
-                .map(DiaryDTO::getUserId)
-                .filter(ObjUtil::isNotNull)
-                .collect(Collectors.toSet());
-        if (CollUtil.isEmpty(userIds)) {
-            return;
-        }
-        List<SysUser> sysUserList = sysUserMapper.selectListByIds(userIds);
-        if (CollUtil.isEmpty(sysUserList)) {
-            return;
-        }
-        Map<Long, SysUser> userMap = sysUserList.stream()
-                .collect(Collectors.toMap(SysUser::getId, Function.identity(), (a, b) -> a));
-        rows.forEach(row -> {
-            SysUser user = userMap.get(row.getUserId());
-            if (ObjUtil.isNotNull(user)) {
-                row.setUsername(user.getUsername());
-                row.setNickname(user.getNickname());
-                row.setQq(user.getQq());
-                row.setAvatar(user.getAvatar());
-            }
-        });
-    }
 
 }
+
