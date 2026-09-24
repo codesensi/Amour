@@ -334,10 +334,12 @@ CREATE TABLE IF NOT EXISTS `sys_notice_read` (
 CREATE TABLE IF NOT EXISTS `portal_moments` (
     `id`          BIGINT        NOT NULL                COMMENT '主键ID',
     `title`       VARCHAR(256)  NOT NULL                COMMENT '文章标题',
-    `author`      VARCHAR(64)   NULL DEFAULT NULL       COMMENT '作者',
+    `user_id`     BIGINT        NULL DEFAULT NULL       COMMENT '作者ID',
     `content`     TEXT          NULL DEFAULT NULL       COMMENT '文章内容',
     `record_date` DATE          NULL DEFAULT NULL       COMMENT '记录日期',
     `sort`        INT           NOT NULL DEFAULT 0      COMMENT '排序（数字越小越靠前）',
+    `category`    VARCHAR(64)   NULL DEFAULT NULL       COMMENT '文章分类',
+    `tags`        VARCHAR(64)   NULL DEFAULT NULL       COMMENT '文章标签',
     `status`      TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '状态: 0-显示, 1-隐藏',
     `creator`     BIGINT        NULL DEFAULT NULL       COMMENT '创建人',
     `create_time` DATETIME      NULL DEFAULT CURRENT_TIMESTAMP       COMMENT '创建时间',
