@@ -151,5 +151,5 @@ docker run -dp 9666:9666 --name amour \
 - 镜像默认激活 `prod` profile（`SPRING_PROFILES_ACTIVE=prod`），本地联调其他环境时用 `-e SPRING_PROFILES_ACTIVE=dev` 覆盖
 - 数据库密码与 JWT 秘钥可用环境变量覆盖 `application-prod.yml` 默认值：`-e SPRING_DATASOURCE_PASSWORD=...`、`-e SA_TOKEN_JWTSECRETKEY=...`（注意后者为无下划线的 Spring Boot relaxed binding 写法，环境变量优先级高于 yml）
 - `TZ` 默认 `Asia/Shanghai`；镜像内置 JVM 基线参数 `JAVA_OPTS`（堆取容器内存 75%、OOM 自动转储、GC 日志均落 `/app/logs`），需要调整时用 `-e JAVA_OPTS=...` 整体覆盖
-- 以非 root 用户（`amour`，UID 1001）运行；使用宿主目录 bind-mount 时需将该目录属主改为 1001（具名卷自动继承，无需处理）
+- 以非 root 用户（`amour`，UID 1001）运行 JVM；容器以 root 启动并自动把挂载卷属主修正为 1001，（rootless Docker 下容器内 chown 无效，仍需在宿主机手动调整）
 - H2 文件库与上传文件统一落在容器 `/app/data`，日志落在 `/app/logs`，均已声明挂载点；不挂卷则数据随容器删除而丢失
