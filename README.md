@@ -2,6 +2,16 @@
 
 `Amour`（法语中意为"爱"）——爱慕情侣小站后端服务，提供门户站点与管理后台全部接口；配套前端工程：[AmourWeb](https://github.com/codesensi/AmourWeb)。
 
+## 在线体验
+
+演示站点：<https://amour-demo.codesensi.cn:1443/>（已开启演示模式，仅开放只读操作，密码均为 `123456`）
+
+| 账号    | 角色       |
+| ------- | ---------- |
+| `admin` | 超级管理员 |
+| `li`    | 男主       |
+| `su`    | 女主       |
+
 ## 技术栈
 
 - Java 21 + Spring Boot 4 + MyBatis-Flex
