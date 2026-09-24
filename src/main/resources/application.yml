@@ -23,7 +23,7 @@ logging:
   logback:
     rollingpolicy:
       file-name-pattern: ${logging.file.name}.%d.%i.log
-      max-file-size: 100MB
+      max-file-size: 50MB
       max-history: 180
   level:
     org.zalando.logbook.Logbook: TRACE
@@ -69,6 +69,16 @@ logbook:
       - newPassword
       - confirmPassword
       - configValue
+
+# Actuator配置（仅暴露健康检查端点供容器 HEALTHCHECK 自检,细节不展示;dev 可覆盖 show-details）
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
 
 # sa-token配置
 sa-token:

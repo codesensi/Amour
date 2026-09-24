@@ -69,6 +69,11 @@ public class RbacConst {
     public static final String H2_CONSOLE_PATH = "/h2-console/**";
 
     /**
+     * Actuator 健康检查端点（容器 HEALTHCHECK 自检使用，免登录放行；细节不对外展示）
+     */
+    public static final String ACTUATOR_HEALTH_PATH = "/actuator/health";
+
+    /**
      * QQ 信息查询接口路径（免登录；供门户留言、资料展示等场景查询头像与昵称）
      */
     public static final String QQ_INFO_PATH = "/qq-info";

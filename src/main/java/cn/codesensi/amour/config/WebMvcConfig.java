@@ -26,6 +26,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * 演示模式拦截器在注册处对其单独豁免（登出非数据写操作）；
  * 例外：H2 控制台（/h2-console/**，仅 dev 启用）仅从鉴权拦截器豁免——
  * 演示模式拦截器不豁免它，保留演示开关对控制台写操作的拦截能力；
+ * Actuator 健康检查端点（/actuator/health）仅从鉴权拦截器豁免（容器 HEALTHCHECK 自检使用）；
  * 鉴权拦截器还对非 Controller 处理器（静态资源、404 兜底）不做登录校验。
  *
  * @author codesensi
@@ -74,9 +75,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
                     StpUtil.checkDisable(StpUtil.getLoginIdAsLong());
                 })).addPathPatterns(RbacConst.ROOT_PATH)
                 // 公开路径见 RbacConst.PUBLIC_PATHS;
-                // H2 控制台仅 dev 启用且自带 JDBC 账密页，免登录放行（演示模式拦截器不豁免，其写操作仍受限）
+                // H2 控制台仅 dev 启用且自带 JDBC 账密页，免登录放行（演示模式拦截器不豁免，其写操作仍受限）;
+                // Actuator 健康检查为容器 HEALTHCHECK 自检端点（GET 只读），免登录放行
                 .excludePathPatterns(RbacConst.PUBLIC_PATHS)
                 .excludePathPatterns(RbacConst.H2_CONSOLE_PATH)
+                .excludePathPatterns(RbacConst.ACTUATOR_HEALTH_PATH)
                 .order(1);
 
         // 2. 演示模式拦截器：演示开关（app.demo-mode）开启时仅放行 GET/HEAD 等只读请求，

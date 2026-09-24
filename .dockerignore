@@ -1,0 +1,16 @@
+# 构建产物与本地运行数据
+.gradle/
+build/
+data/
+logs/
+*.log
+
+# IDE 与版本控制元数据
+.idea/
+*.iml
+.git/
+
+# Docker 自身文件
+Dockerfile
+.dockerignore
+README.md
