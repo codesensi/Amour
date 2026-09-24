@@ -430,7 +430,7 @@ FROM (
              (10805, 'config-value-type', 'DATETIME', '日期时间', 5, 0, 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN/DATETIME) 对齐', 1),
              -- file-storage-type（存储类型，对应 StorageTypeEnum：local-本地,oss-对象存储；10900 段）
              (10901, 'file-storage-type', 'local', '本地存储', 1, 0, 1, '与 StorageTypeEnum(local/oss) 对齐', 1),
-             (10902, 'file-storage-type', 'oss', '对象存储', 2, 0, 1, '与 StorageTypeEnum(local/oss) 对齐', 1),
+             (10902, 'file-storage-type', 'oss', '对象存储', 2, 1, 1, '与 StorageTypeEnum(local/oss) 对齐', 1),
              -- biz-type（文件业务类型，对应 FileBizTypeEnum：infra-基础设施,avatar-用户头像,photo-相册照片,markdown-点滴配图；11000 段）
              (11001, 'biz-type', 'infra', '基础设施', 1, 0, 1, '与 FileBizTypeEnum(infra/avatar/photo/markdown) 对齐', 1),
              (11002, 'biz-type', 'avatar', '用户头像', 2, 0, 1, '与 FileBizTypeEnum(infra/avatar/photo/markdown) 对齐', 1),
