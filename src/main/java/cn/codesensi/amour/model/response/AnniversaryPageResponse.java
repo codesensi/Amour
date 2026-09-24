@@ -6,6 +6,7 @@ import tools.jackson.databind.ser.std.ToStringSerializer;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * 纪念日行响应结果（管理端分页）。
@@ -56,9 +57,9 @@ public class AnniversaryPageResponse implements Serializable {
     private Integer hidden;
 
     /**
-     * 创建时间
+     * 创建时间（yyyy-MM-dd HH:mm:ss，经 JacksonConfig 全局格式输出）
      */
-    private String createTime;
+    private LocalDateTime createTime;
 
     /**
      * 创建人用户名（服务层批量回填;未登录来源记录为空）

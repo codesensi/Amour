@@ -7,6 +7,7 @@ import cn.codesensi.amour.model.dto.TimeCapsuleDTO;
 import cn.codesensi.amour.model.response.PortalTimeCapsuleResponse;
 import cn.codesensi.amour.service.TimeCapsuleService;
 import com.mybatisflex.core.paginate.Page;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,7 +39,7 @@ public class PortalTimeCapsuleController {
      * @return 时间胶囊分页结果
      */
     @GetMapping("/page")
-    public Page<PortalTimeCapsuleResponse> page(BasePage page) {
+    public Page<PortalTimeCapsuleResponse> page(@Valid BasePage page) {
         Page<TimeCapsuleDTO> itemPage = timeCapsuleService.pagePortal(page);
         return timeCapsuleConverter.toPortalPage(itemPage);
     }

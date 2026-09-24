@@ -1,6 +1,7 @@
 package cn.codesensi.amour.model.entity;
 
 import cn.codesensi.amour.common.core.BaseEntity;
+import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,6 +29,7 @@ public class PortalDiary extends BaseEntity implements Serializable {
     /**
      * 主键ID
      */
+    @Id
     private Long id;
 
     /**

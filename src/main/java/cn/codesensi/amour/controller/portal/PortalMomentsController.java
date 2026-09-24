@@ -8,6 +8,7 @@ import cn.codesensi.amour.model.response.PortalMomentsResponse;
 import cn.codesensi.amour.service.MomentsService;
 import cn.hutool.core.util.ObjUtil;
 import com.mybatisflex.core.paginate.Page;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,7 +40,7 @@ public class PortalMomentsController {
      * @return 点点滴滴分页结果
      */
     @GetMapping("/page")
-    public Page<PortalMomentsResponse> page(BasePage page) {
+    public Page<PortalMomentsResponse> page(@Valid BasePage page) {
         Page<MomentsDTO> itemPage = momentsService.pagePortal(page);
         return momentsConverter.toPortalPage(itemPage);
     }

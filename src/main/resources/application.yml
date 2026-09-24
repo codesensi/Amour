@@ -43,9 +43,9 @@ logbook:
   predicate:
     include:
       - path: /sys/**
+      - path: /admin/**
       - path: /portal/**
       - path: /file/**
-      - path: /cache/**
       - path: /captcha
       - path: /login
       - path: /logout

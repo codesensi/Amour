@@ -7,6 +7,7 @@ import cn.codesensi.amour.model.dto.DiaryDTO;
 import cn.codesensi.amour.model.response.PortalDiaryResponse;
 import cn.codesensi.amour.service.DiaryService;
 import com.mybatisflex.core.paginate.Page;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,7 +38,7 @@ public class PortalDiaryController {
      * @return 情侣日记分页结果
      */
     @GetMapping("/page")
-    public Page<PortalDiaryResponse> page(BasePage page) {
+    public Page<PortalDiaryResponse> page(@Valid BasePage page) {
         Page<DiaryDTO> itemPage = diaryService.pagePortal(page);
         return diaryConverter.toPortalPage(itemPage);
     }

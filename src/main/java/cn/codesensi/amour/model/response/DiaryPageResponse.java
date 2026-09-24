@@ -30,6 +30,7 @@ public class DiaryPageResponse implements Serializable {
     /**
      * 记录人ID
      */
+    @JsonSerialize(using = ToStringSerializer.class) // 序列化为字符串避免前端精度丢失
     private Long userId;
 
     /**

@@ -49,10 +49,4 @@ public class TimeCapsuleUpdateRequest implements Serializable {
     @NotNull(message = "解锁时间不能为空")
     private LocalDateTime openTime;
 
-    /**
-     * 显隐标识: 0-显示， 1-隐藏
-     */
-    @NotNull(message = "显隐标识不能为空")
-    private Integer hidden;
-
 }

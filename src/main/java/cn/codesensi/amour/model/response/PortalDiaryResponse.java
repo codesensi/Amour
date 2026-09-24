@@ -29,6 +29,7 @@ public class PortalDiaryResponse implements Serializable {
     /**
      * 记录人ID（双人日记按人分栏）
      */
+    @JsonSerialize(using = ToStringSerializer.class) // 序列化为字符串避免前端精度丢失
     private Long userId;
 
     /**

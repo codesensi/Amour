@@ -40,9 +40,4 @@ public class TimeCapsuleUpdateDTO implements Serializable {
      */
     private LocalDateTime openTime;
 
-    /**
-     * 显隐标识: 0-显示， 1-隐藏
-     */
-    private Integer hidden;
-
 }

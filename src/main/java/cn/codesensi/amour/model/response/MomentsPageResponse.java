@@ -35,6 +35,7 @@ public class MomentsPageResponse implements Serializable {
     /**
      * 作者ID
      */
+    @JsonSerialize(using = ToStringSerializer.class) // 序列化为字符串避免前端精度丢失
     private Long userId;
 
     /**
