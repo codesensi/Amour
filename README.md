@@ -1,6 +1,6 @@
 # Amour
 
-`Amour`（法语中意为"爱"）——情侣小站后端服务，提供门户站点与管理后台全部接口；配套前端工程：[AmourWeb](https://github.com/codesensi/AmourWeb)。
+`Amour`（法语中意为"爱"）——爱慕情侣小站后端服务，提供门户站点与管理后台全部接口；配套前端工程：[AmourWeb](https://github.com/codesensi/AmourWeb)。
 
 ## 技术栈
 
