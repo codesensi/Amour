@@ -529,7 +529,9 @@ SELECT
     t.creator
 FROM (
          VALUES
-             (31001, '成都', '宽窄巷子', 104.053307, 30.663869, '2024-10-02', NULL, '第一次一起逛巷子,看了变脸吃了三大炮', 1)
+             (31001, '成都', '宽窄巷子', 104.053307, 30.663869, '2024-10-02', NULL, '第一次一起逛巷子,看了变脸吃了三大炮', 1),
+             (31002, '北京', '故宫博物院', 116.397228, 39.916534, '2023-05-20', NULL, '红墙黄瓦里逛了一天紫禁城,砖缝都是故事', 1),
+             (31003, '杭州', '西湖', 120.144386, 30.242874, '2024-04-06', NULL, '断桥遇上苏堤春晓,一湖烟雨看了一天', 1)
      ) AS t(id, city, place_name, longitude, latitude, arrival_date, photo_url, remark, creator)
 WHERE NOT EXISTS (
     SELECT 1 FROM `portal_footprint` WHERE `portal_footprint`.`id` = t.id
