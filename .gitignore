@@ -40,3 +40,6 @@ out/
 /reasonix.toml
 /logs/
 /data/
+
+### 前端构建产物（单体部署时由前端工程构建后拷入，仅本地存在，不入库） ###
+src/main/resources/static/

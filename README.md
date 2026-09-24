@@ -105,16 +105,21 @@ gradlew.bat bootJar
 
 ## Docker 部署
 
-镜像发布在 Docker Hub（`codesensi/amour:latest`），部署机无需构建，直接 `docker run` 即可。
+镜像发布在 Docker Hub（`codesensi/amour`），提供 `latest` 与具体版本号双标签，部署机无需构建，直接 `docker run` 即可。支持两种部署形态：
 
-1. 构建并推送镜像（末尾的 `.` 表示使用当前路径下的 `Dockerfile`，可根据实际情况指定路径；推送前需 `docker login`）
+### 分离部署（前后端独立容器）
+
+后端只提供接口，页面由前端工程 [AmourWeb](https://github.com/codesensi/AmourWeb) 的 nginx 容器承载。
+
+1. 构建并推送后端镜像（末尾的 `.` 表示使用当前路径下的 `Dockerfile`，可根据实际情况指定路径；推送前需 `docker login`；每次发布替换版本号标签）
 
 ```bash
-docker build -t codesensi/amour:latest .
+docker build -t codesensi/amour:latest -t codesensi/amour:1.0.0 .
 docker push codesensi/amour:latest
+docker push codesensi/amour:1.0.0
 ```
 
-2. 启动容器（`9666` 为服务端口；`/app/data` 持久化 H2 数据库与上传文件，`/app/logs` 持久化应用日志）
+2. 启动后端容器（`9666` 为服务端口；`/app/data` 持久化 H2 数据库与上传文件，`/app/logs` 持久化应用日志）
 
 ```bash
 docker run -dp 9666:9666 --name amour \
@@ -123,9 +128,22 @@ docker run -dp 9666:9666 --name amour \
   codesensi/amour:latest
 ```
 
+3. 启动前端容器：使用配套前端工程的镜像，与后端加入同一 `docker` 网络，以 `-e BACKEND_ORIGIN=http://amour:9666` 启动即可（详见前端工程 README）
+
+### 单体部署（前后端一体）
+
+把前端构建产物并入后端镜像，单容器同时承载页面与接口，无需前端容器与 `BACKEND_ORIGIN` 反代。
+
+1. 前端构建：在配套前端工程执行 `pnpm build`，将产物 `dist/` 拷贝至本工程 `src/main/resources/static/`
+2. 构建并推送后端镜像（命令同上，dist 随 jar 打包）
+3. 启动容器（命令同分离部署）
+4. 浏览器直接访问 `http://<主机>:9666`
+
+说明：前后端同源请求，无需 `BACKEND_ORIGIN` 与反代；前端为 hash 路由，刷新与深链接无需 SPA 兜底配置；静态资源不参与登录拦截。
+
 更新版本：重新构建并推送镜像后，删除旧容器并以同名重新 `docker run`。
 
-与前端容器联调：让两者加入同一 `docker` 网络，前端以 `-e BACKEND_ORIGIN=http://amour:9666` 启动即可（`amour` 为本容器名）。
+回滚版本：将启动命令中的镜像标签由 `latest` 替换为对应历史版本号（如 `codesensi/amour:1.0.0`）重新创建容器即可。
 
 说明：
 
