@@ -360,7 +360,7 @@ FROM (
              (99008, 'config-group', '配置分组', 1, '与 sys_config.config_group(base/site/captcha/file/rate-limit/security) 对齐', 1),
              (99009, 'config-value-type', '配置值类型', 1, '与 sys_config.value_type(STRING/INTEGER/LONG/BOOLEAN/DATETIME) 对齐', 1),
              (99010, 'file-storage-type', '存储类型', 1, '与 StorageTypeEnum(local/oss) 对齐', 1),
-             (99011, 'biz-type', '文件业务类型', 1, '与 FileBizTypeEnum(infra/avatar/photo/markdown) 对齐', 1),
+             (99011, 'biz-type', '文件业务类型', 1, '与 FileBizTypeEnum(infra/avatar/photo/footprint/lovelist/markdown) 对齐', 1),
              (99012, 'log-type', '日志类型', 1, '与 LogTypeEnum 对齐', 1),
              (99013, 'hidden', '显隐状态', 1, '与 HiddenEnum(0/1) 对齐', 1),
              (99014, 'anniversary-type', '纪念日类型', 1, '与 AnniversaryTypeEnum(birthday/anniversary/festival) 对齐', 1),
@@ -435,11 +435,13 @@ FROM (
              -- file-storage-type（存储类型，对应 StorageTypeEnum：local-本地,oss-对象存储；10900 段）
              (10901, 'file-storage-type', 'local', '本地存储', 1, 0, 1, '与 StorageTypeEnum(local/oss) 对齐', 1),
              (10902, 'file-storage-type', 'oss', '对象存储', 2, 1, 1, '与 StorageTypeEnum(local/oss) 对齐', 1),
-             -- biz-type（文件业务类型，对应 FileBizTypeEnum：infra-基础设施,avatar-用户头像,photo-相册照片,markdown-点滴配图；11000 段）
-             (11001, 'biz-type', 'infra', '基础设施', 1, 0, 1, '与 FileBizTypeEnum(infra/avatar/photo/markdown) 对齐', 1),
-             (11002, 'biz-type', 'avatar', '用户头像', 2, 0, 1, '与 FileBizTypeEnum(infra/avatar/photo/markdown) 对齐', 1),
-             (11003, 'biz-type', 'photo', '相册照片', 3, 0, 1, '与 FileBizTypeEnum(infra/avatar/photo/markdown) 对齐', 1),
-             (11004, 'biz-type', 'markdown', '点滴配图', 4, 0, 1, '与 FileBizTypeEnum(infra/avatar/photo/markdown) 对齐', 1),
+             -- biz-type（文件业务类型，对应 FileBizTypeEnum：infra-基础设施,avatar-用户头像,photo-相册照片,footprint-足迹照片,lovelist-恋爱清单配图,markdown-点滴配图；11000 段）
+             (11001, 'biz-type', 'infra', '基础设施', 1, 0, 1, '与 FileBizTypeEnum(infra/avatar/photo/footprint/lovelist/markdown) 对齐', 1),
+             (11002, 'biz-type', 'avatar', '用户头像', 2, 0, 1, '与 FileBizTypeEnum(infra/avatar/photo/footprint/lovelist/markdown) 对齐', 1),
+             (11003, 'biz-type', 'photo', '相册照片', 3, 0, 1, '与 FileBizTypeEnum(infra/avatar/photo/footprint/lovelist/markdown) 对齐', 1),
+             (11004, 'biz-type', 'markdown', '点滴配图', 4, 0, 1, '与 FileBizTypeEnum(infra/avatar/photo/footprint/lovelist/markdown) 对齐', 1),
+             (11005, 'biz-type', 'footprint', '足迹照片', 5, 0, 1, '与 FileBizTypeEnum(infra/avatar/photo/footprint/lovelist/markdown) 对齐', 1),
+             (11006, 'biz-type', 'lovelist', '恋爱清单配图', 6, 0, 1, '与 FileBizTypeEnum(infra/avatar/photo/footprint/lovelist/markdown) 对齐', 1),
              -- log-type（日志类型，对应 LogTypeEnum：0-未知,1-登录,2-登出,3-查询,4-新增,5-修改,6-删除,7-授权,8-上传,9-下载；11100 段）
              (11101, 'log-type', '0', '未知', 1, 0, 1, '与 LogTypeEnum 对齐', 1),
              (11102, 'log-type', '1', '登录', 2, 0, 1, '与 LogTypeEnum 对齐', 1),

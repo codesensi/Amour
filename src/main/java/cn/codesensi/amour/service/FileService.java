@@ -27,7 +27,7 @@ public interface FileService {
      * 按业务类型完成扩展名与大小校验后，先落库取得主键，再以主键命名写盘，
      * 任一环节失败整体回滚；返回的分发地址形如 {@code /file/view/{id}}。
      *
-     * @param bizType 业务类型编码（infra/avatar/photo/markdown，详见 FileBizTypeEnum）
+     * @param bizType 业务类型编码（infra/avatar/photo/footprint/lovelist/markdown，详见 FileBizTypeEnum）
      * @param file    上传的文件
      * @return 文件ID、访问地址与原始文件名
      */

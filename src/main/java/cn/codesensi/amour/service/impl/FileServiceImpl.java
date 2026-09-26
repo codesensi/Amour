@@ -125,7 +125,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
      * 上传内容经文件头魔数校验真实类型，防改后缀伪装；
      * 返回的分发地址形如 {@code /file/view/{id}}。
      *
-     * @param bizType 业务类型编码（infra/avatar/photo/markdown，详见 FileBizTypeEnum）
+     * @param bizType 业务类型编码（infra/avatar/photo/footprint/lovelist/markdown，详见 FileBizTypeEnum）
      * @param file    上传的文件
      * @return 文件ID、访问地址与原始文件名
      */

@@ -9,8 +9,8 @@ import java.util.List;
  * 文件业务类型枚举 —— 每种业务类型自带文件格式白名单与单文件大小上限，
  * 上传接口按路径参数中的 bizType 路由并以此校验，新增业务类型仅需补充枚举项。
  * <p>
- * 说明：biz_type 是代码级路由与校验键，校验规则承载于本枚举，
- * 暂不维护进 sys_dict（待文件管理页需要标签展示时再补 file-biz-type 字典）。
+ * 说明：biz_type 是代码级路由与校验键，校验规则承载于本枚举；
+ * sys_dict(biz-type) 仅承载文件管理页的标签展示，与本项目保持对齐。
  *
  * @author codesensi
  * @since 1.0
@@ -22,7 +22,9 @@ public enum FileBizTypeEnum implements BaseEnum<String> {
     INFRA("infra", "基础设施", List.of(FileTypeEnum.JPG, FileTypeEnum.PNG, FileTypeEnum.GIF, FileTypeEnum.WEBP, FileTypeEnum.ICO), 2),
     AVATAR("avatar", "用户头像", List.of(FileTypeEnum.JPG, FileTypeEnum.PNG, FileTypeEnum.GIF, FileTypeEnum.WEBP), 2),
     PHOTO("photo", "相册照片", List.of(FileTypeEnum.JPG, FileTypeEnum.PNG, FileTypeEnum.WEBP), 20),
-    MARKDOWN("markdown", "点滴配图", List.of(FileTypeEnum.JPG, FileTypeEnum.PNG, FileTypeEnum.GIF, FileTypeEnum.WEBP), 10),
+    FOOTPRINT("footprint", "足迹照片", List.of(FileTypeEnum.JPG, FileTypeEnum.PNG, FileTypeEnum.WEBP), 10),
+    LOVELIST("lovelist", "恋爱清单配图", List.of(FileTypeEnum.JPG, FileTypeEnum.PNG, FileTypeEnum.WEBP), 20),
+    MARKDOWN("markdown", "点滴配图", List.of(FileTypeEnum.JPG, FileTypeEnum.PNG, FileTypeEnum.GIF, FileTypeEnum.WEBP), 20),
     ;
 
     /**

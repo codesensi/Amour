@@ -72,7 +72,7 @@ public class SysFile extends BaseEntity implements Serializable {
     private String contentType;
 
     /**
-     * 业务来源: infra-基础设施， avatar-用户头像， photo-相册照片， markdown-点滴配图
+     * 业务来源: infra-基础设施， avatar-用户头像， photo-相册照片， footprint-足迹照片， lovelist-恋爱清单配图， markdown-点滴配图
      */
     private String bizType;
 
