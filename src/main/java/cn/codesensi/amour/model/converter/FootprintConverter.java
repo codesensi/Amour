@@ -7,6 +7,7 @@ import cn.codesensi.amour.model.request.FootprintInsertRequest;
 import cn.codesensi.amour.model.request.FootprintPageRequest;
 import cn.codesensi.amour.model.request.FootprintUpdateRequest;
 import cn.codesensi.amour.model.response.FootprintPageResponse;
+import cn.codesensi.amour.model.response.FootprintStatsResponse;
 import cn.codesensi.amour.model.response.PortalFootprintResponse;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.util.StrUtil;
@@ -67,6 +68,14 @@ public interface FootprintConverter {
      * @return 修改显隐业务数据
      */
     FootprintChangeHiddenDTO toChangeHiddenDTO(FootprintChangeHiddenRequest request);
+
+    /**
+     * 足迹年度统计 DTO → 响应（byMonth/topCities 嵌套结构同名自动映射）。
+     *
+     * @param dto 足迹年度统计 DTO
+     * @return 足迹年度统计响应
+     */
+    FootprintStatsResponse toStatsResponse(FootprintStatsDTO dto);
 
     /**
      * 新增参数 DTO → 实体（id 由雪花生成器填充；

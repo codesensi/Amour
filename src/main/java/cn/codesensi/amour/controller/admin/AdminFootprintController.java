@@ -10,6 +10,7 @@ import cn.codesensi.amour.model.request.FootprintInsertRequest;
 import cn.codesensi.amour.model.request.FootprintPageRequest;
 import cn.codesensi.amour.model.request.FootprintUpdateRequest;
 import cn.codesensi.amour.model.response.FootprintPageResponse;
+import cn.codesensi.amour.model.response.FootprintStatsResponse;
 import cn.codesensi.amour.service.FootprintService;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.mybatisflex.core.paginate.Page;
@@ -17,6 +18,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -48,6 +50,19 @@ public class AdminFootprintController {
     public Page<FootprintPageResponse> page(@Valid FootprintPageRequest pageRequest) {
         Page<FootprintDTO> itemPage = footprintService.pageAdmin(footprintConverter.toPageDTO(pageRequest));
         return footprintConverter.toPageResponse(itemPage);
+    }
+
+    /**
+     * 足迹年度统计（到访次数/去重城市数/月度分布/城市排行）。
+     *
+     * @param year 统计年份（缺省为当前年份）
+     * @return 足迹年度统计响应
+     */
+    @SaCheckPermission("admin:footprint:page")
+    @GetMapping("/stats")
+    public FootprintStatsResponse stats(@RequestParam(required = false) Integer year) {
+        return footprintConverter.toStatsResponse(
+                footprintService.stats(year == null ? LocalDate.now().getYear() : year));
     }
 
     /**

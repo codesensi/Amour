@@ -60,6 +60,32 @@ public class TimeCapsuleServiceImpl implements TimeCapsuleService {
     }
 
     /**
+     * 即将解封的时间胶囊（免登录，首页卡片专用）。
+     * <p>
+     * 显隐口径固定为「仅显示」（与 {@link #pagePortal} 一致的安全边界），
+     * 仅取未到解锁时间的记录，按解锁时间升序 → id 升序取首条；
+     * 内容遮罩口径与门户分页一致（未解封不下发内容）。
+     *
+     * @return 最近一条待解封胶囊条目 DTO；无数据时返回 null
+     */
+    @Override
+    public TimeCapsuleDTO next() {
+        PortalTimeCapsule entity = QueryChain.of(portalTimeCapsuleMapper)
+                .where(PORTAL_TIME_CAPSULE.HIDDEN.eq(HiddenEnum.SHOW.getCode()))
+                .and(PORTAL_TIME_CAPSULE.OPEN_TIME.gt(LocalDateTime.now()))
+                .orderBy(PORTAL_TIME_CAPSULE.OPEN_TIME, true)
+                .orderBy(PORTAL_TIME_CAPSULE.ID, true)
+                .limit(1)
+                .one();
+        if (ObjUtil.isNull(entity)) {
+            return null;
+        }
+        TimeCapsuleDTO itemDTO = timeCapsuleConverter.toDTO(entity);
+        markUnlockState(itemDTO);
+        return itemDTO;
+    }
+
+    /**
      * 管理端时间胶囊分页（全量，含隐藏项与未解锁项）。
      * <p>
      * 标题为模糊匹配，显隐为精确匹配，条件缺省时自动忽略；

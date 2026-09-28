@@ -6,6 +6,7 @@ import cn.codesensi.amour.model.request.LovePhotoChangeHiddenRequest;
 import cn.codesensi.amour.model.request.LovePhotoInsertRequest;
 import cn.codesensi.amour.model.request.LovePhotoPageRequest;
 import cn.codesensi.amour.model.request.LovePhotoUpdateRequest;
+import cn.codesensi.amour.model.response.LovePhotoArchiveItemResponse;
 import cn.codesensi.amour.model.response.LovePhotoPageResponse;
 import cn.codesensi.amour.model.response.LovePhotoResponse;
 import cn.hutool.core.util.StrUtil;
@@ -100,6 +101,14 @@ public interface LovePhotoConverter {
      */
     @Mapping(target = "optimizeCountQuery", ignore = true)
     Page<LovePhotoDTO> toPageDTO(Page<PortalLovePhoto> page);
+
+    /**
+     * 年份归档条目 DTO 列表 → 响应列表。
+     *
+     * @param items 年份归档条目 DTO 列表
+     * @return 年份归档条目响应列表
+     */
+    List<LovePhotoArchiveItemResponse> toArchiveResponse(List<LovePhotoArchiveItemDTO> items);
 
     /**
      * 条目 DTO → 管理端分页行响应。

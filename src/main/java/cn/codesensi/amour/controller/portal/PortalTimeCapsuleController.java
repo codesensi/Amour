@@ -43,4 +43,19 @@ public class PortalTimeCapsuleController {
         Page<TimeCapsuleDTO> itemPage = timeCapsuleService.pagePortal(page);
         return timeCapsuleConverter.toPortalPage(itemPage);
     }
+
+    /**
+     * 即将解封的时间胶囊（免登录）。
+     * <p>
+     * 显隐为「显示」且未到解锁时间的胶囊中，解锁时间最近的一条；
+     * 未到解锁时间的记录 content 为 null，unlocked 标识是否已解锁（本端点恒为 false）；
+     * 无待解封胶囊时 data 为 null。
+     *
+     * @return 最近一条待解封胶囊;无数据时 data 为 null
+     */
+    @GetMapping("/next")
+    public PortalTimeCapsuleResponse next() {
+        TimeCapsuleDTO nextDTO = timeCapsuleService.next();
+        return timeCapsuleConverter.toPortalResponse(nextDTO);
+    }
 }

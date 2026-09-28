@@ -6,6 +6,7 @@ import cn.codesensi.amour.model.dto.FootprintInsertDTO;
 import cn.codesensi.amour.model.dto.FootprintDTO;
 import cn.codesensi.amour.model.dto.FootprintPageDTO;
 import cn.codesensi.amour.model.dto.FootprintUpdateDTO;
+import cn.codesensi.amour.model.dto.FootprintStatsDTO;
 import com.mybatisflex.core.paginate.Page;
 
 import java.util.List;
@@ -51,6 +52,17 @@ public interface FootprintService {
      * @return 足迹条目 DTO 分页
      */
     Page<FootprintDTO> pageAdmin(FootprintPageDTO pageDTO);
+
+    /**
+     * 足迹年度统计（管理端）。
+     * <p>
+     * 统计指定年份的到访次数、去重城市数、月度分布（逐月补齐）与城市排行；
+     * 数据量级为私人足迹，查询当年记录后 Java 内存聚合。
+     *
+     * @param year 统计年份（1970-2100，越界自动收敛到边界值）
+     * @return 足迹年度统计 DTO
+     */
+    FootprintStatsDTO stats(int year);
 
     /**
      * 新增足迹（主键由全局雪花配置生成）。

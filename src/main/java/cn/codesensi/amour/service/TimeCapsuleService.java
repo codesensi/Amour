@@ -33,6 +33,14 @@ public interface TimeCapsuleService {
     Page<TimeCapsuleDTO> pagePortal(BasePage page);
 
     /**
+     * 即将解封的时间胶囊（免登录，首页卡片专用）：显隐为「显示」且未到解锁时间的
+     * 胶囊中，解锁时间最近的一条；内容遮罩口径与门户分页一致；无数据返回 null。
+     *
+     * @return 最近一条待解封胶囊条目 DTO；无数据时返回 null
+     */
+    TimeCapsuleDTO next();
+
+    /**
      * 管理端时间胶囊分页（全量，含隐藏项与未解锁项）。
      * <p>
      * 标题为模糊匹配，显隐为精确匹配，条件缺省时自动忽略。

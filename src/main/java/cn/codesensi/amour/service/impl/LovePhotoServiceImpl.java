@@ -10,6 +10,7 @@ import cn.codesensi.amour.mapper.PortalLovePhotoMapper;
 import cn.codesensi.amour.model.converter.LovePhotoConverter;
 import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.PortalLovePhoto;
+import cn.codesensi.amour.model.request.PortalLovePhotoPageRequest;
 import cn.codesensi.amour.service.DataScopeService;
 import cn.codesensi.amour.service.LovePhotoService;
 import cn.hutool.core.collection.CollUtil;
@@ -22,8 +23,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.SequencedMap;
+import java.util.TreeMap;
+import java.util.function.Function;
 
 import static cn.codesensi.amour.model.entity.table.PortalLovePhotoTableDef.PORTAL_LOVE_PHOTO;
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.groupingBy;
 
 /**
  * 恋爱相册照片 Service 实现 —— 门户下发与管理端维护共用。
@@ -52,14 +59,44 @@ public class LovePhotoServiceImpl implements LovePhotoService {
      * 门户恋爱画册分页（免登录）。
      * <p>
      * 显隐口径固定为「仅显示」（hidden 强制过滤为 0，管理端维护口径之外的安全边界）；
-     * 排序为 sort 升序 → id 升序（同 sort 保持稳定次序）。
+     * 排序为 sort 升序 → id 升序（同 sort 保持稳定次序）；
+     * 年份按照片日期前四位精确匹配（date_text 为 yyyy-MM-dd 字符串，走范围比较），
+     * 标签在逗号分隔集合中精确匹配，缺省时自动忽略（与原门户口径一致）。
      *
-     * @param page 分页参数
+     * @param pageRequest 门户分页查询参数（含年份/标签过滤，可空）
      * @return 照片条目 DTO 分页结果
      */
     @Override
-    public Page<LovePhotoDTO> pagePortal(BasePage page) {
-        return doPage(page, null, null, HiddenEnum.SHOW.getCode(), null);
+    public Page<LovePhotoDTO> pagePortal(PortalLovePhotoPageRequest pageRequest) {
+        return doPage(pageRequest, null, pageRequest.getTag(), HiddenEnum.SHOW.getCode(), null,
+                pageRequest.getYear());
+    }
+
+    /**
+     * 恋爱画册年份归档（免登录）。
+     * <p>
+     * 数据量级为私人相册，取显示照片的照片日期后 Java 内存分组计数（无需 GROUP BY 下推），
+     * 按年份降序返回。
+     *
+     * @return 年份归档条目 DTO 列表（按年份降序）
+     */
+    @Override
+    public List<LovePhotoArchiveItemDTO> archive() {
+        SequencedMap<String, Long> counted = QueryChain.of(portalLovePhotoMapper)
+                .select(PORTAL_LOVE_PHOTO.DATE_TEXT)
+                .where(PORTAL_LOVE_PHOTO.HIDDEN.eq(HiddenEnum.SHOW.getCode()))
+                .listAs(String.class).stream()
+                .filter(StrUtil::isNotBlank)
+                .map(dateText -> dateText.substring(0, 4))
+                .collect(groupingBy(Function.identity(), TreeMap::new, counting()));
+        return counted.reversed().entrySet().stream()
+                .map(entry -> {
+                    LovePhotoArchiveItemDTO item = new LovePhotoArchiveItemDTO();
+                    item.setYear(Integer.valueOf(entry.getKey()));
+                    item.setCount(entry.getValue());
+                    return item;
+                })
+                .toList();
     }
 
     /**
@@ -95,7 +132,7 @@ public class LovePhotoServiceImpl implements LovePhotoService {
     @Override
     public Page<LovePhotoDTO> pageAdmin(LovePhotoPageDTO pageDTO) {
         Page<LovePhotoDTO> result = doPage(pageDTO, pageDTO.getCaption(), pageDTO.getTag(), pageDTO.getHidden(),
-                dataScopeService.visibleOwnerFilter(DataModuleEnum.LOVE_PHOTO));
+                dataScopeService.visibleOwnerFilter(DataModuleEnum.LOVE_PHOTO), null);
         result.getRecords().forEach(item ->
                 item.setCanEdit(dataScopeService.canEdit(DataModuleEnum.LOVE_PHOTO, item.getCreator())));
         auditUserFiller.fill(result.getRecords());
@@ -106,7 +143,8 @@ public class LovePhotoServiceImpl implements LovePhotoService {
      * 分页查询内核 —— 门户与管理端分页共用的条件装配与分页执行。
      * <p>
      * 文案为模糊匹配，标签在逗号分隔集合中精确匹配（FIND_IN_SET，
-     * 数据量级为私人相册，无需标签倒排索引），条件缺省时自动忽略；
+     * 数据量级为私人相册，无需标签倒排索引），年份按照片日期范围匹配，
+     * 条件缺省时自动忽略；
      * 行归属为精确匹配（数据范围策略；null 不过滤）；
      * 排序为 sort 升序 → id 升序；逻辑删除（del_flag）由全局配置自动追加过滤。
      *
@@ -115,15 +153,22 @@ public class LovePhotoServiceImpl implements LovePhotoService {
      * @param tag         标签（逗号集合内精确匹配，可空）
      * @param hidden      显隐过滤（可空;门户固定传 0，管理端传筛选值或 null 查全量）
      * @param ownerFilter 行归属过滤值（数据范围策略；null 不过滤，管理端 self 时为当前用户ID）
+     * @param year        照片年份过滤（按照片日期闭区间匹配；null 不过滤）
      * @return 照片条目 DTO 分页结果
      */
-    private Page<LovePhotoDTO> doPage(BasePage page, String caption, String tag, Integer hidden, Long ownerFilter) {
+    private Page<LovePhotoDTO> doPage(BasePage page, String caption, String tag, Integer hidden, Long ownerFilter,
+                                      Integer year) {
         QueryChain<PortalLovePhoto> chain = QueryChain.of(portalLovePhotoMapper)
                 .where(PORTAL_LOVE_PHOTO.CAPTION.like(caption, StrUtil::isNotBlank))
                 .and(PORTAL_LOVE_PHOTO.HIDDEN.eq(hidden, ObjUtil::isNotNull))
                 .and(PORTAL_LOVE_PHOTO.CREATOR.eq(ownerFilter, ObjUtil::isNotNull));
         if (StrUtil.isNotBlank(tag)) {
             chain.and(TAGS_CONTAINS, tag);
+        }
+        if (ObjUtil.isNotNull(year)) {
+            // date_text 为 yyyy-MM-dd 字符串，字符串形式的日期闭区间比较即年份过滤
+            chain.and(PORTAL_LOVE_PHOTO.DATE_TEXT.ge(year + "-01-01"))
+                    .and(PORTAL_LOVE_PHOTO.DATE_TEXT.le(year + "-12-31"));
         }
         Page<PortalLovePhoto> entityPage = chain
                 .orderBy(PORTAL_LOVE_PHOTO.SORT, true)

@@ -1,7 +1,7 @@
 package cn.codesensi.amour.service;
 
-import cn.codesensi.amour.common.core.BasePage;
 import cn.codesensi.amour.model.dto.*;
+import cn.codesensi.amour.model.request.PortalLovePhotoPageRequest;
 import com.mybatisflex.core.paginate.Page;
 
 import java.util.List;
@@ -20,12 +20,23 @@ public interface LovePhotoService {
     /**
      * 门户恋爱画册分页（免登录）。
      * <p>
-     * 仅返回显隐为「显示」的照片，按 sort 升序 → id 升序；逻辑删除由全局配置自动过滤。
+     * 仅返回显隐为「显示」的照片，按 sort 升序 → id 升序；逻辑删除由全局配置自动过滤；
+     * 年份按照片日期前四位精确匹配，标签在逗号分隔集合中精确匹配，缺省时自动忽略。
      *
-     * @param page 分页参数（pageNumber/pageSize）
+     * @param pageRequest 门户分页查询参数（含年份/标签过滤，可空）
      * @return 照片条目 DTO 分页
      */
-    Page<LovePhotoDTO> pagePortal(BasePage page);
+    Page<LovePhotoDTO> pagePortal(PortalLovePhotoPageRequest pageRequest);
+
+    /**
+     * 恋爱画册年份归档（免登录）。
+     * <p>
+     * 仅统计显隐为「显示」的照片，按照片日期前四位（年份）分组计数，
+     * 按年份降序返回（侧栏年份导航驱动数据）。
+     *
+     * @return 年份归档条目 DTO 列表（按年份降序）
+     */
+    List<LovePhotoArchiveItemDTO> archive();
 
     /**
      * 门户恋爱画册封面照片（免登录）。

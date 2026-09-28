@@ -56,6 +56,11 @@ public class DashboardSummaryResponse implements Serializable {
     private List<String> recentPhotos;
 
     /**
+     * 待审核留言数（auditStatus 为 pending 的留言条数）
+     */
+    private Integer pendingMessages;
+
+    /**
      * 各模块条目计数
      */
     @Data

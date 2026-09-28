@@ -1,8 +1,13 @@
 package cn.codesensi.amour.service;
 
+import cn.codesensi.amour.model.dto.AnnualReviewDTO;
+import cn.codesensi.amour.model.dto.DashboardMessageRegionDTO;
 import cn.codesensi.amour.model.dto.DashboardSummaryDTO;
 import cn.codesensi.amour.model.dto.DashboardTimelineItemDTO;
+import cn.codesensi.amour.model.dto.DashboardVisitTrendItemDTO;
 import com.mybatisflex.core.paginate.Page;
+
+import java.util.List;
 
 /**
  * 管理端首页数据聚合 Service。
@@ -28,5 +33,29 @@ public interface DashboardService {
      * @return 时间线条目 DTO 分页
      */
     Page<DashboardTimelineItemDTO> timeline();
+
+    /**
+     * 访问趋势（按日粒度 PV/UV,日期区间逐日补齐,无访问的日期计 0）。
+     *
+     * @param days 统计最近天数（7-365,越界自动收敛到边界值）
+     * @return 访问趋势条目 DTO 列表（按日期升序）
+     */
+    List<DashboardVisitTrendItemDTO> visitTrend(int days);
+
+    /**
+     * 留言地区分布（按审核通过的留言的 IP 归属地聚合，无法识别的归并为「未知」）。
+     *
+     * @param top 返回条数上限（1-20,越界自动收敛到边界值）
+     * @return 地区分布条目 DTO 列表（按条数降序）
+     */
+    List<DashboardMessageRegionDTO> messageRegion(int top);
+
+    /**
+     * 年度恋爱回顾（聚合各业务表在指定年份的产生量与画像信息）。
+     *
+     * @param year 统计年份（1970-2100,越界自动收敛到边界值）
+     * @return 年度回顾 DTO
+     */
+    AnnualReviewDTO annualReview(int year);
 
 }

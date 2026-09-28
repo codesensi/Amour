@@ -21,9 +21,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static cn.codesensi.amour.model.entity.table.PortalFootprintTableDef.PORTAL_FOOTPRINT;
+import static java.util.stream.Collectors.groupingBy;
 
 /**
  * 足迹地图 Service 实现 —— 门户下发与管理端维护共用。
@@ -95,6 +100,67 @@ public class FootprintServiceImpl implements FootprintService {
         result.getRecords().forEach(item ->
                 item.setCanEdit(dataScopeService.canEdit(DataModuleEnum.FOOTPRINT, item.getCreator())));
         auditUserFiller.fill(result.getRecords());
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * 口径为管理端视角（含隐藏记录，逻辑删除由全局配置自动过滤）；
+     * 月度分布按到访日期的月份聚合并逐月补齐；城市排行为到访次数降序，
+     * 次数相同按城市名升序保证次序稳定。
+     */
+    @Override
+    public FootprintStatsDTO stats(int year) {
+        int limitedYear = Math.clamp(year, 1970, 2100);
+        LocalDate start = LocalDate.of(limitedYear, 1, 1);
+        LocalDate end = start.plusYears(1);
+        List<PortalFootprint> footprints = QueryChain.of(portalFootprintMapper)
+                .select(PORTAL_FOOTPRINT.CITY, PORTAL_FOOTPRINT.ARRIVAL_DATE)
+                .where(PORTAL_FOOTPRINT.ARRIVAL_DATE.ge(start))
+                .and(PORTAL_FOOTPRINT.ARRIVAL_DATE.lt(end))
+                .list();
+
+        FootprintStatsDTO result = new FootprintStatsDTO();
+        result.setYear(limitedYear);
+        result.setTotalVisits(footprints.size());
+        result.setTotalCities((int) footprints.stream()
+                .map(PortalFootprint::getCity)
+                .filter(StrUtil::isNotBlank)
+                .distinct()
+                .count());
+
+        // 月度分布（1-12 月逐月补齐，无到访的月份计 0）
+        Map<Integer, Long> monthCounts = footprints.stream()
+                .filter(item -> ObjUtil.isNotNull(item.getArrivalDate()))
+                .collect(groupingBy(item -> item.getArrivalDate().getMonthValue(), Collectors.counting()));
+        List<FootprintStatsDTO.MonthCount> byMonth = new ArrayList<>();
+        for (int month = 1; month <= 12; month++) {
+            FootprintStatsDTO.MonthCount item = new FootprintStatsDTO.MonthCount();
+            item.setMonth(month);
+            item.setCount(Math.toIntExact(monthCounts.getOrDefault(month, 0L)));
+            byMonth.add(item);
+        }
+        result.setByMonth(byMonth);
+
+        // 城市排行（city 契约必填，空白行防御性跳过；次数降序 → 城市名升序保证稳定）
+        Map<String, Long> cityCounts = footprints.stream()
+                .map(PortalFootprint::getCity)
+                .filter(StrUtil::isNotBlank)
+                .collect(groupingBy(Function.identity(), Collectors.counting()));
+        List<FootprintStatsDTO.CityCount> topCities = cityCounts.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed()
+                        .thenComparing(Map.Entry.comparingByKey()))
+                .limit(10)
+                .map(entry -> {
+                    FootprintStatsDTO.CityCount item = new FootprintStatsDTO.CityCount();
+                    item.setCity(entry.getKey());
+                    item.setCount(Math.toIntExact(entry.getValue()));
+                    return item;
+                })
+                .toList();
+        result.setTopCities(topCities);
+
         return result;
     }
 
