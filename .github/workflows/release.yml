@@ -1,0 +1,39 @@
+# Release 自动化：推送 v 开头的 tag 后，自动从 CHANGELOG.md 提取对应版本段落创建 GitHub Release。
+# 使用流程：先在 CHANGELOG.md 写好该版本条目并提交推送，再创建/推送同名 tag（如 v1.1.3）。
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 从 CHANGELOG 提取当前版本段落
+        id: changelog
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}" # 形如 v1.1.3
+          VER="${TAG#v}"                 # 形如 1.1.3
+          # 用 index() 做字面前缀匹配（方括号/点号不做正则解析），截取该版本段直到下一个二级标题
+          awk -v header="## [$VER]" '
+            index($0, header) == 1 {found=1; next}
+            found && index($0, "## [") == 1 {exit}
+            found
+          ' CHANGELOG.md > release-notes.md
+
+      - name: 创建 GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          body_path: release-notes.md
+          # 预发布版本（tag 含 "-"，如 v1.2.0-rc.1）自动标记为 pre-release
+          prerelease: ${{ contains(github.ref_name, '-') }}

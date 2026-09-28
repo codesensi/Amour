@@ -2,6 +2,8 @@
 
 `Amour`（法语中意为"爱"）——爱慕情侣小站后端服务，提供门户站点与管理后台全部接口；配套前端工程：[AmourWeb](https://github.com/codesensi/AmourWeb)。
 
+版本演进与各版本变更内容见 [CHANGELOG.md](CHANGELOG.md)，版本号遵循语义化版本。
+
 ## 在线体验
 
 演示站点：<https://amour-demo.codesensi.cn:1443/>（已开启演示模式，仅开放只读操作，密码均为 `123456`）
@@ -119,6 +121,12 @@ Amour/src/main/java/cn/codesensi/amour
 - `security.amap-code` 未配置时，`/_AMapService` 按高德错误语义返回「密钥未配置」
 - `security.uapi-key` 未配置时，一言 / QQ 信息查询自动降级（官方头像拼接、空数据），不影响页面访问
 - 接口地址与超时等非密钥项在 `application.yml` 的 `app` 段配置，改动需重启生效
+
+## 分支与发版
+
+- **分支模型**：单主干——`main` 为长期分支，功能以短生命周期分支开发，合入后删除
+- **提交校验**：推送的提交信息遵循 Conventional Commits，由 CI（`Commit Lint`）自动校验
+- **发版流程**：`CHANGELOG.md` 定稿版本段 → 在 `main` 上创建 `v*` 附注标签并推送 → Actions 自动创建 GitHub Release（正文为对应版本段落，tag 含 `-` 的预发布标识会自动标记为 pre-release）
 
 ## Docker 部署
 

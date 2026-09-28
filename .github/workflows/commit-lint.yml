@@ -1,0 +1,34 @@
+# 提交信息校验：push 的每个提交须遵循 Conventional Commits（type(scope): 简述）。
+# 合并提交（Merge ...）豁免；详见 README「Git 提交规范」。
+name: Commit Lint
+
+on:
+  push:
+    branches:
+      - "**"
+
+permissions:
+  contents: read
+
+jobs:
+  commit-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 校验本次推送的提交信息
+        run: |
+          PATTERN='^(feat|fix|docs|style|perf|refactor|revert|test|build|ci|chore|types|wip)(\([^)]+\))?!?: .+'
+          FAIL=0
+          while IFS= read -r MSG; do
+            if [[ -z "$MSG" ]]; then continue; fi
+            if [[ "$MSG" =~ ^Merge\  ]]; then continue; fi
+            if ! echo "$MSG" | grep -qE "$PATTERN"; then
+              echo "不符合 Conventional Commits: $MSG"
+              FAIL=1
+            fi
+          done < <(echo "$COMMITS" | jq -r '.[] | split("\n")[0]')
+          if [[ "$FAIL" -ne 0 ]]; then
+            echo "提交信息格式要求见 README 的「Git 提交规范」章节"
+            exit 1
+          fi
+        env:
+          COMMITS: ${{ toJSON(github.event.commits[*].message) }}
