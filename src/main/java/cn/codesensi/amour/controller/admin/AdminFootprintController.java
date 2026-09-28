@@ -51,7 +51,7 @@ public class AdminFootprintController {
     }
 
     /**
-     * 新增足迹（城市必填，经纬度/到访日期/照片/备注可空）。
+     * 新增足迹（城市/到访日期必填，经纬度/照片/备注可空）。
      *
      * @param insertRequest 新增请求参数
      */

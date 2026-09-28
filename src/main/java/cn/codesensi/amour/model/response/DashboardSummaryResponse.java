@@ -140,7 +140,7 @@ public class DashboardSummaryResponse implements Serializable {
         private String content;
 
         /**
-         * 留言时间（yyyy-MM-dd HH:mm）
+         * 留言时间（yyyy-MM-dd HH:mm:ss）
          */
         private String createTime;
     }

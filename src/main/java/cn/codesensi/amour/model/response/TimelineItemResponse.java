@@ -41,7 +41,7 @@ public class TimelineItemResponse implements Serializable {
     }
 
     /**
-     * 时间（yyyy-MM-dd HH:mm，取记录创建时间）
+     * 时间（yyyy-MM-dd HH:mm:ss，取记录创建时间）
      */
     private String time;
 
