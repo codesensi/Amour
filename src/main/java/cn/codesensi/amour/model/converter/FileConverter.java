@@ -34,13 +34,15 @@ public interface FileConverter {
 
     /**
      * SysFile → FileInfoDTO 单条映射（Page 映射的 records 逐元素复用）；
-     * creatorName/updaterName 由服务层批量回填，实体无对应字段，显式忽略以消除 Unmapped 警告。
+     * creatorName/updaterName 由服务层批量回填、canEdit 由服务层按数据范围策略回填，
+     * 实体无对应字段，显式忽略以消除 Unmapped 警告。
      *
      * @param file 文件实体
      * @return 文件行数据 DTO
      */
     @Mapping(target = "creatorName", ignore = true)
     @Mapping(target = "updaterName", ignore = true)
+    @Mapping(target = "canEdit", ignore = true)
     FileDTO toItemDTO(SysFile file);
 
     /**

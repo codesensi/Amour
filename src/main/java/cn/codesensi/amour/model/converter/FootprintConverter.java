@@ -85,7 +85,8 @@ public interface FootprintConverter {
 
     /**
      * 实体 → Service 出参条目 DTO（字段同名自动映射，photoUrl 原值直传）；
-     * creatorName/updaterName 由服务层批量回填，实体无对应字段，显式忽略以消除 Unmapped 警告。
+     * creatorName/updaterName 由服务层批量回填、canEdit 由服务层按数据范围策略回填，
+     * 实体无对应字段，显式忽略以消除 Unmapped 警告。
      *
      * @param entity 足迹地图实体
      * @return 足迹条目 DTO
@@ -93,6 +94,7 @@ public interface FootprintConverter {
     @Mapping(target = "arrivalDate", dateFormat = "yyyy-MM-dd")
     @Mapping(target = "creatorName", ignore = true)
     @Mapping(target = "updaterName", ignore = true)
+    @Mapping(target = "canEdit", ignore = true)
     FootprintDTO toDTO(PortalFootprint entity);
 
     /**

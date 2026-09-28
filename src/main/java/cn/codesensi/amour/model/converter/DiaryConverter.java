@@ -80,6 +80,7 @@ public interface DiaryConverter {
     @Mapping(target = "avatar", ignore = true)
     @Mapping(target = "creatorName", ignore = true)
     @Mapping(target = "updaterName", ignore = true)
+    @Mapping(target = "canEdit", ignore = true)
     DiaryDTO toDTO(PortalDiary entity);
 
     /**

@@ -16,32 +16,55 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum CacheNameEnum implements BaseEnum<String> {
 
-    /** 验证码缓存：Key 为 captchaKey，存储验证码答案 */
+    /**
+     * 验证码缓存：Key 为 captchaKey，存储验证码答案
+     */
     CAPTCHA("captcha", "验证码"),
 
-    /** 系统配置缓存：Key 为配置键，存储 sys_config 配置实体 */
+    /**
+     * 系统配置缓存：Key 为配置键，存储 sys_config 配置实体
+     */
     CONFIG("config", "系统配置"),
 
-    /** 角色编码缓存：Key 为用户ID，供 Sa-Token 鉴权读取角色编码列表 */
+    /**
+     * 角色编码缓存：Key 为用户ID，供 Sa-Token 鉴权读取角色编码列表
+     */
     ROLE("role", "角色编码"),
 
-    /** 权限编码缓存：Key 为用户ID，供 Sa-Token 鉴权读取权限编码列表 */
+    /**
+     * 权限编码缓存：Key 为用户ID，供 Sa-Token 鉴权读取权限编码列表
+     */
     PERM("perm", "权限编码"),
 
-    /** 路由菜单缓存：Key 为用户ID，存储用户可访问的路由菜单列表 */
+    /**
+     * 路由菜单缓存：Key 为用户ID，存储用户可访问的路由菜单列表
+     */
     MENU("menu", "路由菜单"),
 
-    /** 用户信息缓存：Key 为用户ID，存储用户资料快照 */
+    /**
+     * 用户信息缓存：Key 为用户ID，存储用户资料快照
+     */
     USER("user", "用户信息"),
 
-    /** QQ 信息缓存：Key 为 QQ 号，存储上游服务解析出的头像地址与昵称 */
+    /**
+     * QQ 信息缓存：Key 为 QQ 号，存储上游服务解析出的头像地址与昵称
+     */
     QQ_INFO("qq-info", "QQ信息"),
 
-    /** 数据字典缓存：Key 为字典编码（dict_code），存储该编码下启用中的字典项列表 */
+    /**
+     * 数据字典缓存：Key 为字典编码（dict_code），存储该编码下启用中的字典项列表
+     */
     DICT("dict", "数据字典"),
 
-    /** 接口限流计数缓存：Key 为「接口键:IP」，存储固定窗口计数器 */
+    /**
+     * 接口限流计数缓存：Key 为「接口键:IP」，存储固定窗口计数器
+     */
     RATE_LIMIT("rate-limit", "接口限流计数"),
+
+    /**
+     * 数据范围策略缓存：Key 为角色ID，存储该角色各模块的可见/可改范围
+     */
+    DATA_SCOPE("data-scope", "数据范围策略"),
     ;
 
     /**

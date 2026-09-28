@@ -2,6 +2,7 @@ package cn.codesensi.amour.service.impl;
 
 import cn.codesensi.amour.common.consts.AppConst;
 import cn.codesensi.amour.common.core.BasePage;
+import cn.codesensi.amour.common.enums.DataModuleEnum;
 import cn.codesensi.amour.common.enums.HiddenEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.support.AuditUserFiller;
@@ -9,6 +10,7 @@ import cn.codesensi.amour.mapper.PortalLovePhotoMapper;
 import cn.codesensi.amour.model.converter.LovePhotoConverter;
 import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.PortalLovePhoto;
+import cn.codesensi.amour.service.DataScopeService;
 import cn.codesensi.amour.service.LovePhotoService;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
@@ -44,6 +46,7 @@ public class LovePhotoServiceImpl implements LovePhotoService {
     private final PortalLovePhotoMapper portalLovePhotoMapper;
     private final LovePhotoConverter lovePhotoConverter;
     private final AuditUserFiller auditUserFiller;
+    private final DataScopeService dataScopeService;
 
     /**
      * 门户恋爱画册分页（免登录）。
@@ -56,7 +59,7 @@ public class LovePhotoServiceImpl implements LovePhotoService {
      */
     @Override
     public Page<LovePhotoDTO> pagePortal(BasePage page) {
-        return doPage(page, null, null, HiddenEnum.SHOW.getCode());
+        return doPage(page, null, null, HiddenEnum.SHOW.getCode(), null);
     }
 
     /**
@@ -83,14 +86,18 @@ public class LovePhotoServiceImpl implements LovePhotoService {
      * 管理端恋爱画册分页（全量，含隐藏照片）。
      * <p>
      * 文案为模糊匹配，标签在逗号分隔集合中精确匹配（FIND_IN_SET，
-     * 数据量级为私人相册，无需标签倒排索引），条件缺省时自动忽略。
+     * 数据量级为私人相册，无需标签倒排索引），条件缺省时自动忽略；
+     * 行过滤按数据范围策略（可见范围 self 时仅本人上传的照片），并回填 canEdit。
      *
      * @param pageDTO 分页查询参数 DTO
      * @return 照片条目 DTO 分页结果
      */
     @Override
     public Page<LovePhotoDTO> pageAdmin(LovePhotoPageDTO pageDTO) {
-        Page<LovePhotoDTO> result = doPage(pageDTO, pageDTO.getCaption(), pageDTO.getTag(), pageDTO.getHidden());
+        Page<LovePhotoDTO> result = doPage(pageDTO, pageDTO.getCaption(), pageDTO.getTag(), pageDTO.getHidden(),
+                dataScopeService.visibleOwnerFilter(DataModuleEnum.LOVE_PHOTO));
+        result.getRecords().forEach(item ->
+                item.setCanEdit(dataScopeService.canEdit(DataModuleEnum.LOVE_PHOTO, item.getCreator())));
         auditUserFiller.fill(result.getRecords());
         return result;
     }
@@ -100,18 +107,21 @@ public class LovePhotoServiceImpl implements LovePhotoService {
      * <p>
      * 文案为模糊匹配，标签在逗号分隔集合中精确匹配（FIND_IN_SET，
      * 数据量级为私人相册，无需标签倒排索引），条件缺省时自动忽略；
+     * 行归属为精确匹配（数据范围策略；null 不过滤）；
      * 排序为 sort 升序 → id 升序；逻辑删除（del_flag）由全局配置自动追加过滤。
      *
-     * @param page    分页参数
-     * @param caption 文案（模糊匹配，可空）
-     * @param tag     标签（逗号集合内精确匹配，可空）
-     * @param hidden  显隐过滤（可空;门户固定传 0，管理端传筛选值或 null 查全量）
+     * @param page        分页参数
+     * @param caption     文案（模糊匹配，可空）
+     * @param tag         标签（逗号集合内精确匹配，可空）
+     * @param hidden      显隐过滤（可空;门户固定传 0，管理端传筛选值或 null 查全量）
+     * @param ownerFilter 行归属过滤值（数据范围策略；null 不过滤，管理端 self 时为当前用户ID）
      * @return 照片条目 DTO 分页结果
      */
-    private Page<LovePhotoDTO> doPage(BasePage page, String caption, String tag, Integer hidden) {
+    private Page<LovePhotoDTO> doPage(BasePage page, String caption, String tag, Integer hidden, Long ownerFilter) {
         QueryChain<PortalLovePhoto> chain = QueryChain.of(portalLovePhotoMapper)
                 .where(PORTAL_LOVE_PHOTO.CAPTION.like(caption, StrUtil::isNotBlank))
-                .and(PORTAL_LOVE_PHOTO.HIDDEN.eq(hidden, ObjUtil::isNotNull));
+                .and(PORTAL_LOVE_PHOTO.HIDDEN.eq(hidden, ObjUtil::isNotNull))
+                .and(PORTAL_LOVE_PHOTO.CREATOR.eq(ownerFilter, ObjUtil::isNotNull));
         if (StrUtil.isNotBlank(tag)) {
             chain.and(TAGS_CONTAINS, tag);
         }
@@ -138,19 +148,20 @@ public class LovePhotoServiceImpl implements LovePhotoService {
     /**
      * 修改照片：存在性校验后经 UpdateChain 显式逐列赋值更新（对齐 role 等既有 update 惯例，
      * 照片不存在时抛出业务异常）。显式赋值使 null/空串均真实写入（如清空标签），
-     * 不受忽略 null 策略影响。
+     * 不受忽略 null 策略影响；数据范围按行校验归属。
      *
      * @param updateDTO 修改参数（id 必填）
      */
     @Override
     public void update(LovePhotoUpdateDTO updateDTO) {
         PortalLovePhoto photo = QueryChain.of(portalLovePhotoMapper)
-                .select(PORTAL_LOVE_PHOTO.ID)
+                .select(PORTAL_LOVE_PHOTO.ID, PORTAL_LOVE_PHOTO.CREATOR)
                 .where(PORTAL_LOVE_PHOTO.ID.eq(updateDTO.getId()))
                 .one();
         if (ObjUtil.isNull(photo)) {
             throw new BusinessException("照片不存在");
         }
+        dataScopeService.assertEditable(DataModuleEnum.LOVE_PHOTO, photo.getCreator());
         UpdateChain.of(PortalLovePhoto.class)
                 .set(PORTAL_LOVE_PHOTO.URL, updateDTO.getUrl())
                 .set(PORTAL_LOVE_PHOTO.CAPTION, updateDTO.getCaption())
@@ -170,12 +181,13 @@ public class LovePhotoServiceImpl implements LovePhotoService {
     @Override
     public void changeHidden(LovePhotoChangeHiddenDTO changeHiddenDTO) {
         PortalLovePhoto photo = QueryChain.of(portalLovePhotoMapper)
-                .select(PORTAL_LOVE_PHOTO.ID, PORTAL_LOVE_PHOTO.HIDDEN)
+                .select(PORTAL_LOVE_PHOTO.ID, PORTAL_LOVE_PHOTO.CREATOR, PORTAL_LOVE_PHOTO.HIDDEN)
                 .where(PORTAL_LOVE_PHOTO.ID.eq(changeHiddenDTO.getId()))
                 .one();
         if (ObjUtil.isNull(photo)) {
             throw new BusinessException("照片不存在");
         }
+        dataScopeService.assertEditable(DataModuleEnum.LOVE_PHOTO, photo.getCreator());
 
         // 显隐一致时幂等返回
         if (changeHiddenDTO.getHidden().equals(photo.getHidden())) {
@@ -189,7 +201,8 @@ public class LovePhotoServiceImpl implements LovePhotoService {
     }
 
     /**
-     * 批量逻辑删除照片（对齐 role/dictType 既有 delete 惯例：任一 id 不存在时整批失败）。
+     * 批量逻辑删除照片（对齐 role/dictType 既有 delete 惯例：任一 id 不存在时整批失败；
+     * 数据范围按行校验归属，任一越权整批失败）。
      *
      * @param ids 照片ID集合
      */
@@ -199,13 +212,14 @@ public class LovePhotoServiceImpl implements LovePhotoService {
             return;
         }
         List<Long> distinctIds = ids.stream().distinct().toList();
-        List<Long> existingIds = QueryChain.of(portalLovePhotoMapper)
-                .select(PORTAL_LOVE_PHOTO.ID)
+        List<PortalLovePhoto> existing = QueryChain.of(portalLovePhotoMapper)
+                .select(PORTAL_LOVE_PHOTO.ID, PORTAL_LOVE_PHOTO.CREATOR)
                 .where(PORTAL_LOVE_PHOTO.ID.in(distinctIds))
-                .listAs(Long.class);
-        if (existingIds.size() < distinctIds.size()) {
+                .list();
+        if (existing.size() < distinctIds.size()) {
             throw new BusinessException("照片不存在");
         }
+        existing.forEach(photo -> dataScopeService.assertEditable(DataModuleEnum.LOVE_PHOTO, photo.getCreator()));
         portalLovePhotoMapper.deleteBatchByIds(distinctIds);
     }
 

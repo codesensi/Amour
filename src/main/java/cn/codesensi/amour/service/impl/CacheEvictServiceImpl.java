@@ -92,6 +92,16 @@ public class CacheEvictServiceImpl implements CacheEvictService {
     }
 
     /**
+     * 失效指定角色的数据范围策略缓存。
+     *
+     * @param roleIds 角色ID列表
+     */
+    @Override
+    public void evictDataScopeCache(List<Long> roleIds) {
+        evictByKeys(CacheNameEnum.DATA_SCOPE.getCode(), roleIds);
+    }
+
+    /**
      * 清空指定缓存的全部条目；缓存未注册/未就绪时静默返回。
      *
      * @param cacheName 基础缓存名（经 {@link CacheUtil#withAppEnv(String)} 拼接项目名_运行环境前缀）

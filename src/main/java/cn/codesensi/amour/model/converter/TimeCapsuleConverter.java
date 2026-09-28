@@ -82,6 +82,7 @@ public interface TimeCapsuleConverter {
     @Mapping(target = "creatorName", ignore = true)
     @Mapping(target = "updaterName", ignore = true)
     @Mapping(target = "unlocked", ignore = true)
+    @Mapping(target = "canEdit", ignore = true)
     TimeCapsuleDTO toDTO(PortalTimeCapsule entity);
 
     /**

@@ -1,6 +1,7 @@
 package cn.codesensi.amour.service.impl;
 
 import cn.codesensi.amour.common.core.BasePage;
+import cn.codesensi.amour.common.enums.DataModuleEnum;
 import cn.codesensi.amour.common.enums.HiddenEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.support.AuditUserFiller;
@@ -8,6 +9,7 @@ import cn.codesensi.amour.mapper.PortalFootprintMapper;
 import cn.codesensi.amour.model.converter.FootprintConverter;
 import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.PortalFootprint;
+import cn.codesensi.amour.service.DataScopeService;
 import cn.codesensi.amour.service.FootprintService;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
@@ -39,6 +41,7 @@ public class FootprintServiceImpl implements FootprintService {
     private final PortalFootprintMapper portalFootprintMapper;
     private final FootprintConverter footprintConverter;
     private final AuditUserFiller auditUserFiller;
+    private final DataScopeService dataScopeService;
 
     /**
      * 门户足迹分页（免登录）。
@@ -51,7 +54,7 @@ public class FootprintServiceImpl implements FootprintService {
      */
     @Override
     public Page<FootprintDTO> pagePortal(BasePage page) {
-        return doPage(page, null, null, null, HiddenEnum.SHOW.getCode());
+        return doPage(page, null, null, null, HiddenEnum.SHOW.getCode(), null);
     }
 
     /**
@@ -78,14 +81,19 @@ public class FootprintServiceImpl implements FootprintService {
     /**
      * 管理端足迹分页（全量）。
      * <p>
-     * 城市为模糊匹配，到访日期为闭区间范围过滤，显隐为精确匹配，条件缺省时自动忽略。
+     * 城市为模糊匹配，到访日期为闭区间范围过滤，显隐为精确匹配，条件缺省时自动忽略；
+     * 行过滤按数据范围策略（可见范围 self 时仅本人创建的足迹），并回填 canEdit。
      *
      * @param pageDTO 分页查询参数 DTO
      * @return 足迹条目 DTO 分页结果
      */
     @Override
     public Page<FootprintDTO> pageAdmin(FootprintPageDTO pageDTO) {
-        Page<FootprintDTO> result = doPage(pageDTO, pageDTO.getCity(), pageDTO.getArrivalDateBegin(), pageDTO.getArrivalDateEnd(), pageDTO.getHidden());
+        Page<FootprintDTO> result = doPage(pageDTO, pageDTO.getCity(), pageDTO.getArrivalDateBegin(),
+                pageDTO.getArrivalDateEnd(), pageDTO.getHidden(),
+                dataScopeService.visibleOwnerFilter(DataModuleEnum.FOOTPRINT));
+        result.getRecords().forEach(item ->
+                item.setCanEdit(dataScopeService.canEdit(DataModuleEnum.FOOTPRINT, item.getCreator())));
         auditUserFiller.fill(result.getRecords());
         return result;
     }
@@ -95,6 +103,7 @@ public class FootprintServiceImpl implements FootprintService {
      * <p>
      * 城市为模糊匹配，到访日期为闭区间范围过滤（经纬度未建立空间索引，
      * 私人足迹数据量级小，仅依赖 arrival_date 索引按日期排序）；
+     * 行归属为精确匹配（数据范围策略；null 不过滤）；
      * 排序为到访日期升序 → id 升序（无日期的记录按 NULL 值排序规则置于最前/最后由数据库决定）。
      *
      * @param page             分页参数
@@ -102,14 +111,16 @@ public class FootprintServiceImpl implements FootprintService {
      * @param arrivalDateBegin 到访日期起点（含，可空）
      * @param arrivalDateEnd   到访日期终点（含，可空）
      * @param hidden           显隐过滤（可空;门户固定传 0，管理端传筛选值或 null 查全量）
+     * @param ownerFilter      行归属过滤值（数据范围策略；null 不过滤，管理端 self 时为当前用户ID）
      * @return 足迹条目 DTO 分页结果
      */
-    private Page<FootprintDTO> doPage(BasePage page, String city, LocalDate arrivalDateBegin, LocalDate arrivalDateEnd, Integer hidden) {
+    private Page<FootprintDTO> doPage(BasePage page, String city, LocalDate arrivalDateBegin, LocalDate arrivalDateEnd, Integer hidden, Long ownerFilter) {
         Page<PortalFootprint> entityPage = QueryChain.of(portalFootprintMapper)
                 .where(PORTAL_FOOTPRINT.CITY.like(city, StrUtil::isNotBlank))
                 .and(PORTAL_FOOTPRINT.ARRIVAL_DATE.ge(arrivalDateBegin, ObjUtil::isNotNull))
                 .and(PORTAL_FOOTPRINT.ARRIVAL_DATE.le(arrivalDateEnd, ObjUtil::isNotNull))
                 .and(PORTAL_FOOTPRINT.HIDDEN.eq(hidden, ObjUtil::isNotNull))
+                .and(PORTAL_FOOTPRINT.CREATOR.eq(ownerFilter, ObjUtil::isNotNull))
                 .orderBy(PORTAL_FOOTPRINT.ARRIVAL_DATE, true)
                 .orderBy(PORTAL_FOOTPRINT.ID, true)
                 .page(Page.of(page.getPageNumber(), page.getPageSize()));
@@ -131,19 +142,20 @@ public class FootprintServiceImpl implements FootprintService {
     /**
      * 修改足迹：存在性校验后经 UpdateChain 显式逐列赋值更新（对齐画册既有 update 惯例，
      * 足迹不存在时抛出业务异常）。显式赋值使 null 均真实写入（如清空照片/经纬度），
-     * 不受忽略 null 策略影响。
+     * 不受忽略 null 策略影响；数据范围按行校验归属。
      *
      * @param updateDTO 修改参数（id 必填）
      */
     @Override
     public void update(FootprintUpdateDTO updateDTO) {
         PortalFootprint footprint = QueryChain.of(portalFootprintMapper)
-                .select(PORTAL_FOOTPRINT.ID)
+                .select(PORTAL_FOOTPRINT.ID, PORTAL_FOOTPRINT.CREATOR)
                 .where(PORTAL_FOOTPRINT.ID.eq(updateDTO.getId()))
                 .one();
         if (ObjUtil.isNull(footprint)) {
             throw new BusinessException("足迹不存在");
         }
+        dataScopeService.assertEditable(DataModuleEnum.FOOTPRINT, footprint.getCreator());
         UpdateChain.of(PortalFootprint.class)
                 .set(PORTAL_FOOTPRINT.CITY, updateDTO.getCity())
                 .set(PORTAL_FOOTPRINT.PLACE_NAME, updateDTO.getPlaceName())
@@ -165,12 +177,13 @@ public class FootprintServiceImpl implements FootprintService {
     @Override
     public void changeHidden(FootprintChangeHiddenDTO changeHiddenDTO) {
         PortalFootprint footprint = QueryChain.of(portalFootprintMapper)
-                .select(PORTAL_FOOTPRINT.ID, PORTAL_FOOTPRINT.HIDDEN)
+                .select(PORTAL_FOOTPRINT.ID, PORTAL_FOOTPRINT.CREATOR, PORTAL_FOOTPRINT.HIDDEN)
                 .where(PORTAL_FOOTPRINT.ID.eq(changeHiddenDTO.getId()))
                 .one();
         if (ObjUtil.isNull(footprint)) {
             throw new BusinessException("足迹不存在");
         }
+        dataScopeService.assertEditable(DataModuleEnum.FOOTPRINT, footprint.getCreator());
 
         // 显隐一致时幂等返回
         if (changeHiddenDTO.getHidden().equals(footprint.getHidden())) {
@@ -184,7 +197,8 @@ public class FootprintServiceImpl implements FootprintService {
     }
 
     /**
-     * 批量逻辑删除足迹（对齐画册既有 delete 惯例：任一 id 不存在时整批失败）。
+     * 批量逻辑删除足迹（对齐画册既有 delete 惯例：任一 id 不存在时整批失败；
+     * 数据范围按行校验归属，任一越权整批失败）。
      *
      * @param ids 足迹ID集合
      */
@@ -194,13 +208,14 @@ public class FootprintServiceImpl implements FootprintService {
             return;
         }
         List<Long> distinctIds = ids.stream().distinct().toList();
-        List<Long> existingIds = QueryChain.of(portalFootprintMapper)
-                .select(PORTAL_FOOTPRINT.ID)
+        List<PortalFootprint> existing = QueryChain.of(portalFootprintMapper)
+                .select(PORTAL_FOOTPRINT.ID, PORTAL_FOOTPRINT.CREATOR)
                 .where(PORTAL_FOOTPRINT.ID.in(distinctIds))
-                .listAs(Long.class);
-        if (existingIds.size() < distinctIds.size()) {
+                .list();
+        if (existing.size() < distinctIds.size()) {
             throw new BusinessException("足迹不存在");
         }
+        existing.forEach(item -> dataScopeService.assertEditable(DataModuleEnum.FOOTPRINT, item.getCreator()));
         portalFootprintMapper.deleteBatchByIds(distinctIds);
     }
 

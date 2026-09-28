@@ -62,6 +62,13 @@ public interface CacheEvictService {
     void evictConfigCache(List<String> keys);
 
     /**
+     * 失效指定角色的数据范围策略缓存（data-scope 缓存，Key 为角色ID）。
+     *
+     * @param roleIds 角色ID列表
+     */
+    void evictDataScopeCache(List<Long> roleIds);
+
+    /**
      * 清空指定缓存的全部条目。
      * <p>
      * 适用于缓存内容被全体调用方共享、无法按键精准失效的场景

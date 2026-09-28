@@ -164,6 +164,33 @@ CREATE TABLE IF NOT EXISTS `sys_role_menu` (
     COMMENT = '角色菜单关联表';
 
 -- ----------------------------
+-- 表结构：sys_role_data_scope（角色数据范围策略表）
+-- 幂等建表：仅当表不存在时创建
+-- 说明：数据权限隔离的策略配置——按「角色 × 业务模块」记录可见/可改范围档位；
+--       超级管理员角色（code=admin）在判定层硬编码短路为 all/all，不入本表；
+--       无配置行的角色按最小权限兜底为 self/self
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `sys_role_data_scope` (
+                                                     `id`             BIGINT      NOT NULL                COMMENT '主键ID',
+                                                     `role_id`        BIGINT      NOT NULL                COMMENT '角色ID',
+                                                     `module`         VARCHAR(32) NOT NULL                COMMENT '业务模块键（DataModuleEnum）',
+    `visible_scope`  VARCHAR(16) NOT NULL                COMMENT '可见范围: all-全部数据, self-仅本人',
+    `editable_scope` VARCHAR(16) NOT NULL                COMMENT '可改范围: all-全部数据, self-仅本人（不得宽于可见范围）',
+    `creator`        BIGINT      NULL DEFAULT NULL       COMMENT '创建人',
+    `create_time`    DATETIME    NULL DEFAULT CURRENT_TIMESTAMP       COMMENT '创建时间',
+    `updater`        BIGINT      NULL DEFAULT NULL       COMMENT '更新人',
+    `update_time`    DATETIME    NULL DEFAULT CURRENT_TIMESTAMP       COMMENT '更新时间',
+    `del_flag`       TINYINT(1)  NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
+    PRIMARY KEY (`id`),
+    INDEX `idx_rds_role_id` (`role_id` ASC),
+    UNIQUE INDEX `uk_rds_role_module` (`role_id`, `module`)
+    ) ENGINE = InnoDB
+    CHARACTER SET = utf8mb4
+    COLLATE = utf8mb4_general_ci
+    ROW_FORMAT = DYNAMIC
+    COMMENT = '角色数据范围策略表';
+
+-- ----------------------------
 -- 表结构：sys_log（系统日志表）
 -- 幂等建表：仅当表不存在时创建
 -- ----------------------------

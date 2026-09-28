@@ -3,6 +3,7 @@ package cn.codesensi.amour.service.impl;
 import cn.codesensi.amour.common.core.BasePage;
 import cn.codesensi.amour.common.enums.AnniversaryTypeEnum;
 import cn.codesensi.amour.common.enums.BaseEnum;
+import cn.codesensi.amour.common.enums.DataModuleEnum;
 import cn.codesensi.amour.common.enums.HiddenEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.support.AuditUserFiller;
@@ -11,6 +12,7 @@ import cn.codesensi.amour.model.converter.AnniversaryConverter;
 import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.PortalAnniversary;
 import cn.codesensi.amour.service.AnniversaryService;
+import cn.codesensi.amour.service.DataScopeService;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
@@ -43,6 +45,7 @@ public class AnniversaryServiceImpl implements AnniversaryService {
     private final PortalAnniversaryMapper portalAnniversaryMapper;
     private final AnniversaryConverter anniversaryConverter;
     private final AuditUserFiller auditUserFiller;
+    private final DataScopeService dataScopeService;
 
     /**
      * 门户纪念日分页（免登录）。
@@ -55,7 +58,7 @@ public class AnniversaryServiceImpl implements AnniversaryService {
      */
     @Override
     public Page<AnniversaryDTO> pagePortal(BasePage page) {
-        return doPage(page, null, HiddenEnum.SHOW.getCode());
+        return doPage(page, null, HiddenEnum.SHOW.getCode(), null);
     }
 
     /**
@@ -77,32 +80,38 @@ public class AnniversaryServiceImpl implements AnniversaryService {
      * 管理端纪念日分页（全量）。
      * <p>
      * 名称模糊匹配，显隐为精确匹配（条件缺省时自动忽略），
-     * 排序为下一次发生日升序 → id 升序（与门户口径一致）。
+     * 排序为下一次发生日升序 → id 升序（与门户口径一致）；
+     * 行过滤按数据范围策略（可见范围 self 时仅本人创建的纪念日），并回填 canEdit。
      *
      * @param pageDTO 分页查询参数 DTO
      * @return 纪念日条目 DTO 分页结果
      */
     @Override
     public Page<AnniversaryDTO> pageAdmin(AnniversaryPageDTO pageDTO) {
-        Page<AnniversaryDTO> result = doPage(pageDTO, pageDTO.getName(), pageDTO.getHidden());
+        Page<AnniversaryDTO> result = doPage(pageDTO, pageDTO.getName(), pageDTO.getHidden(),
+                dataScopeService.visibleOwnerFilter(DataModuleEnum.ANNIVERSARY));
+        result.getRecords().forEach(item ->
+                item.setCanEdit(dataScopeService.canEdit(DataModuleEnum.ANNIVERSARY, item.getCreator())));
         auditUserFiller.fill(result.getRecords());
         return result;
     }
 
     /**
      * 分页查询内核 —— 门户与管理端分页共用的条件装配与分页执行：
-     * 名称模糊匹配，显隐精确匹配（条件缺省时自动忽略）；
+     * 名称模糊匹配，显隐与行归属精确匹配（条件缺省时自动忽略）；
      * 排序为下一次发生日升序（排序键见 {@link #nextOccurrenceColumn()}）→ id 升序。
      *
-     * @param page   分页参数
-     * @param name   纪念日名称（模糊匹配，可空）
-     * @param hidden 显隐过滤（可空;门户固定传显示，管理端传筛选值或 null 查全量）
+     * @param page        分页参数
+     * @param name        纪念日名称（模糊匹配，可空）
+     * @param hidden      显隐过滤（可空;门户固定传显示，管理端传筛选值或 null 查全量）
+     * @param ownerFilter 行归属过滤值（数据范围策略；null 不过滤，管理端 self 时为当前用户ID）
      * @return 纪念日条目 DTO 分页结果
      */
-    private Page<AnniversaryDTO> doPage(BasePage page, String name, Integer hidden) {
+    private Page<AnniversaryDTO> doPage(BasePage page, String name, Integer hidden, Long ownerFilter) {
         Page<PortalAnniversary> entityPage = QueryChain.of(portalAnniversaryMapper)
                 .where(PORTAL_ANNIVERSARY.NAME.like(name, StrUtil::isNotBlank))
                 .and(PORTAL_ANNIVERSARY.HIDDEN.eq(hidden, ObjUtil::isNotNull))
+                .and(PORTAL_ANNIVERSARY.CREATOR.eq(ownerFilter, ObjUtil::isNotNull))
                 .orderBy(nextOccurrenceColumn(), true)
                 .orderBy(PORTAL_ANNIVERSARY.ID, true)
                 .page(Page.of(page.getPageNumber(), page.getPageSize()));
@@ -132,19 +141,20 @@ public class AnniversaryServiceImpl implements AnniversaryService {
 
     /**
      * 修改纪念日显隐（对齐足迹既有单列状态更新惯例：存在性校验 + 同状态幂等返回，
-     * 仅覆盖 hidden 字段）。
+     * 仅覆盖 hidden 字段；数据范围按行校验归属）。
      *
      * @param changeHiddenDTO 显隐状态信息
      */
     @Override
     public void changeHidden(AnniversaryChangeHiddenDTO changeHiddenDTO) {
         PortalAnniversary entity = QueryChain.of(portalAnniversaryMapper)
-                .select(PORTAL_ANNIVERSARY.ID, PORTAL_ANNIVERSARY.HIDDEN)
+                .select(PORTAL_ANNIVERSARY.ID, PORTAL_ANNIVERSARY.CREATOR, PORTAL_ANNIVERSARY.HIDDEN)
                 .where(PORTAL_ANNIVERSARY.ID.eq(changeHiddenDTO.getId()))
                 .one();
         if (ObjUtil.isNull(entity)) {
             throw new BusinessException("纪念日不存在");
         }
+        dataScopeService.assertEditable(DataModuleEnum.ANNIVERSARY, entity.getCreator());
 
         // 显隐一致时幂等返回
         if (changeHiddenDTO.getHidden().equals(entity.getHidden())) {
@@ -172,6 +182,8 @@ public class AnniversaryServiceImpl implements AnniversaryService {
 
     /**
      * {@inheritDoc}
+     * <p>
+     * 数据范围按行校验归属（entity 为全量查询，直接取 creator 判定）。
      */
     @Override
     public void update(AnniversaryUpdateDTO updateDTO) {
@@ -181,6 +193,7 @@ public class AnniversaryServiceImpl implements AnniversaryService {
         if (ObjUtil.isNull(entity)) {
             throw new BusinessException("纪念日不存在");
         }
+        dataScopeService.assertEditable(DataModuleEnum.ANNIVERSARY, entity.getCreator());
         assertTypeInDict(updateDTO.getType());
         portalAnniversaryMapper.update(anniversaryConverter.toEntity(updateDTO));
     }
@@ -197,7 +210,8 @@ public class AnniversaryServiceImpl implements AnniversaryService {
     }
 
     /**
-     * 批量逻辑删除纪念日（对齐足迹既有 delete 惯例：任一 id 不存在时整批失败）。
+     * 批量逻辑删除纪念日（对齐足迹既有 delete 惯例：任一 id 不存在时整批失败；
+     * 数据范围按行校验归属，任一越权整批失败）。
      *
      * @param ids 纪念日ID集合
      */
@@ -207,13 +221,14 @@ public class AnniversaryServiceImpl implements AnniversaryService {
             return;
         }
         List<Long> distinctIds = ids.stream().distinct().toList();
-        List<Long> existingIds = QueryChain.of(portalAnniversaryMapper)
-                .select(PORTAL_ANNIVERSARY.ID)
+        List<PortalAnniversary> existing = QueryChain.of(portalAnniversaryMapper)
+                .select(PORTAL_ANNIVERSARY.ID, PORTAL_ANNIVERSARY.CREATOR)
                 .where(PORTAL_ANNIVERSARY.ID.in(distinctIds))
-                .listAs(Long.class);
-        if (existingIds.size() < distinctIds.size()) {
+                .list();
+        if (existing.size() < distinctIds.size()) {
             throw new BusinessException("纪念日不存在");
         }
+        existing.forEach(item -> dataScopeService.assertEditable(DataModuleEnum.ANNIVERSARY, item.getCreator()));
         portalAnniversaryMapper.deleteBatchByIds(distinctIds);
     }
 

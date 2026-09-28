@@ -78,4 +78,9 @@ public class MomentsPageResponse implements Serializable {
      */
     private LocalDateTime createTime;
 
+    /**
+     * 当前登录人是否可修改本行（数据范围策略判定，服务层回填）
+     */
+    private Boolean canEdit;
+
 }

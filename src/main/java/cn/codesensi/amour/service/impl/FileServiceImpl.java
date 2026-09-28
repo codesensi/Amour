@@ -15,6 +15,7 @@ import cn.codesensi.amour.model.dto.FileDTO;
 import cn.codesensi.amour.model.dto.FilePageDTO;
 import cn.codesensi.amour.model.dto.FileUploadResultDTO;
 import cn.codesensi.amour.model.entity.SysFile;
+import cn.codesensi.amour.service.DataScopeService;
 import cn.codesensi.amour.service.FileService;
 import cn.codesensi.amour.service.SysConfigService;
 import cn.codesensi.amour.service.file.FileStorage;
@@ -86,6 +87,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
     private final SysConfigService sysConfigService;
     private final FileConverter fileConverter;
     private final AuditUserFiller auditUserFiller;
+    private final DataScopeService dataScopeService;
     private final Map<StorageTypeEnum, FileStorage> storageMap;
 
     /**
@@ -97,6 +99,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
      * @param sysConfigService 系统配置服务（读取 file.storage）
      * @param fileConverter    文件转换器（实体 → 行响应对象）
      * @param auditUserFiller  审计用户回填器（分页结果回填上传人用户名）
+     * @param dataScopeService 数据范围策略服务（分页行过滤与写保护判定）
      * @param storages         全部存储实现（本地/对象存储等）
      */
     public FileServiceImpl(SysFileMapper sysFileMapper,
@@ -105,6 +108,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
                            SysConfigService sysConfigService,
                            FileConverter fileConverter,
                            AuditUserFiller auditUserFiller,
+                           DataScopeService dataScopeService,
                            List<FileStorage> storages) {
         this.sysFileMapper = sysFileMapper;
         this.sysUserMapper = sysUserMapper;
@@ -112,6 +116,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         this.sysConfigService = sysConfigService;
         this.fileConverter = fileConverter;
         this.auditUserFiller = auditUserFiller;
+        this.dataScopeService = dataScopeService;
         this.storageMap = storages.stream()
                 .collect(Collectors.toUnmodifiableMap(FileStorage::getStorageType, Function.identity()));
     }
@@ -259,6 +264,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
      * 文件名模糊、业务类型/存储类型精确、上传人用户名模糊
      * （先按用户名解析用户ID集合再 IN）、上传时间范围（起止均含边界），
      * 条件缺省时自动忽略；按 ID 倒序（最新在前）；
+     * 行过滤按数据范围策略（可见范围 self 时仅本人上传的文件），并回填 canEdit；
      * 上传人用户名按本页出现的 creator 批量回填，避免逐行查询。
      *
      * @param pageDTO 分页查询参数
@@ -297,11 +303,15 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
                         .and(SYS_FILE.CREATE_TIME.ge(parseTime(pageDTO.getBeginTime(), false), Objects::nonNull))
                         .and(SYS_FILE.CREATE_TIME.le(parseTime(pageDTO.getEndTime(), true), Objects::nonNull))
                         .and(SYS_FILE.CREATOR.in(creatorIds, CollUtil::isNotEmpty))
+                        .and(SYS_FILE.CREATOR.eq(dataScopeService.visibleOwnerFilter(DataModuleEnum.FILE), ObjUtil::isNotNull))
                         .orderBy(SYS_FILE.ID, false)
                         .page(Page.of(pageDTO.getPageNumber(), pageDTO.getPageSize())));
 
-        // 批量回填上传人用户名:统一走审计用户回填器（收集 creator/updater 主键单次查询）
+        // 批量回填上传人用户名:统一走审计用户回填器（收集 creator/updater 主键单次查询）；
+        // canEdit 按数据范围策略回填（管理端操作列按钮门控）
         Page<FileDTO> result = fileConverter.toPageDTO(page);
+        result.getRecords().forEach(item ->
+                item.setCanEdit(dataScopeService.canEdit(DataModuleEnum.FILE, item.getCreator())));
         auditUserFiller.fill(result.getRecords());
         return result;
     }
@@ -316,6 +326,8 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
      * 权限口径：上传人本人或具备 system:file:delete 权限——
      * 本人口径兼容业务侧清除图片（头像/站点Logo等）复用本接口，
      * 权限口径保留文件管理页对任意文件的删除能力；
+     * 在功能权限之上叠加数据范围收窄：FILE 模块档位为 self 时，
+     * 即使持有删除权限也仅可删除本人上传的文件；
      * 对已在回收站内的文件幂等成功，便于业务侧未保存场景下的重复清除。
      *
      * @param id 文件ID
@@ -333,6 +345,8 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         if (!ownFile && !StpUtil.hasPermission("system:file:delete")) {
             throw new BusinessException("仅可删除自己上传的文件");
         }
+        // 数据范围收窄:非本人文件的删除能力跟随 FILE 模块档位（self 时拒绝）
+        dataScopeService.assertEditable(DataModuleEnum.FILE, sysFile.getCreator());
         // 已在回收站时幂等成功:业务侧"清除图片"未保存前可重复触发，
         // 且逻辑删除改写自动携带 del_flag=0 条件，重复执行本就无副作用
         if (DelFlagEnum.DELETED.getCode().equals(sysFile.getDelFlag())) {

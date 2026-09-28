@@ -1,6 +1,7 @@
 package cn.codesensi.amour.service.impl;
 
 import cn.codesensi.amour.common.core.BasePage;
+import cn.codesensi.amour.common.enums.DataModuleEnum;
 import cn.codesensi.amour.common.exception.BusinessException;
 import cn.codesensi.amour.common.support.AuditUserFiller;
 import cn.codesensi.amour.common.support.AuthorInfoFiller;
@@ -8,6 +9,7 @@ import cn.codesensi.amour.mapper.PortalMomentsMapper;
 import cn.codesensi.amour.model.converter.MomentsConverter;
 import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.PortalMoments;
+import cn.codesensi.amour.service.DataScopeService;
 import cn.codesensi.amour.service.MomentsService;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.collection.CollUtil;
@@ -19,7 +21,10 @@ import com.mybatisflex.core.update.UpdateChain;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 import static cn.codesensi.amour.model.entity.table.PortalMomentsTableDef.PORTAL_MOMENTS;
 
@@ -43,6 +48,8 @@ public class MomentsServiceImpl implements MomentsService {
     private final MomentsConverter momentsConverter;
 
     private final AuditUserFiller auditUserFiller;
+
+    private final DataScopeService dataScopeService;
 
     /**
      * 状态:显示（与表注释及 HiddenEnum 方向一致）。
@@ -69,7 +76,8 @@ public class MomentsServiceImpl implements MomentsService {
     }
 
     /**
-     * 管理端点点滴滴分页（全量）：标题模糊 + 分类/状态精确,条件缺省自动忽略。
+     * 管理端点点滴滴分页（全量）：标题模糊 + 分类/状态精确,条件缺省自动忽略；
+     * 行过滤按数据范围策略（可见范围 self 时仅本人发布的文章）,并回填 canEdit。
      *
      * @param pageDTO 分页查询参数 DTO
      * @return 点点滴滴 DTO 分页
@@ -80,11 +88,14 @@ public class MomentsServiceImpl implements MomentsService {
                 .where(PORTAL_MOMENTS.TITLE.like(pageDTO.getTitle(), StrUtil::isNotBlank))
                 .and(PORTAL_MOMENTS.CATEGORY.eq(pageDTO.getCategory(), StrUtil::isNotBlank))
                 .and(PORTAL_MOMENTS.STATUS.eq(pageDTO.getStatus(), ObjUtil::isNotNull))
+                .and(PORTAL_MOMENTS.USER_ID.eq(dataScopeService.visibleOwnerFilter(DataModuleEnum.MOMENTS), ObjUtil::isNotNull))
                 .orderBy(PORTAL_MOMENTS.SORT, true)
                 .orderBy(PORTAL_MOMENTS.RECORD_DATE, false)
                 .orderBy(PORTAL_MOMENTS.ID, false)
                 .page(Page.of(pageDTO.getPageNumber(), pageDTO.getPageSize()));
         Page<MomentsDTO> itemPage = momentsConverter.toPageDTO(entityPage);
+        itemPage.getRecords().forEach(item ->
+                item.setCanEdit(dataScopeService.canEdit(DataModuleEnum.MOMENTS, item.getUserId())));
         authorInfoFiller.fill(itemPage.getRecords());
         auditUserFiller.fill(itemPage.getRecords());
         return itemPage;
@@ -152,12 +163,13 @@ public class MomentsServiceImpl implements MomentsService {
     @Override
     public void changeStatus(MomentsChangeStatusDTO changeStatusDTO) {
         PortalMoments entity = QueryChain.of(portalMomentsMapper)
-                .select(PORTAL_MOMENTS.ID, PORTAL_MOMENTS.STATUS)
+                .select(PORTAL_MOMENTS.ID, PORTAL_MOMENTS.USER_ID, PORTAL_MOMENTS.STATUS)
                 .where(PORTAL_MOMENTS.ID.eq(changeStatusDTO.getId()))
                 .one();
         if (ObjUtil.isNull(entity)) {
             throw new BusinessException("文章不存在");
         }
+        dataScopeService.assertEditable(DataModuleEnum.MOMENTS, entity.getUserId());
 
         // 状态一致时幂等返回
         if (changeStatusDTO.getStatus().equals(entity.getStatus())) {
@@ -191,12 +203,13 @@ public class MomentsServiceImpl implements MomentsService {
     @Override
     public void update(MomentsUpdateDTO updateDTO) {
         PortalMoments moments = QueryChain.of(portalMomentsMapper)
-                .select(PORTAL_MOMENTS.ID)
+                .select(PORTAL_MOMENTS.ID, PORTAL_MOMENTS.USER_ID)
                 .where(PORTAL_MOMENTS.ID.eq(updateDTO.getId()))
                 .one();
         if (ObjUtil.isNull(moments)) {
             throw new BusinessException("文章不存在");
         }
+        dataScopeService.assertEditable(DataModuleEnum.MOMENTS, moments.getUserId());
         UpdateChain.of(PortalMoments.class)
                 .set(PORTAL_MOMENTS.TITLE, updateDTO.getTitle())
                 .set(PORTAL_MOMENTS.CONTENT, updateDTO.getContent())
@@ -209,7 +222,8 @@ public class MomentsServiceImpl implements MomentsService {
     }
 
     /**
-     * 批量逻辑删除点点滴滴文章（对齐既有 delete 惯例：任一 id 不存在时整批失败）。
+     * 批量逻辑删除点点滴滴文章（对齐既有 delete 惯例：任一 id 不存在时整批失败；
+     * 数据范围按行校验归属，任一越权整批失败）。
      *
      * @param ids 文章ID集合
      */
@@ -219,13 +233,14 @@ public class MomentsServiceImpl implements MomentsService {
             return;
         }
         List<Long> distinctIds = ids.stream().distinct().toList();
-        List<Long> existingIds = QueryChain.of(portalMomentsMapper)
-                .select(PORTAL_MOMENTS.ID)
+        List<PortalMoments> existing = QueryChain.of(portalMomentsMapper)
+                .select(PORTAL_MOMENTS.ID, PORTAL_MOMENTS.USER_ID)
                 .where(PORTAL_MOMENTS.ID.in(distinctIds))
-                .listAs(Long.class);
-        if (existingIds.size() < distinctIds.size()) {
+                .list();
+        if (existing.size() < distinctIds.size()) {
             throw new BusinessException("文章不存在");
         }
+        existing.forEach(item -> dataScopeService.assertEditable(DataModuleEnum.MOMENTS, item.getUserId()));
         portalMomentsMapper.deleteBatchByIds(distinctIds);
     }
 

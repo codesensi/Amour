@@ -1,11 +1,6 @@
 package cn.codesensi.amour.model.converter;
 
-import cn.codesensi.amour.model.dto.MomentsChangeStatusDTO;
-import cn.codesensi.amour.model.dto.MomentsDTO;
-import cn.codesensi.amour.model.dto.MomentsHistoryDTO;
-import cn.codesensi.amour.model.dto.MomentsInsertDTO;
-import cn.codesensi.amour.model.dto.MomentsPageDTO;
-import cn.codesensi.amour.model.dto.MomentsUpdateDTO;
+import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.PortalMoments;
 import cn.codesensi.amour.model.request.MomentsChangeStatusRequest;
 import cn.codesensi.amour.model.request.MomentsInsertRequest;
@@ -84,6 +79,7 @@ public interface MomentsConverter {
     @Mapping(target = "avatar", ignore = true)
     @Mapping(target = "creatorName", ignore = true)
     @Mapping(target = "updaterName", ignore = true)
+    @Mapping(target = "canEdit", ignore = true)
     MomentsDTO toDTO(PortalMoments entity);
 
     /**

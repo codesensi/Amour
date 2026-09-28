@@ -82,4 +82,9 @@ public class LovePhotoDTO implements AuditUserAware, Serializable {
      */
     private String updaterName;
 
+    /**
+     * 当前登录人是否可修改本行（数据范围策略判定，服务层回填；管理端口径消费）
+     */
+    private Boolean canEdit;
+
 }

@@ -228,6 +228,41 @@ WHERE NOT EXISTS (
 );
 
 -- ----------------------------
+-- 数据填充：sys_role_data_scope（幂等插入）
+-- 主角角色的初始数据范围：全部模块「all 可读 + self 可改」——
+-- 门户双方的数据互相可见，但只能修改/删除自己创建的；
+-- 超级管理员角色（code=admin）判定层硬编码 all/all，不配置不入表；
+-- 幂等按业务唯一键（role_id + module）判断：用户在界面显式保存过的档位优先于种子，不会被覆盖；
+-- id 使用独立的 50000 段顺序预留（与 40000 段角色菜单、30000 段门户数据互相独立）
+-- ----------------------------
+INSERT INTO `sys_role_data_scope` (
+    `id`, `role_id`, `module`, `visible_scope`, `editable_scope`, `creator`
+)
+SELECT
+    t.id,
+    t.role_id,
+    t.module,
+    t.visible_scope,
+    t.editable_scope,
+    t.creator
+FROM (
+         VALUES
+             (50001, 2, 'time-capsule', 'all', 'self', 1),
+             (50002, 2, 'diary',        'all', 'self', 1),
+             (50003, 2, 'moments',      'all', 'self', 1),
+             (50004, 2, 'love-photo',   'all', 'self', 1),
+             (50005, 2, 'love-list',    'all', 'self', 1),
+             (50006, 2, 'footprint',    'all', 'self', 1),
+             (50007, 2, 'anniversary',  'all', 'self', 1),
+             (50008, 2, 'file',         'all', 'self', 1)
+     ) AS t(id, role_id, module, visible_scope, editable_scope, creator)
+WHERE NOT EXISTS (
+    SELECT 1 FROM `sys_role_data_scope`
+    WHERE `sys_role_data_scope`.`role_id` = t.role_id
+      AND `sys_role_data_scope`.`module` = t.module
+);
+
+-- ----------------------------
 -- 数据填充：sys_menu（幂等插入）
 -- ----------------------------
 INSERT INTO `sys_menu` (
@@ -266,6 +301,7 @@ FROM (
              (1303, 1300, '修改', 'B', NULL, NULL, 3, NULL, 'system:role:update', 1, 1),
              (1304, 1300, '增加', 'B', NULL, NULL, 4, NULL, 'system:role:insert', 1, 1),
              (1305, 1300, '删除', 'B', NULL, NULL, 5, NULL, 'system:role:delete', 1, 1),
+             (1306, 1300, '数据权限', 'B', NULL, NULL, 6, NULL, 'system:role:scope', 1, 1),
              (1400, 1000, '菜单管理', 'M', '/admin/system/menu', 'system/menu/index', 4, 'ep:menu', NULL, 1, 1),
              (1401, 1400, '分页查询', 'B', NULL, NULL, 1, NULL, 'system:menu:page', 1, 1),
              (1402, 1400, '详情', 'B', NULL, NULL, 2, NULL, 'system:menu:detail', 1, 1),
@@ -366,7 +402,9 @@ FROM (
              (99014, 'anniversary-type', '纪念日类型', 1, '与 AnniversaryTypeEnum(birthday/anniversary/festival) 对齐', 1),
              (99015, 'message-audit-status', '留言审核状态', 1, '与 MessageAuditStatusEnum(pending/approved/rejected) 对齐', 1),
              (99016, 'done', '完成状态', 1, '与 DoneEnum(0/1) 对齐', 1),
-             (99017, 'diary-mood', '日记心情', 1, '与 DiaryMoodEnum(sunny/cloudy/rainy/windy/snowy/starry/bloom/moon) 对齐', 1)
+             (99017, 'diary-mood', '日记心情', 1, '与 DiaryMoodEnum(sunny/cloudy/rainy/windy/snowy/starry/bloom/moon) 对齐', 1),
+             (99018, 'data-scope', '数据范围档位', 1, '与 DataScopeEnum(all/self) 对齐', 1),
+             (99019, 'data-module', '数据权限模块', 1, '与 DataModuleEnum 对齐', 1)
      ) AS t(id, dict_code, dict_name, builtin, remark, creator)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_dict_type` WHERE `sys_dict_type`.`id` = t.id
@@ -487,7 +525,19 @@ FROM (
              (11617, 'diary-mood', 'leaf', '落叶', 17, 0, 1, '与 DiaryMoodEnum 对齐', 1),
              (11618, 'diary-mood', 'sunset', '日落', 18, 0, 1, '与 DiaryMoodEnum 对齐', 1),
              (11619, 'diary-mood', 'meteor', '流星', 19, 0, 1, '与 DiaryMoodEnum 对齐', 1),
-             (11620, 'diary-mood', 'aurora', '极光', 20, 0, 1, '与 DiaryMoodEnum 对齐', 1)
+             (11620, 'diary-mood', 'aurora', '极光', 20, 0, 1, '与 DiaryMoodEnum 对齐', 1),
+             -- data-scope（数据范围档位，对应 DataScopeEnum：all-全部数据,self-仅本人；11700 段）
+             (11701, 'data-scope', 'all', '全部数据', 1, 0, 1, '与 DataScopeEnum(all/self) 对齐', 1),
+             (11702, 'data-scope', 'self', '仅本人', 2, 0, 1, '与 DataScopeEnum(all/self) 对齐', 1),
+             -- data-module（数据权限模块，与 DataModuleEnum 对齐；11700 段）
+             (11703, 'data-module', 'time-capsule', '时间胶囊', 1, 0, 1, '与 DataModuleEnum 对齐', 1),
+             (11704, 'data-module', 'diary', '日记', 2, 0, 1, '与 DataModuleEnum 对齐', 1),
+             (11705, 'data-module', 'moments', '点滴', 3, 0, 1, '与 DataModuleEnum 对齐', 1),
+             (11706, 'data-module', 'love-photo', '恋爱画册', 4, 0, 1, '与 DataModuleEnum 对齐', 1),
+             (11707, 'data-module', 'love-list', '恋爱清单', 5, 0, 1, '与 DataModuleEnum 对齐', 1),
+             (11708, 'data-module', 'footprint', '足迹', 6, 0, 1, '与 DataModuleEnum 对齐', 1),
+             (11709, 'data-module', 'anniversary', '纪念日', 7, 0, 1, '与 DataModuleEnum 对齐', 1),
+             (11710, 'data-module', 'file', '文件', 8, 0, 1, '与 DataModuleEnum 对齐', 1)
      ) AS t(id, dict_code, dict_value, dict_label, sort, status, builtin, remark, creator)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_dict_data` WHERE `sys_dict_data`.`id` = t.id
@@ -510,7 +560,7 @@ SELECT
     t.creator
 FROM (
          VALUES
-             (30001, 'https://t.alcy.cc/pic/fj/130.webp', '我们的第一张合照', '2018-07-15', '日常', 1, 1)
+             (30001, 'https://t.alcy.cc/pic/fj/130.webp', '我们的第一张合照', '2018-07-15', '日常', 1, 2)
      ) AS t(id, url, caption, date_text, tags, sort, creator)
 WHERE NOT EXISTS (
     SELECT 1 FROM `portal_love_photo` WHERE `portal_love_photo`.`id` = t.id
@@ -535,9 +585,9 @@ SELECT
     t.creator
 FROM (
          VALUES
-             (31001, '成都', '宽窄巷子', 104.053307, 30.663869, '2024-10-02', NULL, '第一次一起逛巷子,看了变脸吃了三大炮', 1),
-             (31002, '北京', '故宫博物院', 116.397228, 39.916534, '2023-05-20', NULL, '红墙黄瓦里逛了一天紫禁城,砖缝都是故事', 1),
-             (31003, '杭州', '西湖', 120.144386, 30.242874, '2024-04-06', NULL, '断桥遇上苏堤春晓,一湖烟雨看了一天', 1)
+             (31001, '成都', '宽窄巷子', 104.053307, 30.663869, '2024-10-02', NULL, '第一次一起逛巷子,看了变脸吃了三大炮', 2),
+             (31002, '北京', '故宫博物院', 116.397228, 39.916534, '2023-05-20', NULL, '红墙黄瓦里逛了一天紫禁城,砖缝都是故事', 3),
+             (31003, '杭州', '西湖', 120.144386, 30.242874, '2024-04-06', NULL, '断桥遇上苏堤春晓,一湖烟雨看了一天', 2)
      ) AS t(id, city, place_name, longitude, latitude, arrival_date, photo_url, remark, creator)
 WHERE NOT EXISTS (
     SELECT 1 FROM `portal_footprint` WHERE `portal_footprint`.`id` = t.id
@@ -559,7 +609,7 @@ SELECT
     t.creator
 FROM (
          VALUES
-             (32001, '在一起纪念日', 'anniversary', '2022-05-21', 1, 1)
+             (32001, '在一起纪念日', 'anniversary', '2022-05-21', 1, 3)
      ) AS t(id, name, type, anniversary_date, repeat_yearly, creator)
 WHERE NOT EXISTS (
     SELECT 1 FROM `portal_anniversary` WHERE `portal_anniversary`.`id` = t.id
@@ -605,26 +655,26 @@ SELECT
     t.creator
 FROM (
          VALUES
-             (34001, '一起期待未来甜蜜小生活💑', 0, NULL, 1, 1),
-             (34002, '一起为我们的小家添置东西🏠', 0, NULL, 2, 1),
-             (34003, '一起挑选婚纱👗', 0, NULL, 3, 1),
-             (34004, '一起去见双方父母🏡', 0, NULL, 4, 1),
-             (34005, '一起听一次演唱会🎤', 1, 'https://t.alcy.cc/pic/fj/135.webp', 5, 1),
-             (34006, '一起去看樱花🌸', 0, NULL, 6, 1),
-             (34007, '一起存钱💰', 0, NULL, 7, 1),
-             (34008, '一起去看一次日出🌅', 1, 'https://t.alcy.cc/pic/fj/132.webp', 8, 1),
-             (34009, '一起去看一次大海🌊', 1, 'https://t.alcy.cc/pic/fj/133.webp', 9, 1),
-             (34010, '一起做一顿烛光晚餐🕯️', 0, NULL, 10, 1),
-             (34011, '一起养一只小猫咪🐱', 0, NULL, 11, 1),
-             (34012, '一起去看一次极光🌌', 0, NULL, 12, 1),
-             (34013, '一起露营看星星✨', 0, NULL, 13, 1),
-             (34014, '一起坐一次热气球🎈', 0, NULL, 14, 1),
-             (34015, '一起装饰一棵圣诞树🎄', 0, NULL, 15, 1),
-             (34016, '一起跨年倒数🕛', 1, 'https://t.alcy.cc/pic/fj/134.webp', 16, 1),
-             (34017, '一起逛遍这座城市的夜市🍢', 0, NULL, 17, 1),
-             (34018, '一起学一门乐器🎹', 0, NULL, 18, 1),
-             (34019, '一起拍一套情侣写真📷', 0, NULL, 19, 1),
-             (34020, '一起攒够小家的第一桶金🏆', 0, NULL, 20, 1)
+             (34001, '一起期待未来甜蜜小生活💑', 0, NULL, 1, 2),
+             (34002, '一起为我们的小家添置东西🏠', 0, NULL, 2, 3),
+             (34003, '一起挑选婚纱👗', 0, NULL, 3, 2),
+             (34004, '一起去见双方父母🏡', 0, NULL, 4, 3),
+             (34005, '一起听一次演唱会🎤', 1, 'https://t.alcy.cc/pic/fj/135.webp', 5, 2),
+             (34006, '一起去看樱花🌸', 0, NULL, 6, 3),
+             (34007, '一起存钱💰', 0, NULL, 7, 2),
+             (34008, '一起去看一次日出🌅', 1, 'https://t.alcy.cc/pic/fj/132.webp', 8, 3),
+             (34009, '一起去看一次大海🌊', 1, 'https://t.alcy.cc/pic/fj/133.webp', 9, 2),
+             (34010, '一起做一顿烛光晚餐🕯️', 0, NULL, 10, 3),
+             (34011, '一起养一只小猫咪🐱', 0, NULL, 11, 2),
+             (34012, '一起去看一次极光🌌', 0, NULL, 12, 3),
+             (34013, '一起露营看星星✨', 0, NULL, 13, 2),
+             (34014, '一起坐一次热气球🎈', 0, NULL, 14, 3),
+             (34015, '一起装饰一棵圣诞树🎄', 0, NULL, 15, 2),
+             (34016, '一起跨年倒数🕛', 1, 'https://t.alcy.cc/pic/fj/134.webp', 16, 3),
+             (34017, '一起逛遍这座城市的夜市🍢', 0, NULL, 17, 2),
+             (34018, '一起学一门乐器🎹', 0, NULL, 18, 3),
+             (34019, '一起拍一套情侣写真📷', 0, NULL, 19, 2),
+             (34020, '一起攒够小家的第一桶金🏆', 0, NULL, 20, 3)
      ) AS t(id, content, done, photo, sort, creator)
 WHERE NOT EXISTS (
     SELECT 1 FROM `portal_love_list` WHERE `portal_love_list`.`id` = t.id
@@ -646,9 +696,9 @@ SELECT
     t.creator
 FROM (
          VALUES
-             (35001, '写给恋爱三周年的信💌', '三年前的今天你答应了和我在一起，这三年的每一天都比昨天更幸福。希望未来的每一年，我们都像今天一样热爱生活、热爱彼此。', '2025-05-21 00:00:00', 0, 1),
-             (35002, '写给下一个五年的我们💌', '见字如面。五年后的我们，应该在为小家忙碌着吧？希望那时的我们依然会为一顿烛光晚餐而开心，依然愿意为对方学一道新菜。', '2026-12-31 00:00:00', 0, 1),
-             (35003, '三十年后打开🔮', '当你打开这封信的时候，我们已经一起走过了大半生。谢谢你没有放开我的手。余生很长，我们慢慢走。', '2048-05-21 00:00:00', 0, 1)
+             (35001, '写给恋爱三周年的信💌', '三年前的今天你答应了和我在一起，这三年的每一天都比昨天更幸福。希望未来的每一年，我们都像今天一样热爱生活、热爱彼此。', '2025-05-21 00:00:00', 0, 2),
+             (35002, '写给下一个五年的我们💌', '见字如面。五年后的我们，应该在为小家忙碌着吧？希望那时的我们依然会为一顿烛光晚餐而开心，依然愿意为对方学一道新菜。', '2026-12-31 00:00:00', 0, 3),
+             (35003, '三十年后打开🔮', '当你打开这封信的时候，我们已经一起走过了大半生。谢谢你没有放开我的手。余生很长，我们慢慢走。', '2048-05-21 00:00:00', 0, 2)
      ) AS t(id, title, content, open_time, hidden, creator)
 WHERE NOT EXISTS (
     SELECT 1 FROM `portal_time_capsule` WHERE `portal_time_capsule`.`id` = t.id
@@ -671,23 +721,23 @@ SELECT
 FROM (
          VALUES
              (36001, 2, '2025-01-12', 'sunny', '今天一起去了菜市场,她挑西红柿的样子像在选宝石。晚饭做了番茄牛腩,汤底很浓,是家的味道。', 2),
-             (36002, 3, '2025-01-12', 'unknown', '加班到很晚,回家路上看见他在楼下等我,手里的奶茶还是热的。原来被人惦记是这种感觉。', 2),
+             (36002, 3, '2025-01-12', 'unknown', '加班到很晚,回家路上看见他在楼下等我,手里的奶茶还是热的。原来被人惦记是这种感觉。', 3),
              (36003, 2, '2025-02-09', 'sunny', '周末把阳台收拾了出来,绿萝又发了新芽。我们约定每周日一起给它浇水。', 2),
-             (36004, 3, '2025-03-14', 'drizzle', '下雨了,我们窝在沙发里重看了一遍老电影。他说台词比记忆里的更甜。', 2),
+             (36004, 3, '2025-03-14', 'drizzle', '下雨了,我们窝在沙发里重看了一遍老电影。他说台词比记忆里的更甜。', 3),
              (36005, 2, '2025-04-02', 'sunset', '一起规划了明年的旅行,第一站是海边。期待是一件让日子发光的事。', 2),
-             (36006, 3, '2025-04-02', 'overcast', '今天吵了一点点架,又和好了。原来磨合不是妥协,是学会把「我」变成「我们」。', 2),
+             (36006, 3, '2025-04-02', 'overcast', '今天吵了一点点架,又和好了。原来磨合不是妥协,是学会把「我」变成「我们」。', 3),
              (36007, 2, '2025-05-20', 'bloom', '他学会了做舒芙蕾,虽然塌了,但是很好吃。认真生活的样子真好看。', 2),
-             (36008, 3, '2025-06-01', 'starry', '晚饭后沿着河边走了很久,路灯把两个人的影子拉得很长。所谓幸福,大概就是这样不说话也不尴尬的散步。', 2),
+             (36008, 3, '2025-06-01', 'starry', '晚饭后沿着河边走了很久,路灯把两个人的影子拉得很长。所谓幸福,大概就是这样不说话也不尴尬的散步。', 3),
              (36009, 2, '2025-07-19', 'windy', '一起给绿萝换了盆,泥土的味道让人踏实。她说秋天要买个书架,把我们的书都摆在一起。', 2),
-             (36010, 3, '2025-08-23', 'thunderstorm', '台风天宅在家,煮了一锅姜茶,把毯子铺在地板上打牌。输了的人负责下一顿晚饭。', 2),
+             (36010, 3, '2025-08-23', 'thunderstorm', '台风天宅在家,煮了一锅姜茶,把毯子铺在地板上打牌。输了的人负责下一顿晚饭。', 3),
              (36011, 2, '2025-09-30', 'moon', '中秋节回她家,阿姨做的菜好吃到犯规。临走时阿姨塞给我们一整盒月饼,说路上慢慢吃。', 2),
-             (36012, 3, '2025-10-25', 'starry', '今晚的月亮很圆。我们坐在阳台的懒人沙发上,一人一副耳机,把喜欢的歌单交换着听完。', 2),
+             (36012, 3, '2025-10-25', 'starry', '今晚的月亮很圆。我们坐在阳台的懒人沙发上,一人一副耳机,把喜欢的歌单交换着听完。', 3),
              (36013, 2, '2025-11-11', 'fog', '双十一没买东西,一起去了趟宜家。在样板间里畅想未来的客厅,越聊越起劲。', 2),
-             (36014, 3, '2025-12-14', 'snowy', '初雪比预报来得早。他站在楼下,围巾裹到鼻子,手里还是一杯热奶茶。', 2),
+             (36014, 3, '2025-12-14', 'snowy', '初雪比预报来得早。他站在楼下,围巾裹到鼻子,手里还是一杯热奶茶。', 3),
              (36015, 2, '2025-12-31', 'starry', '跨年夜,我们对着烟花许了同一个愿望。新的一年,也请多多指教。', 2),
-             (36016, 3, '2026-01-03', 'sunny', '元旦一起大扫除,翻出去年一起买的第一件家具。原来我们已经攒了这么多共同记忆。', 2),
+             (36016, 3, '2026-01-03', 'sunny', '元旦一起大扫除,翻出去年一起买的第一件家具。原来我们已经攒了这么多共同记忆。', 3),
              (36017, 2, '2026-01-05', 'sleet', '她开始学吉他了,每天晚上练二十分钟。跑调也没关系,反正好听的都是心意。', 2),
-             (36018, 3, '2026-01-07', 'unknown', '把这一年的照片洗了出来,做成本子。原来我们已经一起走过了这么多地方。', 2)
+             (36018, 3, '2026-01-07', 'unknown', '把这一年的照片洗了出来,做成本子。原来我们已经一起走过了这么多地方。', 3)
      ) AS t(id, user_id, diary_date, mood, content, creator)
 WHERE NOT EXISTS (
     SELECT 1 FROM `portal_diary` WHERE `portal_diary`.`id` = t.id
@@ -721,5 +771,19 @@ FROM (
 WHERE NOT EXISTS (
     SELECT 1 FROM `portal_moments` WHERE `portal_moments`.`id` = t.id
 );
+
+-- ----------------------------
+-- 历史数据归属修正（幂等）：门户展示数据的创建人原统一为 admin(1)，
+-- 修正为两位主角用户（li=2/su=3）按 id 奇偶交替归属；
+-- WHERE creator = 1 保证幂等（已归属主角用户的数据不会被重复改写），
+-- 修正范围覆盖全部门户展示的业务数据（照片/足迹/纪念日/清单/时间胶囊）。
+-- ----------------------------
+UPDATE `portal_love_photo`   SET `creator` = CASE WHEN `id` % 2 = 1 THEN 2 ELSE 3 END WHERE `creator` = 1;
+UPDATE `portal_footprint`    SET `creator` = CASE WHEN `id` % 2 = 1 THEN 2 ELSE 3 END WHERE `creator` = 1;
+UPDATE `portal_anniversary`  SET `creator` = CASE WHEN `id` % 2 = 1 THEN 2 ELSE 3 END WHERE `creator` = 1;
+UPDATE `portal_love_list`    SET `creator` = CASE WHEN `id` % 2 = 1 THEN 2 ELSE 3 END WHERE `creator` = 1;
+UPDATE `portal_time_capsule` SET `creator` = CASE WHEN `id` % 2 = 1 THEN 2 ELSE 3 END WHERE `creator` = 1;
+-- 情侣日记：创建人与记录人业务归属对齐（门户按 user_id 分栏展示）
+UPDATE `portal_diary` SET `creator` = `user_id` WHERE `creator` <> `user_id`;
 
 SET REFERENTIAL_INTEGRITY TRUE;

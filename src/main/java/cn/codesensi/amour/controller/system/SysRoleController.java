@@ -4,11 +4,14 @@ import cn.codesensi.amour.common.annotation.ApiResponseBody;
 import cn.codesensi.amour.common.annotation.Log;
 import cn.codesensi.amour.common.enums.LogTypeEnum;
 import cn.codesensi.amour.model.converter.RoleConverter;
+import cn.codesensi.amour.model.converter.RoleDataScopeConverter;
 import cn.codesensi.amour.model.dto.*;
 import cn.codesensi.amour.model.entity.SysRole;
 import cn.codesensi.amour.model.request.*;
+import cn.codesensi.amour.model.response.RoleDataScopeResponse;
 import cn.codesensi.amour.model.response.RolePageResponse;
 import cn.codesensi.amour.model.response.RoleResponse;
+import cn.codesensi.amour.service.SysRoleDataScopeService;
 import cn.codesensi.amour.service.SysRoleService;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.mybatisflex.core.paginate.Page;
@@ -31,7 +34,9 @@ import java.util.List;
 public class SysRoleController {
 
     private final SysRoleService sysRoleService;
+    private final SysRoleDataScopeService sysRoleDataScopeService;
     private final RoleConverter roleConverter;
+    private final RoleDataScopeConverter roleDataScopeConverter;
 
     /**
      * 分页查询角色信息表。
@@ -140,6 +145,38 @@ public class SysRoleController {
     @GetMapping("/menu-ids/{id}")
     public List<String> menuIds(@PathVariable Long id) {
         return sysRoleService.listMenuIdStrings(id);
+    }
+
+    /**
+     * 查询角色的数据范围配置。
+     * <p>
+     * 全模块列表（含未配置行的最小权限兜底值）；超级管理员角色整单标记
+     * superAdmin（数据范围硬编码 all/all，前端置灰展示）。
+     *
+     * @param id 角色ID
+     * @return 全模块的数据范围配置列表
+     */
+    @SaCheckPermission("system:role:scope")
+    @GetMapping("/data-scope/{id}")
+    public List<RoleDataScopeResponse> dataScope(@PathVariable Long id) {
+        List<RoleDataScopeDTO> roleDataScopeDTOS = sysRoleDataScopeService.listByRoleId(id);
+        return roleDataScopeConverter.toListResponse(roleDataScopeDTOS);
+    }
+
+    /**
+     * 分配角色的数据范围（整角色覆盖式保存）。
+     * <p>
+     * 校验角色存在且非超级管理员、模块键合法、可改范围不宽于可见范围；
+     * 保存成功后失效该角色的数据范围缓存，判定即时生效。
+     *
+     * @param request 保存请求参数
+     */
+    @SaCheckPermission("system:role:scope")
+    @Log(module = "角色管理", operation = "配置数据权限", type = LogTypeEnum.GRANT)
+    @PutMapping("/assign-data-scope")
+    public void assignDataScope(@Valid @RequestBody RoleDataScopeAssignRequest request) {
+        RoleDataScopeSaveDTO saveDTO = roleDataScopeConverter.toSaveDTO(request);
+        sysRoleDataScopeService.assignDataScope(saveDTO);
     }
 
 }

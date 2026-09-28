@@ -76,13 +76,15 @@ public interface LoveListConverter {
 
     /**
      * 实体 → Service 出参 DTO（字段同名自动映射）；
-     * creatorName/updaterName 由服务层批量回填，实体无对应字段，显式忽略以消除 Unmapped 警告。
+     * creatorName/updaterName 由服务层批量回填、canEdit 由服务层按数据范围策略回填，
+     * 实体无对应字段，显式忽略以消除 Unmapped 警告。
      *
      * @param entity 恋爱清单项实体
      * @return 清单项 DTO
      */
     @Mapping(target = "creatorName", ignore = true)
     @Mapping(target = "updaterName", ignore = true)
+    @Mapping(target = "canEdit", ignore = true)
     LoveListItemDTO toDTO(PortalLoveList entity);
 
     /**
