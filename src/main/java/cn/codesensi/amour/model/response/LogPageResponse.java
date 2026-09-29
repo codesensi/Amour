@@ -29,6 +29,11 @@ public class LogPageResponse implements Serializable {
     private Long id;
 
     /**
+     * 链路追踪ID
+     */
+    private String traceId;
+
+    /**
      * 用户名称
      */
     private String username;
