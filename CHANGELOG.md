@@ -8,6 +8,17 @@
 
 <!-- 未发布的变更记录在此段，发布时改为 [x.y.z] - 日期 -->
 
+## [1.1.4] - 2026-09-29
+
+### 新增
+
+- 定时任务管理：支持任务的创建、修改、启停、手动执行与删除，修改 cron 表达式后即时生效；可选禁止任务并发执行，上次未结束时自动跳过本次触发；完整记录每次执行的开始时间、耗时与结果，执行日志可查
+- 管理端仪表盘与足迹统计：汇总、访问趋势、留言地区分布、年度回顾、足迹统计、恋爱画册归档，门户首页时间胶囊卡片与封面增强
+
+### 变更
+
+- 操作日志展示链路追踪ID
+
 ## [1.1.3] - 2026-09-28
 
 ### 新增
@@ -52,7 +63,8 @@
 - **数据存储**：H2 文件数据库（`MODE=MySQL`），`init_ddl.sql` / `init_dml.sql` 启动幂等初始化
 - **部署**：Dockerfile（非 root 运行、优雅停机、Actuator 健康检查、挂载卷持久化），H2 密码与 JWT 密钥支持环境变量覆盖
 
-[Unreleased]: https://github.com/codesensi/Amour/compare/v1.1.3...HEAD
+[Unreleased]: https://github.com/codesensi/Amour/compare/v1.1.4...HEAD
+[1.1.4]: https://github.com/codesensi/Amour/compare/v1.1.3...v1.1.4
 [1.1.3]: https://github.com/codesensi/Amour/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/codesensi/Amour/compare/v1.0.0...v1.1.2
 [1.0.0]: https://github.com/codesensi/Amour/releases/tag/v1.0.0
