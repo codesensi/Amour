@@ -168,3 +168,9 @@ thread:
       wait-for-tasks-to-complete-on-shutdown: true
       await-termination-seconds: 60
       rejected-execution-handler: DiscardWarnPolicy
+    # ---- 调度池:定时任务触发专用,固定大小(队列/核心超时等参数对调度器无意义) ----
+    scheduler:
+      pool-size: 4
+      # 停机即终止:调度任务可中断且下次启动全量重注册,等待延迟触发无意义
+      wait-for-tasks-to-complete-on-shutdown: false
+      await-termination-seconds: 60

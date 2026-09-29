@@ -14,6 +14,7 @@ import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
@@ -133,6 +134,25 @@ public class ThreadPoolConfig implements AsyncConfigurer {
     }
 
     /**
+     * 定时任务调度器 —— 承载动态注册的 cron 任务（SysJobScheduleHolder），
+     * 固定大小的调度线程池（队列/核心超时等参数对调度器无意义），
+     * 停机语义与其它两池对齐：等待在途任务完成（最多 await-termination-seconds 秒）。
+     *
+     * @return 定时任务调度器
+     */
+    @Bean(ThreadConst.TASK_SCHEDULER_NAME)
+    public ThreadPoolTaskScheduler JobTaskScheduler() {
+        ThreadPoolProperties.Scheduler spec = threadPoolProperties.getScheduler();
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(spec.getPoolSize());
+        scheduler.setWaitForTasksToCompleteOnShutdown(spec.getWaitForTasksToCompleteOnShutdown());
+        scheduler.setAwaitTerminationSeconds(spec.getAwaitTerminationSeconds());
+        scheduler.setThreadNamePrefix("job-task-");
+        scheduler.initialize();
+        return scheduler;
+    }
+
+    /**
      * 按规格构建平台线程池执行器：统一装配参数、MDC 装饰器与初始化，两池共用。
      *
      * @param spec       池规格
@@ -173,7 +193,7 @@ public class ThreadPoolConfig implements AsyncConfigurer {
         // 接入与平台线程分支同一份优雅停机参数，使 yml 配置在虚拟线程模式下不再失效；
         // 未配置等待时保持默认 0（立即关机），与历史行为兼容
         if (Boolean.TRUE.equals(spec.getWaitForTasksToCompleteOnShutdown())
-                && spec.getAwaitTerminationSeconds() != null) {
+                && ObjUtil.isNotNull(spec.getAwaitTerminationSeconds())) {
             executor.setTaskTerminationTimeout(spec.getAwaitTerminationSeconds() * 1000L);
         }
         executor.setTaskDecorator(new ContextTaskDecorator());

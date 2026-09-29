@@ -14,6 +14,7 @@ import cn.codesensi.amour.model.entity.PortalMessage;
 import cn.codesensi.amour.model.entity.PortalVisit;
 import cn.codesensi.amour.service.AnniversaryService;
 import cn.codesensi.amour.service.DashboardService;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.ObjUtil;
@@ -164,7 +165,7 @@ public class DashboardServiceImpl implements DashboardService {
                 .orderBy(PORTAL_LOVE_PHOTO.CREATE_TIME, false)
                 .limit(9)
                 .listAs(String.class);
-        if (!recentPhotos.isEmpty()) {
+        if (CollUtil.isNotEmpty(recentPhotos)) {
             summary.setRecentPhotos(recentPhotos);
         }
 

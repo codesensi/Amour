@@ -8,6 +8,7 @@ import cn.codesensi.amour.model.request.LoveListPageRequest;
 import cn.codesensi.amour.model.request.LoveListUpdateRequest;
 import cn.codesensi.amour.model.response.LoveListPageResponse;
 import cn.codesensi.amour.model.response.PortalLoveListResponse;
+import cn.hutool.core.util.ObjUtil;
 import com.mybatisflex.core.paginate.Page;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -142,7 +143,6 @@ public interface LoveListConverter {
      * @return 门户契约的布尔形态；null 视为未完成
      */
     default Boolean toBoolean(Integer done) {
-        return done != null && done != 0;
+        return ObjUtil.isNotNull(done) && done != 0;
     }
-
 }

@@ -6,6 +6,7 @@ import cn.codesensi.amour.common.exception.SystemException;
 import cn.codesensi.amour.common.properties.AppCacheProperties;
 import cn.codesensi.amour.common.util.CacheUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.cache.CacheManager;
@@ -104,7 +105,7 @@ public class CacheConfig {
     private Cache<Object, Object> build(AppCacheProperties.CacheItem item, AppCacheProperties props) {
         // 单缓存容量可按条目覆盖:rate-limit 等条目数随活跃来源数线性增长的缓存单独调大,
         // 避免计数器被全局容量上限静默驱逐导致限流重置
-        long maxSize = item.getMaxSize() != null ? item.getMaxSize() : props.getMaxSize();
+        long maxSize = ObjUtil.isNotNull(item.getMaxSize()) ? item.getMaxSize() : props.getMaxSize();
         Caffeine<Object, Object> builder = Caffeine.newBuilder().maximumSize(maxSize).recordStats();
         if (item.getExpireAfterWrite() > 0) {
             builder.expireAfterWrite(applyJitter(item.getExpireAfterWrite(), props), TimeUnit.SECONDS);

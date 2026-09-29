@@ -106,12 +106,12 @@ public class SysRoleDataScopeServiceImpl implements SysRoleDataScopeService {
         List<SysRoleDataScope> entities = items.stream()
                 .map(item -> {
                     DataModuleEnum module = BaseEnum.fromCode(DataModuleEnum.class, item.getModule());
-                    if (module == null) {
+                    if (ObjUtil.isNull(module)) {
                         throw new BusinessException("不支持的数据权限模块：" + item.getModule());
                     }
                     DataScopeEnum visible = BaseEnum.fromCode(DataScopeEnum.class, item.getVisibleScope());
                     DataScopeEnum editable = BaseEnum.fromCode(DataScopeEnum.class, item.getEditableScope());
-                    if (visible == null || editable == null) {
+                    if (ObjUtil.isNull(visible) || ObjUtil.isNull(editable)) {
                         throw new BusinessException("不支持的数据范围档位：" + item.getVisibleScope() + "/" + item.getEditableScope());
                     }
                     // 一致性不变式：可改范围不得宽于可见范围（self 可见时仅可 self 可改）

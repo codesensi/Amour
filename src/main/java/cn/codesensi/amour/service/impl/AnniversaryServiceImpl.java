@@ -204,7 +204,7 @@ public class AnniversaryServiceImpl implements AnniversaryService {
      * @param type 类型编码
      */
     private void assertTypeInDict(String type) {
-        if (BaseEnum.fromCode(AnniversaryTypeEnum.class, type) == null) {
+        if (ObjUtil.isNull(BaseEnum.fromCode(AnniversaryTypeEnum.class, type))) {
             throw new BusinessException("纪念日类型不合法");
         }
     }

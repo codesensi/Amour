@@ -550,7 +550,7 @@ public class FileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impleme
         }
         FileTypeEnum fileTypeEnum = FileTypeEnum.fromExtension(extension);
         FileTypeEnum actual = head.length == 0 ? null : FileTypeEnum.fromMagic(head);
-        if (fileTypeEnum == null || actual != fileTypeEnum) {
+        if (ObjUtil.isNull(fileTypeEnum) || actual != fileTypeEnum) {
             throw new BusinessException("文件内容与扩展名不符，请上传真实的图片文件");
         }
         return fileTypeEnum;

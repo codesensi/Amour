@@ -24,6 +24,44 @@ public class ThreadPoolProperties {
     private Pool log = new Pool(1, 2, 200, 60, false, true, 5, "DiscardWarnPolicy", false);
 
     /**
+     * 定时任务调度器配置（缺省值 4 个调度线程 + 停机即终止，最多等待 5 秒兜底）
+     */
+    private Scheduler scheduler = new Scheduler(4, false, 5);
+
+    /**
+     * 定时任务调度器配置 —— 仅承载固定大小的调度线程参数，
+     * 供 {@code ThreadPoolTaskScheduler} Bean 装配（队列/核心超时等参数对调度器无意义）
+     */
+    @Data
+    public static class Scheduler {
+
+        /**
+         * 调度线程数
+         */
+        private Integer poolSize;
+
+        /**
+         * 是否等待剩余任务完成后才关闭应用（调度任务可中断且下次启动全量重注册，建议关闭）
+         */
+        private Boolean waitForTasksToCompleteOnShutdown;
+
+        /**
+         * 等待剩余任务完成的最大秒数
+         */
+        private Integer awaitTerminationSeconds;
+
+        /**
+         * 按全量参数构建调度器规格（用于代码内缺省值）
+         */
+        public Scheduler(Integer poolSize, Boolean waitForTasksToCompleteOnShutdown,
+                         Integer awaitTerminationSeconds) {
+            this.poolSize = poolSize;
+            this.waitForTasksToCompleteOnShutdown = waitForTasksToCompleteOnShutdown;
+            this.awaitTerminationSeconds = awaitTerminationSeconds;
+        }
+    }
+
+    /**
      * 池规格 —— 通用池与日志池共用的参数集
      */
     @Data

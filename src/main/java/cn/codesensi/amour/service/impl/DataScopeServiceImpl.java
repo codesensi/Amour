@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static cn.codesensi.amour.model.entity.table.SysRoleDataScopeTableDef.SYS_ROLE_DATA_SCOPE;
@@ -184,11 +183,11 @@ public class DataScopeServiceImpl implements DataScopeService {
                     DataModuleEnum module = BaseEnum.fromCode(DataModuleEnum.class, scope.getModule());
                     DataScopeEnum visible = BaseEnum.fromCode(DataScopeEnum.class, scope.getVisibleScope());
                     DataScopeEnum editable = BaseEnum.fromCode(DataScopeEnum.class, scope.getEditableScope());
-                    return module == null || visible == null || editable == null
+                    return ObjUtil.isNull(module) || ObjUtil.isNull(visible) || ObjUtil.isNull(editable)
                             ? null
                             : Map.entry(module, new ScopePair(visible, editable));
                 })
-                .filter(Objects::nonNull)
+                .filter(ObjUtil::isNotNull)
                 .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 

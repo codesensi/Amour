@@ -356,6 +356,69 @@ CREATE TABLE IF NOT EXISTS `sys_notice_read` (
     COMMENT = '通知阅读记录表';
 
 -- ----------------------------
+-- 表结构：sys_job（定时任务表）
+-- 幂等建表：仅当表不存在时创建
+-- 说明：调用目标仅允许容器内实现 SysTask 接口的 bean 名称（白名单校验），
+--       cron 变更经调度容器热更新；内置任务(builtin=1)不可删除，
+--       且任务分组与调用目标创建后不可修改（修改请求中对内置任务忽略这两项）。
+-- 唯一性：invoke_target 全生命周期唯一（含逻辑删除记录），服务层全量查重先行拦截并给出友好提示
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `sys_job` (
+    `id`              BIGINT        NOT NULL                COMMENT '主键ID',
+    `job_name`        VARCHAR(64)   NOT NULL                COMMENT '任务名称',
+    `job_group`       VARCHAR(64)   NOT NULL DEFAULT 'default' COMMENT '任务分组(与 JobGroupEnum 对齐: default-默认, infra-基础设施)',
+    `invoke_target`   VARCHAR(128)  NOT NULL                COMMENT '调用目标(SysTask实现类的bean名称)',
+    `cron_expression` VARCHAR(64)   NOT NULL                COMMENT 'cron表达式',
+    `concurrent`      TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '是否允许并发: 0-禁止, 1-允许',
+    `status`          TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '任务状态: 0-正常, 1-暂停',
+    `builtin`         TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '是否内置: 0-否, 1-是',
+    `remark`          VARCHAR(512)  NULL DEFAULT NULL       COMMENT '备注',
+    `creator`         BIGINT        NULL DEFAULT NULL       COMMENT '创建人',
+    `create_time`     DATETIME      NULL DEFAULT CURRENT_TIMESTAMP       COMMENT '创建时间',
+    `updater`         BIGINT        NULL DEFAULT NULL       COMMENT '更新人',
+    `update_time`     DATETIME      NULL DEFAULT CURRENT_TIMESTAMP       COMMENT '更新时间',
+    `del_flag`        TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `uk_j_invoke_target` (`invoke_target`),
+    INDEX `idx_j_status` (`status` ASC)
+    ) ENGINE = InnoDB
+    CHARACTER SET = utf8mb4
+    COLLATE = utf8mb4_general_ci
+    ROW_FORMAT = DYNAMIC
+    COMMENT = '定时任务表';
+
+-- ----------------------------
+-- 表结构：sys_job_log（定时任务执行日志表）
+-- 幂等建表：仅当表不存在时创建
+-- 说明：每次触发（cron/手动）记录开始时间、耗时与结果；无审计列与逻辑删除，
+--       日志由内置清理任务按保留期物理删除。
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `sys_job_log` (
+    `id`           BIGINT       NOT NULL                COMMENT '主键ID',
+    `job_id`       BIGINT       NOT NULL                COMMENT '任务ID',
+    `job_name`     VARCHAR(64)  NULL DEFAULT NULL       COMMENT '任务名称',
+    `trigger_type` VARCHAR(32)   NOT NULL DEFAULT 'cron' COMMENT '触发方式(与 TriggerTypeEnum 对齐: cron-cron调度, manual-手动执行)',
+    `start_time`   DATETIME     NULL DEFAULT NULL       COMMENT '开始时间',
+    `duration`     BIGINT       NULL DEFAULT NULL       COMMENT '耗时（毫秒）',
+    `status`       TINYINT(1)   NULL DEFAULT NULL       COMMENT '执行状态: 0-失败, 1-成功',
+    `error_msg`    TEXT         NULL                    COMMENT '异常信息',
+    `creator`         BIGINT        NULL DEFAULT NULL       COMMENT '创建人',
+    `create_time`     DATETIME      NULL DEFAULT CURRENT_TIMESTAMP       COMMENT '创建时间',
+    `updater`         BIGINT        NULL DEFAULT NULL       COMMENT '更新人',
+    `update_time`     DATETIME      NULL DEFAULT CURRENT_TIMESTAMP       COMMENT '更新时间',
+    `del_flag`        TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
+    PRIMARY KEY (`id`),
+    INDEX `idx_jl_job_id` (`job_id` ASC),
+    INDEX `idx_jl_start_time` (`start_time` ASC)
+    ) ENGINE = InnoDB
+    CHARACTER SET = utf8mb4
+    COLLATE = utf8mb4_general_ci
+    ROW_FORMAT = DYNAMIC
+    COMMENT = '定时任务执行日志表';
+
+
+
+-- ----------------------------
 -- 表结构：portal_moments（点点滴滴文章表）
 -- 幂等建表：仅当表不存在时创建
 -- ----------------------------

@@ -399,7 +399,7 @@ public class SysDictDataServiceImpl implements SysDictDataService {
      * @param page 字典条目分页
      */
     private void fillDictNames(Page<SysDictData> page) {
-        if (page == null || CollUtil.isEmpty(page.getRecords())) {
+        if (ObjUtil.isNull(page) || CollUtil.isEmpty(page.getRecords())) {
             return;
         }
         List<String> codes = page.getRecords().stream()

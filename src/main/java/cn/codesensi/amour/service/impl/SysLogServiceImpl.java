@@ -19,7 +19,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 
 import static cn.codesensi.amour.model.entity.table.SysLogTableDef.SYS_LOG;
 
@@ -93,8 +92,8 @@ public class SysLogServiceImpl implements SysLogService {
         // 公共过滤条件:类型范围交集 + 用户名/状态可选过滤,键集与 offset 两分支共用
         QueryCondition condition = SYS_LOG.LOG_TYPE.in(scope)
                 .and(SYS_LOG.USERNAME.like(pageDTO.getUsername(), StrUtil::isNotBlank))
-                .and(SYS_LOG.STATUS.eq(pageDTO.getStatus(), Objects::nonNull));
-        if (pageDTO.getLastId() != null) {
+                .and(SYS_LOG.STATUS.eq(pageDTO.getStatus(), ObjUtil::isNotNull));
+        if (ObjUtil.isNotNull(pageDTO.getLastId())) {
             // 键集翻页:游标替代 offset,消除深 offset 扫描;
             // 总行数按过滤条件(不含游标)统计,保持分页器总数稳定
             long total = QueryChain.of(sysLogMapper).where(condition).count();

@@ -1,5 +1,7 @@
 package cn.codesensi.amour.common.enums;
 
+import cn.codesensi.amour.common.consts.AppConst;
+import cn.hutool.core.util.ObjUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -54,6 +56,6 @@ public enum FileBizTypeEnum implements BaseEnum<String> {
      * @return true 表示白名单内
      */
     public boolean accepts(String extension) {
-        return extension != null && formats.contains(FileTypeEnum.fromExtension(extension));
+        return ObjUtil.isNotNull(extension) && formats.contains(FileTypeEnum.fromExtension(extension));
     }
 }

@@ -322,6 +322,13 @@ FROM (
              (1800, 1000, '文件管理', 'M', '/admin/system/file', 'system/file/index', 8, 'ep:folder-opened', NULL, 1, 1),
              (1801, 1800, '文件分页查询', 'B', NULL, NULL, 1, NULL, 'system:file:page', 1, 1),
              (1802, 1800, '删除文件', 'B', NULL, NULL, 2, NULL, 'system:file:delete', 1, 1),
+             (1900, 1000, '定时任务', 'M', '/admin/system/job', 'system/job/index', 9, 'ep:alarm-clock', NULL, 1, 1),
+             (1901, 1900, '分页查询', 'B', NULL, NULL, 1, NULL, 'system:job:page', 1, 1),
+             (1902, 1900, '增加任务', 'B', NULL, NULL, 2, NULL, 'system:job:insert', 1, 1),
+             (1903, 1900, '修改任务', 'B', NULL, NULL, 3, NULL, 'system:job:update', 1, 1),
+             (1904, 1900, '删除任务', 'B', NULL, NULL, 4, NULL, 'system:job:delete', 1, 1),
+             (1905, 1900, '执行一次', 'B', NULL, NULL, 5, NULL, 'system:job:run', 1, 1),
+             (1906, 1900, '启停任务', 'B', NULL, NULL, 6, NULL, 'system:job:change-status', 1, 1),
              (2000, 0, '点点滴滴', 'M', '/admin/moments', 'admin/moments/index', 2, 'ep:sunny', NULL, 1, 1),
              (2001, 2000, '分页查询', 'B', NULL, NULL, 1, NULL, 'admin:moments:page', 1, 1),
              (2002, 2000, '增加', 'B', NULL, NULL, 2, NULL, 'admin:moments:insert', 1, 1),
@@ -404,7 +411,10 @@ FROM (
              (99016, 'done', '完成状态', 1, '与 DoneEnum(0/1) 对齐', 1),
              (99017, 'diary-mood', '日记心情', 1, '与 DiaryMoodEnum(sunny/cloudy/rainy/windy/snowy/starry/bloom/moon) 对齐', 1),
              (99018, 'data-scope', '数据范围档位', 1, '与 DataScopeEnum(all/self) 对齐', 1),
-             (99019, 'data-module', '数据权限模块', 1, '与 DataModuleEnum 对齐', 1)
+             (99019, 'data-module', '数据权限模块', 1, '与 DataModuleEnum 对齐', 1),
+             (99020, 'permit', '允许状态', 1, '与 PermitEnum(1/0) 对齐', 1),
+             (99021, 'trigger-type', '任务触发方式', 1, '与 TriggerTypeEnum(cron/manual) 对齐', 1),
+             (99022, 'job-group', '任务分组', 1, '与 JobGroupEnum(default/infra) 对齐', 1)
      ) AS t(id, dict_code, dict_name, builtin, remark, creator)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_dict_type` WHERE `sys_dict_type`.`id` = t.id
@@ -537,7 +547,16 @@ FROM (
              (11707, 'data-module', 'love-list', '恋爱清单', 5, 0, 1, '与 DataModuleEnum 对齐', 1),
              (11708, 'data-module', 'footprint', '足迹', 6, 0, 1, '与 DataModuleEnum 对齐', 1),
              (11709, 'data-module', 'anniversary', '纪念日', 7, 0, 1, '与 DataModuleEnum 对齐', 1),
-             (11710, 'data-module', 'file', '文件', 8, 0, 1, '与 DataModuleEnum 对齐', 1)
+             (11710, 'data-module', 'file', '文件', 8, 0, 1, '与 DataModuleEnum 对齐', 1),
+             -- permit（通用允许/禁止状态，对应 PermitEnum：0-禁止,1-允许；11800 段）
+             (11801, 'permit', '0', '禁止', 1, 0, 1, '与 PermitEnum(0/1) 对齐', 1),
+             (11802, 'permit', '1', '允许', 2, 0, 1, '与 PermitEnum(0/1) 对齐', 1),
+             -- trigger-type（任务触发方式，对应 TriggerTypeEnum：cron-cron调度,manual-手动执行；11900 段）
+             (11901, 'trigger-type', 'cron', 'cron调度', 1, 0, 1, '与 TriggerTypeEnum 对齐', 1),
+             (11902, 'trigger-type', 'manual', '手动执行', 2, 0, 1, '与 TriggerTypeEnum 对齐', 1),
+             -- job-group（任务分组，对应 JobGroupEnum：default-默认,infra-基础设施；12000 段）
+             (12001, 'job-group', 'default', '默认', 1, 0, 1, '与 JobGroupEnum 对齐', 1),
+             (12002, 'job-group', 'infra', '基础设施', 2, 0, 1, '与 JobGroupEnum 对齐', 1)
      ) AS t(id, dict_code, dict_value, dict_label, sort, status, builtin, remark, creator)
 WHERE NOT EXISTS (
     SELECT 1 FROM `sys_dict_data` WHERE `sys_dict_data`.`id` = t.id
@@ -785,5 +804,35 @@ UPDATE `portal_love_list`    SET `creator` = CASE WHEN `id` % 2 = 1 THEN 2 ELSE 
 UPDATE `portal_time_capsule` SET `creator` = CASE WHEN `id` % 2 = 1 THEN 2 ELSE 3 END WHERE `creator` = 1;
 -- 情侣日记：创建人与记录人业务归属对齐（门户按 user_id 分栏展示）
 UPDATE `portal_diary` SET `creator` = `user_id` WHERE `creator` <> `user_id`;
+
+-- ----------------------------
+-- 数据填充：sys_job（幂等插入）
+-- 内置定时任务种子（builtin=1 不可删除，cron/状态/并发/备注可在页面上调整；
+-- 任务分组与调用目标为部署期约定，创建后不可修改）：
+--   1. 文件回收站清理（每日 03:30）：物理删除回收站中超过 30 天的文件
+--   2. 系统日志清理（每日 04:00）：物理删除超过 180 天的登录与操作日志
+-- ----------------------------
+INSERT INTO `sys_job` (
+    `id`, `job_name`, `job_group`, `invoke_target`, `cron_expression`, `concurrent`, `status`, `builtin`, `remark`, `creator`
+)
+SELECT
+    t.id,
+    t.job_name,
+    t.job_group,
+    t.invoke_target,
+    t.cron_expression,
+    t.concurrent,
+    t.status,
+    t.builtin,
+    t.remark,
+    t.creator
+FROM (
+         VALUES
+             (1, '文件回收站清理', 'infra', 'fileRecycleCleanTask', '0 30 3 * * ?', 0, 0, 1, '清空回收站中删除超过 30 天的文件（磁盘文件与记录一并物理删除）', 1),
+             (2, '系统日志清理', 'infra', 'sysLogCleanTask', '0 0 4 * * ?', 0, 0, 1, '物理删除超过 180 天的登录与操作日志，控制库文件膨胀', 1)
+     ) AS t(id, job_name, job_group, invoke_target, cron_expression, concurrent, status, builtin, remark, creator)
+WHERE NOT EXISTS (
+    SELECT 1 FROM `sys_job` WHERE `sys_job`.`id` = t.id
+);
 
 SET REFERENTIAL_INTEGRITY TRUE;

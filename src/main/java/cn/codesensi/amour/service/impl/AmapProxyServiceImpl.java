@@ -93,7 +93,7 @@ public class AmapProxyServiceImpl implements AmapProxyService {
         body.setInfo(info);
         String json = JSONUtil.toJsonStr(body);
         String callback = extractCallback(query);
-        return buildResult(callback != null ? callback + "(" + json + ")" : json, query);
+        return buildResult(ObjUtil.isNotNull(callback) ? callback + "(" + json + ")" : json, query);
     }
 
     /**
@@ -127,7 +127,7 @@ public class AmapProxyServiceImpl implements AmapProxyService {
     private AmapProxyResultDTO buildResult(String body, String query) {
         AmapProxyResultDTO result = new AmapProxyResultDTO();
         result.setBody(body);
-        result.setJsonp(query != null && query.contains(CALLBACK_PARAM));
+        result.setJsonp(ObjUtil.isNotNull(query) && query.contains(CALLBACK_PARAM));
         return result;
     }
 

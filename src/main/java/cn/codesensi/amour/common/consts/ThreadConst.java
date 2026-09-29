@@ -19,7 +19,8 @@ public class ThreadConst {
     public static final String LOG_EXECUTOR_NAME = "logExecutor";
 
     /**
-     * 定时任务执行器名称
+     * 定时任务调度器名称（避免使用 Spring 内部约定名 taskScheduler，
+     * 防止未来引入 EnableScheduling 时发生 Bean 语义冲突）
      */
-    public static final String SCHEDULED_EXECUTOR_SERVICE = "scheduledExecutorService";
+    public static final String TASK_SCHEDULER_NAME = "JobTaskScheduler";
 }
