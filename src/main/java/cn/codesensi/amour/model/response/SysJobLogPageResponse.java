@@ -43,6 +43,11 @@ public class SysJobLogPageResponse implements Serializable {
     private String triggerType;
 
     /**
+     * 链路追踪ID（与响应头 X-Trace-Id 同源，凭此检索服务端日志）
+     */
+    private String traceId;
+
+    /**
      * 开始时间
      */
     private LocalDateTime startTime;

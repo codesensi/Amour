@@ -398,6 +398,7 @@ CREATE TABLE IF NOT EXISTS `sys_job_log` (
     `job_id`       BIGINT       NOT NULL                COMMENT '任务ID',
     `job_name`     VARCHAR(64)  NULL DEFAULT NULL       COMMENT '任务名称',
     `trigger_type` VARCHAR(32)   NOT NULL DEFAULT 'cron' COMMENT '触发方式(与 TriggerTypeEnum 对齐: cron-cron调度, manual-手动执行)',
+    `trace_id`     VARCHAR(64)   NULL DEFAULT NULL       COMMENT '链路追踪ID(手动触发沿用发起请求的 traceId, cron 触发执行时新建)',
     `start_time`   DATETIME     NULL DEFAULT NULL       COMMENT '开始时间',
     `duration`     BIGINT       NULL DEFAULT NULL       COMMENT '耗时（毫秒）',
     `status`       TINYINT(1)   NULL DEFAULT NULL       COMMENT '执行状态: 0-失败, 1-成功',
@@ -409,7 +410,8 @@ CREATE TABLE IF NOT EXISTS `sys_job_log` (
     `del_flag`        TINYINT(1)    NOT NULL DEFAULT 0      COMMENT '逻辑删除标识: 0-未删除, 1-已删除',
     PRIMARY KEY (`id`),
     INDEX `idx_jl_job_id` (`job_id` ASC),
-    INDEX `idx_jl_start_time` (`start_time` ASC)
+    INDEX `idx_jl_start_time` (`start_time` ASC),
+    INDEX `idx_jl_trace_id` (`trace_id` ASC)
     ) ENGINE = InnoDB
     CHARACTER SET = utf8mb4
     COLLATE = utf8mb4_general_ci

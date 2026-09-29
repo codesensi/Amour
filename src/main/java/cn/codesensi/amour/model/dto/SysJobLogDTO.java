@@ -39,6 +39,11 @@ public class SysJobLogDTO implements Serializable {
     private String triggerType;
 
     /**
+     * 链路追踪ID（手动触发沿用发起请求的 traceId，cron 触发执行时新建）
+     */
+    private String traceId;
+
+    /**
      * 开始时间
      */
     private LocalDateTime startTime;

@@ -1,5 +1,6 @@
 package cn.codesensi.amour.task;
 
+import cn.codesensi.amour.common.consts.AppConst;
 import cn.codesensi.amour.common.consts.ThreadConst;
 import cn.codesensi.amour.common.enums.EnableEnum;
 import cn.codesensi.amour.common.enums.PermitEnum;
@@ -12,10 +13,13 @@ import cn.codesensi.amour.model.entity.SysJob;
 import cn.codesensi.amour.model.entity.SysJobLog;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -114,7 +118,7 @@ public class SysJobScheduleHolder implements ApplicationRunner {
         Assert.notNull(job.getId(), "任务ID不能为空");
         cancel(job.getId());
         ScheduledFuture<?> future = taskScheduler.schedule(
-                () -> executeSafely(job, TriggerTypeEnum.CRON.getCode()), new CronTrigger(job.getCronExpression()));
+                () -> executeSafely(job, TriggerTypeEnum.CRON.getCode(), null), new CronTrigger(job.getCronExpression()));
         scheduledFutures.put(job.getId(), future);
         log.info("定时任务已注册：id={}，jobName={}，cron={}", job.getId(), job.getJobName(), job.getCronExpression());
     }
@@ -138,16 +142,39 @@ public class SysJobScheduleHolder implements ApplicationRunner {
      * @param job 任务实体
      */
     public void runOnce(SysJob job) {
-        taskScheduler.execute(() -> executeSafely(job, TriggerTypeEnum.MANUAL.getCode()));
+        // 手动触发:在提交线程(HTTP 请求线程)内固化本次请求的 traceId,任务执行与触发请求同链路;
+        // traceId 以参数值传入,请求线程结束与 MDC 清理均不影响任务侧使用
+        String upstreamTraceId = MDC.get(AppConst.TRACE_ID);
+        taskScheduler.execute(() -> executeSafely(job, TriggerTypeEnum.MANUAL.getCode(), upstreamTraceId));
     }
 
     /**
-     * 执行任务体并记录执行日志：解析调用目标 → 并发禁止检查 → 执行 → 结果落库。
+     * 执行任务并管理链路追踪上下文：手动触发沿用发起请求的 traceId（与操作日志、请求日志同链路），
+     * cron 触发无上游、执行时新建独立链路（与 {@code TraceIdFilter} 同源同格式）；
+     * MDC 在调度线程内显式自管，执行结束即清理，不污染池化线程。
+     *
+     * @param job             任务实体快照
+     * @param triggerType     触发方式: {@link TriggerTypeEnum#CRON} 或 {@link TriggerTypeEnum#MANUAL}
+     * @param upstreamTraceId 上游链路追踪ID（手动触发传入，cron 触发传 null）
+     */
+    private void executeSafely(SysJob job, String triggerType, String upstreamTraceId) {
+        String traceId = StrUtil.isBlank(upstreamTraceId) ? IdUtil.fastSimpleUUID() : upstreamTraceId;
+        MDC.put(AppConst.TRACE_ID, traceId);
+        try {
+            doExecute(job, triggerType);
+        } finally {
+            MDC.remove(AppConst.TRACE_ID);
+        }
+    }
+
+    /**
+     * 执行任务体并记录执行日志：解析调用目标 → 并发禁止检查 → 执行 → 结果落库；
+     * 日志输出与执行日志落库（sys_job_log.trace_id）自动携带当前链路追踪 ID。
      *
      * @param job         任务实体快照
      * @param triggerType 触发方式: {@link TriggerTypeEnum#CRON} 或 {@link TriggerTypeEnum#MANUAL}
      */
-    private void executeSafely(SysJob job, String triggerType) {
+    private void doExecute(SysJob job, String triggerType) {
         Long jobId = job.getId();
         // 并发禁止：上一次执行未结束时跳过本次触发（手动执行同样受约束）
         if (isConcurrentAllowed(job) && ObjUtil.isNotNull(runningJobs.putIfAbsent(jobId, Boolean.TRUE))) {
@@ -197,6 +224,8 @@ public class SysJobScheduleHolder implements ApplicationRunner {
         jobLog.setJobId(job.getId());
         jobLog.setJobName(job.getJobName());
         jobLog.setTriggerType(triggerType);
+        // 链路追踪ID随执行日志落库,与日志管理列表(trace_id)同源,凭此串联触发请求与服务端日志
+        jobLog.setTraceId(MDC.get(AppConst.TRACE_ID));
         jobLog.setStartTime(startTime);
         jobLog.setDuration(System.currentTimeMillis() - beginMillis);
         jobLog.setStatus(status);

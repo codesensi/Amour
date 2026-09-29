@@ -136,7 +136,11 @@ public class ThreadPoolConfig implements AsyncConfigurer {
     /**
      * 定时任务调度器 —— 承载动态注册的 cron 任务（SysJobScheduleHolder），
      * 固定大小的调度线程池（队列/核心超时等参数对调度器无意义），
-     * 停机语义与其它两池对齐：等待在途任务完成（最多 await-termination-seconds 秒）。
+     * 停机语义：立即终止（调度任务可中断且下次启动全量重注册，等待延迟触发无意义）。
+     * <p>
+     * 有意不装配 {@link ContextTaskDecorator}：cron 注册发生在管理员请求线程，
+     * 装饰器快照会把注册时的 MDC（请求 traceId）脏传播给之后所有 cron 触发；
+     * 链路追踪由 SysJobScheduleHolder.executeSafely 显式管理（手动沿用请求链路、cron 新建）。
      *
      * @return 定时任务调度器
      */

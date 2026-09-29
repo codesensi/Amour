@@ -52,6 +52,11 @@ public class SysJobLog extends BaseEntity implements Serializable {
     private String triggerType;
 
     /**
+     * 链路追踪ID（手动触发沿用发起请求的 traceId，cron 触发执行时新建，与响应头 X-Trace-Id 同源）
+     */
+    private String traceId;
+
+    /**
      * 开始时间
      */
     private LocalDateTime startTime;
